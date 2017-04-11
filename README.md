@@ -1,4 +1,4 @@
-# ProjectPorcupine [![Build Status](https://travis-ci.org/TeamPorcupine/ProjectPorcupine.svg?branch=master)](https://travis-ci.org/TeamPorcupine/ProjectPorcupine)
+# ProjectPorcupine [![Build Status](https://travis-ci.org/TeamPorcupine/ProjectPorcupine.svg?branch=master)](https://travis-ci.org/OrderOfThePorcupine/ProjectPorcupine)
 
 ### Project Porcupine: A Base-Building Game...in Space!
 
