@@ -1,0 +1,22 @@
+<% version = Time.now.strftime("%Y.%V") # (year).(week), e.g. 2017.15 %>
+{
+    "package": {
+        "name": "Prebuild-Binarys",
+        "repo": "ProjectPorcupine",
+        "subject": "kjarrigan",
+        "desc": "Weekly dev-build #<%= version %>"
+    },
+
+    "version": {
+        "name": "<%= version %>",
+        "released": <%= Time.now.strftime("%Y-%m-%d") %>,
+        "attributes": [],
+        "gpgSign": false
+    },
+
+    "files":
+        [
+        {"includePattern": "Build/(.*\\.zip)", "uploadPattern": "$1"}
+        ],
+    "publish": true
+}

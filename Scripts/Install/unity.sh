@@ -1,12 +1,38 @@
 #! /bin/sh
 
-# adapted from: https://github.com/JonathanPorta/ci-build
+# adapated from: http://blog.stablekernel.com/continuous-integration-for-unity-5-using-travisci
+BASE_URL=http://netstorage.unity3d.com/unity
+HASH=4d2f809fd6f3
+VERSION=5.5.3f1
 
-# This link should be changed if the unity version of this project is updated
-echo 'Downloading Unity-5.4.0f3: '
-curl -o Unity.pkg http://download.unity3d.com/download_unity/4d2f809fd6f3/MacEditorInstaller/Unity-5.5.3f1.pkg
+download() {
+    file=$1
+    url="$BASE_URL/$HASH/$package"
+
+    echo "Downloading from $url: "
+    curl -o `basename "$package"` "$url"
+}
+
+install() {
+    package=$1
+    download "$package"
+
+    echo "Installing "`basename "$package"`
+    sudo installer -dumplog -package `basename "$package"` -target /
+}
+
+# See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list
+# of available packages, where PLATFORM is `osx` or `win`
 
 echo 'travis_fold:start:install-unity'
 echo 'Installing Unity.pkg'
-sudo installer -dumplog -package Unity.pkg -target /
+install "MacEditorInstaller/Unity-$VERSION.pkg"
+
+# These packages are only necessary to build the binary for these platforms
+# and at the moment the build should only be done through the cronjob
+if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
+    install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
+    install "MacEditorTargetInstaller/UnitySetup-Mac-Support-for-Editor-$VERSION.pkg"
+    install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
+fi
 echo 'travis_fold:end:install-unity'

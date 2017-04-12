@@ -18,3 +18,12 @@ script:
 - ./Scripts/travis.sh
 notifications:
   email: false
+deploy:
+  provider: bintray
+  file: ./Scripts/bintray.json
+  user: Kjarrigan
+  key:
+    secure: SNg/fU847/VkYR9Ta55Vy3w9WLbGbEjhl8O1JocPeEqJ+qqw0ztzde5p+kVFN22SqMBOtLJYMtPmgpyZlWeWlKqGpflvajD1BcF7ycMp1PAAv6FvLijnzcSmQMMxhon7J7bIHc7xn9gmSRGEW+IkaL+mjmyRZTnuoMjmwlLPmQBBwZPNxa3mAHqL7jltJsZVHQ6puHoe3qo0mlZBfzCaMHpsMfHlzRDTcAxq1HCYrraIQmCdHZ0niKwGJNMVzq9wA5puVcVxh95UuPUaf6Jbs3u8sGLIrGJdnfKn1mo3E/FP5ZLtDAB7gIqW1j3vXDYYFWKezyi5UT8ZW7htJnOVg3uKB/Y8zhFieQXTZs42jnw1v6pi40qtg9+E2c2UAVyaEubmtXbEcC6ZbNrnwo+YlvZ1XjbMlNV37dUmWvCj6RXy4Kge38v34Qly2G9TqPuVox5FfZ19XeN3JmkNtqhARa8THRrwwYJ5nc6qRZ2AikdmaO07wPUJgvSmC01p6hLeZxh8RsOyNcZ5Hvh+eSpyoQWv44ce6SfNdhPYdsc8Bal0dYhmyCmZKhW2X3ONk1q6EH/iDfedAvWASCTa1/uL4izLS/eB0WZj9x0GJRARVtU5bLTgCVu3+EOIeiMHshS+pF29Hgy03MvKCSFEt7+lQbvL54vxtRXzPkEHvE8Cgz0=
+  on:
+    condition: $TRAVIS_EVENT_TYPE = cron
+    all_branches: true
