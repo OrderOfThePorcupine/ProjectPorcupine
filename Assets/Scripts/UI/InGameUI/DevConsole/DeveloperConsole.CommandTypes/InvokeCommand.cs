@@ -9,11 +9,9 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-
-using DeveloperConsole.Interfaces;
 using MoonSharp.Interpreter;
 
-namespace DeveloperConsole.CommandTypes
+namespace DeveloperConsole.Core.CommandTypes
 {
     /// <summary>
     /// Invoke some code from either C# Function Manager or LUA Function Manager.
@@ -99,7 +97,7 @@ namespace DeveloperConsole.CommandTypes
                         // We just split, since its a decently appropriate solution.
                         string[] parameterSections = parameterTypes[i].Split(';');
 
-                        types[i] = GetType(parameterSections[1], parameterSections[0]);
+                        types[i] = Type.GetType((parameterSections[1].Contains('.') ? parameterSections[1] : "System." + parameterSections[1]) + parameterSections[0], true, true);
                     }
                     catch (Exception e)
                     {
@@ -113,12 +111,7 @@ namespace DeveloperConsole.CommandTypes
             }
 
             // Assign array
-            Types = types;
-        }
-
-        public Type[] Types
-        {
-            get; private set;
+            this.TypeInfo = types;
         }
 
         public string FunctionName
@@ -131,16 +124,6 @@ namespace DeveloperConsole.CommandTypes
             get; protected set;
         }
 
-        /// <summary>
-        /// Just does the Type.GetType(TypeName, AssemblyName) to get the types from a wider range.
-        /// </summary>
-        public Type GetType(string typeName, string namespaceName)
-        {
-            Type tryType = Type.GetType((typeName.Contains('.') ? typeName : "System." + typeName) + namespaceName, true, true);
-
-            return tryType;
-        }
-
         public override void ExecuteCommand(string arguments)
         {
             try
@@ -151,47 +134,6 @@ namespace DeveloperConsole.CommandTypes
             {
                 DevConsole.LogError(e.Message);
             }
-        }
-
-        protected override object[] ParseArguments(string arguments)
-        {
-            try
-            {
-                string[] args = RegexToStandardPattern(arguments);
-                object[] convertedArgs = new object[args.Length];
-
-                if (Types.Length == 0)
-                {
-                    return args;
-                }
-                else
-                {
-                    for (int i = 0; i < Types.Length; i++)
-                    {
-                        // Guard to make sure we don't actually go overboard
-                        if (args.Length > i)
-                        {
-                            // This just wraps then unwraps, works quite fast actually, since its a easy wrap/unwrap.
-                            convertedArgs[i] = GetValueType<object>(args[i], Types[i]);
-                        }
-                        else
-                        {
-                            // No point running through the rest, 
-                            // this means 'technically' you could have 100 parameters at the end (not tested)
-                            // However, that may break for other reasons
-                            break;
-                        }
-                    }
-
-                    return convertedArgs;
-                }
-            }
-            catch (Exception e)
-            {
-                UnityDebugger.Debugger.LogError("DevConsole", e.ToString());
-            }
-
-            return new object[] { };
         }
     }
 }

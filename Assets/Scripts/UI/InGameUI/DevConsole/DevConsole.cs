@@ -9,15 +9,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DeveloperConsole.CommandTypes;
-using DeveloperConsole.Interfaces;
 using MoonSharp.Interpreter;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Reflection;
+using DeveloperConsole.Core.CommandTypes;
 
 namespace DeveloperConsole
 {
+    /// <summary>
+    /// A delegate for the parse operation.
+    /// If object is null it failed.
+    /// </summary>
+    /// <param name="args"> Arguments passed in. </param>
+    /// <returns> The parsed value of the arguments.  Null if arguments are wrong. </returns>
+    public delegate object ParseDelegate(string args);
+
     [MoonSharpUserData]
     public class DevConsole : MonoBehaviour
     {
@@ -40,6 +47,11 @@ namespace DeveloperConsole
         /// Whole list of commands available.
         /// </summary>
         private List<CommandBase> consoleCommands = new List<CommandBase>();
+
+        /// <summary>
+        /// All the parsers available.
+        /// </summary>
+        public static Dictionary<Type, ParseDelegate> Parsers { get; private set; }
 
         /// <summary>
         /// History of commands.
@@ -305,9 +317,7 @@ namespace DeveloperConsole
             {
                 foreach (CommandBase commandToCall in commandsToCall)
                 {
-                    ICommandRunnable runnable = (ICommandRunnable)commandToCall;
-
-                    if (runnable != null)
+                    if (commandToCall != null)
                     {
                         if (commandToCall.Parameters == null || commandToCall.Parameters == string.Empty)
                         {
@@ -322,13 +332,13 @@ namespace DeveloperConsole
 
                             // They really need a better literal system...
                             // This is the closet we can get basically
-                            if (args == string.Empty || args == '"'.ToString())
+                            if (string.IsNullOrEmpty(args) || args == '"'.ToString())
                             {
                                 args = @"""";
                             }
                         }
 
-                        runnable.ExecuteCommand(args);
+                        commandToCall.ExecuteCommand(args);
                     }
                 }
             }
@@ -348,7 +358,6 @@ namespace DeveloperConsole
 
                 foreach (CommandBase commandToShow in commandsToShow)
                 {
-                    // Yah its close enough either 2/3rds similar or 1/3rd if no matches found
                     Log(commandToShow.Title, "green");
                 }
             }
@@ -565,6 +574,8 @@ namespace DeveloperConsole
             instance.scrollRect.scrollSensitivity = SettingsKeyHolder.ScrollSensitivity;
         }
 
+        #region AttributeImplementations
+
         /// <summary>
         /// Logs all the tags in a nice format.
         /// </summary>
@@ -616,9 +627,192 @@ namespace DeveloperConsole
 
             if (textObj != null)
             {
-                TextObject().text = "\n<color=green>Clear Successful :D</color>\n";
+                TextObject().text = "\n<color=#7CFC00>Clear Successful :D</color>\n";
             }
         }
+
+        /// <summary>
+        /// Parse an integer 16 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(short))]
+        public static object HandleInt16(string args)
+        {
+            short outValue;
+            return short.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an integer 32 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(int))]
+        public static object HandleInt32(string args)
+        {
+            int outValue;
+            return int.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an integer 64 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(long))]
+        public static object HandleInt64(string args)
+        {
+            long outValue;
+            return long.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an unsigned integer 16 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(ushort))]
+        public static object HandleUInt16(string args)
+        {
+            ushort outValue;
+            return ushort.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an unsigned integer 32 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(uint))]
+        public static object HandleUInt32(string args)
+        {
+            uint outValue;
+            return uint.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an unsigned integer 64 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(ulong))]
+        public static object HandleUInt64(string args)
+        {
+            ulong outValue;
+            return ulong.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a float from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(float))]
+        public static object HandleFloat(string args)
+        {
+            float outValue;
+            return float.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a double from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(double))]
+        public static object HandleDouble(string args)
+        {
+            double outValue;
+            return double.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a decimal from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(decimal))]
+        public static object HandleDecimal(string args)
+        {
+            decimal outValue;
+            return decimal.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a boolean from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(bool))]
+        public static object HandleBoolean(string args)
+        {
+            bool outValue;
+            return bool.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a string from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(string))]
+        public static object HandleString(string args)
+        {
+            return args;
+        }
+
+        /// <summary>
+        /// Parse an float from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(char))]
+        public static object HandleChar(string args)
+        {
+            return args.Length >= 1 ? (object)args.ToCharArray()[0] : null;
+        }
+
+        /// <summary>
+        /// Parse a vector2 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(Vector2))]
+        public static object HandleVector2(string args)
+        {
+            string[] coordinates = args.Split(',');
+            float x, y;
+            return coordinates.Length >= 2 && float.TryParse(coordinates[0], out x) && float.TryParse(coordinates[1], out y) ? (object)new Vector2(x, y) : null;
+        }
+
+        /// <summary>
+        /// Parse a vector3 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(Vector3))]
+        public static object HandleVector3(string args)
+        {
+            string[] coordinates = args.Split(',');
+            float x, y, z;
+            return coordinates.Length >= 3 && float.TryParse(coordinates[0], out x) && float.TryParse(coordinates[1], out y) && float.TryParse(coordinates[2], out z) ? (object)new Vector3(x, y, z) : null;
+        }
+
+        /// <summary>
+        /// Parse a vector4 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(Vector4))]
+        public static object HandleVector4(string args)
+        {
+            string[] coordinates = args.Split(',');
+            float x, y, z, w;
+            return coordinates.Length >= 4 && float.TryParse(coordinates[0], out x) && float.TryParse(coordinates[1], out y) && float.TryParse(coordinates[2], out z) && float.TryParse(coordinates[3], out w) ? (object)new Vector4(x, y, z, w) : null;
+        }
+
+        #endregion
 
         /// <summary>
         /// Button delegate action to handle command.
@@ -733,6 +927,11 @@ namespace DeveloperConsole
         /// </summary>
         private void Start()
         {
+            if (Parsers == null)
+            {
+                Parsers = new Dictionary<Type, ParseDelegate>();
+            }
+
             transform.SetAsLastSibling();
 
             // Guard
@@ -744,6 +943,8 @@ namespace DeveloperConsole
 
             textArea.fontSize = SettingsKeyHolder.FontSize;
             textArea.text = "\n";
+
+            AddParsersByReflection();
 
             // Load all the commands
             LoadCommands();
@@ -909,19 +1110,61 @@ namespace DeveloperConsole
             }
         }
 
-        private List<CommandBase> GetCommandsByReflection()
+        /// <summary>
+        /// Add a parser through reflection of method info.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="methodInfo"> The reflected method that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, MethodInfo methodInfo)
         {
-            List<CommandBase> dynamicList = new List<CommandBase>();
+            Parsers.Add(target, (ParseDelegate)Delegate.CreateDelegate(typeof(ParseDelegate), methodInfo));
+        }
 
+        /// <summary>
+        /// Add a parser through a parse delegate.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, ParseDelegate method)
+        {
+            Parsers.Add(target, method);
+        }
+
+        /// <summary>
+        /// Add a parser through a function.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, Func<string, object> method)
+        {
+            Parsers.Add(target, new ParseDelegate(method));
+        }
+
+        /// <summary>
+        /// Adds all parsers that implement <see cref="ParserAttribute"/>.
+        /// </summary>
+        private void AddParsersByReflection()
+        {
+            // Find each method with the command attribute then add it to the console commands
+            foreach (MethodInfo method in Assembly.GetCallingAssembly().GetTypes().SelectMany(x => x.GetMethods().Where(y => y.GetCustomAttributes(typeof(ParserAttribute), false).Count() > 0)))
+            {
+                ParserAttribute attribute = (ParserAttribute)method.GetCustomAttributes(typeof(ParserAttribute), false).First();
+                AddParser(attribute.target, method);
+            }
+        }
+
+        /// <summary>
+        /// Adds all commands that implement <see cref="CommandAttribute"/>.
+        /// </summary>
+        private void AddCommandsByReflection()
+        {
             // Find each method with the command attribute then add it to the console commands
             foreach (MethodInfo method in Assembly.GetCallingAssembly().GetTypes().SelectMany(x => x.GetMethods().Where(y => y.GetCustomAttributes(typeof(CommandAttribute), false).Count() > 0)))
             {
                 CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false).First();
                 string parameters = string.Join(",", method.GetParameters().Select(x => x.ParameterType.Name + " " + x.Name).ToArray());
-                dynamicList.Add(new InternalCommand(attribute.title, method, attribute.description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.detailedDescription, attribute.tags));
+                consoleCommands.Add(new InternalCommand(attribute.title, method, attribute.description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.detailedDescription, attribute.tags));
             }
-
-            return dynamicList;
         }
 
         /// <summary>
@@ -931,7 +1174,7 @@ namespace DeveloperConsole
         {
             consoleCommands.Clear();
 
-            consoleCommands.AddRange(GetCommandsByReflection());
+            AddCommandsByReflection();
 
             // Load Commands from XML (will be changed to JSON AFTER the current upgrade)
             // Covers both CSharp and LUA

@@ -6,10 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using DeveloperConsole.CommandTypes;
-using DeveloperConsole.Interfaces;
+using DeveloperConsole.Core.CommandTypes;
 
-namespace DeveloperConsole
+namespace DeveloperConsole.Core
 {
     public static class Errors
     {

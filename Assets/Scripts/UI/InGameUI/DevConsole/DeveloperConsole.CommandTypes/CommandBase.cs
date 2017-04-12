@@ -6,7 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +13,14 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using MoonSharp.Interpreter;
 using UnityEngine;
-using DeveloperConsole.Interfaces;
 
-namespace DeveloperConsole.CommandTypes
+namespace DeveloperConsole.Core.CommandTypes
 {
     /// <summary>
     /// A command base that all commands derive from.
     /// </summary> 
     [MoonSharpUserData]
-    public abstract class CommandBase : ICommandRunnable
+    public abstract class CommandBase
     {
         /// <summary>
         /// Text describing the command.
@@ -56,15 +54,36 @@ namespace DeveloperConsole.CommandTypes
             get; protected set;
         }
 
+        /// <summary>
+        /// The tags associated with this command.
+        /// </summary>
         public string[] Tags
         {
             get; protected set;
         }
 
+        /// <summary>
+        /// All types associated with this command.
+        /// </summary>
+        public Type[] TypeInfo
+        {
+            get; protected set;
+        }
+
+        /// <summary>
+        /// The default value of this command.
+        /// Implemented only for LUA.
+        /// </summary>
         public string DefaultValue
         {
             get; protected set;
         }
+
+        /// <summary>
+        /// Execute this command.
+        /// </summary>
+        /// <param name="arguments"></param>
+        public abstract void ExecuteCommand(string arguments);
 
         /// <summary>
         /// Regexs the character set properly, should always be called instead of you trying to do it yourself.
@@ -91,10 +110,11 @@ namespace DeveloperConsole.CommandTypes
                 [...] | NOT',' then check for (,[...]|NOT',')*
             */
 
-            string mutableArgs = arguments;
+            string mutableArgs = arguments == null ? string.Empty : arguments;
             string constantsPattern = @"(?:\'(.*?)\')";
 
-            mutableArgs = Regex.Replace(arguments, constantsPattern, MatchEval, RegexOptions.IgnoreCase);
+            // Replace 'x' with constant y where x represents the constant name and y the constant value
+            mutableArgs = Regex.Replace(arguments, constantsPattern, GetConstantForMatch, RegexOptions.IgnoreCase);
 
             string pattern = @"\s*((?:\[.*?\])|(?:[^,]*))\s*";
 
@@ -102,12 +122,17 @@ namespace DeveloperConsole.CommandTypes
 
             return result
                 .Cast<Match>()
-                .Select(m => m.Value.Trim())
+                .Select(m => m.Value.Trim('[', ']', ' '))
                 .Where(m => m != string.Empty)
                 .ToArray();
         }
 
-        protected string MatchEval(Match match)
+        /// <summary>
+        /// Finds any constant matches in the match.
+        /// </summary>
+        /// <param name="match"> A match from a regex expression. </param>
+        /// <returns> The constant value if one exists in the match. </returns>
+        protected string GetConstantForMatch(Match match)
         {
             if (match.Groups.Count < 2)
             {
@@ -117,6 +142,7 @@ namespace DeveloperConsole.CommandTypes
             World world;
             bool worldSuccess = ModUtils.GetCurrentWorld(out world);
 
+            // 0 is the full text 1 is the match text.
             switch (match.Groups[1].Value.ToLower())
             {
                 case "center":
@@ -126,7 +152,6 @@ namespace DeveloperConsole.CommandTypes
                         Tile t = world.GetCenterTile();
                         return "[" + t.X + ", " + t.Y + ", " + t.Z + "]";
                     }
-
                     break;
                 case "mousePos":
                     Vector3 mousePos = Input.mousePosition;
@@ -134,7 +159,9 @@ namespace DeveloperConsole.CommandTypes
                 case "timeScale":
                     return (TimeManager.Instance != null) ? TimeManager.Instance.TimeScale.ToString() : string.Empty;
                 case "pi":
-                    return Mathf.PI.ToString();
+                    return Math.PI.ToString();
+                case "e":
+                    return Math.E.ToString();
                 default:
                     DevConsole.LogWarning("You entered an constant identifier that doesn't exist?  Check spelling.");
                     break;
@@ -148,173 +175,48 @@ namespace DeveloperConsole.CommandTypes
         /// </summary>
         /// <param name="arguments"> Arguments to parse.</param>
         /// <returns> The parsed arguments.</returns>
-        protected virtual object[] ParseArguments(string arguments)
+        protected virtual object[] ParseArguments(string args)
         {
-            return RegexToStandardPattern(arguments);
-        }
-
-        /// <summary>
-        /// Get the value type of the argument.
-        /// </summary>
-        /// <typeparam name="T"> The type of the argument. </typeparam>
-        /// <param name="arg"> The argument to find the value type. </param>
-        /// <returns> The type of the argument given. </returns>
-        /// <exception cref="Exception"> Throws exception if arg is not type T, SHOULD BE CAUGHT by command. </exception>
-        protected T GetValueType<T>(string arg, Type typeVariable = null)
-        {
-            Type typeOfT;
-
-            if (typeVariable != null)
-            {
-                typeOfT = typeVariable;
-            }
-            else
-            {
-                typeOfT = typeof(T);
-            }
+            object[] convertedArgs = new object[] { };
 
             try
             {
-                T returnValue;
-                if (typeof(bool) == typeOfT)
+                string[] arguments = RegexToStandardPattern(args);
+                convertedArgs = new object[arguments.Length];
+
+                // If TypeInfo null then no new parameters to pass (we'll we will pass an array of strings, which could be empty)
+                if (TypeInfo == null || TypeInfo.Length == 0)
                 {
-                    // I'm wanting a boolean
-                    bool result;
-                    if (ValueToBool(arg, out result))
+                    return arguments;
+                }
+
+                for (int i = 0; i < TypeInfo.Length; i++)
+                {
+                    // Guard to make sure we don't actually go overflow.
+                    if (arguments.Length > i)
                     {
-                        returnValue = (T)(object)result;
+                        convertedArgs[i] = DevConsole.Parsers[TypeInfo[i]](arguments[i]);
+                        if (convertedArgs[i] == null)
+                        {
+                            DevConsole.LogError(Errors.ParametersNotInFormat(this));
+                            throw new Exception(Errors.ParametersNotInFormat(this));
+                        }
                     }
                     else
                     {
-                        throw new Exception("The entered value is not a valid " + typeOfT + " value");
+                        // No point running through the rest, 
+                        // this means 'technically' you could have 100 unused parameters at the end (not tested)
+                        // However, that may break for other reasons
+                        break;
                     }
                 }
-                else if (typeOfT == typeof(string))
-                {
-                    return (T)(object)arg.Trim('"');
-                }
-                else if (arg.Contains('['))
-                {
-                    arg = arg.Trim().Trim('[', ']');
-
-                    string pattern = @"\,?((?:\"".*?\"")|(?:[^\,]*))\,?";
-
-                    string[] args = Regex.Matches(arg, pattern)
-                        .Cast<Match>()
-                        .Where(m => m.Groups.Count >= 2 && m.Groups[1].Value != string.Empty)
-                        .Select(m => m.Groups[1].Value.Trim().Trim('"'))
-                        .ToArray();
-
-                    // This is a list because then we can go parameters.Count to get the current 'non nil' parameters
-                    List<object> parameters = new List<object>();
-
-                    ConstructorInfo[] possibleConstructors = typeOfT.GetConstructors().Where(x => x.GetParameters().Length == args.Length).ToArray();
-                    ConstructorInfo chosenConstructor = null;
-
-                    for (int i = 0; i < possibleConstructors.Length; i++)
-                    {
-                        parameters = new List<object>();
-                        ParameterInfo[] possibleParameters = possibleConstructors[i].GetParameters();
-
-                        for (int j = 0; j < possibleParameters.Length; j++)
-                        {
-                            try
-                            {
-                                if (possibleParameters[j].ParameterType == typeof(string))
-                                {
-                                    parameters.Add(args[j]);
-                                }
-                                else
-                                {
-                                    parameters.Add(Convert.ChangeType(args[j], possibleParameters[j].ParameterType));
-                                }
-                            }
-                            catch
-                            {
-                                break;
-                            }
-                        }
-
-                        if (parameters.Count == possibleParameters.Length)
-                        {
-                            // We have all our parameters
-                            chosenConstructor = possibleConstructors[i];
-                            break;
-                        }
-                    }
-
-                    if (chosenConstructor == null)
-                    {
-                        throw new Exception("The entered value is not a valid " + typeOfT + " value");
-                    }
-                    else
-                    {
-                        returnValue = (T)chosenConstructor.Invoke(parameters.ToArray());
-                    }
-                }
-                else
-                {
-                    returnValue = (T)Convert.ChangeType(arg, typeOfT);
-                }
-
-                return returnValue;
             }
             catch (Exception e)
             {
-                DevConsole.LogError(Errors.ParametersNotInFormat(this));
-                throw e;
+                UnityDebugger.Debugger.LogError("DevConsole", e.ToString());
             }
+
+            return convertedArgs;
         }
-
-        /// <summary>
-        /// Converts the value to a boolean via Int, Bool, and String Parsers.
-        /// </summary>
-        /// <param name="value"> The value to convert.</param>
-        /// <param name="result"> The resulting boolean.</param>
-        /// <returns> True if the conversion was successful.</returns>
-        protected bool ValueToBool(string value, out bool result)
-        {
-            bool boolResult = result = false;
-            int intResult = 0;
-
-            if (bool.TryParse(value, out boolResult))
-            {
-                // Try Bool Parser
-                result = boolResult;
-            }
-            else if (int.TryParse(value, out intResult))
-            {
-                // Try Int Parser
-                if (intResult == 1 || intResult == 0)
-                {
-                    result = (intResult == 1) ? true : false;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                // Try String Parser
-                string stringResult = value.ToLower().Trim();
-                if (stringResult.Equals("yes") || stringResult.Equals("y"))
-                {
-                    result = true;
-                }
-                else if (stringResult.Equals("no") || stringResult.Equals("n"))
-                {
-                    result = false;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public abstract void ExecuteCommand(string arguments);
     }
 }

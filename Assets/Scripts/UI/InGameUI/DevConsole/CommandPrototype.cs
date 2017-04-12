@@ -8,8 +8,8 @@
 #endregion
 
 using System.Xml;
-using DeveloperConsole.CommandTypes;
 using MoonSharp.Interpreter;
+using DeveloperConsole.Core.CommandTypes;
 
 namespace DeveloperConsole
 {
@@ -81,7 +81,7 @@ namespace DeveloperConsole
             string title = reader.GetAttribute("Title");
             string functionName = reader.GetAttribute("FunctionName");
             string description = reader.GetAttribute("Description");
-            string helpFunctionName = reader.GetAttribute("HelpFunctionName");
+            string detailedDescription = reader.GetAttribute("DetailedDescription");
             string parameters = reader.GetAttribute("Parameters");
             string tags = reader.GetAttribute("Tags");
 
@@ -98,7 +98,7 @@ namespace DeveloperConsole
                 defaultValue = string.Empty;
             }
 
-            ConsoleCommand = new InvokeCommand(title, functionName, description, helpFunctionName, parameters, tags.Split(','), defaultValue);
+            ConsoleCommand = new InvokeCommand(title, functionName, description, detailedDescription, parameters, tags.Split(','), defaultValue);
         }
     }
 }
