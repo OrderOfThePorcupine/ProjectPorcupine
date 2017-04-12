@@ -85,6 +85,9 @@ All pull requests must build in 5.4.2 to be a valid patch.  Though you can use `
 * [Quill18's Channel](https://www.youtube.com/channel/UCPXOQq7PWh5OdCwEO60Y8jQ)
 * [Project Porcupine Playlist](https://www.youtube.com/playlist?list=PLbghT7MmckI4_VM5q3va043FgAwRim6yX)
 
+## Kaplan Board?  (Projects)
+Due to weird restrictions that github puts on projects only gate keepers can update them (personally I'm all for a system that is request based so we just have to approve changes but doubt github would ever implement that).  Regardless me and Koosemose will update it (along with any other gatekeepers) as time goes on, whenever you open a PR I will move the note into the `In Progress` column, you can also @ping me on either the PR or on Discord, I'm somewhat regular in checking emails and github, and try to give me/koosemose atleast 12 hrs cause of sleep and other commitments before pinging us to death :P.
+
 ## Style Guidelines
 
 We have standardized on Microsoft's [C# Coding Conventions](https://msdn.microsoft.com/en-us/library/ff926074.aspx) and [General Naming Conventions](https://msdn.microsoft.com/en-us/library/ms229045(v=vs.110).aspx), with the following exception:
