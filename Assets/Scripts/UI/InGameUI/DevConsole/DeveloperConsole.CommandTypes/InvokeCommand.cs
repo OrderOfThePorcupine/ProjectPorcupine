@@ -19,7 +19,7 @@ namespace DeveloperConsole.CommandTypes
     /// Invoke some code from either C# Function Manager or LUA Function Manager.
     /// </summary>
     [MoonSharpUserData]
-    public sealed class InvokeCommand : CommandBase, ICommandInvoke
+    public sealed class InvokeCommand : CommandBase
     {
         /// <summary>
         /// Standard constructor.
@@ -29,33 +29,14 @@ namespace DeveloperConsole.CommandTypes
         /// <param name="descriptiveText"> The text that describes this command. </param>
         /// <param name="helpFunctionName"> The help function name of the command (can be C# or LUA). </param>
         /// <param name="parameters"> The parameters ( should be invokeable format of (using [any character];)? type variableName, ... ). </param>
-        public InvokeCommand(string title, string functionName, string descriptiveText, string helpFunctionName, string parameters, string[] tags, string defaultValue)
+        public InvokeCommand(string title, string functionName, string descriptiveText, string detailedDescriptiveText, string parameters, string[] tags, string defaultValue)
         {
             Title = title;
             FunctionName = functionName;
             DescriptiveText = descriptiveText;
-            HelpFunctionName = helpFunctionName;
+            DetailedDescriptiveText = detailedDescriptiveText;
             Tags = tags;
             DefaultValue = defaultValue;
-
-            HelpMethod = delegate
-            {
-                if (HelpFunctionName == string.Empty)
-                {
-                    DevConsole.Log("<color=yellow>Command Info:</color> " + ((DescriptiveText == string.Empty) ? " < color=red>There's no help for this command</color>" : DescriptiveText));
-                    return;
-                }
-
-                try
-                {
-                    FunctionsManager.DevConsole.CallWithError(HelpFunctionName);
-                }
-                catch (Exception e)
-                {
-                    DevConsole.LogError(Errors.UnknownError(this));
-                    DevConsole.LogError("This error message may be able to help: " + e.Message);
-                }
-            };
 
             // If the parameters contains a ';' then it'll exclude the 'using' statement.
             // Just makes the declaration help look nicer.
@@ -145,11 +126,6 @@ namespace DeveloperConsole.CommandTypes
             get; private set;
         }
 
-        public string HelpFunctionName
-        {
-            get; private set;
-        }
-
         public override string Parameters
         {
             get; protected set;
@@ -165,7 +141,7 @@ namespace DeveloperConsole.CommandTypes
             return tryType;
         }
 
-        public void ExecuteCommand(string arguments)
+        public override void ExecuteCommand(string arguments)
         {
             try
             {

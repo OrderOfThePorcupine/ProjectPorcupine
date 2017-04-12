@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using DeveloperConsole.Interfaces;
 using MoonSharp.Interpreter;
+using System.Reflection;
 
 namespace DeveloperConsole.CommandTypes
 {
@@ -18,7 +19,7 @@ namespace DeveloperConsole.CommandTypes
     /// A core class for Internal Commands.
     /// </summary>
     [MoonSharpUserData]
-    public class InternalCommand : CommandBase, ICommandInternal
+    public class InternalCommand : CommandBase
     {
         /// <summary>
         /// Standard with title, method, and help text.
@@ -26,119 +27,36 @@ namespace DeveloperConsole.CommandTypes
         /// <param name="title"> The title for the command.</param>
         /// <param name="method"> The command to execute.</param>
         /// <param name="helpText"> The help text to display.</param>
-        public InternalCommand(string title, Method method, string descriptiveText, Type[] typeInfo = null, string[] parameterNames = null, string defaultValue = "")
+        public InternalCommand(string title, MethodInfo method, string descriptiveText, Type[] typeInfo, string parameters, string detailedDescriptiveText = "", string[] tags = null)
         {
             this.Title = title;
             this.Method = method;
             this.DescriptiveText = descriptiveText;
-            this.DefaultValue = defaultValue;
+            this.Parameters = parameters;
+            this.DetailedDescriptiveText = string.IsNullOrEmpty(detailedDescriptiveText) ? descriptiveText : detailedDescriptiveText;
+            this.Tags = tags == null ? new string[0] : tags;
             this.TypeInfo = typeInfo;
-            this.ParameterNames = parameterNames;
-        }
-
-        /// <summary>
-        /// Standard but uses a delegate method for help text.
-        /// </summary>
-        /// <param name="title"> The title for the command.</param>
-        /// <param name="method"> The command to execute.</param>
-        /// <param name="helpMethod"> The help method to execute.</param>
-        public InternalCommand(string title, Method method, HelpMethod helpMethod, Type[] typeInfo = null, string[] parameterNames = null, string defaultValue = "") : this(title, method, defaultValue)
-        {
-            this.HelpMethod = helpMethod;
-        }
-
-        /// <summary>
-        /// Standard with title, method, and help text.
-        /// </summary>
-        /// <param name="title"> The title for the command.</param>
-        /// <param name="method"> The command to execute.</param>
-        /// <param name="helpText"> The help text to display.</param>
-        /// <param name="tags"> Just tags for help function. </param>
-        public InternalCommand(string title, Method method, string descriptiveText, string[] tags, Type[] typeInfo = null, string[] parameterNames = null, string defaultValue = "") : this(title, method, descriptiveText, typeInfo, parameterNames, defaultValue)
-        {
-            this.Tags = tags;
-        }
-
-        /// <summary>
-        /// Standard but uses a delegate method for help text.
-        /// </summary>
-        /// <param name="title"> The title for the command. </param>
-        /// <param name="method"> The command to execute. </param>
-        /// <param name="helpMethod"> The help method to execute. </param>
-        /// <param name="tags"> Just tags for help function. </param>
-        public InternalCommand(string title, Method method, HelpMethod helpMethod, string[] tags, Type[] typeInfo = null, string[] parameterNames = null, string defaultValue = "") : this(title, method, helpMethod, typeInfo, parameterNames, defaultValue)
-        {
-            this.Tags = tags;
         }
 
         /// <summary>
         /// Get all the parameters for this function.
+        /// A string of all the parameters with a comma between them.
         /// </summary>
-        /// <returns> a string of all the parameters with a comma between them.</returns>
-        public override string Parameters
-        {
-            get
-            {
-                string list = string.Empty;
+        public override string Parameters { get; protected set; }
 
-                if (TypeInfo == null && ParameterNames != null)
-                {
-                    list = string.Join(", ", ParameterNames);
-                }
-                else if (TypeInfo != null && ParameterNames == null)
-                {
-                    list = string.Join(", ", TypeInfo.Select(x => x.Name).ToArray());
-                }
-                else if (TypeInfo == null && ParameterNames == null)
-                {
-                    return list;
-                }
-                else
-                {
-                    for (int i = 0; i < Math.Max(TypeInfo.Length, ParameterNames.Length); i++)
-                    {
-                        if (TypeInfo.Length >= i)
-                        {
-                            list += " " + TypeInfo[i].Name;
-                        }
-
-                        if (ParameterNames.Length >= i)
-                        {
-                            list += " " + ParameterNames[i];
-                        }
-
-                        if (i + 1 < Math.Max(TypeInfo.Length, ParameterNames.Length))
-                        {
-                            list += ",";
-                        }
-                    }
-                }
-
-                // Trim that first space
-                return list.TrimStart();
-            }
-
-            protected set
-            {
-                return;
-            }
-        }
-
-        public Method Method { get; protected set; }
+        public MethodInfo Method { get; protected set; }
 
         public Type[] TypeInfo { get; protected set; }
-
-        public string[] ParameterNames { get; protected set; }
 
         /// <summary>
         /// Executes the command.
         /// </summary>
         /// <param name="arguments"> Passes the arguments.</param>
-        public void ExecuteCommand(string arguments)
+        public override void ExecuteCommand(string arguments)
         {
             try
             {
-                Method(ParseArguments(arguments));
+                Method.Invoke(null, ParseArguments(arguments));
             }
             catch (Exception e)
             {

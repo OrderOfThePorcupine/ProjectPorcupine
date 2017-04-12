@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using MoonSharp.Interpreter;
 using UnityEngine;
+using DeveloperConsole.Interfaces;
 
 namespace DeveloperConsole.CommandTypes
 {
@@ -21,7 +22,7 @@ namespace DeveloperConsole.CommandTypes
     /// A command base that all commands derive from.
     /// </summary> 
     [MoonSharpUserData]
-    public abstract class CommandBase
+    public abstract class CommandBase : ICommandRunnable
     {
         /// <summary>
         /// Text describing the command.
@@ -48,9 +49,9 @@ namespace DeveloperConsole.CommandTypes
         }
 
         /// <summary>
-        /// The help method to call.
+        /// The detailed help description.
         /// </summary>
-        public HelpMethod HelpMethod
+        public string DetailedDescriptiveText
         {
             get; protected set;
         }
@@ -313,5 +314,7 @@ namespace DeveloperConsole.CommandTypes
 
             return true;
         }
+
+        public abstract void ExecuteCommand(string arguments);
     }
 }
