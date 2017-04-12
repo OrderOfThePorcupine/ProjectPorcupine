@@ -105,11 +105,6 @@ public static class SettingsMenuFunctions
         return new FullScreenToggle();
     }
 
-    public static DeveloperModeToggle GetDeveloperModeToggle()
-    {
-        return new DeveloperModeToggle();
-    }
-
     public static SoftParticlesToggle GetSoftParticlesToggle()
     {
         return new SoftParticlesToggle();
