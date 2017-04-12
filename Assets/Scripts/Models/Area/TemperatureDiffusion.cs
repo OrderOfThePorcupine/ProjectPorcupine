@@ -6,11 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using MoonSharp.Interpreter;
 using ProjectPorcupine.Rooms;
 using UnityEngine;
@@ -169,13 +165,14 @@ public class TemperatureDiffusion
             }
         }
 
+        /*
         foreach (var r1 in diffusion.Keys)
         {
             foreach (var r2 in diffusion[r1].Keys)
             {
                 ////Debug.Log(r1.ID + " -> " + r2.ID + " = " + diffusion[r1][r2]);
             }
-        }
+        }*/
     }
 
     private void InitDiffusionMap()

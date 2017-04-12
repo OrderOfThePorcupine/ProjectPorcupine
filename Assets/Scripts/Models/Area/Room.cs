@@ -17,7 +17,7 @@ namespace ProjectPorcupine.Rooms
     [MoonSharpUserData]
     public class Room
     {
-        private Dictionary<string, string> deltaGas;
+        // private Dictionary<string, string> deltaGas;
 
         private List<Tile> tiles;
 
@@ -25,7 +25,8 @@ namespace ProjectPorcupine.Rooms
         {
             tiles = new List<Tile>();
             Atmosphere = new AtmosphereComponent();
-            deltaGas = new Dictionary<string, string>();
+
+            // deltaGas = new Dictionary<string, string>();
             RoomBehaviors = new Dictionary<string, RoomBehavior>();
         }
 

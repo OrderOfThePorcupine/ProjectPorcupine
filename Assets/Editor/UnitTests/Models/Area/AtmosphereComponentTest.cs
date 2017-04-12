@@ -12,13 +12,12 @@ using NUnit.Framework;
 
 public class AtmosphereComponentTest
 {
-    private AtmosphereComponent empty1, empty2, notEmpty1, notEmpty2;
+    private AtmosphereComponent empty1, notEmpty1, notEmpty2;
 
     [SetUp]
     public void Setup()
     {
         empty1 = new AtmosphereComponent();
-        empty2 = new AtmosphereComponent();
 
         notEmpty1 = new AtmosphereComponent();
         notEmpty2 = new AtmosphereComponent();
