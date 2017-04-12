@@ -18,7 +18,6 @@ namespace ProjectPorcupine.Rooms
     public class Room
     {
         // private Dictionary<string, string> deltaGas;
-
         private List<Tile> tiles;
 
         public Room()
@@ -53,7 +52,7 @@ namespace ProjectPorcupine.Rooms
 
         public float GetGasPressure()
         {
-            return IsOutsideRoom() ? 0.0f : Atmosphere.GetGasAmount() / TileCount;
+            return IsOutsideRoom() ? 0.0f : Atmosphere.TotalGas / TileCount;
         }
 
         public float GetGasPressure(string gasName)

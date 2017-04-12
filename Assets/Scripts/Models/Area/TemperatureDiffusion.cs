@@ -69,20 +69,10 @@ public class TemperatureDiffusion
     /// <param name="y">Y coordinates.</param>
     /// <param name="z">Z coordinates.</param>
     /// <returns>Temperature at x,y,z.</returns>
-    public float GetTemperature(int x, int y, int z)
+    public TemperatureValue GetTemperature(int x, int y, int z)
     {
         Room room = World.Current.GetTileAt(x, y, z).Room;
-        return room == null ? 0 : room.Atmosphere.GetTemperature();
-    }
-
-    public float GetTemperatureInC(int x, int y, int z)
-    {
-        return GetTemperature(x, y, z) - 273.15f;
-    }
-
-    public float GetTemperatureInF(int x, int y, int z)
-    {
-        return (GetTemperature(x, y, z) * 1.8f) - 459.67f;
+        return room == null ? TemperatureValue.AbsoluteZero : room.Atmosphere.GetTemperature();
     }
 
     /*
@@ -238,12 +228,12 @@ public class TemperatureDiffusion
         {
             foreach (var r2 in diffusion[r1].Keys)
             {
-                float temperatureDifference = r1.Atmosphere.GetTemperature() - r2.Atmosphere.GetTemperature();
+                float temperatureDifference = r1.Atmosphere.GetTemperature().InKelvin - r2.Atmosphere.GetTemperature().InKelvin;
                 if (temperatureDifference > 0)
                 {
                     float energyTransfer = diffusion[r1][r2] * temperatureDifference * Mathf.Sqrt(r1.GetGasPressure()) * Mathf.Sqrt(r2.GetGasPressure()) * deltaTime;
-                    r1.Atmosphere.ChangeEnergy(-energyTransfer);
-                    r2.Atmosphere.ChangeEnergy(energyTransfer);
+                    r1.Atmosphere.ChangeTemperature(-energyTransfer / r1.Atmosphere.TotalGas);
+                    r2.Atmosphere.ChangeTemperature(energyTransfer / r2.Atmosphere.TotalGas);
                 }
             }
         }
@@ -260,10 +250,10 @@ public class TemperatureDiffusion
         float pressure = tile.Room.GetGasPressure();
         float efficiency = ModUtils.Clamp01(pressure / furniture.Parameters["pressure_threshold"].ToFloat());
         float energyChangePerSecond = furniture.Parameters["base_heating"].ToFloat() * efficiency;
-        float energyChange = energyChangePerSecond * deltaTime;
+        float temperatureChange = (energyChangePerSecond * deltaTime) / tile.Room.Atmosphere.TotalGas;
 
         UnityDebugger.Debugger.Log("Atmosphere", "Generating heat: " + furniture.Type + " = " + energyChangePerSecond + "(" + pressure + " -> " + efficiency + "%)");
 
-        tile.Room.Atmosphere.ChangeEnergy(energyChange);
+        tile.Room.Atmosphere.ChangeTemperature(temperatureChange);
     }
 }
