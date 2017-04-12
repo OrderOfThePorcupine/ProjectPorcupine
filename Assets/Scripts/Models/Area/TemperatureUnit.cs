@@ -88,7 +88,6 @@ public class TemperatureValue : IFormattable
             return InKelvin * 1.8f;
         }
 
-
         set
         {
             InKelvin = value * (5 / 9);
