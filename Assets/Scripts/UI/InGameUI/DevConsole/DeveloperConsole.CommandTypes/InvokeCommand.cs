@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MoonSharp.Interpreter;
 
-namespace DeveloperConsole.Core.CommandTypes
+namespace DeveloperConsole.Core
 {
     /// <summary>
     /// Invoke some code from either C# Function Manager or LUA Function Manager.

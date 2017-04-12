@@ -7,10 +7,10 @@
 // ====================================================
 #endregion
 using System;
-using MoonSharp.Interpreter;
 using System.Reflection;
+using MoonSharp.Interpreter;
 
-namespace DeveloperConsole.Core.CommandTypes
+namespace DeveloperConsole.Core
 {
     /// <summary>
     /// A core class for Internal Commands.

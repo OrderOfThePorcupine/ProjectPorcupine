@@ -9,11 +9,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using DeveloperConsole.Core;
 using MoonSharp.Interpreter;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Reflection;
-using DeveloperConsole.Core.CommandTypes;
 
 namespace DeveloperConsole
 {
@@ -47,11 +47,6 @@ namespace DeveloperConsole
         /// Whole list of commands available.
         /// </summary>
         private List<CommandBase> consoleCommands = new List<CommandBase>();
-
-        /// <summary>
-        /// All the parsers available.
-        /// </summary>
-        public static Dictionary<Type, ParseDelegate> Parsers { get; private set; }
 
         /// <summary>
         /// History of commands.
@@ -113,6 +108,11 @@ namespace DeveloperConsole
         /// </summary>
         [SerializeField]
         private GameObject root;
+
+        /// <summary>
+        /// All the parsers available.
+        /// </summary>
+        public static Dictionary<Type, ParseDelegate> Parsers { get; private set; }
 
         /// <summary>
         /// Is the command line open.
@@ -572,6 +572,36 @@ namespace DeveloperConsole
 
             instance.textArea.fontSize = SettingsKeyHolder.FontSize;
             instance.scrollRect.scrollSensitivity = SettingsKeyHolder.ScrollSensitivity;
+        }
+
+        /// <summary>
+        /// Add a parser through reflection of method info.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="methodInfo"> The reflected method that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, MethodInfo methodInfo)
+        {
+            Parsers.Add(target, (ParseDelegate)Delegate.CreateDelegate(typeof(ParseDelegate), methodInfo));
+        }
+
+        /// <summary>
+        /// Add a parser through a parse delegate.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, ParseDelegate method)
+        {
+            Parsers.Add(target, method);
+        }
+
+        /// <summary>
+        /// Add a parser through a function.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, Func<string, object> method)
+        {
+            Parsers.Add(target, new ParseDelegate(method));
         }
 
         #region AttributeImplementations
@@ -1111,36 +1141,6 @@ namespace DeveloperConsole
         }
 
         /// <summary>
-        /// Add a parser through reflection of method info.
-        /// </summary>
-        /// <param name="target"> The target type of the parser. </param>
-        /// <param name="methodInfo"> The reflected method that takes in a string and returns an object. </param>
-        public static void AddParser(Type target, MethodInfo methodInfo)
-        {
-            Parsers.Add(target, (ParseDelegate)Delegate.CreateDelegate(typeof(ParseDelegate), methodInfo));
-        }
-
-        /// <summary>
-        /// Add a parser through a parse delegate.
-        /// </summary>
-        /// <param name="target"> The target type of the parser. </param>
-        /// <param name="method"> A function that takes in a string and returns an object. </param>
-        public static void AddParser(Type target, ParseDelegate method)
-        {
-            Parsers.Add(target, method);
-        }
-
-        /// <summary>
-        /// Add a parser through a function.
-        /// </summary>
-        /// <param name="target"> The target type of the parser. </param>
-        /// <param name="method"> A function that takes in a string and returns an object. </param>
-        public static void AddParser(Type target, Func<string, object> method)
-        {
-            Parsers.Add(target, new ParseDelegate(method));
-        }
-
-        /// <summary>
         /// Adds all parsers that implement <see cref="ParserAttribute"/>.
         /// </summary>
         private void AddParsersByReflection()
@@ -1149,7 +1149,7 @@ namespace DeveloperConsole
             foreach (MethodInfo method in Assembly.GetCallingAssembly().GetTypes().SelectMany(x => x.GetMethods().Where(y => y.GetCustomAttributes(typeof(ParserAttribute), false).Count() > 0)))
             {
                 ParserAttribute attribute = (ParserAttribute)method.GetCustomAttributes(typeof(ParserAttribute), false).First();
-                AddParser(attribute.target, method);
+                AddParser(attribute.Target, method);
             }
         }
 
@@ -1163,7 +1163,7 @@ namespace DeveloperConsole
             {
                 CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false).First();
                 string parameters = string.Join(",", method.GetParameters().Select(x => x.ParameterType.Name + " " + x.Name).ToArray());
-                consoleCommands.Add(new InternalCommand(attribute.title, method, attribute.description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.detailedDescription, attribute.tags));
+                consoleCommands.Add(new InternalCommand(attribute.title, method, attribute.description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.detailedDescription, attribute.Tags));
             }
         }
 

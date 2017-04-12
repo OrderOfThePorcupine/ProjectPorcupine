@@ -7,14 +7,12 @@
 // ====================================================
 #endregion
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using MoonSharp.Interpreter;
 using UnityEngine;
 
-namespace DeveloperConsole.Core.CommandTypes
+namespace DeveloperConsole.Core
 {
     /// <summary>
     /// A command base that all commands derive from.
@@ -152,6 +150,7 @@ namespace DeveloperConsole.Core.CommandTypes
                         Tile t = world.GetCenterTile();
                         return "[" + t.X + ", " + t.Y + ", " + t.Z + "]";
                     }
+
                     break;
                 case "mousePos":
                     Vector3 mousePos = Input.mousePosition;

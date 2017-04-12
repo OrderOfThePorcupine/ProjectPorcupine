@@ -6,7 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using DeveloperConsole.Core.CommandTypes;
+using DeveloperConsole.Core;
 
 namespace DeveloperConsole.Core
 {
