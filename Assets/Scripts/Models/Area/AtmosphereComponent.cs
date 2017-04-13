@@ -141,9 +141,13 @@ public class AtmosphereComponent
             return;
         }
 
+        // Δ
+        // E = ∑G*T
+        // Therefore using E += ΔG * ΔT
+        // T = { [T(initial) * ∑G(initial)] + [ΔG * ΔT] } / ∑G(final)
+        float oldThermal = internalTemperature.InKelvin * TotalGas + amount * temperature;
         ChangeGas(gasName, amount);
-
-        ChangeTemperature((amount * internalTemperature.InKelvin) / TotalGas);
+        SetTemperature(oldThermal / TotalGas);
     }
 
     /// <summary>
@@ -159,12 +163,14 @@ public class AtmosphereComponent
         }
 
         amount = Mathf.Min(TotalGas, amount);
+        float thermal = internalTemperature.InKelvin * (TotalGas - amount);
+
         foreach (var gasName in GetGasNames())
         {
             ChangeGas(gasName, -amount * GetGasFraction(gasName));
         }
 
-        ChangeTemperature((-amount * internalTemperature.InKelvin) / TotalGas);
+        SetTemperature(thermal / TotalGas);
     }
 
     /// <summary>
@@ -180,8 +186,11 @@ public class AtmosphereComponent
             return;
         }
 
-        ChangeGas(gasName, -Mathf.Min(GetGasAmount(gasName), amount));
-        ChangeTemperature((-amount * internalTemperature.InKelvin) / TotalGas);
+        amount = Mathf.Min(GetGasAmount(gasName), amount);
+        float thermal = internalTemperature.InKelvin * (TotalGas - amount);
+
+        ChangeGas(gasName, -amount);
+        SetTemperature(thermal / TotalGas);
     }
 
     /// <summary>
