@@ -22,11 +22,13 @@ namespace DeveloperConsole.Core
         /// <summary>
         /// Standard constructor.
         /// </summary>
-        /// <param name="title"> The title of the command. </param>
-        /// <param name="functionName"> The function name of the command (can be C# or LUA). </param>
-        /// <param name="descriptiveText"> The text that describes this command. </param>
-        /// <param name="helpFunctionName"> The help function name of the command (can be C# or LUA). </param>
-        /// <param name="parameters"> The parameters ( should be invokeable format of (using [any character];)? type variableName, ... ). </param>
+        /// <param name="title"> The title for the command. </param>
+        /// <param name="functionName"> The name of the command to execute. </param>
+        /// <param name="descriptiveText"> The help text to display. </param>
+        /// <param name="detailedDescriptiveText"> More detailed help text to display. </param>
+        /// <param name="parameters"> In format of 'Type name' i.e. Int myInt.  With a comma separator. </param>
+        /// <param name="tags"> Tags group commands for easy access. </param>
+        /// <param name="defaultValue"> The default value for this command. </param>
         public InvokeCommand(string title, string functionName, string descriptiveText, string detailedDescriptiveText, string parameters, string[] tags, string defaultValue)
         {
             Title = title;
@@ -114,16 +116,26 @@ namespace DeveloperConsole.Core
             this.TypeInfo = types;
         }
 
+        /// <summary>
+        /// The name of the function to execute.
+        /// </summary>
         public string FunctionName
         {
             get; private set;
         }
 
+        /// <summary>
+        /// All the parameters in format Type name, with a comma seperator.
+        /// </summary>
         public override string Parameters
         {
             get; protected set;
         }
 
+        /// <summary>
+        /// Execute this command.
+        /// </summary>
+        /// <param name="arguments"> The arguments to pass in. </param>
         public override void ExecuteCommand(string arguments)
         {
             try

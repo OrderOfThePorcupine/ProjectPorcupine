@@ -197,8 +197,9 @@ namespace DeveloperConsole.Core
                         convertedArgs[i] = DevConsole.Parsers[TypeInfo[i]](arguments[i]);
                         if (convertedArgs[i] == null)
                         {
-                            DevConsole.LogError(Errors.ParametersNotInFormat(this));
-                            throw new Exception(Errors.ParametersNotInFormat(this));
+                            string errorMessage = "The entered parameters do not conform to the types (in order): " + this.Parameters;
+                            DevConsole.LogError(errorMessage);
+                            throw new Exception(errorMessage);
                         }
                     }
                     else

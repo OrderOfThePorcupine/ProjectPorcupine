@@ -16,14 +16,18 @@ namespace DeveloperConsole.Core
     /// A core class for Internal Commands.
     /// </summary>
     [MoonSharpUserData]
-    public class InternalCommand : CommandBase
+    public sealed class InternalCommand : CommandBase
     {
         /// <summary>
         /// Standard with title, method, and help text.
         /// </summary>
-        /// <param name="title"> The title for the command.</param>
-        /// <param name="method"> The command to execute.</param>
-        /// <param name="helpText"> The help text to display.</param>
+        /// <param name="title"> The title for the command. </param>
+        /// <param name="method"> The command to execute. </param>
+        /// <param name="descriptiveText"> The help text to display. </param>
+        /// <param name="detailedDescriptiveText"> More detailed help text to display. </param>
+        /// <param name="parameters"> In format of 'Type name' i.e. Int myInt.  With a comma separator. </param>
+        /// <param name="tags"> Tags group commands for easy access. </param>
+        /// <param name="typeInfo"> All the types in respect to this command. </param>
         public InternalCommand(string title, MethodInfo method, string descriptiveText, Type[] typeInfo, string parameters, string detailedDescriptiveText = "", string[] tags = null)
         {
             this.Title = title;
@@ -41,7 +45,10 @@ namespace DeveloperConsole.Core
         /// </summary>
         public override string Parameters { get; protected set; }
 
-        public MethodInfo Method { get; protected set; }
+        /// <summary>
+        /// The method to call to perform the required action.
+        /// </summary>
+        public MethodInfo Method { get; private set; }
 
         /// <summary>
         /// Executes the command.
@@ -55,7 +62,7 @@ namespace DeveloperConsole.Core
             }
             catch (Exception e)
             {
-                DevConsole.LogError(Errors.UnknownError(this));
+                DevConsole.LogError("An execute error as occured, this could be the method raising an error (or causing an error).  We could not locate the specific error however.");
                 UnityDebugger.Debugger.LogError("DevConsole", e.ToString());
             }
         }

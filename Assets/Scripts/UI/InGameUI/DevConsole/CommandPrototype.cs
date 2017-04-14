@@ -33,11 +33,11 @@ namespace DeveloperConsole
         /// <param name="title"> The title of the command.</param>
         /// <param name="methodFunctionName"> The name of the function to call.</param>
         /// <param name="description"> The description of the command.</param>
-        /// <param name="helpFunctionName"> The name of the function to call to show help.</param>
+        /// <param name="detailedDescription"> A more detailed description of this command. </param>
         /// <param name="parameters"> The parameters that this class requires (a string in C# type formats and comma between them).</param>
-        public CommandPrototype(string title, string methodFunctionName, string description, string helpFunctionName, string parameters, string tags, string defaultValue) : this()
+        public CommandPrototype(string title, string methodFunctionName, string description, string detailedDescription, string parameters, string tags, string defaultValue) : this()
         {
-            ConsoleCommand = new InvokeCommand(title, methodFunctionName, description, helpFunctionName, parameters, tags.Split(','), defaultValue);
+            ConsoleCommand = new InvokeCommand(title, methodFunctionName, description, detailedDescription, parameters, tags.Split(','), defaultValue);
         }
 
         /// <summary>
