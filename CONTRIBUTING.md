@@ -7,6 +7,18 @@
 [Best Practices for Contributing](#best-practices-for-contributing)  
 [Image & Sound File Formats](#file-formats)  
 
+# How do I make my old Project Porcupine repository link to the new one?
+
+If you have an old Project Porcupine repository fork and you want to contribute to the new one it is quite easy, if you want to keep the old repository fork then follow these instructions.  If you don't then just delete your old fork and then do these steps, instead of having two forks with the new one called `ProjectPorcupine-1` you'll just have one with it being called `ProjectPorcupine`, so remove all instances of `-1` in the below set of instructions.
+1.  First you have to fork the new `OrderOfThePorcupine/ProjectPorcupine` project.
+2.  You will now have two forks one called `ProjectPorcupine` and the other `ProjectPorcupine-1`.  
+3.  Copy the link to the git of the `ProjectPorcupine-1` (https) it should be in format `https://github.com/<USERNAME>/ProjectPorcupine-1.git`.
+4.  Open up gitbash or commandline and type `git remote remove origin`.  This will remove your origin remote that originally was linked to the old repository, if your's is called something different for some reason remove that one.
+5.  Also remove the old upstream using `git remote remove upstream`.
+6.  Link to the new upstream by typing `git remote add upstream https://github.com/OrderOfThePorcupine/ProjectPorcupine.git`
+7.  Add the link to your new origin by typing `git remote add origin https://github.com/<USERNAME>/ProjectPorcupine-1.git` (using that link you just copied before).
+8.  And tada your done, you can checkout any feature branches you were working on and push them to your new fork location since you'll still have the local copies and it doesn't require any new setup just changing of remotes.  Isn't this easy!
+
 # Note
 
 Please also read the [Contributor's Portal](../../wiki/Contributors'-Portal#important-links), mainly the [Contributing Guidelines](../../wiki/Contributing-Guidelines).
@@ -21,7 +33,7 @@ If you would like to contribute to this project by modifying/adding to the progr
 3. Change into your new project folder.
  * From the command line: `cd ProjectPorcupine`
 4. [optional]  Add the upstream repository to your list of remotes.
- * From the command line: `git remote add upstream https://github.com/TeamPorcupine/ProjectPorcupine.git`
+ * From the command line: `git remote add upstream https://github.com/OrderOfThePorcupine/ProjectPorcupine.git`
 5. Create a branch for your new feature.
  * From the command line: `git checkout -b my-feature-branch-name`
 6. Make your changes.
