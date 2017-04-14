@@ -9,17 +9,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DeveloperConsole.CommandTypes;
-using DeveloperConsole.Interfaces;
+using System.Reflection;
+using DeveloperConsole.Core;
 using MoonSharp.Interpreter;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace DeveloperConsole
 {
-    public delegate void Method(params object[] parameters);
-
-    public delegate void HelpMethod();
+    /// <summary>
+    /// A delegate for the parse operation.
+    /// If object is null it failed.
+    /// </summary>
+    /// <param name="args"> Arguments passed in. </param>
+    /// <returns> The parsed value of the arguments.  Null if arguments are wrong. </returns>
+    public delegate object ParseDelegate(string args);
 
     [MoonSharpUserData]
     public class DevConsole : MonoBehaviour
@@ -30,7 +34,8 @@ namespace DeveloperConsole
         private const int AutoclearThreshold = 18000;
 
         /// <summary>
-        /// Current instance.
+        /// Singleton patterned instnace.
+        /// Private since there are static functions only for controlled access.
         /// </summary>
         private static DevConsole instance;
 
@@ -104,6 +109,11 @@ namespace DeveloperConsole
         /// </summary>
         [SerializeField]
         private GameObject root;
+
+        /// <summary>
+        /// All the parsers available.
+        /// </summary>
+        public static Dictionary<Type, ParseDelegate> Parsers { get; private set; }
 
         /// <summary>
         /// Is the command line open.
@@ -308,9 +318,7 @@ namespace DeveloperConsole
             {
                 foreach (CommandBase commandToCall in commandsToCall)
                 {
-                    ICommandRunnable runnable = (ICommandRunnable)commandToCall;
-
-                    if (runnable != null)
+                    if (commandToCall != null)
                     {
                         if (commandToCall.Parameters == null || commandToCall.Parameters == string.Empty)
                         {
@@ -325,13 +333,13 @@ namespace DeveloperConsole
 
                             // They really need a better literal system...
                             // This is the closet we can get basically
-                            if (args == string.Empty || args == '"'.ToString())
+                            if (string.IsNullOrEmpty(args) || args == '"'.ToString())
                             {
                                 args = @"""";
                             }
                         }
 
-                        runnable.ExecuteCommand(args);
+                        commandToCall.ExecuteCommand(args);
                     }
                 }
             }
@@ -351,7 +359,6 @@ namespace DeveloperConsole
 
                 foreach (CommandBase commandToShow in commandsToShow)
                 {
-                    // Yah its close enough either 2/3rds similar or 1/3rd if no matches found
                     Log(commandToShow.Title, "green");
                 }
             }
@@ -362,15 +369,13 @@ namespace DeveloperConsole
         /// </summary>
         public static void ShowHelpMethod(CommandBase help)
         {
-            if (help.HelpMethod != null)
+            if (string.IsNullOrEmpty(help.DetailedDescriptiveText) && string.IsNullOrEmpty(help.DescriptiveText))
             {
-                help.HelpMethod();
-            }
-            else
-            {
-                Log("<color=yellow>Command Info:</color> " + ((help.DescriptiveText == string.Empty) ? " < color=red>There's no help for this command</color>" : help.DescriptiveText));
+                DevConsole.Log("<color=yellow>Command Info:</color> <color=red>There's no help for this command</color>");
+                return;
             }
 
+            Log("<color=yellow>Command Info:</color> " + (string.IsNullOrEmpty(help.DetailedDescriptiveText) ? help.DescriptiveText : help.DetailedDescriptiveText));
             Log("<color=yellow>Call it like </color><color=orange> " + help.Title + GetParameters(help) + "</color>");
         }
 
@@ -571,10 +576,42 @@ namespace DeveloperConsole
         }
 
         /// <summary>
-        /// Logs all the tags.
-        /// We don't care about the params object.
+        /// Add a parser through reflection of method info.
         /// </summary>
-        public static void AllTags(params object[] objects)
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="methodInfo"> The reflected method that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, MethodInfo methodInfo)
+        {
+            Parsers.Add(target, (ParseDelegate)Delegate.CreateDelegate(typeof(ParseDelegate), methodInfo));
+        }
+
+        /// <summary>
+        /// Add a parser through a parse delegate.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, ParseDelegate method)
+        {
+            Parsers.Add(target, method);
+        }
+
+        /// <summary>
+        /// Add a parser through a function.
+        /// </summary>
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, Func<string, object> method)
+        {
+            Parsers.Add(target, new ParseDelegate(method));
+        }
+
+        #region AttributeImplementations
+
+        /// <summary>
+        /// Logs all the tags in a nice format.
+        /// </summary>
+        [Command("System", description = "Logs all the tags used currently by the system", title = "AllTags")]
+        public static void AllTags()
         {
             Log("All the tags: ", "green");
             Log(string.Join(", ", CommandArray().SelectMany(x => x.Tags).Select(x => x.Trim()).Distinct().ToArray()));
@@ -583,16 +620,10 @@ namespace DeveloperConsole
         /// <summary>
         /// Just returns help dependent on each command.
         /// </summary>
-        /// <param name="objects"> First one should be a string tag. </param>
-        public static void Help(params object[] objects)
+        /// <param name="tag"> The tag to search for.  If "" then do all tags. </param>
+        [Command("System", description = "Returns information on all commands.  Can take in a parameter as a tag to search for all commands with that tag", title = "Help")]
+        public static void Help(string tag = "")
         {
-            string tag = string.Empty;
-
-            if (objects != null && objects.Length > 0 && objects[0] is string)
-            {
-                tag = objects[0] as string;
-            }
-
             Log("-- Help --", "green");
 
             string text = string.Empty;
@@ -609,26 +640,210 @@ namespace DeveloperConsole
             Log("\n<color=orange>Note:</color> If the function has no parameters you <color=red> don't</color> need to use the parameter modifier.");
             Log("<color=orange>Note:</color> You <color=red>don't</color> need to use the trailing parameter modifier either");
             Log("You can use constants to replace common parameters (they are case insensitive but require ' ' around them):");
-            Log("- 'Center' (or 'Centre') is a position of the center/centre of the map.");
+            Log("- 'Center' (or 'Centre') is the position of the center/centre of the map.");
             Log("- 'MousePos' is the position of the mouse");
             Log("- 'TimeScale' is the current time scale");
-            Log("- 'Pi' is Pi");
+            Log("- 'Pi' is 3.141...");
+            Log("- 'E' is 2.718...");
         }
 
         /// <summary>
         /// Clears the text area and history.
         /// </summary>
-        /// <param name="objects"> We don't care about the objects :D. </param>
-        public static void Clear(params object[] objects)
+        [Command("System", description = "Clears the developer console", title = "Clear")]
+        public static void Clear()
         {
             ClearHistory();
             Text textObj = TextObject();
 
             if (textObj != null)
             {
-                TextObject().text = "\n<color=green>Clear Successful :D</color>\n";
+                TextObject().text = "\n<color=#7CFC00>Clear Successful :D</color>\n";
             }
         }
+
+        /// <summary>
+        /// Parse an integer 16 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(short))]
+        public static object HandleInt16(string args)
+        {
+            short outValue;
+            return short.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an integer 32 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(int))]
+        public static object HandleInt32(string args)
+        {
+            int outValue;
+            return int.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an integer 64 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(long))]
+        public static object HandleInt64(string args)
+        {
+            long outValue;
+            return long.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an unsigned integer 16 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(ushort))]
+        public static object HandleUInt16(string args)
+        {
+            ushort outValue;
+            return ushort.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an unsigned integer 32 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(uint))]
+        public static object HandleUInt32(string args)
+        {
+            uint outValue;
+            return uint.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse an unsigned integer 64 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(ulong))]
+        public static object HandleUInt64(string args)
+        {
+            ulong outValue;
+            return ulong.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a float from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(float))]
+        public static object HandleFloat(string args)
+        {
+            float outValue;
+            return float.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a double from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(double))]
+        public static object HandleDouble(string args)
+        {
+            double outValue;
+            return double.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a decimal from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(decimal))]
+        public static object HandleDecimal(string args)
+        {
+            decimal outValue;
+            return decimal.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a boolean from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(bool))]
+        public static object HandleBoolean(string args)
+        {
+            bool outValue;
+            return bool.TryParse(args, out outValue) ? (object)outValue : null;
+        }
+
+        /// <summary>
+        /// Parse a string from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(string))]
+        public static object HandleString(string args)
+        {
+            return args;
+        }
+
+        /// <summary>
+        /// Parse an float from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(char))]
+        public static object HandleChar(string args)
+        {
+            return args.Length >= 1 ? (object)args.ToCharArray()[0] : null;
+        }
+
+        /// <summary>
+        /// Parse a vector2 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(Vector2))]
+        public static object HandleVector2(string args)
+        {
+            string[] coordinates = args.Split(',');
+            float x, y;
+            return coordinates.Length >= 2 && float.TryParse(coordinates[0], out x) && float.TryParse(coordinates[1], out y) ? (object)new Vector2(x, y) : null;
+        }
+
+        /// <summary>
+        /// Parse a vector3 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(Vector3))]
+        public static object HandleVector3(string args)
+        {
+            string[] coordinates = args.Split(',');
+            float x, y, z;
+            return coordinates.Length >= 3 && float.TryParse(coordinates[0], out x) && float.TryParse(coordinates[1], out y) && float.TryParse(coordinates[2], out z) ? (object)new Vector3(x, y, z) : null;
+        }
+
+        /// <summary>
+        /// Parse a vector4 from arguments given.
+        /// </summary>
+        /// <param name="args"> The string version of the end result. </param>
+        /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
+        [Parser(typeof(Vector4))]
+        public static object HandleVector4(string args)
+        {
+            string[] coordinates = args.Split(',');
+            float x, y, z, w;
+            return coordinates.Length >= 4 && float.TryParse(coordinates[0], out x) && float.TryParse(coordinates[1], out y) && float.TryParse(coordinates[2], out z) && float.TryParse(coordinates[3], out w) ? (object)new Vector4(x, y, z, w) : null;
+        }
+
+        #endregion
 
         /// <summary>
         /// Button delegate action to handle command.
@@ -743,6 +958,11 @@ namespace DeveloperConsole
         /// </summary>
         private void Start()
         {
+            if (Parsers == null)
+            {
+                Parsers = new Dictionary<Type, ParseDelegate>();
+            }
+
             transform.SetAsLastSibling();
 
             // Guard
@@ -754,6 +974,8 @@ namespace DeveloperConsole
 
             textArea.fontSize = SettingsKeyHolder.FontSize;
             textArea.text = "\n";
+
+            AddParsersByReflection();
 
             // Load all the commands
             LoadCommands();
@@ -920,17 +1142,40 @@ namespace DeveloperConsole
         }
 
         /// <summary>
+        /// Adds all parsers that implement <see cref="ParserAttribute"/>.
+        /// </summary>
+        private void AddParsersByReflection()
+        {
+            // Find each method with the command attribute then add it to the console commands
+            foreach (MethodInfo method in Assembly.GetCallingAssembly().GetTypes().SelectMany(x => x.GetMethods().Where(y => y.GetCustomAttributes(typeof(ParserAttribute), false).Count() > 0)))
+            {
+                ParserAttribute attribute = (ParserAttribute)method.GetCustomAttributes(typeof(ParserAttribute), false).First();
+                AddParser(attribute.Target, method);
+            }
+        }
+
+        /// <summary>
+        /// Adds all commands that implement <see cref="CommandAttribute"/>.
+        /// </summary>
+        private void AddCommandsByReflection()
+        {
+            // Find each method with the command attribute then add it to the console commands
+            foreach (MethodInfo method in Assembly.GetCallingAssembly().GetTypes().SelectMany(x => x.GetMethods().Where(y => y.GetCustomAttributes(typeof(CommandAttribute), false).Count() > 0)))
+            {
+                CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false).First();
+                string parameters = string.Join(",", method.GetParameters().Select(x => x.ParameterType.Name + " " + x.Name).ToArray());
+                consoleCommands.Add(new InternalCommand(attribute.title, method, attribute.description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.detailedDescription, attribute.Tags));
+            }
+        }
+
+        /// <summary>
         /// Clears commands and re-loads them.
         /// </summary>
         private void LoadCommands()
         {
             consoleCommands.Clear();
 
-            // Load Base Commands
-            AddCommands(
-                new InternalCommand("Help", Help, "Returns information on all commands.  Can take in a parameter as a tag to search for all commands with that tag", new string[] { "System" }, new Type[] { typeof(string) }, new string[] { "tag" }),
-                new InternalCommand("Clear", Clear, "Clears the developer console", new string[] { "System" }),
-                new InternalCommand("Tags", AllTags, "Logs all the tags used", new string[] { "System" }));
+            AddCommandsByReflection();
 
             // Load Commands from XML (will be changed to JSON AFTER the current upgrade)
             // Covers both CSharp and LUA

@@ -4,11 +4,11 @@
   <!--Title is mandatory and should be unique-->
   <!--FunctionName is for LUA and is the function name of the LUA Script that runs when the command is called-->
   <!--Description is a short description of what this command does-->
-  <!--HelpFunctionName is for LUA and is the function name of the LUA Script that runs on Title?-->
+  <!--DetailedDescription is printed whenever Command ? is called-->
   <!--You set parameters to the format Type VariableName,...-->
   <!--E.g. UnityEngine.Vector3 MyVector, Int32 MyPrimitiveInt, Single MyPrimitiveFloat -->
   <!--Note: You can chooes not to include the namespace if its a system namespace (like primitives i.e. Int32, Boolean...)-->
-  <ConsoleCommand Title="SetFontSize" FunctionName="SetFontSize" Description="Sets the font size, must be between 10 and 20 (inclusive)" HelpFunctionName="" Parameters="Int32 size" Tags="Console, UI" DefaultValue="14"></ConsoleCommand>
+  <ConsoleCommand Title="SetFontSize" FunctionName="SetFontSize" Description="Sets the font size, must be between 10 and 20 (inclusive)" Parameters="Int32 size" DetailedDescription="This command sets the font size of the console.  It takes a single parameter which is a whole number (integer) and has to be between 10 and 20 (inclusive).  The default is 14." Tags="Console, UI" DefaultValue="14"></ConsoleCommand>
   <ConsoleCommand Title="SetTimeStamp" FunctionName="SetTimeStamp" Description="Sets the time stamp" Parameters="Boolean on" Tags="Console, UI" DefaultValue=""></ConsoleCommand>
   <ConsoleCommand Title="CameraPos" FunctionName="ChangeCameraPosition" Description="Changes the camera position to the one provided" Parameters="UnityEngine.Vector3 NewPos" Tags="Camera" DefaultValue="'Center'"></ConsoleCommand>
   <ConsoleCommand Title="Run_LUA" FunctionName="Run_LUA" Description="Runs the string as LUA" Parameters="String luaText" Tags="LUA, Modding, Compile" DefaultValue=""></ConsoleCommand>
@@ -35,7 +35,7 @@
   <ConsoleCommand Title="DevMode" FunctionName="DevMode" Description="Floods fills the room at the position provided" Parameters="Boolean isOn" Tags="Developer" DefaultValue="true"></ConsoleCommand>
   <ConsoleCommand Title="Status" FunctionName="Status" Description="Returns current status of game" Parameters="" Tags="System" DefaultValue=""></ConsoleCommand>
   <ConsoleCommand Title="NewCharacter" FunctionName="NewCharacter" Description="Creates a new character at the position provided" Parameters="UnityEngine.Vector3 pos, string name" Tags="Character" DefaultValue="{Center}, &quot;&quot;"></ConsoleCommand>
-  <ConsoleCommand Title="DoBuild" FunctionName="DoBuild" HelpFunctionName="DoBuildHelp" Description="Builds the object provided" Parameters="Int32 buildMode, string type, UnityEngine.Vector3 pos" Tags="Build" DefaultValue=""></ConsoleCommand>
+  <ConsoleCommand Title="DoBuild" FunctionName="DoBuild" DetailedDescription="Does build mode using the furniture/floor/whatever type provided at position pos.  The options for build mode are: FLOOR = 0, ROOMBEHAVIOUR= 1, FURNITURE= 2, UTILITY = 3, and DECONSTRUCT= 4" Description="Builds the object provided at the position passed in" Parameters="Int32 buildMode, string type, UnityEngine.Vector3 pos" Tags="Build" DefaultValue=""></ConsoleCommand>
   <ConsoleCommand Title="InvalidateTileGraph" FunctionName="InvalidateTileGraph" Description="Invalidates the tile graph" Parameters="" Tags="Check" DefaultValue=""></ConsoleCommand>
   <ConsoleCommand Title="GetCharacterNames" FunctionName="GetCharacterNames" Description="Logs all the character's names" Parameters="" Tags="Character" DefaultValue=""></ConsoleCommand>
   <ConsoleCommand Title="SetRoomGas" FunctionName="SetRoomGas" Description="Sets the gas in the room" Parameters="Int32 roomID, string gasName, Single pressure" Tags="Room, Gas" DefaultValue=""></ConsoleCommand>
