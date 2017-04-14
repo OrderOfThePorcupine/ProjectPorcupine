@@ -17,6 +17,10 @@ public class AtmosphereComponentTest
     [SetUp]
     public void Setup()
     {
+        // Disable logs
+        UnityDebugger.Debugger.Enabled = false;
+        UnityEngine.Debug.logger.logEnabled = false;
+
         empty1 = new AtmosphereComponent();
         empty2 = new AtmosphereComponent();
 

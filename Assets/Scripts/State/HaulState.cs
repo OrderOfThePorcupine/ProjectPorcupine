@@ -79,7 +79,7 @@ namespace ProjectPorcupine.State
                     int amount = Mathf.Min(Job.AmountDesiredOfInventoryType(tileInventory.Type) - amountCarried, tileInventory.StackSize);
                     DebugLog(" - Picked up {0} {1}", amount, tileInventory.Type);
                     World.Current.InventoryManager.PlaceInventory(character, tileInventory, amount);
-                    Profiler.EndSample();
+                    UnityEngine.Profiling.Profiler.EndSample();
                     break;
 
                 case HaulAction.DeliverMaterial:

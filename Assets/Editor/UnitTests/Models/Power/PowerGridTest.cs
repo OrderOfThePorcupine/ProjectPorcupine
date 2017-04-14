@@ -29,10 +29,9 @@ public class PowerGridTest
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PlugInArgumentNullException()
     {
-        grid.PlugIn(null);
+        Assert.That(() => grid.PlugIn(null), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -323,17 +322,17 @@ public class PowerGridTest
             get { return StoredAmount.AreEqual(StorageCapacity); }
         }
 
-        public string UtilityType 
-        { 
-            get 
-            { 
+        public string UtilityType
+        {
+            get
+            {
                 return "Power";
             }
         }
 
-        public string SubType 
+        public string SubType
         {
-            get 
+            get
             {
                 return string.Empty;
             }
