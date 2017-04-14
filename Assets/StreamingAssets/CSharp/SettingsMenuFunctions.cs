@@ -730,7 +730,7 @@ public class SoundDeviceComboBox : GenericComboBox
     {
         Dropdown.OptionData[] options = new Dropdown.OptionData[WorldController.Instance.soundController.GetDriverCount()];
 
-        for (int i = 0; i < Screen.resolutions.Length; i++)
+        for (int i = 0; i < options.Length; i++)
         {
             DriverInfo info = WorldController.Instance.soundController.GetDriverInfo(i);
 
