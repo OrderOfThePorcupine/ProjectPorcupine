@@ -32,28 +32,6 @@ public static class CommandFunctions
         new LuaFunctions().LoadScript(code, "User Script");
     }
 
-    public static void SetFontSize(int size)
-    {
-        if (size < 10)
-        {
-            DevConsole.LogError("Font size would be too small");
-        }
-        else if (size > 20)
-        {
-            DevConsole.LogError("Font size would be too big");
-        }
-        else
-        {
-            DevConsole.TextObject().fontSize = size;
-            DevConsole.Log("Change successful :D", "green");
-        }
-    }
-
-    public static void SetText(string text = "")
-    {
-        DevConsole.TextObject().text = "\n" + text;
-    }
-
     public static void SetCharacterHealth(string name, float health)
     {
         World world;
@@ -247,20 +225,9 @@ public static class CommandFunctions
         }
     }
 
-    public static void Exit()
-    {
-        DevConsole.Close();
-    }
-
     public static void DevMode(bool isOn)
     {
         SettingsKeyHolder.DeveloperMode = isOn;
-    }
-
-    public static void Status()
-    {
-        DevConsole.Log("Developer Mode is " + (SettingsKeyHolder.DeveloperMode ? "on" : "off"), "yellow");
-        DevConsole.Log("Time is " + (TimeManager.Instance.IsPaused ? "paused" : TimeManager.Instance.TimeScale + "x"), "yellow");
     }
 
     public static void NewCharacter(Vector3 pos, string name = "")
