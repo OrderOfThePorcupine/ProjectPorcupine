@@ -26,9 +26,10 @@ public class MouseOverRoomDetails : MouseOver
 
         string roomDetails = string.Format("{0:F}/{0:C}\n", World.Current.temperature.GetTemperature(tile.X, tile.Y, tile.Z));
 
-        foreach (string gasName in tile.Room.Atmosphere.GetGasNames())
+        string[] gasNames = tile.Room.Atmosphere.GetGasNames();
+        for (int i = 0; i < gasNames.Length; i++)
         {
-            roomDetails += string.Format("{0}: ({1}) {2:0.000} atm ({3:0.0}%)\n", gasName, "-", tile.Room.GetGasPressure(gasName), tile.Room.Atmosphere.GetGasFraction(gasName) * 100);
+            roomDetails += string.Format("{0}: ({1}) {2:0.000} atm ({3:0.0}%)\n", gasNames[i], "-", tile.Room.GetGasPressure(gasNames[i]), tile.Room.Atmosphere.GetGasFraction(gasNames[i]) * 100);
         }
 
         if (tile.Room.RoomBehaviors.Count > 0)

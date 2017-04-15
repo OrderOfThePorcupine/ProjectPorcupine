@@ -122,9 +122,10 @@ public class AtmosphereComponent
     public void SetGas(float newValue)
     {
         float delta = newValue - TotalGas;
-        foreach (string gasName in GetGasNames())
+        string[] gasNames = this.GetGasNames();
+        for (int i = 0; i < gasNames.Length; i++)
         {
-            gasses[gasName] += delta * GetGasFraction(gasName);
+            gasses[gasNames[i]] += delta * GetGasFraction(gasNames[i]);
         }
 
         TotalGas = newValue;
@@ -187,9 +188,10 @@ public class AtmosphereComponent
         }
 
         amount = Mathf.Min(TotalGas, amount);
-        foreach (var gasName in GetGasNames())
+        string[] gasNames = this.GetGasNames();
+        for (int i = 0; i < gasNames.Length; i++)
         {
-            ChangeGas(gasName, -amount * GetGasFraction(gasName));
+            ChangeGas(gasNames[i], -amount * GetGasFraction(gasNames[i]));
         }
 
         ThermalEnergy -= amount * internalTemperature.InKelvin;
