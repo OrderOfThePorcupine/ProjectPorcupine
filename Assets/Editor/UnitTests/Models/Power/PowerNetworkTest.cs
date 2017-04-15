@@ -30,10 +30,9 @@ public class PowerNetworkTest
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PlugInArgumentNullException()
     {
-        powerNetwork.PlugIn(null);
+        Assert.That(() => powerNetwork.PlugIn(null), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -150,17 +149,17 @@ public class PowerNetworkTest
             get { return StoredAmount.AreEqual(StorageCapacity); }
         }
 
-        public string UtilityType 
-        { 
-            get 
-            { 
+        public string UtilityType
+        {
+            get
+            {
                 return "Power";
             }
         }
 
-        public string SubType 
+        public string SubType
         {
-            get 
+            get
             {
                 return string.Empty;
             }
