@@ -11,7 +11,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIRescaler : MonoBehaviour 
+public class UIRescaler : MonoBehaviour
 {
     private const float MaxScale = 2f;
     private const float MinScale = .5f;
@@ -19,7 +19,7 @@ public class UIRescaler : MonoBehaviour
     private int lastScreenHeight = 0;
     private float scale = 1f;
 
-    public float Scale 
+    public float Scale
     {
         get
         {
@@ -36,7 +36,7 @@ public class UIRescaler : MonoBehaviour
             {
                 scale = MinScale;
             }
-            else 
+            else
             {
                 scale = value;
             }
@@ -46,7 +46,6 @@ public class UIRescaler : MonoBehaviour
     public void Start()
     {
         lastScreenHeight = Screen.height;
-
         AdjustScale();
     }
 
