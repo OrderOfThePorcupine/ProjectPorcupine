@@ -9,7 +9,6 @@
 using System;
 using System.Reflection;
 using MoonSharp.Interpreter;
-using System.Linq;
 
 namespace DeveloperConsole.Core
 {
@@ -62,15 +61,16 @@ namespace DeveloperConsole.Core
                 object[] objs = ParseArguments(arguments);
                 if (objs.Length > 0)
                 {
-                    ParameterInfo[] pInfo = Method.GetParameters();
+                    ParameterInfo[] parameterInfo = Method.GetParameters();
                     for (int i = 0; i < objs.Length; i++)
                     {
                         if (objs[i] == null)
                         {
                             // Add default
-                            objs[i] = pInfo[i].DefaultValue;
+                            objs[i] = parameterInfo[i].DefaultValue;
                         }
                     }
+
                     Method.Invoke(null, objs);
                 }
                 else
