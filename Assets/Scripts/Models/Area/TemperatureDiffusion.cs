@@ -102,7 +102,6 @@ public class TemperatureDiffusion
     /// <param name="tile"> The tile in question. </param>
     private void OnTileTypeChanged(Tile tile)
     {
-        Debug.LogWarning(tile.GetName());
         recomputeOnNextUpdate = true;
     }
 
@@ -112,8 +111,6 @@ public class TemperatureDiffusion
     /// <param name="furn"></param>
     private void OnFurnitureCreated(Furniture furn)
     {
-        Debug.LogWarning(furn.GetName());
-
         if (furn.RoomEnclosure)
         {
             furn.Removed += OnFurnitureRemoved;
@@ -127,8 +124,6 @@ public class TemperatureDiffusion
     /// <param name="furn"></param>
     private void OnFurnitureRemoved(Furniture furn)
     {
-        Debug.LogWarning(furn.GetName());
-
         recomputeOnNextUpdate = true;
     }
 
@@ -202,23 +197,16 @@ public class TemperatureDiffusion
 
     private void UpdateTemperature(float deltaTime)
     {
-        UnityEngine.Profiling.Profiler.BeginSample("Temperature");
-
         if (recomputeOnNextUpdate)
         {
             RecomputeDiffusion();
         }
 
-        UnityEngine.Profiling.Profiler.EndSample();
-
-        UnityEngine.Profiling.Profiler.BeginSample("Sinks & Sources");
         foreach (var furn in sinksAndSources)
         {
             GenerateHeatFromFurniture(furn, deltaTime);
         }
-        UnityEngine.Profiling.Profiler.EndSample();
 
-        UnityEngine.Profiling.Profiler.BeginSample("Energy Transfer");
         int roomCount = world.RoomManager.Count;
         Room r1, r2;
         for (int i = 0; i < roomCount; i++)
@@ -239,7 +227,6 @@ public class TemperatureDiffusion
                 }
             }
         }
-        UnityEngine.Profiling.Profiler.EndSample();
     }
 
     private void GenerateHeatFromFurniture(Furniture furniture, float deltaTime)
