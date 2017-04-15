@@ -32,6 +32,11 @@ public class AtmosphereComponent
     private TemperatureValue internalTemperature;
 
     /// <summary>
+    /// Internal thermal energy, do not touch unless through property.
+    /// </summary>
+    private float internalThermalEnergy;
+
+    /// <summary>
     /// Empty constructor, that initialises variables.
     /// </summary>
     public AtmosphereComponent()
@@ -47,11 +52,6 @@ public class AtmosphereComponent
     public float TotalGas { get; private set; }
 
     /// <summary>
-    /// Internal.
-    /// </summary>
-    public float _thermalEnergy;
-
-    /// <summary>
     /// The thermal energy of this component
     /// ALWAYS set after gas since,
     /// this will also update the internal temperature.
@@ -60,14 +60,15 @@ public class AtmosphereComponent
     {
         get
         {
-            return _thermalEnergy;
+            return internalThermalEnergy;
         }
 
         set
         {
-            _thermalEnergy = value;
+            internalThermalEnergy = value;
+
             // Update internal temperature
-            internalTemperature = TotalGas > 0 ? new TemperatureValue(_thermalEnergy / TotalGas) : TemperatureValue.AbsoluteZero;
+            internalTemperature = TotalGas > 0 ? new TemperatureValue(internalThermalEnergy / TotalGas) : TemperatureValue.AbsoluteZero;
         }
     }
 
@@ -116,7 +117,7 @@ public class AtmosphereComponent
     }
 
     /// <summary>
-    /// Sets the total gas value then evenly spreads it depending on gas fractions
+    /// Sets the total gas value then evenly spreads it depending on gas fractions.
     /// </summary>
     /// <param name="newValue"> The new value for the total gas to be. </param>
     public void SetGas(float newValue)
