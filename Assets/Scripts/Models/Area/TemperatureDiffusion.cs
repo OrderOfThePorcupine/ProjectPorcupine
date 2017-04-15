@@ -232,8 +232,8 @@ public class TemperatureDiffusion
                 if (temperatureDifference > 0)
                 {
                     float energyTransfer = diffusion[r1][r2] * temperatureDifference * Mathf.Sqrt(r1.GetGasPressure()) * Mathf.Sqrt(r2.GetGasPressure()) * deltaTime;
-                    r1.Atmosphere.ChangeTemperature(-energyTransfer / r1.Atmosphere.TotalGas);
-                    r2.Atmosphere.ChangeTemperature(energyTransfer / r2.Atmosphere.TotalGas);
+                    r1.Atmosphere.ChangeEnergy(-energyTransfer);
+                    r2.Atmosphere.ChangeEnergy(energyTransfer);
                 }
             }
         }
@@ -250,10 +250,10 @@ public class TemperatureDiffusion
         float pressure = tile.Room.GetGasPressure();
         float efficiency = ModUtils.Clamp01(pressure / furniture.Parameters["pressure_threshold"].ToFloat());
         float energyChangePerSecond = furniture.Parameters["base_heating"].ToFloat() * efficiency;
-        float temperatureChange = (energyChangePerSecond * deltaTime) / tile.Room.Atmosphere.TotalGas;
+        float energyChange = energyChangePerSecond * deltaTime;
 
         UnityDebugger.Debugger.Log("Atmosphere", "Generating heat: " + furniture.Type + " = " + energyChangePerSecond + "(" + pressure + " -> " + efficiency + "%)");
 
-        tile.Room.Atmosphere.ChangeTemperature(temperatureChange);
+        tile.Room.Atmosphere.ChangeEnergy(energyChange);
     }
 }

@@ -31,17 +31,45 @@ public class AtmosphereComponent
     /// </summary>
     private TemperatureValue internalTemperature;
 
+    /// <summary>
+    /// Empty constructor, that initialises variables.
+    /// </summary>
     public AtmosphereComponent()
     {
         TotalGas = 0;
-        internalTemperature = new TemperatureValue(0);
         gasses = new Dictionary<string, float>();
+        ThermalEnergy = 0;
     }
 
     /// <summary>
     /// The total gas amount.
     /// </summary>
     public float TotalGas { get; private set; }
+
+    /// <summary>
+    /// Internal.
+    /// </summary>
+    public float _thermalEnergy;
+
+    /// <summary>
+    /// The thermal energy of this component
+    /// ALWAYS set after gas since,
+    /// this will also update the internal temperature.
+    /// </summary>
+    public float ThermalEnergy
+    {
+        get
+        {
+            return _thermalEnergy;
+        }
+
+        set
+        {
+            _thermalEnergy = value;
+            // Update internal temperature
+            internalTemperature = TotalGas > 0 ? new TemperatureValue(_thermalEnergy / TotalGas) : TemperatureValue.AbsoluteZero;
+        }
+    }
 
     #region Gas
 
@@ -67,7 +95,6 @@ public class AtmosphereComponent
 
     /// <summary>
     /// Get the names of gasses present in this component.
-    /// TODO: Not efficient enough.
     /// </summary>
     /// <returns>The names of gasses present.</returns>
     public string[] GetGasNames()
@@ -82,25 +109,26 @@ public class AtmosphereComponent
     /// <param name="amount">The amount of gas to set it to.</param>
     public void SetGas(string gasName, float newValue)
     {
-        float amount = newValue - GetGasAmount(gasName);
-        ChangeGas(gasName, amount);
-        ChangeTemperature((amount * internalTemperature.InKelvin) / TotalGas);
+        float delta = newValue - GetGasAmount(gasName);
+        ChangeGas(gasName, delta);
+        ThermalEnergy += delta * internalTemperature.InKelvin;
         ////UnityDebugger.Debugger.Log("Atmosphere", "Setting " + gasName + ". New value is " + GetGasAmount(gasName));
     }
 
     /// <summary>
-    /// Sets the total gas value then evenly spreads it.
+    /// Sets the total gas value then evenly spreads it depending on gas fractions
     /// </summary>
     /// <param name="newValue"> The new value for the total gas to be. </param>
     public void SetGas(float newValue)
     {
-        float amount = newValue - TotalGas;
-        foreach (var gasName in GetGasNames())
+        float delta = newValue - TotalGas;
+        foreach (string gasName in GetGasNames())
         {
-            ChangeGas(gasName, amount * GetGasFraction(gasName));
+            gasses[gasName] += delta * GetGasFraction(gasName);
         }
 
-        ChangeTemperature((-amount * internalTemperature.InKelvin) / TotalGas);
+        TotalGas = newValue;
+        ThermalEnergy += delta * internalTemperature.InKelvin;
     }
 
     /// <summary>
@@ -141,13 +169,9 @@ public class AtmosphereComponent
             return;
         }
 
-        // Δ
-        // E = ∑G*T
-        // Therefore using E += ΔG * ΔT
-        // T = { [T(initial) * ∑G(initial)] + [ΔG * ΔT] } / ∑G(final)
-        float oldThermal = internalTemperature.InKelvin * TotalGas + amount * temperature;
         ChangeGas(gasName, amount);
-        SetTemperature(oldThermal / TotalGas);
+
+        ThermalEnergy += amount * temperature;
     }
 
     /// <summary>
@@ -163,14 +187,12 @@ public class AtmosphereComponent
         }
 
         amount = Mathf.Min(TotalGas, amount);
-        float thermal = internalTemperature.InKelvin * (TotalGas - amount);
-
         foreach (var gasName in GetGasNames())
         {
             ChangeGas(gasName, -amount * GetGasFraction(gasName));
         }
 
-        SetTemperature(thermal / TotalGas);
+        ThermalEnergy -= amount * internalTemperature.InKelvin;
     }
 
     /// <summary>
@@ -187,10 +209,8 @@ public class AtmosphereComponent
         }
 
         amount = Mathf.Min(GetGasAmount(gasName), amount);
-        float thermal = internalTemperature.InKelvin * (TotalGas - amount);
-
         ChangeGas(gasName, -amount);
-        SetTemperature(thermal / TotalGas);
+        ThermalEnergy -= amount * internalTemperature.InKelvin;
     }
 
     /// <summary>
@@ -222,14 +242,9 @@ public class AtmosphereComponent
             destination.ChangeGas(gasNames[i], partialAmount);
         }
 
-        // The amount lost
-        // Equation E = T * ∑G
-        // Therefore ΔE = ΔT * Δ∑G
-        // Therefore ΔE = amount * current temperature
-        // And we can get the temperature amount by incrementing it by ΔE/∑G for the source and destination.
-        float deltaTemperature = amount * this.internalTemperature.InKelvin;
-        this.ChangeTemperature(-deltaTemperature / this.TotalGas);
-        destination.ChangeTemperature(deltaTemperature / destination.TotalGas);
+        float thermalDelta = amount * internalTemperature.InKelvin;
+        this.ThermalEnergy -= thermalDelta;
+        destination.ThermalEnergy += thermalDelta;
     }
 
     public void MoveGasTo(AtmosphereComponent destination, string gasName, float amount)
@@ -244,14 +259,9 @@ public class AtmosphereComponent
         this.ChangeGas(gasName, -amount);
         destination.ChangeGas(gasName, amount);
 
-        // The amount lost
-        // Equation E = T * ∑G
-        // Therefore ΔE = ΔT * Δ∑G
-        // Therefore ΔE = amount * current temperature
-        // And we can get the temperature amount by incrementing it by ΔE/∑G for the source and destination.
-        float deltaTemperature = amount * this.internalTemperature.InKelvin;
-        this.ChangeTemperature(-deltaTemperature / this.TotalGas);
-        destination.ChangeTemperature(deltaTemperature / destination.TotalGas);
+        float thermalDelta = amount * internalTemperature.InKelvin;
+        this.ThermalEnergy -= thermalDelta;
+        destination.ThermalEnergy += thermalDelta;
     }
     #endregion
 
@@ -267,21 +277,22 @@ public class AtmosphereComponent
     }
 
     /// <summary>
-    /// Sets the temperature to a specific value.
+    /// Sets the temperature.
     /// </summary>
     /// <param name="temperature">Temperature.</param>
-    public void SetTemperature(float newTemperatureInKelvin)
+    public void SetTemperature(float temperature)
     {
-        internalTemperature.InKelvin = newTemperatureInKelvin;
+        // Also will conversely set the temperature.
+        ThermalEnergy = TotalGas * temperature;
     }
 
     /// <summary>
     /// Changes the energy.
     /// </summary>
     /// <param name="amount">The amount of energy added or removed from the total.</param>
-    public void ChangeTemperature(float amountInKelvin)
+    public void ChangeEnergy(float amount)
     {
-        internalTemperature.InKelvin += amountInKelvin;
+        ThermalEnergy += Mathf.Max(-ThermalEnergy, amount);
     }
     #endregion
 }

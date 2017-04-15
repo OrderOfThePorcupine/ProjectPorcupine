@@ -175,7 +175,7 @@ public class ScheduledEventTest
             3.0f,
             true,
             1);
-        
+
         Reset();
         evt.Update(2f);
         evt.SetCooldown(2.5f);

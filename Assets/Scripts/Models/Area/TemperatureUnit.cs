@@ -15,7 +15,7 @@ using UnityEngine;
 /// Holds temperature data in Kelvin but can be accessed in celsius, fahrenheit, and rankine.
 /// </summary>
 [MoonSharpUserData]
-public class TemperatureValue : IFormattable
+public struct TemperatureValue : IFormattable
 {
     /// <summary>
     /// Absolute 0, or 0 K.
@@ -44,7 +44,7 @@ public class TemperatureValue : IFormattable
     /// <summary>
     /// The current temperature in Kelvin.
     /// </summary>
-    public float InKelvin { get; set; }
+    public float InKelvin { get; private set; }
 
     /// <summary>
     /// The current temperature in Celsius.
@@ -54,11 +54,6 @@ public class TemperatureValue : IFormattable
         get
         {
             return InKelvin - 273.15f;
-        }
-
-        set
-        {
-            InKelvin = value + 273.15f;
         }
     }
 
@@ -71,11 +66,6 @@ public class TemperatureValue : IFormattable
         {
             return (InKelvin * 1.8f) - 459.67f;
         }
-
-        set
-        {
-            InKelvin = (value + 459.67f) * (5 / 9);
-        }
     }
 
     /// <summary>
@@ -86,11 +76,6 @@ public class TemperatureValue : IFormattable
         get
         {
             return InKelvin * 1.8f;
-        }
-
-        set
-        {
-            InKelvin = value * (5 / 9);
         }
     }
 
