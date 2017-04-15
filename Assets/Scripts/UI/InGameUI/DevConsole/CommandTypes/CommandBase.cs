@@ -121,7 +121,7 @@ namespace DeveloperConsole.Core
             return result
                 .Cast<Match>()
                 .Select(m => m.Value.Trim('[', ']', ' '))
-                .Where(m => m != string.Empty)
+                .Where(m => string.IsNullOrEmpty(m) == false)
                 .ToArray();
         }
 
@@ -181,7 +181,7 @@ namespace DeveloperConsole.Core
             try
             {
                 string[] arguments = RegexToStandardPattern(args);
-                convertedArgs = new object[arguments.Length];
+                convertedArgs = new object[TypeInfo.Length];
 
                 // If TypeInfo null then no new parameters to pass (we'll we will pass an array of strings, which could be empty)
                 if (TypeInfo == null || TypeInfo.Length == 0)
@@ -191,8 +191,7 @@ namespace DeveloperConsole.Core
 
                 for (int i = 0; i < TypeInfo.Length; i++)
                 {
-                    // Guard to make sure we don't actually go overflow.
-                    if (arguments.Length > i)
+                    if (arguments.Length > i && arguments[i] != null)
                     {
                         convertedArgs[i] = DevConsole.Parsers[TypeInfo[i]](arguments[i]);
                         if (convertedArgs[i] == null)
@@ -204,10 +203,7 @@ namespace DeveloperConsole.Core
                     }
                     else
                     {
-                        // No point running through the rest, 
-                        // this means 'technically' you could have 100 unused parameters at the end (not tested)
-                        // However, that may break for other reasons
-                        break;
+                        convertedArgs[i] = null;
                     }
                 }
             }

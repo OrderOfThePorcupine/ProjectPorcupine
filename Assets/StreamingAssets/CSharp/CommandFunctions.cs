@@ -15,9 +15,10 @@ public static class CommandFunctions
         DevConsole.Log("Change successful :D", "green");
     }
 
-    public static void ChangeCameraPosition(Vector3 newPos)
+    public static void ChangeCameraPosition(Vector3 newPos, string logThis)
     {
         Camera.main.transform.position = newPos;
+        DevConsole.Log(logThis, "green");
     }
 
     /// <summary>

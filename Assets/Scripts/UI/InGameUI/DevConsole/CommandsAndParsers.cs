@@ -23,7 +23,7 @@ namespace DeveloperConsole.Core
             DevConsole.Log("Time is " + (TimeManager.Instance.IsPaused ? "paused" : TimeManager.Instance.TimeScale + "x"), "yellow");
         }
 
-        [Command("System", "Console", description = "Sets the font size, must be between 10 and 20 (inclusive)", detailedDescription = "This command sets the font size of the console.  It takes a single parameter which is a whole number (integer) and has to be between 10 and 20 (inclusive).  The default is 14.")]
+        [Command("System", "Console", description = "Sets the font size, must be between 10 and 20 (inclusive)", detailedDescription = "This command sets the font size of the console.  It takes a single parameter which is a whole number (integer) and has to be between 10 and 20 (inclusive).  The default is 14.", title = "SetFontSize")]
         public static void SetFontSize(int size = 14)
         {
             if (size < 10)
@@ -73,7 +73,7 @@ namespace DeveloperConsole.Core
         /// </summary>
         /// <param name="text"> The text to set to. </param>
         [Command("System", "Console", description = "Sets the console text", title = "SetText")]
-        public static void SetText(string text = "")
+        public static void SetText(string text = "", int cat = 2)
         {
             Text textObj = DevConsole.TextObject();
 
