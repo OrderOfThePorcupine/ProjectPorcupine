@@ -9,17 +9,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DeveloperConsole.CommandTypes;
-using DeveloperConsole.Interfaces;
+using System.Reflection;
+using DeveloperConsole.Core;
 using MoonSharp.Interpreter;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace DeveloperConsole
 {
-    public delegate void Method(params object[] parameters);
-
-    public delegate void HelpMethod();
+    /// <summary>
+    /// A delegate for the parse operation.
+    /// If object is null it failed.
+    /// </summary>
+    /// <param name="args"> Arguments passed in. </param>
+    /// <returns> The parsed value of the arguments.  Null if arguments are wrong. </returns>
+    public delegate object ParseDelegate(string args);
 
     [MoonSharpUserData]
     public class DevConsole : MonoBehaviour
@@ -30,7 +34,8 @@ namespace DeveloperConsole
         private const int AutoclearThreshold = 18000;
 
         /// <summary>
-        /// Current instance.
+        /// Singleton patterned instnace.
+        /// Private since there are static functions only for controlled access.
         /// </summary>
         private static DevConsole instance;
 
@@ -104,6 +109,11 @@ namespace DeveloperConsole
         /// </summary>
         [SerializeField]
         private GameObject root;
+
+        /// <summary>
+        /// All the parsers available.
+        /// </summary>
+        public static Dictionary<Type, ParseDelegate> Parsers { get; private set; }
 
         /// <summary>
         /// Is the command line open.
@@ -308,9 +318,7 @@ namespace DeveloperConsole
             {
                 foreach (CommandBase commandToCall in commandsToCall)
                 {
-                    ICommandRunnable runnable = (ICommandRunnable)commandToCall;
-
-                    if (runnable != null)
+                    if (commandToCall != null)
                     {
                         if (commandToCall.Parameters == null || commandToCall.Parameters == string.Empty)
                         {
@@ -325,13 +333,13 @@ namespace DeveloperConsole
 
                             // They really need a better literal system...
                             // This is the closet we can get basically
-                            if (args == string.Empty || args == '"'.ToString())
+                            if (string.IsNullOrEmpty(args) || args == '"'.ToString())
                             {
-                                args = @"""";
+                                args = string.Empty;
                             }
                         }
 
-                        runnable.ExecuteCommand(args);
+                        commandToCall.ExecuteCommand(args);
                     }
                 }
             }
@@ -351,7 +359,6 @@ namespace DeveloperConsole
 
                 foreach (CommandBase commandToShow in commandsToShow)
                 {
-                    // Yah its close enough either 2/3rds similar or 1/3rd if no matches found
                     Log(commandToShow.Title, "green");
                 }
             }
@@ -362,15 +369,13 @@ namespace DeveloperConsole
         /// </summary>
         public static void ShowHelpMethod(CommandBase help)
         {
-            if (help.HelpMethod != null)
+            if (string.IsNullOrEmpty(help.DetailedDescriptiveText) && string.IsNullOrEmpty(help.DescriptiveText))
             {
-                help.HelpMethod();
-            }
-            else
-            {
-                Log("<color=yellow>Command Info:</color> " + ((help.DescriptiveText == string.Empty) ? " < color=red>There's no help for this command</color>" : help.DescriptiveText));
+                DevConsole.Log("<color=yellow>Command Info:</color> <color=red>There's no help for this command</color>");
+                return;
             }
 
+            Log("<color=yellow>Command Info:</color> " + (string.IsNullOrEmpty(help.DetailedDescriptiveText) ? help.DescriptiveText : help.DetailedDescriptiveText));
             Log("<color=yellow>Call it like </color><color=orange> " + help.Title + GetParameters(help) + "</color>");
         }
 
@@ -571,63 +576,33 @@ namespace DeveloperConsole
         }
 
         /// <summary>
-        /// Logs all the tags.
-        /// We don't care about the params object.
+        /// Add a parser through reflection of method info.
         /// </summary>
-        public static void AllTags(params object[] objects)
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="methodInfo"> The reflected method that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, MethodInfo methodInfo)
         {
-            Log("All the tags: ", "green");
-            Log(string.Join(", ", CommandArray().SelectMany(x => x.Tags).Select(x => x.Trim()).Distinct().ToArray()));
+            Parsers.Add(target, (ParseDelegate)Delegate.CreateDelegate(typeof(ParseDelegate), methodInfo));
         }
 
         /// <summary>
-        /// Just returns help dependent on each command.
+        /// Add a parser through a parse delegate.
         /// </summary>
-        /// <param name="objects"> First one should be a string tag. </param>
-        public static void Help(params object[] objects)
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, ParseDelegate method)
         {
-            string tag = string.Empty;
-
-            if (objects != null && objects.Length > 0 && objects[0] is string)
-            {
-                tag = objects[0] as string;
-            }
-
-            Log("-- Help --", "green");
-
-            string text = string.Empty;
-
-            CommandBase[] consoleCommands = CommandArray(tag);
-
-            for (int i = 0; i < consoleCommands.Length; i++)
-            {
-                text += "\n<color=orange>" + consoleCommands[i].Title + GetParameters(consoleCommands[i]) + "</color>" + (consoleCommands[i].DescriptiveText == null ? string.Empty : " //" + consoleCommands[i].DescriptiveText);
-            }
-
-            Log(text);
-
-            Log("\n<color=orange>Note:</color> If the function has no parameters you <color=red> don't</color> need to use the parameter modifier.");
-            Log("<color=orange>Note:</color> You <color=red>don't</color> need to use the trailing parameter modifier either");
-            Log("You can use constants to replace common parameters (they are case insensitive but require ' ' around them):");
-            Log("- 'Center' (or 'Centre') is a position of the center/centre of the map.");
-            Log("- 'MousePos' is the position of the mouse");
-            Log("- 'TimeScale' is the current time scale");
-            Log("- 'Pi' is Pi");
+            Parsers.Add(target, method);
         }
 
         /// <summary>
-        /// Clears the text area and history.
+        /// Add a parser through a function.
         /// </summary>
-        /// <param name="objects"> We don't care about the objects :D. </param>
-        public static void Clear(params object[] objects)
+        /// <param name="target"> The target type of the parser. </param>
+        /// <param name="method"> A function that takes in a string and returns an object. </param>
+        public static void AddParser(Type target, Func<string, object> method)
         {
-            ClearHistory();
-            Text textObj = TextObject();
-
-            if (textObj != null)
-            {
-                TextObject().text = "\n<color=green>Clear Successful :D</color>\n";
-            }
+            Parsers.Add(target, new ParseDelegate(method));
         }
 
         /// <summary>
@@ -743,6 +718,11 @@ namespace DeveloperConsole
         /// </summary>
         private void Start()
         {
+            if (Parsers == null)
+            {
+                Parsers = new Dictionary<Type, ParseDelegate>();
+            }
+
             transform.SetAsLastSibling();
 
             // Guard
@@ -754,6 +734,8 @@ namespace DeveloperConsole
 
             textArea.fontSize = SettingsKeyHolder.FontSize;
             textArea.text = "\n";
+
+            AddParsersByReflection();
 
             // Load all the commands
             LoadCommands();
@@ -920,17 +902,40 @@ namespace DeveloperConsole
         }
 
         /// <summary>
+        /// Adds all parsers that implement <see cref="ParserAttribute"/>.
+        /// </summary>
+        private void AddParsersByReflection()
+        {
+            // Find each method with the command attribute then add it to the console commands
+            foreach (MethodInfo method in Assembly.GetCallingAssembly().GetTypes().SelectMany(x => x.GetMethods().Where(y => y.GetCustomAttributes(typeof(ParserAttribute), false).Count() > 0)))
+            {
+                ParserAttribute attribute = (ParserAttribute)method.GetCustomAttributes(typeof(ParserAttribute), false).First();
+                AddParser(attribute.Target, method);
+            }
+        }
+
+        /// <summary>
+        /// Adds all commands that implement <see cref="CommandAttribute"/>.
+        /// </summary>
+        private void AddCommandsByReflection()
+        {
+            // Find each method with the command attribute then add it to the console commands
+            foreach (MethodInfo method in Assembly.GetCallingAssembly().GetTypes().SelectMany(x => x.GetMethods().Where(y => y.GetCustomAttributes(typeof(CommandAttribute), false).Count() > 0)))
+            {
+                CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false).First();
+                string parameters = string.Join(",", method.GetParameters().Select(x => x.ParameterType.Name + " " + x.Name).ToArray());
+                consoleCommands.Add(new InternalCommand(string.IsNullOrEmpty(attribute.title) ? method.Name : attribute.title, method, attribute.description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.detailedDescription, attribute.Tags));
+            }
+        }
+
+        /// <summary>
         /// Clears commands and re-loads them.
         /// </summary>
         private void LoadCommands()
         {
             consoleCommands.Clear();
 
-            // Load Base Commands
-            AddCommands(
-                new InternalCommand("Help", Help, "Returns information on all commands.  Can take in a parameter as a tag to search for all commands with that tag", new string[] { "System" }, new Type[] { typeof(string) }, new string[] { "tag" }),
-                new InternalCommand("Clear", Clear, "Clears the developer console", new string[] { "System" }),
-                new InternalCommand("Tags", AllTags, "Logs all the tags used", new string[] { "System" }));
+            AddCommandsByReflection();
 
             // Load Commands from XML (will be changed to JSON AFTER the current upgrade)
             // Covers both CSharp and LUA
