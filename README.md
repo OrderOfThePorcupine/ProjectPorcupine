@@ -66,11 +66,11 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md) file for contribution instru
 
 For further information, such as Roadmaps, explanations of systems and features, Standards and Conventions, and all your Git needs and troubleshooting see the [Wiki](https://github.com/TeamPorcupine/ProjectPorcupine/wiki)
 
-Make sure that you are using Unity 5.4.2 [Windows](https://unity3d.com/get-unity/download?thank-you=update&download_nid=43049&os=Win) | [Mac](https://unity3d.com/get-unity/download?thank-you=update&download_nid=43049&os=Mac)
+Make sure that you are using Unity 5.5.3 [Windows](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Win) | [Mac](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Mac)
 
 ## Community
 
-* [Unoffical Discord Channel ](https://discord.gg/68hkpSA)<discord.projectporcupine.com>
+* [Offical Discord Channel ](https://discord.gg/68hkpSA)<discord.projectporcupine.com>
 * [Unoffical Subreddit](https://reddit.com/r/ProjectPorcupine)
 
 ## Contact

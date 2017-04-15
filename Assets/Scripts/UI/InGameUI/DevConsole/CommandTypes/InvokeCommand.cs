@@ -9,53 +9,34 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-
-using DeveloperConsole.Interfaces;
 using MoonSharp.Interpreter;
 
-namespace DeveloperConsole.CommandTypes
+namespace DeveloperConsole.Core
 {
     /// <summary>
     /// Invoke some code from either C# Function Manager or LUA Function Manager.
     /// </summary>
     [MoonSharpUserData]
-    public sealed class InvokeCommand : CommandBase, ICommandInvoke
+    public sealed class InvokeCommand : CommandBase
     {
         /// <summary>
         /// Standard constructor.
         /// </summary>
-        /// <param name="title"> The title of the command. </param>
-        /// <param name="functionName"> The function name of the command (can be C# or LUA). </param>
-        /// <param name="descriptiveText"> The text that describes this command. </param>
-        /// <param name="helpFunctionName"> The help function name of the command (can be C# or LUA). </param>
-        /// <param name="parameters"> The parameters ( should be invokeable format of (using [any character];)? type variableName, ... ). </param>
-        public InvokeCommand(string title, string functionName, string descriptiveText, string helpFunctionName, string parameters, string[] tags, string defaultValue)
+        /// <param name="title"> The title for the command. </param>
+        /// <param name="functionName"> The name of the command to execute. </param>
+        /// <param name="descriptiveText"> The help text to display. </param>
+        /// <param name="detailedDescriptiveText"> More detailed help text to display. </param>
+        /// <param name="parameters"> In format of 'Type name' i.e. Int myInt.  With a comma separator. </param>
+        /// <param name="tags"> Tags group commands for easy access. </param>
+        /// <param name="defaultValue"> The default value for this command. </param>
+        public InvokeCommand(string title, string functionName, string descriptiveText, string detailedDescriptiveText, string parameters, string[] tags, string defaultValue)
         {
             Title = title;
             FunctionName = functionName;
             DescriptiveText = descriptiveText;
-            HelpFunctionName = helpFunctionName;
+            DetailedDescriptiveText = detailedDescriptiveText;
             Tags = tags;
             DefaultValue = defaultValue;
-
-            HelpMethod = delegate
-            {
-                if (HelpFunctionName == string.Empty)
-                {
-                    DevConsole.Log("<color=yellow>Command Info:</color> " + ((DescriptiveText == string.Empty) ? " < color=red>There's no help for this command</color>" : DescriptiveText));
-                    return;
-                }
-
-                try
-                {
-                    FunctionsManager.DevConsole.CallWithError(HelpFunctionName);
-                }
-                catch (Exception e)
-                {
-                    DevConsole.LogError(Errors.UnknownError(this));
-                    DevConsole.LogError("This error message may be able to help: " + e.Message);
-                }
-            };
 
             // If the parameters contains a ';' then it'll exclude the 'using' statement.
             // Just makes the declaration help look nicer.
@@ -118,7 +99,7 @@ namespace DeveloperConsole.CommandTypes
                         // We just split, since its a decently appropriate solution.
                         string[] parameterSections = parameterTypes[i].Split(';');
 
-                        types[i] = GetType(parameterSections[1], parameterSections[0]);
+                        types[i] = Type.GetType((parameterSections[1].Contains('.') ? parameterSections[1] : "System." + parameterSections[1]) + parameterSections[0], true, true);
                     }
                     catch (Exception e)
                     {
@@ -132,40 +113,30 @@ namespace DeveloperConsole.CommandTypes
             }
 
             // Assign array
-            Types = types;
+            this.TypeInfo = types;
         }
 
-        public Type[] Types
-        {
-            get; private set;
-        }
-
+        /// <summary>
+        /// The name of the function to execute.
+        /// </summary>
         public string FunctionName
         {
             get; private set;
         }
 
-        public string HelpFunctionName
-        {
-            get; private set;
-        }
-
+        /// <summary>
+        /// All the parameters in format Type name, with a comma seperator.
+        /// </summary>
         public override string Parameters
         {
             get; protected set;
         }
 
         /// <summary>
-        /// Just does the Type.GetType(TypeName, AssemblyName) to get the types from a wider range.
+        /// Execute this command.
         /// </summary>
-        public Type GetType(string typeName, string namespaceName)
-        {
-            Type tryType = Type.GetType((typeName.Contains('.') ? typeName : "System." + typeName) + namespaceName, true, true);
-
-            return tryType;
-        }
-
-        public void ExecuteCommand(string arguments)
+        /// <param name="arguments"> The arguments to pass in. </param>
+        public override void ExecuteCommand(string arguments)
         {
             try
             {
@@ -175,47 +146,6 @@ namespace DeveloperConsole.CommandTypes
             {
                 DevConsole.LogError(e.Message);
             }
-        }
-
-        protected override object[] ParseArguments(string arguments)
-        {
-            try
-            {
-                string[] args = RegexToStandardPattern(arguments);
-                object[] convertedArgs = new object[args.Length];
-
-                if (Types.Length == 0)
-                {
-                    return args;
-                }
-                else
-                {
-                    for (int i = 0; i < Types.Length; i++)
-                    {
-                        // Guard to make sure we don't actually go overboard
-                        if (args.Length > i)
-                        {
-                            // This just wraps then unwraps, works quite fast actually, since its a easy wrap/unwrap.
-                            convertedArgs[i] = GetValueType<object>(args[i], Types[i]);
-                        }
-                        else
-                        {
-                            // No point running through the rest, 
-                            // this means 'technically' you could have 100 parameters at the end (not tested)
-                            // However, that may break for other reasons
-                            break;
-                        }
-                    }
-
-                    return convertedArgs;
-                }
-            }
-            catch (Exception e)
-            {
-                UnityDebugger.Debugger.LogError("DevConsole", e.ToString());
-            }
-
-            return new object[] { };
         }
     }
 }

@@ -6,9 +6,8 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System.Xml;
-using DeveloperConsole.CommandTypes;
+using DeveloperConsole.Core;
 using MoonSharp.Interpreter;
 
 namespace DeveloperConsole
@@ -34,11 +33,11 @@ namespace DeveloperConsole
         /// <param name="title"> The title of the command.</param>
         /// <param name="methodFunctionName"> The name of the function to call.</param>
         /// <param name="description"> The description of the command.</param>
-        /// <param name="helpFunctionName"> The name of the function to call to show help.</param>
+        /// <param name="detailedDescription"> A more detailed description of this command. </param>
         /// <param name="parameters"> The parameters that this class requires (a string in C# type formats and comma between them).</param>
-        public CommandPrototype(string title, string methodFunctionName, string description, string helpFunctionName, string parameters, string tags, string defaultValue) : this()
+        public CommandPrototype(string title, string methodFunctionName, string description, string detailedDescription, string parameters, string tags, string defaultValue) : this()
         {
-            ConsoleCommand = new InvokeCommand(title, methodFunctionName, description, helpFunctionName, parameters, tags.Split(','), defaultValue);
+            ConsoleCommand = new InvokeCommand(title, methodFunctionName, description, detailedDescription, parameters, tags.Split(','), defaultValue);
         }
 
         /// <summary>
@@ -81,7 +80,7 @@ namespace DeveloperConsole
             string title = reader.GetAttribute("Title");
             string functionName = reader.GetAttribute("FunctionName");
             string description = reader.GetAttribute("Description");
-            string helpFunctionName = reader.GetAttribute("HelpFunctionName");
+            string detailedDescription = reader.GetAttribute("DetailedDescription");
             string parameters = reader.GetAttribute("Parameters");
             string tags = reader.GetAttribute("Tags");
 
@@ -98,7 +97,7 @@ namespace DeveloperConsole
                 defaultValue = string.Empty;
             }
 
-            ConsoleCommand = new InvokeCommand(title, functionName, description, helpFunctionName, parameters, tags.Split(','), defaultValue);
+            ConsoleCommand = new InvokeCommand(title, functionName, description, detailedDescription, parameters, tags.Split(','), defaultValue);
         }
     }
 }

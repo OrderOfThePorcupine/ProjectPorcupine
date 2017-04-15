@@ -8,32 +8,29 @@
 #endregion
 using System;
 
-namespace DeveloperConsole.Interfaces
+namespace DeveloperConsole.Core
 {
-    public interface ICommandInvoke : ICommandRunnable
+    /// <summary>
+    /// An attribute to wrap up a command through reflection.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ParserAttribute : Attribute
     {
         /// <summary>
-        /// The function name to call.
+        /// Create a parser attribute.
         /// </summary>
-        string FunctionName
+        /// <param name="target"> With target type. </param>
+        public ParserAttribute(Type target)
         {
-            get;
+            this.Target = target;
         }
 
         /// <summary>
-        /// The help function name to call.
+        /// The target that this parser is converting to.
         /// </summary>
-        string HelpFunctionName
+        public Type Target
         {
-            get;
-        }
-
-        /// <summary>
-        /// All the types of the parameters.
-        /// </summary>
-        Type[] Types
-        {
-            get;
+            get; protected set;
         }
     }
 }

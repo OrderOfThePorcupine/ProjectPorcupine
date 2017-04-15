@@ -15,9 +15,10 @@ public static class CommandFunctions
         DevConsole.Log("Change successful :D", "green");
     }
 
-    public static void ChangeCameraPosition(Vector3 newPos)
+    public static void ChangeCameraPosition(Vector3 newPos, string logThis)
     {
         Camera.main.transform.position = newPos;
+        DevConsole.Log(logThis, "green");
     }
 
     /// <summary>
@@ -30,28 +31,6 @@ public static class CommandFunctions
     public static void Run_LUA(string code)
     {
         new LuaFunctions().LoadScript(code, "User Script");
-    }
-
-    public static void SetFontSize(int size)
-    {
-        if (size < 10)
-        {
-            DevConsole.LogError("Font size would be too small");
-        }
-        else if (size > 20)
-        {
-            DevConsole.LogError("Font size would be too big");
-        }
-        else
-        {
-            DevConsole.TextObject().fontSize = size;
-            DevConsole.Log("Change successful :D", "green");
-        }
-    }
-
-    public static void SetText(string text = "")
-    {
-        DevConsole.TextObject().text = "\n" + text;
     }
 
     public static void SetCharacterHealth(string name, float health)
@@ -247,20 +226,9 @@ public static class CommandFunctions
         }
     }
 
-    public static void Exit()
-    {
-        DevConsole.Close();
-    }
-
     public static void DevMode(bool isOn)
     {
         SettingsKeyHolder.DeveloperMode = isOn;
-    }
-
-    public static void Status()
-    {
-        DevConsole.Log("Developer Mode is " + (SettingsKeyHolder.DeveloperMode ? "on" : "off"), "yellow");
-        DevConsole.Log("Time is " + (TimeManager.Instance.IsPaused ? "paused" : TimeManager.Instance.TimeScale + "x"), "yellow");
     }
 
     public static void NewCharacter(Vector3 pos, string name = "")
