@@ -30,14 +30,14 @@ public class SettingsMenu : MonoBehaviour
     private GameObject categoryRoot;
     [SerializeField]
     private GameObject mainRoot;
-
     [SerializeField]
     private GameObject categoryPrefab;
     [SerializeField]
     private GameObject headingPrefab;
-
     [SerializeField]
     private Text categoryHeading;
+    [SerializeField]
+    private ScrollRect settingsScrollRect;
 
     // For optimising saving
     private string currentCategory = string.Empty;
@@ -152,6 +152,9 @@ public class SettingsMenu : MonoBehaviour
                 }
             }
         }
+
+        instance.settingsScrollRect.verticalNormalizedPosition = 1;
+        instance.settingsScrollRect.horizontalNormalizedPosition = 0;
     }
 
     public void Apply()

@@ -961,16 +961,31 @@ public class DeveloperConsoleSlider : GenericSlider
 
 public class UIScaleSlider : GenericSlider
 {
+    private UIRescaler rescaler;
+
+    public override GameObject InitializeElement()
+    {
+        GameObject go = base.InitializeElement();
+        rescaler = GameObject.Find("Canvas").GetComponent<UIRescaler>();
+        return go;
+    }
+
     public override void ApplySetting()
     {
         base.ApplySetting();
-        sliderElement.GetComponentInParent<UIRescaler>().AdjustScale();
+        if (rescaler != null)
+        {
+            rescaler.AdjustScale();
+        }
     }
 
     public override void CancelSetting()
     {
         base.CancelSetting();
-        sliderElement.GetComponentInParent<UIRescaler>().AdjustScale();
+        if (rescaler != null)
+        {
+            rescaler.AdjustScale();
+        }
     }
 }
 
