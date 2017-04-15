@@ -52,25 +52,28 @@ public class SettingsMenu : MonoBehaviour
         GameController.Instance.IsModal = true;
         GameController.Instance.soundController.OnButtonSFX();
 
+        instance.changesTracker.Clear();
+
         if (instance.options.Count > 0)
         {
-            DisplayCategory(instance.options.First().Key);
+            DisplayCategory(instance.options.First().Key, true);
         }
         else
         {
-            DisplayCategory("No Settings Loaded");
+            DisplayCategory("No Settings Loaded", true);
         }
 
         instance.mainRoot.SetActive(true);
     }
 
-    public static void DisplayCategory(string category)
+    public static void DisplayCategory(string category, bool initial = false)
     {
         if (instance == null)
         {
             return;
         }
 
+        /*
         RectTransform rectTransform = instance.mainRoot.GetComponent<RectTransform>();
         if (rectTransform.sizeDelta.x > Screen.width * 0.8f)
         {
@@ -81,9 +84,10 @@ public class SettingsMenu : MonoBehaviour
         {
             rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, Screen.height * 0.8f);
         }
+        */
 
         // Optimisation for saving
-        if (instance.currentCategory != string.Empty && instance.currentCategory != category && instance.options.ContainsKey(instance.currentCategory))
+        if (instance.currentCategory != string.Empty && instance.currentCategory != category && instance.options.ContainsKey(instance.currentCategory) && initial == false)
         {
             foreach (string headingName in instance.options[instance.currentCategory].Keys)
             {
@@ -94,9 +98,13 @@ public class SettingsMenu : MonoBehaviour
                     if (elementCopy != null && elementCopy.valueChanged)
                     {
                         instance.changesTracker.Add(elementCopy);
-                        instance.Apply();
                     }
                 }
+            }
+
+            if (instance.changesTracker.Count > 0)
+            {
+                instance.Apply();
             }
         }
 
@@ -215,6 +223,8 @@ public class SettingsMenu : MonoBehaviour
                             changesTracker[i].CancelSettingLUA();
                         }
 
+                        changesTracker.Clear();
+
                         GameController.Instance.IsModal = false;
                         GameController.Instance.soundController.OnButtonSFX();
                         mainRoot.SetActive(false);
@@ -295,11 +305,11 @@ public class SettingsMenu : MonoBehaviour
 
         if (options.Count > 0)
         {
-            DisplayCategory(options.First().Key);
+            DisplayCategory(options.First().Key, true);
         }
         else
         {
-            DisplayCategory("No Settings Loaded");
+            DisplayCategory("No Settings Loaded", true);
         }
 
         yield return null;
