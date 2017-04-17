@@ -97,7 +97,7 @@ namespace DeveloperConsole
                 defaultValue = string.Empty;
             }
 
-            ConsoleCommand = new InvokeCommand(title, functionName, description, detailedDescription, parameters, tags.Split(','), defaultValue);
+            ConsoleCommand = new InvokeCommand(title, functionName, description, detailedDescription, parameters, tags.Split(',').Select(x => x.Trim()).ToArray(), defaultValue);
         }
     }
 }
