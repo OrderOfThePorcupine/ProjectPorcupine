@@ -95,18 +95,19 @@ public class EventActions
 
     /// <summary>
     /// Fire the event named actionName, resulting in all lua functions being called.
+    /// This one reduces GC bloat.
     /// </summary>
     /// <param name="actionName">Name of the action being triggered.</param>
     /// <param name="target">Object, passed to LUA function as 1-argument.</param>
-    /// <param name="deltaTime">Time since last Trigger of this event.</param>
-    public void Trigger<T>(string actionName, T target, params object[] parameters)
+    /// <param name="parameters">Parameters in question.  First one must be target instance. </param>
+    public void Trigger(string actionName, params object[] parameters)
     {
         if (!actionsList.ContainsKey(actionName) || actionsList[actionName] == null)
         {
         }
         else
         {
-            FunctionsManager.Get(target.GetType().Name).CallWithInstance(actionsList[actionName], target, parameters);
+            FunctionsManager.Get(parameters[0].GetType().Name).Call(actionsList[actionName], parameters);
         }
     }
 

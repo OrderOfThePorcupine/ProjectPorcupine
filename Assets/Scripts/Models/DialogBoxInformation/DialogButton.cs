@@ -12,7 +12,7 @@ public class DialogButton : DialogControl
     public string buttonName;
 
     public void OnClicked()
-    { 
+    {
         // These names should actually be something like "button_my" in order to be localized.
         // However, just to make sure, we replace this to avoid any problems.
         buttonName = buttonName.Replace(" ", "_");
@@ -23,7 +23,7 @@ public class DialogButton : DialogControl
         if (dialogEvents.HasEvent("On" + buttonName + "Clicked") == true)
         {
             UnityDebugger.Debugger.Log("ModDialogBox", "Found On" + buttonName + "Clicked event");
-            dialogEvents.Trigger<ModDialogBox>("On" + buttonName + "Clicked", transform.GetComponentInParent<ModDialogBox>());
+            dialogEvents.Trigger("On" + buttonName + "Clicked", transform.GetComponentInParent<ModDialogBox>());
         }
     }
 }
