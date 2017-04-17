@@ -8,9 +8,9 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using ProjectPorcupine.PowerNetwork;
-using System.Collections.Generic;
 
 public class LuaFunctions : IFunctions
 {

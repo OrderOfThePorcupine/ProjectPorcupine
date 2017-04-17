@@ -152,6 +152,7 @@ public class Functions
             {
                 throw new Exception("'" + functionName + "' is not a LUA nor is it a CSharp function!");
             }
+
             return null;
         }
     }
