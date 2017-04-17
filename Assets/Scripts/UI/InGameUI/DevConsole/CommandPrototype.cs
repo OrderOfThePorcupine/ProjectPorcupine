@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System.Linq;
 using System.Xml;
 using DeveloperConsole.Core;
 using MoonSharp.Interpreter;
