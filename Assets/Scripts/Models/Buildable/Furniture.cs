@@ -547,6 +547,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         prevUpdatePowerOn = true;
         Jobs.ResumeAll();
 
+        UnityEngine.Profiling.Profiler.BeginSample("Furniture");
+
         if (EventActions != null)
         {
             EventActions.Trigger("OnUpdate", this, deltaTime);
@@ -561,6 +563,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             Animation.Update(deltaTime);
         }
+
+        UnityEngine.Profiling.Profiler.EndSample();
     }
 
     /// <summary>
