@@ -134,30 +134,6 @@ public class CSharpFunctions : IFunctions
         return (T)methods[functionName].Invoke(null, args);
     }
 
-    public void CallWithInstance(string[] functionNames, object instance, params object[] parameters)
-    {
-        foreach (string fn in functionNames)
-        {
-            if (fn == null)
-            {
-                UnityDebugger.Debugger.LogError("CSharp", "'" + fn + "' is not a CSharp function.");
-                return;
-            }
-
-            DynValue result;
-            object[] instanceAndParams = new object[parameters.Length + 1];
-            instanceAndParams[0] = instance;
-            parameters.CopyTo(instanceAndParams, 1);
-
-            result = Call(fn, instanceAndParams);
-
-            if (result != null && result.Type == DataType.String)
-            {
-                UnityDebugger.Debugger.LogError("CSharp", result.String);
-            }
-        }
-    }
-
     public void RegisterType(Type type)
     {
         // nothing to do for C#

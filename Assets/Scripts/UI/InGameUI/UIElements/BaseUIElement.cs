@@ -122,10 +122,18 @@ public abstract class BaseUIElement
         baseLayout.minHeight = allocatedHeight;
     }
 
-    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft)
+    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
     {
-        Text text = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsText")).GetComponent<Text>();
-        text.text = LocalizationTable.GetLocalization(withText);
+        Text text = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsText"), Vector3.zero, Quaternion.identity).GetComponent<Text>();
+        if (localize)
+        {
+            text.text = LocalizationTable.GetLocalization(withText);
+        }
+        else
+        {
+            text.text = withText;
+        }
+
         text.alignment = alignment;
 
         if (autoFit == true)
@@ -138,12 +146,12 @@ public abstract class BaseUIElement
 
     protected Toggle CreateToggle(string type)
     {
-        return GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/Settings" + type)).GetComponent<Toggle>();
+        return SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/Settings" + type), Vector3.zero, Quaternion.identity).GetComponent<Toggle>();
     }
 
     protected InputField CreateInputField(string withText)
     {
-        InputField field = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsField")).GetComponent<InputField>();
+        InputField field = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsField"), Vector3.zero, Quaternion.identity).GetComponent<InputField>();
         field.text = withText;
 
         return field;
@@ -151,7 +159,7 @@ public abstract class BaseUIElement
 
     protected Slider CreateSlider(float value, Vector2 range, bool wholeNumbers = true)
     {
-        Slider slider = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsSlider")).GetComponent<Slider>();
+        Slider slider = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsSlider"), Vector3.zero, Quaternion.identity).GetComponent<Slider>();
 
         slider.maxValue = range.y;
         slider.minValue = range.x;
@@ -163,12 +171,12 @@ public abstract class BaseUIElement
 
     protected Dropdown CreateEmptyDropdown()
     {
-        return GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown")).GetComponent<Dropdown>();
+        return SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown"), Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
     }
 
     protected Dropdown CreateDropdownFromText(string[] textOptions, int value)
     {
-        Dropdown dropdown = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown")).GetComponent<Dropdown>();
+        Dropdown dropdown = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown"), Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
         dropdown.AddOptions(textOptions.ToList());
         dropdown.value = value;
 
@@ -177,7 +185,7 @@ public abstract class BaseUIElement
 
     protected Dropdown CreateDropdownFromOptionData(Dropdown.OptionData[] optionDataOptions, int value)
     {
-        Dropdown dropdown = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown")).GetComponent<Dropdown>();
+        Dropdown dropdown = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown"), Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
         dropdown.AddOptions(optionDataOptions.ToList());
         dropdown.value = value;
 

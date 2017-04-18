@@ -290,7 +290,7 @@ public class GenericSlider : BaseSettingsElement
         // Note this is just from playing around and finding a nice value
         GameObject element = GetVerticalBaseElement("Slider", 200, 20, TextAnchor.MiddleLeft, 0, 40);
 
-        textElement = CreateText(string.Format(format, getValue()) + LocalizationTable.GetLocalization(option.name), true, TextAnchor.MiddleCenter);
+        textElement = CreateText(string.Format(format, getValue()) + LocalizationTable.GetLocalization(option.name), true, TextAnchor.MiddleCenter, false);
         textElement.transform.SetParent(element.transform);
 
         float minValue = this.parameterData.ContainsKey("MinimumValue") ? this.parameterData["MinimumValue"].ToFloat() : 0;

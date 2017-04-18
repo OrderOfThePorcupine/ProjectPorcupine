@@ -8,6 +8,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using ProjectPorcupine.PowerNetwork;
 
@@ -61,7 +62,7 @@ public class LuaFunctions : IFunctions
         this.scriptName = scriptName;
         try
         {
-            script.DoString(text);
+            script.DoString(text, script.Globals);
         }
         catch (SyntaxErrorException e)
         {
@@ -87,43 +88,6 @@ public class LuaFunctions : IFunctions
         return Call(functionName, args).ToObject<T>();
     }
 
-    /// <summary>
-    /// Calls the specified lua functions with the specified instance.
-    /// </summary>
-    /// <param name="functionNames">Function names.</param>
-    /// <param name="instance">An instance of the actions type.</param>
-    /// <param name="deltaTime">Delta time.</param>
-    public void CallWithInstance(string[] functionNames, object instance, params object[] parameters)
-    {
-        if (instance == null)
-        {
-            // These errors are about the lua code so putting them in the Lua channel.
-            UnityDebugger.Debugger.LogError("Lua", "Instance is null, cannot call LUA function (something is fishy).");
-        }
-
-        foreach (string fn in functionNames)
-        {
-            if (fn == null)
-            {
-                UnityDebugger.Debugger.LogError("Lua", "'" + fn + "' is not a LUA function.");
-                return;
-            }
-
-            object[] instanceAndParams = new object[parameters.Length + 1];
-            instanceAndParams[0] = instance;
-            parameters.CopyTo(instanceAndParams, 1);
-
-            try
-            {
-                Call(fn, instanceAndParams);
-            }
-            catch (ScriptRuntimeException e)
-            {
-                UnityDebugger.Debugger.LogError("Lua", "[" + scriptName + "] LUA RunTime error: " + e.DecoratedMessage);
-            }
-        }
-    }
-
     public void RegisterType(Type type)
     {
         RegisterGlobal(type);
@@ -136,15 +100,18 @@ public class LuaFunctions : IFunctions
     /// <param name="args">Arguments.</param>
     private DynValue Call(string functionName, bool throwError, params object[] args)
     {
-        object func = script.Globals[functionName];
-
         try
         {
-            return script.Call(func, args);
+            return ((Closure)script.Globals[functionName]).Call(args);
         }
         catch (ScriptRuntimeException e)
         {
             UnityDebugger.Debugger.LogError("Lua", "[" + scriptName + "] LUA RunTime error: " + e.DecoratedMessage);
+            return null;
+        }
+        catch (Exception e)
+        {
+            UnityDebugger.Debugger.LogError("Lua", "[" + scriptName + "] Something else went wrong: " + e.Message);
             return null;
         }
     }

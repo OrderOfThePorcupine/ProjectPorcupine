@@ -12,62 +12,34 @@ using UnityEngine;
 // This whole class is a nice one since it'll always ensure a value
 // This means if we change defaults in our program we also need to change them here
 // But it also means that generally it's 'better' code
-// Misc.
+// Movement
 public static partial class SettingsKeyHolder
 {
-    public static int WorldWidth
+    public static float ZoomLerp
     {
         get
         {
-            int temp;
-            return Settings.GetSetting("worldWidth", out temp) ? temp : 101;
+            float temp;
+            return Settings.GetSetting("general_movement_zoomLerp", out temp) ? temp : 10f;
         }
 
         set
         {
-            Settings.SetSetting("worldWidth", value);
+            Settings.SetSetting("general_movement_zoomLerp", value);
         }
     }
 
-    public static int WorldHeight
+    public static float ZoomSensitivity
     {
         get
         {
-            int temp;
-            return Settings.GetSetting("worldHeight", out temp) ? temp : 101;
+            float temp;
+            return Settings.GetSetting("general_movement_zoomSensitivity", out temp) ? temp : 3f;
         }
 
         set
         {
-            Settings.SetSetting("worldHeight", value);
-        }
-    }
-
-    public static int ZoomLerp
-    {
-        get
-        {
-            int temp;
-            return Settings.GetSetting("ZoomLerp", out temp) ? temp : 10;
-        }
-
-        set
-        {
-            Settings.SetSetting("ZoomLerp", value);
-        }
-    }
-
-    public static int ZoomSensitivity
-    {
-        get
-        {
-            int temp;
-            return Settings.GetSetting("ZoomSensitivity", out temp) ? temp : 3;
-        }
-
-        set
-        {
-            Settings.SetSetting("ZoomSensitivity", value);
+            Settings.SetSetting("general_movement_zoomSensitivity", value);
         }
     }
 }

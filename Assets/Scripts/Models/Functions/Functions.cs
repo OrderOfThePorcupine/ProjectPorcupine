@@ -87,6 +87,23 @@ public class Functions
         }
     }
 
+    /// <summary>
+    /// The Common Call Function expanded for multiple functions.
+    /// </summary>
+    public void Call(List<string> functionNames, params object[] args)
+    {
+        for (int i = 0; i < functionNames.Count; i++)
+        {
+            if (functionNames[i] == null)
+            {
+                UnityDebugger.Debugger.LogError(ModFunctionsLogChannel, "'" + functionNames[i] + "'  is not a LUA nor CSharp function!");
+                continue;
+            }
+
+            Call(functionNames[i], false, args);
+        }
+    }
+
     public void CallWithInstance(List<string> functionNames, object instance, params object[] parameters)
     {
         DynValue result;
