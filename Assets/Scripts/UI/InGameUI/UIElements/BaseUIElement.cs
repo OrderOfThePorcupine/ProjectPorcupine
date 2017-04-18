@@ -6,11 +6,11 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System.Linq;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 // Every specific UI element comes from this
 public abstract class BaseUIElement
@@ -31,6 +31,11 @@ public abstract class BaseUIElement
     /// Pass it back basically.
     /// </summary>
     public abstract GameObject InitializeElement();
+
+    /// <summary>
+    /// For internals, to prevent having to load resources every time.
+    /// </summary>
+    private static Dictionary<string, GameObject> loadedResources;
 
     protected GameObject GetFluidHorizontalBaseElement(string elementTitle = "", bool stretchX = false, bool stretchY = false, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
@@ -124,7 +129,12 @@ public abstract class BaseUIElement
 
     protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
     {
-        Text text = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsText"), Vector3.zero, Quaternion.identity).GetComponent<Text>();
+        if (loadedResources.ContainsKey("TextElement") == false)
+        {
+            loadedResources["TextElement"] = Resources.Load<GameObject>("UI/Elements/TextElement");
+        }
+
+        Text text = SimplePool.Spawn(loadedResources["TextElement"], Vector3.zero, Quaternion.identity).GetComponent<Text>();
         if (localize)
         {
             text.text = LocalizationTable.GetLocalization(withText);
@@ -146,12 +156,22 @@ public abstract class BaseUIElement
 
     protected Toggle CreateToggle(string type)
     {
-        return SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/Settings" + type), Vector3.zero, Quaternion.identity).GetComponent<Toggle>();
+        if (loadedResources.ContainsKey(type) == false)
+        {
+            loadedResources[type] = Resources.Load<GameObject>("UI/Elements/" + type);
+        }
+
+        return SimplePool.Spawn(loadedResources[type], Vector3.zero, Quaternion.identity).GetComponent<Toggle>();
     }
 
     protected InputField CreateInputField(string withText)
     {
-        InputField field = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsField"), Vector3.zero, Quaternion.identity).GetComponent<InputField>();
+        if (loadedResources.ContainsKey("Field") == false)
+        {
+            loadedResources["Field"] = Resources.Load<GameObject>("UI/Elements/Field");
+        }
+
+        InputField field = SimplePool.Spawn(loadedResources["Field"], Vector3.zero, Quaternion.identity).GetComponent<InputField>();
         field.text = withText;
 
         return field;
@@ -159,7 +179,12 @@ public abstract class BaseUIElement
 
     protected Slider CreateSlider(float value, Vector2 range, bool wholeNumbers = true)
     {
-        Slider slider = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsSlider"), Vector3.zero, Quaternion.identity).GetComponent<Slider>();
+        if (loadedResources.ContainsKey("Slider") == false)
+        {
+            loadedResources["Slider"] = Resources.Load<GameObject>("UI/SettingsMenu/Slider");
+        }
+
+        Slider slider = SimplePool.Spawn(loadedResources["Slider"], Vector3.zero, Quaternion.identity).GetComponent<Slider>();
 
         slider.maxValue = range.y;
         slider.minValue = range.x;
@@ -171,12 +196,17 @@ public abstract class BaseUIElement
 
     protected Dropdown CreateEmptyDropdown()
     {
-        return SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown"), Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
+        if (loadedResources.ContainsKey("Dropdown") == false)
+        {
+            loadedResources["Dropdown"] = Resources.Load<GameObject>("UI/SettingsMenu/Dropdown");
+        }
+
+        return SimplePool.Spawn(loadedResources["Dropdown"], Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
     }
 
     protected Dropdown CreateDropdownFromText(string[] textOptions, int value)
     {
-        Dropdown dropdown = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown"), Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
+        Dropdown dropdown = CreateEmptyDropdown();
         dropdown.AddOptions(textOptions.ToList());
         dropdown.value = value;
 
@@ -185,7 +215,7 @@ public abstract class BaseUIElement
 
     protected Dropdown CreateDropdownFromOptionData(Dropdown.OptionData[] optionDataOptions, int value)
     {
-        Dropdown dropdown = SimplePool.Spawn(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown"), Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
+        Dropdown dropdown = CreateEmptyDropdown();
         dropdown.AddOptions(optionDataOptions.ToList());
         dropdown.value = value;
 
