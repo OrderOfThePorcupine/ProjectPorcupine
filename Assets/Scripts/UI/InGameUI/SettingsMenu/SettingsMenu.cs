@@ -112,6 +112,7 @@ public class SettingsMenu : MonoBehaviour
         // Clear root
         foreach (Transform child in instance.elementRoot.transform)
         {
+            child.BroadcastMessage("Despawn", SendMessageOptions.DontRequireReceiver);
             Destroy(child.gameObject);
         }
 
@@ -355,8 +356,6 @@ public class SettingsMenu : MonoBehaviour
             foreach (KeyValuePair<string, List<SettingsOption>> keyValuePair in categories[i].headings)
             {
                 options[categories[i].Type].Add(keyValuePair.Key, new BaseSettingsElement[keyValuePair.Value.Count]);
-
-                Debug.LogWarning(keyValuePair.Value.Count);
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {

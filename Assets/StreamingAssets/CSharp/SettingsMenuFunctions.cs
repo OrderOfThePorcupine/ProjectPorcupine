@@ -125,6 +125,7 @@ public class GenericToggle : BaseSettingsElement
         GameObject element = GetHorizontalBaseElement(type, 120, 60, TextAnchor.MiddleLeft);
 
         Text text = CreateText(option.name, true);
+        Debug.LogWarning(text.text);
         text.transform.SetParent(element.transform);
 
         toggleElement = CreateToggle(type);
@@ -183,7 +184,10 @@ public class GenericInputField : BaseSettingsElement
     {
         GameObject element = GetFluidHorizontalBaseElement("InputField", true, false, TextAnchor.MiddleLeft, 10);
 
-        CreateText(option.name, true).transform.SetParent(element.transform);
+        Text text = CreateText(option.name, true);
+        text.transform.SetParent(element.transform);
+
+        Debug.LogWarning(text.text);
 
         value = getValue();
 
@@ -410,7 +414,7 @@ public class LocalizationComboBox : GenericComboBox
     public override GameObject InitializeElement()
     {
         GameObject go = DropdownHelperEmpty();
-        dropdownElement.gameObject.AddComponent<LanguageDropdownUpdater>();
+        dropdownElement.transform.parent.gameObject.AddComponent<LanguageDropdownUpdater>();
         dropdownElement.onValueChanged.AddListener(
             (int v) =>
             {
@@ -876,10 +880,25 @@ public class ResolutionComboBox : GenericComboBox
         public Resolution Resolution { get; set; }
     }
 
+    private static Dropdown.OptionData[] data;
+
+    static ResolutionComboBox()
+    {
+        if (data == null || data.Length != Screen.resolutions.Length + 1)
+        {
+            data = CreateResolutionDropdown();
+        }
+    }
+
     public override GameObject InitializeElement()
     {
+        if (data == null || data.Length != Screen.resolutions.Length + 1)
+        {
+            data = CreateResolutionDropdown();
+        }
+
         selectedValue = getValue();
-        GameObject go = DropdownHelperFromOptionData(CreateResolutionDropdown(), selectedValue);
+        GameObject go = DropdownHelperFromOptionData(data, selectedValue);
         dropdownElement.onValueChanged.AddListener(
             (int v) =>
             {
@@ -897,7 +916,7 @@ public class ResolutionComboBox : GenericComboBox
     /// <summary>
     /// Create the differents option for the resolution dropdown.
     /// </summary>
-    private Dropdown.OptionData[] CreateResolutionDropdown()
+    private static Dropdown.OptionData[] CreateResolutionDropdown()
     {
         Dropdown.OptionData[] options = new Dropdown.OptionData[Screen.resolutions.Length + 1];
         options[0] = new ResolutionOption

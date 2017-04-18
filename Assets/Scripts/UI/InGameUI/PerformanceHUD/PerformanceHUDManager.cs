@@ -50,6 +50,7 @@ public class PerformanceHUDManager : MonoBehaviour
         {
             foreach (Transform child in rootTransform)
             {
+                child.BroadcastMessage("Despawn", SendMessageOptions.DontRequireReceiver);
                 Destroy(child.gameObject);
             }
         }

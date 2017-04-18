@@ -399,7 +399,7 @@ public class Ship : IPrototypable
         float distance = 5f * deltaTime;
         Position += Vector2.ClampMagnitude(direction, distance);
     }
-        
+
     /// <summary>
     /// Gets tile in world that corresponds to the relative coordinates in the ship definition
     /// counted from the berth.
@@ -450,7 +450,7 @@ public class Ship : IPrototypable
             do
             {
                 int x = int.Parse(reader.GetAttribute("x"));
-                int y = int.Parse(reader.GetAttribute("x"));
+                int y = int.Parse(reader.GetAttribute("y"));
                 ShipStorage storage = new ShipStorage(x, y);
                 storages.Add(storage);
             }
