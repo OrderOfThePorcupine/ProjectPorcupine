@@ -30,7 +30,7 @@ public static class PerformanceHUDFunctions
     /// <summary>
     /// Displays the currently used memory and the currently allocated memory.
     /// </summary>
-    public class MemoryPerformanceComponent : BasePerformanceHUDElement
+    public class MemoryPerformanceComponent : BasePerformanceHUDComponent
     {
         private Text UITextElement;
         private const string Display = "Mem/Alloc: {0}mb\n{1}mb";
@@ -62,7 +62,7 @@ public static class PerformanceHUDFunctions
     /// <summary>
     /// Currently not used but may be used in future is just network.
     /// </summary>
-    public class NetworkPerformanceComponent : BasePerformanceHUDElement
+    public class NetworkPerformanceComponent : BasePerformanceHUDComponent
     {
         private Text UITextElement;
 
@@ -91,7 +91,7 @@ public static class PerformanceHUDFunctions
     /// <summary>
     /// Displays current FPS (over a certain period).
     /// </summary>
-    public class FPSPerformanceComponent : BasePerformanceHUDElement
+    public class FPSPerformanceComponent : BasePerformanceHUDComponent
     {
         private float FPSMeasurePeriod = 0.5f;
         private string display = "FPS: ";
@@ -171,7 +171,7 @@ public static class PerformanceHUDFunctions
     /// <summary>
     /// Just measures the max and min range for FPS.
     /// </summary>
-    public class FPSRangePerformanceComponent : BasePerformanceHUDElement
+    public class FPSRangePerformanceComponent : BasePerformanceHUDComponent
     {
         private const float FPSMeasurePeriod = 0.5f;
         private const string Display = "Min/Max: {0}/{1}";

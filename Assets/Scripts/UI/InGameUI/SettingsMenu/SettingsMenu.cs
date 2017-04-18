@@ -343,34 +343,35 @@ public class SettingsMenu : MonoBehaviour
 
         options = new Dictionary<string, Dictionary<string, BaseSettingsElement[]>>();
 
-        Dictionary<string, Dictionary<string, SettingsOption[]>> categories = PrototypeManager.SettingsCategories.Values.ToArray().SelectMany(x => x.categories).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        List<SettingsCategory> categories = PrototypeManager.SettingsCategories.Values;
 
-        foreach (string currentName in categories.Keys)
+        for (int i = 0; i < categories.Count; i++)
         {
             ColorButton button = Instantiate(categoryPrefab).GetComponent<ColorButton>();
             button.transform.SetParent(categoryRoot.transform);
-            button.name = currentName;
-            button.SetText(LocalizationTable.GetLocalization(currentName));
-            options.Add(currentName, new Dictionary<string, BaseSettingsElement[]>());
+            button.name = categories[i].Type;
+            button.SetText(LocalizationTable.GetLocalization(categories[i].Type));
+            options.Add(categories[i].Type, new Dictionary<string, BaseSettingsElement[]>());
 
-            // This is quite optimised (despite being a forloop on a dictionary), and is only done during start
-            foreach (KeyValuePair<string, SettingsOption[]> keyValuePair in categories[currentName])
+            foreach (KeyValuePair<string, List<SettingsOption>> keyValuePair in categories[i].headings)
             {
-                options[currentName].Add(keyValuePair.Key, new BaseSettingsElement[keyValuePair.Value.Length]);
+                options[categories[i].Type].Add(keyValuePair.Key, new BaseSettingsElement[keyValuePair.Value.Count]);
 
-                for (int i = 0; i < keyValuePair.Value.Length; i++)
+                Debug.LogWarning(keyValuePair.Value.Count);
+
+                for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    if (FunctionsManager.SettingsMenu.HasFunction("Get" + keyValuePair.Value[i].className))
+                    if (FunctionsManager.SettingsMenu.HasFunction("Get" + keyValuePair.Value[j].className))
                     {
-                        BaseSettingsElement element = FunctionsManager.SettingsMenu.Call("Get" + keyValuePair.Value[i].className).ToObject<BaseSettingsElement>();
-                        element.option = keyValuePair.Value[i];
-                        element.parameterData = keyValuePair.Value[i].options;
+                        BaseSettingsElement element = FunctionsManager.SettingsMenu.Call("Get" + keyValuePair.Value[j].className).ToObject<BaseSettingsElement>();
+                        element.option = keyValuePair.Value[j];
+                        element.parameterData = keyValuePair.Value[j].options;
                         element.InitializeLUA();
-                        options[currentName][keyValuePair.Key][i] = element;
+                        options[categories[i].Type][keyValuePair.Key][j] = element;
                     }
-                    else if (keyValuePair.Value[i].name != null)
+                    else if (keyValuePair.Value[j].name != null)
                     {
-                        Debug.LogWarning("Get" + keyValuePair.Value[i].className + "() Doesn't exist");
+                        UnityDebugger.Debugger.LogError("Get" + keyValuePair.Value[j].className + "() Doesn't exist");
                     }
                 }
             }

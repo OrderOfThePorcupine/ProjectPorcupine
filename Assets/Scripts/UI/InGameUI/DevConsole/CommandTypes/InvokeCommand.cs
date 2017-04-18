@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MoonSharp.Interpreter;
+using System.Xml;
 
 namespace DeveloperConsole.Core
 {
@@ -17,36 +18,84 @@ namespace DeveloperConsole.Core
     /// Invoke some code from either C# Function Manager or LUA Function Manager.
     /// </summary>
     [MoonSharpUserData]
-    public sealed class InvokeCommand : CommandBase
+    public sealed class InvokeCommand : CommandBase, IPrototypable
     {
         /// <summary>
-        /// Standard constructor.
+        /// The name of the function to execute.
         /// </summary>
-        /// <param name="title"> The title for the command. </param>
-        /// <param name="functionName"> The name of the command to execute. </param>
-        /// <param name="descriptiveText"> The help text to display. </param>
-        /// <param name="detailedDescriptiveText"> More detailed help text to display. </param>
-        /// <param name="parameters"> In format of 'Type name' i.e. Int myInt.  With a comma separator. </param>
-        /// <param name="tags"> Tags group commands for easy access. </param>
-        /// <param name="defaultValue"> The default value for this command. </param>
-        public InvokeCommand(string title, string functionName, string descriptiveText, string detailedDescriptiveText, string parameters, string[] tags, string defaultValue)
+        public string FunctionName
         {
-            Title = title;
-            FunctionName = functionName;
-            DescriptiveText = descriptiveText;
-            DetailedDescriptiveText = detailedDescriptiveText;
-            Tags = tags;
-            DefaultValue = defaultValue;
+            get; private set;
+        }
+
+        /// <summary>
+        /// All the parameters in format Type name, with a comma seperator.
+        /// </summary>
+        public override string Parameters
+        {
+            get; protected set;
+        }
+
+        /// <summary>
+        /// The type of command.
+        /// </summary>
+        public string Type
+        {
+            get
+            {
+                return this.Title;
+            }
+        }
+
+        /// <summary>
+        /// Execute this command.
+        /// </summary>
+        /// <param name="arguments"> The arguments to pass in. </param>
+        public override void ExecuteCommand(string arguments)
+        {
+            try
+            {
+                FunctionsManager.DevConsole.CallWithError(FunctionName, ParseArguments(arguments));
+            }
+            catch (Exception e)
+            {
+                DevConsole.LogError(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Reads from the reader provided.
+        /// </summary>
+        public void ReadXmlPrototype(XmlReader reader)
+        {
+            Title = reader.GetAttribute("Title");
+            FunctionName = reader.GetAttribute("FunctionName");
+            DescriptiveText = reader.GetAttribute("Description");
+            DetailedDescriptiveText = reader.GetAttribute("DetailedDescription");
+            Parameters = reader.GetAttribute("Parameters");
+            Tags = reader.GetAttribute("Tags").Split(',').Select(x => x.Trim()).ToArray();
+            DefaultValue = reader.GetAttribute("DefaultValue");
+
+            // This is an optional checker basically
+            if (Tags == null)
+            {
+                Tags = new string[0];
+            }
+
+            if (DefaultValue == null)
+            {
+                DefaultValue = string.Empty;
+            }
 
             // If the parameters contains a ';' then it'll exclude the 'using' statement.
             // Just makes the declaration help look nicer.
-            if (parameters.Contains(';'))
+            if (Parameters.Contains(';'))
             {
-                int indexOfSemiColon = parameters.IndexOf(';') + 1;
+                int indexOfSemiColon = Parameters.IndexOf(';') + 1;
 
-                if (parameters.Length > indexOfSemiColon)
+                if (Parameters.Length > indexOfSemiColon)
                 {
-                    Parameters = parameters.Substring(indexOfSemiColon).Trim();
+                    Parameters = Parameters.Substring(indexOfSemiColon).Trim();
                 }
                 else
                 {
@@ -54,14 +103,8 @@ namespace DeveloperConsole.Core
                     // This will only happen if the semi colon is the last element in the string
                     Parameters = string.Empty;
 
-                    UnityDebugger.Debugger.LogWarning("DevConsole", "Parameters for " + title + " had a semicolon as a last character this is an illegal string.");
+                    UnityDebugger.Debugger.LogWarning("DevConsole", "Parameters for " + Title + " had a semicolon as a last character this is an illegal string.");
                 }
-            }
-            else
-            {
-                // No ';' exists so free to just copy it over
-                // We can't just do a substring cause it'll return an error and this isn't safely done
-                Parameters = parameters;
             }
 
             // Parse the parameters
@@ -75,7 +118,7 @@ namespace DeveloperConsole.Core
             string regexExpression = @"\s*([^\s]+)\s+[^\s]+";
 
             // This will just get the types
-            string[] parameterTypes = Regex.Matches(parameters, regexExpression)
+            string[] parameterTypes = Regex.Matches(Parameters, regexExpression)
                 .Cast<Match>()
                 .Where(m => m.Groups.Count >= 1 && m.Groups[1].Value != string.Empty)
                 .Select(m => (m.Groups[1].Value.Contains('.') ? ", " + m.Groups[1].Value.Trim().Split('.')[0] : string.Empty) + ";" + m.Groups[1].Value.Trim())
@@ -99,7 +142,7 @@ namespace DeveloperConsole.Core
                         // We just split, since its a decently appropriate solution.
                         string[] parameterSections = parameterTypes[i].Split(';');
 
-                        types[i] = Type.GetType((parameterSections[1].Contains('.') ? parameterSections[1] : "System." + parameterSections[1]) + parameterSections[0], true, true);
+                        types[i] = System.Type.GetType((parameterSections[1].Contains('.') ? parameterSections[1] : "System." + parameterSections[1]) + parameterSections[0], true, true);
                     }
                     catch (Exception e)
                     {
@@ -114,38 +157,6 @@ namespace DeveloperConsole.Core
 
             // Assign array
             this.TypeInfo = types;
-        }
-
-        /// <summary>
-        /// The name of the function to execute.
-        /// </summary>
-        public string FunctionName
-        {
-            get; private set;
-        }
-
-        /// <summary>
-        /// All the parameters in format Type name, with a comma seperator.
-        /// </summary>
-        public override string Parameters
-        {
-            get; protected set;
-        }
-
-        /// <summary>
-        /// Execute this command.
-        /// </summary>
-        /// <param name="arguments"> The arguments to pass in. </param>
-        public override void ExecuteCommand(string arguments)
-        {
-            try
-            {
-                FunctionsManager.DevConsole.CallWithError(FunctionName, ParseArguments(arguments));
-            }
-            catch (Exception e)
-            {
-                DevConsole.LogError(e.Message);
-            }
         }
     }
 }

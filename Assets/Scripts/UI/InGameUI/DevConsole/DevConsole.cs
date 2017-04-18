@@ -939,7 +939,7 @@ namespace DeveloperConsole
 
             // Load Commands from XML (will be changed to JSON AFTER the current upgrade)
             // Covers both CSharp and LUA
-            AddCommands(PrototypeManager.DevConsole.Values.Select(x => x.ConsoleCommand).ToArray());
+            AddCommands(PrototypeManager.DevConsole.Values.ToArray());
         }
     }
 }

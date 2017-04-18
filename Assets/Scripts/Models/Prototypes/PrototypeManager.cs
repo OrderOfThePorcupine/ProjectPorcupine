@@ -35,9 +35,9 @@ public class PrototypeManager
         Headline = new PrototypeMap<Headline>("Headlines", "Headline");
         Overlay = new PrototypeMap<OverlayDescriptor>("Overlays", "Overlay");
         Ship = new PrototypeMap<Ship>("Ships", "Ship");
-        DevConsole = new PrototypeMap<DeveloperConsole.CommandPrototype>("ConsoleCommands", "ConsoleCommand");
+        DevConsole = new PrototypeMap<DeveloperConsole.Core.InvokeCommand>("ConsoleCommands", "ConsoleCommand");
         SettingsCategories = new PrototypeMap<SettingsCategory>("Categories", "Category");
-        PerformanceHUD = new PrototypeMap<PerformanceGroupReader>("ComponentGroups", "ComponentGroup");
+        PerformanceHUD = new PrototypeMap<PerformanceGroup>("ComponentGroups", "ComponentGroup");
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public class PrototypeManager
     /// Gets the DevConsole prototype map.
     /// </summary>
     /// <value>The DevConsole prototype map.</value>
-    public static PrototypeMap<DeveloperConsole.CommandPrototype> DevConsole { get; private set; }
+    public static PrototypeMap<DeveloperConsole.Core.InvokeCommand> DevConsole { get; private set; }
 
     /// <summary>
     /// Gets the SettingsCategory prototype map.
@@ -139,7 +139,7 @@ public class PrototypeManager
     /// Gets the PerformanceHUD prototype map.
     /// </summary>
     /// <value>The PerformanceHUD prototype map.</value>
-    public static PrototypeMap<PerformanceGroupReader> PerformanceHUD { get; private set; }
+    public static PrototypeMap<PerformanceGroup> PerformanceHUD { get; private set; }
 
     /// <summary>
     /// Gets the ship prototype map.

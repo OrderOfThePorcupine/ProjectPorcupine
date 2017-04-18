@@ -62,7 +62,7 @@ public class ModsManager
     /// </summary>
     private static string GetPathToModsFolder()
     {
-        return System.IO.Path.Combine(System.IO.Path.Combine(Application.streamingAssetsPath, "Data"), "Mods");
+        return Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Mods");
     }
 
     private void LoadMainSceneFiles()
@@ -118,13 +118,13 @@ public class ModsManager
 
         LoadPrototypes("ConsoleCommands.xml", PrototypeManager.DevConsole.LoadPrototypes);
         LoadPrototypes("SettingsTemplate.xml", PrototypeManager.SettingsCategories.LoadPrototypes);
-        LoadPrototypes("PerformanceHUDTemplate.xml", PrototypeManager.PerformanceHUD.LoadPrototypes);
+        LoadPrototypes("PerformanceHUDComponentGroups.xml", PrototypeManager.PerformanceHUD.LoadPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
 
         LoadFunctions("PerformanceHUDFunctions.cs", "PerformanceHUD");
-        LoadFunctions("PerfanceHUDCommands.lua", "PerformanceHUD");
+        LoadFunctions("PerformanceHUDCommands.lua", "PerformanceHUD");
     }
 
     /// <summary>
@@ -209,6 +209,10 @@ public class ModsManager
         {
             readText(filePath);
         }
+        else
+        {
+            UnityDebugger.Debugger.LogError("File at " + filePath + " not found");
+        }
 
         foreach (DirectoryInfo mod in mods)
         {
@@ -231,6 +235,10 @@ public class ModsManager
         if (Directory.Exists(directoryPath))
         {
             readDirectory(directoryPath);
+        }
+        else
+        {
+            UnityDebugger.Debugger.LogError("Directory at " + directoryPath + " not found");
         }
 
         foreach (DirectoryInfo mod in mods)

@@ -18,7 +18,7 @@ public class PerformanceHUDManager : MonoBehaviour
     /// <summary>
     /// The current group/mode to display.
     /// </summary>
-    public static Dictionary<PerformanceGroup, BasePerformanceHUDElement[]> allGroups;
+    public static Dictionary<PerformanceGroup, BasePerformanceHUDComponent[]> allGroups;
 
     /// <summary>
     /// What group are we currently at.
@@ -37,7 +37,7 @@ public class PerformanceHUDManager : MonoBehaviour
 
     public static string[] GetNames()
     {
-        return allGroups.Keys.Select(x => x.name).ToArray();
+        return allGroups.Keys.Select(x => x.Type).ToArray();
     }
 
     /// <summary>
@@ -54,16 +54,16 @@ public class PerformanceHUDManager : MonoBehaviour
             }
         }
 
-        groupPointer = allGroups.FirstOrDefault(x => x.Key.name == SettingsKeyHolder.PerformanceHUD).Key;
+        groupPointer = allGroups.FirstOrDefault(x => x.Key.Type == SettingsKeyHolder.PerformanceHUD).Key;
 
         // Set group
-        if (groupPointer.name == null)
+        if (groupPointer == null || string.IsNullOrEmpty(groupPointer.Type))
         {
-            groupPointer = allGroups.First(x => x.Key.name == "none").Key;
+            groupPointer = allGroups.First(x => x.Key.Type == "none").Key;
         }
 
         // Draw and Begin UI Functionality
-        foreach (BasePerformanceHUDElement elementName in allGroups[groupPointer])
+        foreach (BasePerformanceHUDComponent elementName in allGroups[groupPointer])
         {
             Transform rootTransfer = GetColumnRootObject().transform;
             GameObject go = elementName.InitializeElement();
@@ -113,28 +113,28 @@ public class PerformanceHUDManager : MonoBehaviour
         }
 
         // Load Settings
-        allGroups = new Dictionary<PerformanceGroup, BasePerformanceHUDElement[]>();
+        allGroups = new Dictionary<PerformanceGroup, BasePerformanceHUDComponent[]>();
 
-        PerformanceGroup[] groups = PrototypeManager.PerformanceHUD.Values.SelectMany(x => x.groups).ToArray();
+        List<PerformanceGroup> groups = PrototypeManager.PerformanceHUD.Values;
 
-        allGroups.Add(new PerformanceGroup("none", new string[0], new Parameter[0], true), new BasePerformanceHUDElement[0]);
-        List<BasePerformanceHUDElement> elements = new List<BasePerformanceHUDElement>();
+        allGroups.Add(new PerformanceGroup("none", new List<string>(), new List<Parameter>(), true), new BasePerformanceHUDComponent[0]);
+        List<BasePerformanceHUDComponent> elements = new List<BasePerformanceHUDComponent>();
 
         // Convert the dictionary of specialised elements to a more generalised format
-        for (int i = 0; i < groups.Length; i++)
+        for (int i = 0; i < groups.Count; i++)
         {
-            for (int j = 0; j < groups[i].elementData.Length; j++)
+            for (int j = 0; j < groups[i].componentData.Count; j++)
             {
-                if (FunctionsManager.PerformanceHUD.HasFunction("Get" + groups[i].elementData[j]))
+                if (FunctionsManager.PerformanceHUD.HasFunction("Get" + groups[i].componentData[j]))
                 {
-                    BasePerformanceHUDElement element = FunctionsManager.PerformanceHUD.Call("Get" + groups[i].elementData[j]).ToObject<BasePerformanceHUDElement>();
+                    BasePerformanceHUDComponent element = FunctionsManager.PerformanceHUD.Call("Get" + groups[i].componentData[j]).ToObject<BasePerformanceHUDComponent>();
                     element.parameterData = groups[i].parameterData[j];
                     element.InitializeLUA();
                     elements.Add(element);
                 }
                 else
                 {
-                    Debug.LogWarning("Get" + groups[i] + groups[i].elementData[j] + "() Doesn't exist");
+                    Debug.LogWarning("Get" + groups[i] + groups[i].componentData[j] + "() Doesn't exist");
                 }
             }
 
@@ -158,7 +158,7 @@ public class PerformanceHUDManager : MonoBehaviour
         }
 
         // Update UI
-        foreach (BasePerformanceHUDElement element in allGroups[groupPointer])
+        foreach (BasePerformanceHUDComponent element in allGroups[groupPointer])
         {
             if (element != null)
             {
