@@ -153,8 +153,7 @@ public class SettingsMenu : MonoBehaviour
             }
         }
 
-        instance.settingsScrollRect.verticalNormalizedPosition = 1;
-        instance.settingsScrollRect.horizontalNormalizedPosition = 0;
+        instance.settingsScrollRect.normalizedPosition = new Vector2(0, 1);
     }
 
     public void Apply()

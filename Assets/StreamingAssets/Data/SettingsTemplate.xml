@@ -17,6 +17,20 @@
       <Option Name="language" Key="general_localization_language" DefaultValue="en_US" ClassName="LocalizationComboBox" />
       <Option Name="auto_update_language" Key="general_localization_autoUpdate" DefaultValue="true" ClassName="GenericToggle" />
     </OptionHeading>
+    <OptionHeading Name="Movement">
+      <Option Name="zoom_lerp_time" Key="general_movement_zoomLerp" DefaultValue="10" ClassName="GenericSlider">
+        <Params>
+          <Param name="MinimumValue" value="1" />
+          <Param name="MaximumValue" value="20" />
+        </Params>
+      </Option>
+      <Option Name="zoom_sensitivity" Key="general_movement_zoomSensitivity" DefaultValue="3" ClassName="GenericSlider">
+        <Params>
+          <Param name="MinimumValue" value="1" />
+          <Param name="MaximumValue" value="9" />
+        </Params>
+      </Option>
+    </OptionHeading>
   </Category>
   <Category Name="sound">
     <OptionHeading Name="volume">

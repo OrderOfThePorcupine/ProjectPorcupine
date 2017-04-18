@@ -180,6 +180,9 @@ change_to_raw_copper=Change to Raw Copper
 deconstruct=Deconstruct {0}
 
 ##########Settings##########
+movement=Camera Movement
+zoom_lerp_time=Camera Lerping Time
+zoom_sensitivity=Zoom Sensitivity
 confirm_settings_menu_close=Are you sure you want to close the menu and cancel all settings?
 general=General
 sound=Sound

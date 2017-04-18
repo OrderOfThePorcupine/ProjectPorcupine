@@ -122,10 +122,18 @@ public abstract class BaseUIElement
         baseLayout.minHeight = allocatedHeight;
     }
 
-    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft)
+    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
     {
         Text text = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsText")).GetComponent<Text>();
-        text.text = LocalizationTable.GetLocalization(withText);
+        if (localize)
+        {
+            text.text = LocalizationTable.GetLocalization(withText);
+        }
+        else
+        {
+            text.text = withText;
+        }
+
         text.alignment = alignment;
 
         if (autoFit == true)
