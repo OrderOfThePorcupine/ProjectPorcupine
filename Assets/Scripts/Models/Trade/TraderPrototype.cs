@@ -205,10 +205,10 @@ public class TraderPrototype : IPrototypable
                 switch (state)
                 {
                     case "idle":
-                        AnimationIdle = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, valueBased);
+                        AnimationIdle = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
                         break;
                     case "flying":
-                        AnimationFlying = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, valueBased);
+                        AnimationFlying = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
                         break;
                 }
             }
