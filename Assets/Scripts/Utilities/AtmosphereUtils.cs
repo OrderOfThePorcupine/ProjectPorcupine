@@ -27,7 +27,7 @@ public static class AtmosphereUtils
             lowPressureRoom = room1;
         }
 
-        float targetPressure = (room1.Atmosphere.GetGasAmount() + room2.Atmosphere.GetGasAmount()) / (room1.TileCount + room2.TileCount);
+        float targetPressure = (room1.Atmosphere.TotalGas + room2.Atmosphere.TotalGas) / (room1.TileCount + room2.TileCount);
         float gasNeededForTargetPressure = (highPressureRoom.GetGasPressure() - targetPressure) * highPressureRoom.TileCount;
         float gasMoved = Mathf.Min(maxGasToMove, gasNeededForTargetPressure);
 
@@ -41,6 +41,6 @@ public static class AtmosphereUtils
             UnityDebugger.Debugger.Log("MovePercentageOfAtmosphere -- Ratio is out of bounds: " + ratio);
         }
 
-        source.MoveGasTo(destination, ratio * source.GetGasAmount());
+        source.MoveGasTo(destination, ratio * source.TotalGas);
     }
 }

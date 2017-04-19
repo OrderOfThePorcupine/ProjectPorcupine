@@ -12,13 +12,12 @@ using NUnit.Framework;
 
 public class AtmosphereComponentTest
 {
-    private AtmosphereComponent empty1, empty2, notEmpty1, notEmpty2;
+    private AtmosphereComponent empty1, notEmpty1, notEmpty2;
 
     [SetUp]
     public void Setup()
     {
         empty1 = new AtmosphereComponent();
-        empty2 = new AtmosphereComponent();
 
         notEmpty1 = new AtmosphereComponent();
         notEmpty2 = new AtmosphereComponent();
@@ -33,8 +32,8 @@ public class AtmosphereComponentTest
         empty1.CreateGas("gas", 1.0f, 1.0f);
         notEmpty1.CreateGas("gas", 1.0f, 1.0f);
 
-        Assert.AreEqual(1.0f, empty1.GetGasAmount());
-        Assert.AreEqual(2.0f, notEmpty2.GetGasAmount());
+        Assert.AreEqual(1.0f, empty1.TotalGas);
+        Assert.AreEqual(2.0f, notEmpty2.TotalGas);
     }
 
     [Test]
@@ -54,9 +53,9 @@ public class AtmosphereComponentTest
         notEmpty1.CreateGas("gas", 1.0f, 1.0f);
         notEmpty2.CreateGas("gas", 1.0f, 1.0f);
 
-        Assert.AreEqual(1.0f, empty1.GetTemperature());
-        Assert.AreEqual(1.0f, notEmpty1.GetTemperature());
-        Assert.AreEqual(5.0f / 3.0f, notEmpty2.GetTemperature());
+        Assert.AreEqual(1.0f, empty1.GetTemperature().InKelvin);
+        Assert.AreEqual(1.0f, notEmpty1.GetTemperature().InKelvin);
+        Assert.AreEqual(5.0f / 3.0f, notEmpty2.GetTemperature().InKelvin);
     }
 
     [Test]
@@ -64,7 +63,7 @@ public class AtmosphereComponentTest
     {
         empty1.CreateGas("gas", -1.0f, 1.0f);
 
-        Assert.AreEqual(0.0f, empty1.GetGasAmount());
+        Assert.AreEqual(0.0f, empty1.TotalGas);
     }
 
     [Test]
@@ -72,7 +71,7 @@ public class AtmosphereComponentTest
     {
         empty1.CreateGas("gas", 1.0f, -1.0f);
 
-        Assert.AreEqual(0.0f, empty1.GetGasAmount());
+        Assert.AreEqual(0.0f, empty1.TotalGas);
     }
     #endregion
 
@@ -82,7 +81,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.DestroyGas("gas", 0.5f);
 
-        Assert.AreEqual(0.5f, notEmpty1.GetGasAmount());
+        Assert.AreEqual(0.5f, notEmpty1.TotalGas);
     }
 
     [Test]
@@ -99,8 +98,8 @@ public class AtmosphereComponentTest
         notEmpty1.DestroyGas("gas", 0.5f);
         notEmpty2.DestroyGas("gas", 0.5f);
 
-        Assert.AreEqual(1.0f, notEmpty1.GetTemperature());
-        Assert.AreEqual(2.0f, notEmpty2.GetTemperature());
+        Assert.AreEqual(1.0f, notEmpty1.GetTemperature().InKelvin);
+        Assert.AreEqual(2.0f, notEmpty2.GetTemperature().InKelvin);
     }
 
     [Test]
@@ -108,7 +107,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.DestroyGas("gas", -0.5f);
 
-        Assert.AreEqual(1.0f, notEmpty1.GetGasAmount());
+        Assert.AreEqual(1.0f, notEmpty1.TotalGas);
     }
 
     [Test]
@@ -118,8 +117,8 @@ public class AtmosphereComponentTest
         notEmpty2.CreateGas("otherGas", 1.0f, 1.0f);
         notEmpty2.DestroyGas("otherGas", 1.5f);
 
-        Assert.AreEqual(0.0f, notEmpty1.GetGasAmount());
-        Assert.AreEqual(2.0f, notEmpty2.GetGasAmount());
+        Assert.AreEqual(0.0f, notEmpty1.TotalGas);
+        Assert.AreEqual(2.0f, notEmpty2.TotalGas);
     }
 
     [Test]
@@ -137,7 +136,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.MoveGasTo(null, 1.0f);
 
-        Assert.AreEqual(1.0f, notEmpty1.GetGasAmount());
+        Assert.AreEqual(1.0f, notEmpty1.TotalGas);
     }
 
     [Test]
@@ -145,7 +144,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.MoveGasTo(empty1, 0.5f);
 
-        Assert.AreEqual(0.5f, notEmpty1.GetGasAmount());
+        Assert.AreEqual(0.5f, notEmpty1.TotalGas);
     }
 
     [Test]
@@ -153,7 +152,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.MoveGasTo(empty1, 0.5f);
 
-        Assert.AreEqual(0.5f, empty1.GetGasAmount());
+        Assert.AreEqual(0.5f, empty1.TotalGas);
     }
 
     [Test]
@@ -177,7 +176,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.MoveGasTo(empty1, 0.5f);
 
-        Assert.AreEqual(1.0f, notEmpty1.GetTemperature());
+        Assert.AreEqual(1.0f, notEmpty1.GetTemperature().InKelvin);
     }
 
     [Test]
@@ -186,8 +185,8 @@ public class AtmosphereComponentTest
         notEmpty2.MoveGasTo(empty1, 0.5f);
         notEmpty2.MoveGasTo(notEmpty1, 0.5f);
 
-        Assert.AreEqual(2.0f, empty1.GetTemperature());
-        Assert.AreEqual(4.0f / 3.0f, notEmpty1.GetTemperature());
+        Assert.AreEqual(2.0f, empty1.GetTemperature().InKelvin);
+        Assert.AreEqual(4.0f / 3.0f, notEmpty1.GetTemperature().InKelvin);
     }
 
     [Test]
@@ -195,7 +194,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.MoveGasTo(empty1, -0.5f);
 
-        Assert.AreEqual(1.0f, notEmpty1.GetGasAmount());
+        Assert.AreEqual(1.0f, notEmpty1.TotalGas);
     }
 
     [Test]
@@ -203,7 +202,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.MoveGasTo(empty1, 1.5f);
 
-        Assert.AreEqual(0.0f, notEmpty1.GetGasAmount());
+        Assert.AreEqual(0.0f, notEmpty1.TotalGas);
     }
 
     [Test]
@@ -211,7 +210,7 @@ public class AtmosphereComponentTest
     {
         notEmpty1.MoveGasTo(empty1, 1.5f);
 
-        Assert.AreEqual(1.0f, empty1.GetGasAmount());
+        Assert.AreEqual(1.0f, empty1.TotalGas);
     }
     #endregion
 }

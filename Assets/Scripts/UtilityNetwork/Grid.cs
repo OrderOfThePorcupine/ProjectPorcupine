@@ -44,9 +44,9 @@ namespace ProjectPorcupine.PowerNetwork
         /// </summary>
         public int ConnectionCount
         {
-            get 
+            get
             {
-                return connections.Count; 
+                return connections.Count;
             }
         }
 
@@ -161,12 +161,12 @@ namespace ProjectPorcupine.PowerNetwork
 
         public void Tick()
         {
-            float producers = 0f;
-            float producersVarying = 0f;
+            // float producers = 0f;
+            // float producersVarying = 0f;
             float producersStable = 0;
             float consumersVarying = 0f;
             float consumersStable = 0;
-            
+
             foreach (IPluggable connection in connections)
             {
                 if (connection.IsProducer && connection.AllRequirementsFulfilled)
@@ -186,7 +186,7 @@ namespace ProjectPorcupine.PowerNetwork
                     }
                 }
             }
-            
+
             float currentLevel = producersStable - consumersVarying - consumersStable;
 
             if (producersStable > 0f && currentLevel.IsZero())
@@ -198,13 +198,11 @@ namespace ProjectPorcupine.PowerNetwork
             // if there is power shortage, check if you can get power from 'on demand' producers
             if (currentLevel < 0.0f)
             {
-                float curLevelWithVaryingOutput = currentLevel;
-
                 // here check if we can plug in some varying output
                 // can't use connection.IsProducer as it's hooked on IsRunning already
                 foreach (IPluggable connection in connections)
                 {
-                    if (connection.OutputCanVary) 
+                    if (connection.OutputCanVary)
                     {
                         connection.OutputIsNeeded = true;
                     }
@@ -232,12 +230,11 @@ namespace ProjectPorcupine.PowerNetwork
                 FillStorage(ref currentLevel);
             }
             else
-            {                
+            {
                 EmptyStorage(ref currentLevel);
             }
 
-            producers = producersStable + producersVarying;
-
+            // producers = producersStable + producersVarying;
             Efficiency = 1f;
 
             // calculate immediate efficiency
@@ -258,7 +255,7 @@ namespace ProjectPorcupine.PowerNetwork
                     Efficiency = 0f;
                 }
             }
-            
+
             // Efficiency == 1f condition prevents flickering of machines without varying input
             IsOperating = currentLevel >= 0.0f && Efficiency == 1f;
         }
