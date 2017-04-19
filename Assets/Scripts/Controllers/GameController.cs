@@ -6,7 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
+using System;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 
@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
     // If so - beginner task!
     public static readonly string GameVersion = "Someone_will_come_up_with_a_proper_naming_scheme_later";
 
+    public static CacheFlags Flags { get; private set; }
     public KeyboardManager KeyboardManager;
     public SceneController SceneManager;
     public SoundController soundController;
@@ -24,6 +25,8 @@ public class GameController : MonoBehaviour
     public bool IsModal;
 
     public static GameController Instance { get; protected set; }
+
+    public event Action<CacheFlags> OnDirtyFlags;
 
     public bool IsPaused
     {
@@ -35,6 +38,14 @@ public class GameController : MonoBehaviour
         set
         {
             TimeManager.Instance.IsPaused = value;
+        }
+    }
+
+    public static void DirtyFlags()
+    {
+        if (Instance != null)
+        {
+            Instance.OnDirtyFlags(flags);
         }
     }
 
