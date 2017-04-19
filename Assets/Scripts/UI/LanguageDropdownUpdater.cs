@@ -25,7 +25,7 @@ public class LanguageDropdownUpdater : MonoBehaviour
 
     private void UpdateLanguageDropdown()
     {
-        Dropdown dropdown = GetComponent<Dropdown>();
+        Dropdown dropdown = GetComponentInChildren<Dropdown>();
 
         string[] languages = LocalizationTable.GetLanguages();
 

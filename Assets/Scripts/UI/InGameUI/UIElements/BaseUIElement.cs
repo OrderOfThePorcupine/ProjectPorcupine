@@ -6,7 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
+using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
 using UnityEngine;
@@ -19,6 +19,11 @@ public abstract class BaseUIElement
     /// Internal option data.
     /// </summary>
     public Parameter parameterData;
+
+    /// <summary>
+    /// For internals, to prevent having to load resources every time.
+    /// </summary>
+    private static Dictionary<string, GameObject> loadedResources = new Dictionary<string, GameObject>();
 
     /// <summary>
     /// Returns the name of this object for internal reasons.
@@ -124,7 +129,13 @@ public abstract class BaseUIElement
 
     protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
     {
-        Text text = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsText")).GetComponent<Text>();
+        if (loadedResources.ContainsKey("Text") == false)
+        {
+            loadedResources["Text"] = Resources.Load<GameObject>("UI/Elements/Text");
+        }
+
+        Text text = GameObject.Instantiate(loadedResources["Text"]).GetComponent<Text>();
+
         if (localize)
         {
             text.text = LocalizationTable.GetLocalization(withText);
@@ -146,20 +157,34 @@ public abstract class BaseUIElement
 
     protected Toggle CreateToggle(string type)
     {
-        return GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/Settings" + type)).GetComponent<Toggle>();
+        if (loadedResources.ContainsKey(type) == false)
+        {
+            loadedResources[type] = Resources.Load<GameObject>("UI/Elements/" + type);
+        }
+
+        return GameObject.Instantiate(loadedResources[type]).GetComponent<Toggle>();
     }
 
     protected InputField CreateInputField(string withText)
     {
-        InputField field = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsField")).GetComponent<InputField>();
-        field.text = withText;
+        if (loadedResources.ContainsKey("Field") == false)
+        {
+            loadedResources["Field"] = Resources.Load<GameObject>("UI/Elements/Field");
+        }
 
+        InputField field = GameObject.Instantiate(loadedResources["Field"]).GetComponent<InputField>();
+        field.text = withText;
         return field;
     }
 
     protected Slider CreateSlider(float value, Vector2 range, bool wholeNumbers = true)
     {
-        Slider slider = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsSlider")).GetComponent<Slider>();
+        if (loadedResources.ContainsKey("Slider") == false)
+        {
+            loadedResources["Slider"] = Resources.Load<GameObject>("UI/Elements/Slider");
+        }
+
+        Slider slider = GameObject.Instantiate(loadedResources["Slider"]).GetComponent<Slider>();
 
         slider.maxValue = range.y;
         slider.minValue = range.x;
@@ -171,12 +196,17 @@ public abstract class BaseUIElement
 
     protected Dropdown CreateEmptyDropdown()
     {
-        return GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown")).GetComponent<Dropdown>();
+        if (loadedResources.ContainsKey("Dropdown") == false)
+        {
+            loadedResources["Dropdown"] = Resources.Load<GameObject>("UI/Elements/Dropdown");
+        }
+
+        return GameObject.Instantiate(loadedResources["Dropdown"]).GetComponent<Dropdown>();
     }
 
     protected Dropdown CreateDropdownFromText(string[] textOptions, int value)
     {
-        Dropdown dropdown = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown")).GetComponent<Dropdown>();
+        Dropdown dropdown = CreateEmptyDropdown();
         dropdown.AddOptions(textOptions.ToList());
         dropdown.value = value;
 
@@ -185,7 +215,7 @@ public abstract class BaseUIElement
 
     protected Dropdown CreateDropdownFromOptionData(Dropdown.OptionData[] optionDataOptions, int value)
     {
-        Dropdown dropdown = GameObject.Instantiate(Resources.Load<GameObject>("UI/SettingsMenu/SettingsDropdown")).GetComponent<Dropdown>();
+        Dropdown dropdown = CreateEmptyDropdown();
         dropdown.AddOptions(optionDataOptions.ToList());
         dropdown.value = value;
 

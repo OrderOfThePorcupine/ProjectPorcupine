@@ -9,90 +9,81 @@
 using System.Collections.Generic;
 using System.Xml;
 
-public struct PerformanceGroup
+public class PerformanceGroup : IPrototypable
 {
-    public string name;
-    public string[] elementData;
-    public Parameter[] parameterData;
+    /// <summary>
+    /// What classes to show in each group.
+    /// </summary>
+    public List<string> componentData = new List<string>();
+
+    /// <summary>
+    /// Parameter data to pass to classes to implement.
+    /// </summary>
+    public List<Parameter> parameterData = new List<Parameter>();
+
+    /// <summary>
+    /// Disable UI or not.
+    /// </summary>
     public bool disableUI;
 
-    public PerformanceGroup(string name, string[] elementData, Parameter[] parameterData, bool disableUI)
+    /// <summary>
+    /// Constructor with parameters.
+    /// </summary>
+    /// <param name="name"> The name of the group. </param>
+    /// <param name="componentData"> The element data for names of classes to show. </param>
+    /// <param name="parameterData"> Parameter data to pass to the classes. </param>
+    /// <param name="disableUI"> Disable UI or not. </param>
+    public PerformanceGroup(string name, List<string> componentData, List<Parameter> parameterData, bool disableUI)
     {
-        this.name = name;
-        this.elementData = elementData;
+        this.Type = name;
+        this.componentData = componentData;
         this.disableUI = disableUI;
         this.parameterData = parameterData;
     }
-}
 
-public class PerformanceGroupReader : IPrototypable
-{
-    public List<PerformanceGroup> groups = new List<PerformanceGroup>();
-
-    public string Type
+    /// <summary>
+    /// Empty constructor.
+    /// </summary>
+    public PerformanceGroup()
     {
-        get
-        {
-            return "PerformanceGroup";
-        }
     }
+
+    /// <summary>
+    /// The type of the performance group.
+    /// In JSON its the 'Name' of the component group.
+    /// </summary>
+    public string Type { get; set; }
 
     /// <summary>
     /// Reads from the reader provided.
     /// </summary>
-    public void ReadXmlPrototype(XmlReader reader)
+    public void ReadXmlPrototype(XmlReader parentReader)
     {
-        string name = reader.GetAttribute("Name");
+        Type = parentReader.GetAttribute("Name");
 
-        bool disableUI = XmlConvert.ToBoolean(reader.GetAttribute("DisableUI").ToLower());
-
-        if (name == null)
+        if (Type == null)
         {
-            name = string.Empty;
+            throw new System.Exception("Type ('Name') doesn't exist in component group.");
         }
 
-        List<string> elementData = new List<string>();
-        List<Parameter> parameterData = new List<Parameter>();
+        string disableUIText = parentReader.GetAttribute("DisableUI");
+        bool disableUI = string.IsNullOrEmpty(disableUIText) ? false : XmlConvert.ToBoolean(disableUIText.ToLower());
+
+        XmlReader reader = parentReader.ReadSubtree();
 
         while (reader.Read())
         {
-            if (reader.Name == "Option")
+            if (reader.Name == "Component")
             {
                 reader.MoveToContent();
                 string className = reader.GetAttribute("ClassName");
 
                 if (string.IsNullOrEmpty(className) == false)
                 {
-                    elementData.Add(reader.GetAttribute("ClassName"));
+                    componentData.Add(reader.GetAttribute("ClassName"));
                     parameterData.Add(reader != null && reader.ReadToDescendant("Params") ? Parameter.ReadXml(reader) : new Parameter());
                 }
             }
-            else if (reader.Name == "ComponentGroup")
-            {
-                if (name != null)
-                {
-                    groups.Add(new PerformanceGroup(name, elementData.ToArray(), parameterData.ToArray(), disableUI));
-                }
-
-                name = reader.GetAttribute("Name");
-
-                if (reader.Name == "DisableUI")
-                {
-                    disableUI = XmlConvert.ToBoolean(reader.GetAttribute("DisableUI").ToLower());
-                }
-                else
-                {
-                    disableUI = false;
-                }
-
-                elementData.Clear();
-                parameterData.Clear();
-            }
-        }
-
-        if (name != null)
-        {
-            groups.Add(new PerformanceGroup(name, elementData.ToArray(), parameterData.ToArray(), disableUI));
         }
     }
 }

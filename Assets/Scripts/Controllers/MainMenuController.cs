@@ -68,8 +68,11 @@ public class MainMenuController : MonoBehaviour
         GameObject menuTop = (GameObject)Instantiate(Resources.Load("UI/MenuTop"));
         menuTop.name = "MenuTop";
         menuTop.transform.SetParent(canvas.transform, false);
-        GameObject fpsCounter = menuTop.GetComponent<PerformanceHUDManager>().gameObject;
+        GameObject fpsCounter = menuTop.GetComponentInChildren<PerformanceHUDManager>().gameObject;
         fpsCounter.SetActive(true);
+
+        // Destroy the currency
+        Destroy(menuTop.GetComponentInChildren<CurrencyDisplay>().gameObject);
 
         // Dev Console
         GameObject devConsole = (GameObject)Instantiate(Resources.Load("UI/Console/DevConsole"));

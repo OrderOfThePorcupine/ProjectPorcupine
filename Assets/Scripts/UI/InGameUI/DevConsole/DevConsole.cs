@@ -582,7 +582,7 @@ namespace DeveloperConsole
         /// <param name="methodInfo"> The reflected method that takes in a string and returns an object. </param>
         public static void AddParser(Type target, MethodInfo methodInfo)
         {
-            Parsers.Add(target, (ParseDelegate)Delegate.CreateDelegate(typeof(ParseDelegate), methodInfo));
+            Parsers[target] = (ParseDelegate)Delegate.CreateDelegate(typeof(ParseDelegate), methodInfo);
         }
 
         /// <summary>
@@ -592,7 +592,7 @@ namespace DeveloperConsole
         /// <param name="method"> A function that takes in a string and returns an object. </param>
         public static void AddParser(Type target, ParseDelegate method)
         {
-            Parsers.Add(target, method);
+            Parsers[target] = method;
         }
 
         /// <summary>
@@ -602,7 +602,7 @@ namespace DeveloperConsole
         /// <param name="method"> A function that takes in a string and returns an object. </param>
         public static void AddParser(Type target, Func<string, object> method)
         {
-            Parsers.Add(target, new ParseDelegate(method));
+            Parsers[target] = new ParseDelegate(method);
         }
 
         /// <summary>
@@ -686,27 +686,31 @@ namespace DeveloperConsole
         }
 
         /// <summary>
-        /// Raises the enable event.  It just does some instance checking.
+        /// Instance/Singleton management.
         /// </summary>
-        private void OnEnable()
+        private void Awake()
         {
             // Guard
             if (instance != this && instance != null)
             {
                 // Destroy instance.
-                UnityDebugger.Debugger.LogError("DevConsole", "There can only be one Console per project.  Deleting instance with name: " + instance.gameObject.name);
-                Destroy(instance.gameObject);
+                UnityDebugger.Debugger.LogError("DevConsole", "There can only be one Console per 'game'.  Deleting instance with name: " + gameObject.name);
+                Destroy(gameObject);
             }
-
-            // Saves a small amount of extra calls and what not
-            if (instance != this)
+            else
             {
                 instance = this;
 
                 KeyboardManager.Instance.RegisterModalInputField(inputField);
                 KeyboardManager.Instance.RegisterInputAction("DevConsole", KeyboardMappedInputType.KeyUp, ToggleConsole);
             }
+        }
 
+        /// <summary>
+        /// Raises the enable event.  If we are closed it just closes it again.
+        /// </summary>
+        private void OnEnable()
+        {
             if (SettingsKeyHolder.EnableDevConsole == false || closed)
             {
                 Close();
@@ -939,7 +943,7 @@ namespace DeveloperConsole
 
             // Load Commands from XML (will be changed to JSON AFTER the current upgrade)
             // Covers both CSharp and LUA
-            AddCommands(PrototypeManager.DevConsole.Values.Select(x => x.ConsoleCommand).ToArray());
+            AddCommands(PrototypeManager.DevConsole.Values.ToArray());
         }
     }
 }

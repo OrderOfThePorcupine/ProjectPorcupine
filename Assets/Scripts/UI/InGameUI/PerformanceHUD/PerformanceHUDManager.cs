@@ -18,26 +18,71 @@ public class PerformanceHUDManager : MonoBehaviour
     /// <summary>
     /// The current group/mode to display.
     /// </summary>
-    public static Dictionary<PerformanceGroup, BasePerformanceHUDElement[]> allGroups;
+    private static Dictionary<PerformanceGroup, BasePerformanceHUDComponent[]> allGroups;
+
+    /// <summary>
+    /// Instance managament.
+    /// </summary>
+    private static PerformanceHUDManager instance;
 
     /// <summary>
     /// What group are we currently at.
     /// </summary>
-    private static PerformanceGroup groupPointer;
+    private PerformanceGroup groupPointer;
 
     /// <summary>
     /// What current root are we at.
     /// </summary>
-    private static int columnRootIndex = 0;
+    private int columnRootIndex = 0;
 
     /// <summary>
     /// All of our root objects.
     /// </summary>
-    private static List<GameObject> columnRootObjects = new List<GameObject>();
+    private List<GameObject> columnRootObjects = new List<GameObject>();
 
+    /// <summary>
+    /// Get all the group names.
+    /// </summary>
+    /// <returns> All the group names. </returns>
     public static string[] GetNames()
     {
-        return allGroups.Keys.Select(x => x.name).ToArray();
+        return allGroups.Keys.Select(x => x.Type).ToArray();
+    }
+
+    /// <summary>
+    /// Loads all the groups.
+    /// </summary>
+    public static void LoadGroups()
+    {
+        // Load Settings
+        allGroups = new Dictionary<PerformanceGroup, BasePerformanceHUDComponent[]>();
+
+        List<PerformanceGroup> groups = PrototypeManager.PerformanceHUD.Values;
+
+        allGroups.Add(new PerformanceGroup("none", new List<string>(), new List<Parameter>(), true), new BasePerformanceHUDComponent[0]);
+        List<BasePerformanceHUDComponent> elements = new List<BasePerformanceHUDComponent>();
+
+        // Convert the dictionary of specialised elements to a more generalised format
+        for (int i = 0; i < groups.Count; i++)
+        {
+            for (int j = 0; j < groups[i].componentData.Count; j++)
+            {
+                if (FunctionsManager.PerformanceHUD.HasFunction("Get" + groups[i].componentData[j]))
+                {
+                    BasePerformanceHUDComponent element = FunctionsManager.PerformanceHUD.Call("Get" + groups[i].componentData[j]).ToObject<BasePerformanceHUDComponent>();
+                    element.parameterData = groups[i].parameterData[j];
+                    element.InitializeLUA();
+                    elements.Add(element);
+                }
+                else
+                {
+                    Debug.LogWarning("Get" + groups[i] + groups[i].componentData[j] + "() Doesn't exist");
+                }
+            }
+
+            allGroups.Add(groups[i], elements.ToArray());
+            elements.Clear();
+        }
     }
 
     /// <summary>
@@ -45,30 +90,45 @@ public class PerformanceHUDManager : MonoBehaviour
     /// </summary>
     public static void DirtyUI()
     {
+        if (instance == null)
+        {
+            return;
+        }
+
         // Clear
-        foreach (Transform rootTransform in columnRootObjects.Select(x => x.transform))
+        foreach (Transform rootTransform in instance.columnRootObjects.Select(x => x.transform))
         {
             foreach (Transform child in rootTransform)
             {
+                child.BroadcastMessage("Despawn", SendMessageOptions.DontRequireReceiver);
                 Destroy(child.gameObject);
             }
         }
 
-        groupPointer = allGroups.FirstOrDefault(x => x.Key.name == SettingsKeyHolder.PerformanceHUD).Key;
+        instance.groupPointer = allGroups.FirstOrDefault(x => x.Key.Type == SettingsKeyHolder.PerformanceHUD).Key;
 
         // Set group
-        if (groupPointer.name == null)
+        if (instance.groupPointer == null || string.IsNullOrEmpty(instance.groupPointer.Type))
         {
-            groupPointer = allGroups.First(x => x.Key.name == "none").Key;
+            instance.groupPointer = allGroups.First(x => x.Key.Type == "none").Key;
         }
 
         // Draw and Begin UI Functionality
-        foreach (BasePerformanceHUDElement elementName in allGroups[groupPointer])
+        foreach (BasePerformanceHUDComponent elementName in allGroups[instance.groupPointer])
         {
             Transform rootTransfer = GetColumnRootObject().transform;
             GameObject go = elementName.InitializeElement();
             go.transform.SetParent(rootTransfer);
             go.name = elementName.GetName();
+        }
+
+        // If we are at group -1, or are already disabled then return
+        if (instance.gameObject.activeInHierarchy == false && instance.groupPointer.disableUI == true)
+        {
+            // Disable self
+            instance.gameObject.SetActive(false);
+
+            return;
         }
     }
 
@@ -77,25 +137,49 @@ public class PerformanceHUDManager : MonoBehaviour
     /// </summary>
     private static GameObject GetColumnRootObject()
     {
-        if (columnRootIndex < columnRootObjects.Count)
+        if (instance.columnRootIndex < instance.columnRootObjects.Count)
         {
-            columnRootIndex++;
-            return columnRootObjects[columnRootIndex - 1];
+            instance.columnRootIndex++;
+            return instance.columnRootObjects[instance.columnRootIndex - 1];
         }
-        else if (columnRootIndex > 0)
+        else if (instance.columnRootIndex > 0)
         {
-            columnRootIndex = 0;
-            return columnRootObjects[columnRootIndex];
+            instance.columnRootIndex = 0;
+            return instance.columnRootObjects[instance.columnRootIndex];
         }
-        else if (columnRootObjects.Count == 0)
+        else if (instance.columnRootObjects.Count == 0)
         {
             throw new System.Exception("Column Root Object Array is empty and the system wants an object");
         }
         else
         {
-            columnRootIndex++;
+            instance.columnRootIndex++;
             return GetColumnRootObject();
         }
+    }
+
+    /// <summary>
+    /// Singleton management.
+    /// </summary>
+    private void Awake()
+    {
+        if (instance == this || instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            UnityDebugger.Debugger.LogError("There can only be one PerformanceHUD per 'game'.  Deleting instance with name: " + gameObject.name);
+            Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Remove self from the every frame call.
+    /// </summary>
+    private void OnDestroy()
+    {
+        TimeManager.Instance.EveryFrame -= Instance_EveryFrame;
     }
 
     /// <summary>
@@ -112,53 +196,20 @@ public class PerformanceHUDManager : MonoBehaviour
             columnRootObjects.Add(child.gameObject);
         }
 
-        // Load Settings
-        allGroups = new Dictionary<PerformanceGroup, BasePerformanceHUDElement[]>();
-
-        PerformanceGroup[] groups = PrototypeManager.PerformanceHUD.Values.SelectMany(x => x.groups).ToArray();
-
-        allGroups.Add(new PerformanceGroup("none", new string[0], new Parameter[0], true), new BasePerformanceHUDElement[0]);
-        List<BasePerformanceHUDElement> elements = new List<BasePerformanceHUDElement>();
-
-        // Convert the dictionary of specialised elements to a more generalised format
-        for (int i = 0; i < groups.Length; i++)
-        {
-            for (int j = 0; j < groups[i].elementData.Length; j++)
-            {
-                if (FunctionsManager.PerformanceHUD.HasFunction("Get" + groups[i].elementData[j]))
-                {
-                    BasePerformanceHUDElement element = FunctionsManager.PerformanceHUD.Call("Get" + groups[i].elementData[j]).ToObject<BasePerformanceHUDElement>();
-                    element.parameterData = groups[i].parameterData[j];
-                    element.InitializeLUA();
-                    elements.Add(element);
-                }
-                else
-                {
-                    Debug.LogWarning("Get" + groups[i] + groups[i].elementData[j] + "() Doesn't exist");
-                }
-            }
-
-            allGroups.Add(groups[i], elements.ToArray());
-            elements.Clear();
-        }
+        LoadGroups();
 
         // Setup UI
         DirtyUI();
     }
 
-    private void Instance_EveryFrame(float obj)
+    /// <summary>
+    /// Update instance.
+    /// </summary>
+    /// <param name="deltaTime"> Time since last update. </param>
+    private void Instance_EveryFrame(float deltaTime)
     {
-        // If we are at group -1, or are already disabled then return
-        if (gameObject.activeInHierarchy == false && groupPointer.disableUI == true)
-        {
-            // Disable self
-            gameObject.SetActive(false);
-
-            return;
-        }
-
         // Update UI
-        foreach (BasePerformanceHUDElement element in allGroups[groupPointer])
+        foreach (BasePerformanceHUDComponent element in allGroups[groupPointer])
         {
             if (element != null)
             {

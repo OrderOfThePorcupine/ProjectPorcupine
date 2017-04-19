@@ -15,7 +15,7 @@ using UnityEngine.UI;
 /// or throught he function call changeText.
 /// </summary>
 [MoonSharp.Interpreter.MoonSharpUserData]
-public abstract class BasePerformanceHUDElement : BaseUIElement
+public abstract class BasePerformanceHUDComponent : BaseUIElement
 {
     public event EventHandler UpdateHandler;
 
@@ -29,7 +29,7 @@ public abstract class BasePerformanceHUDElement : BaseUIElement
         EventHandler invoker = UpdateHandler;
         if (invoker != null)
         {
-            invoker(this, null);
+            invoker.Invoke(this, EventArgs.Empty);
         }
     }
 

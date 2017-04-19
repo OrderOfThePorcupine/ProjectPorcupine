@@ -195,8 +195,7 @@ public static class Settings
         // Only done if it can't find file so it's fine
         // It just gets the dictionary values, then the next values, then since its a jagged array it then simplifies it
         SettingsOption[] settingsOptions = PrototypeManager.SettingsCategories.Values
-                                                                         .SelectMany(x => x.categories.Values)
-                                                                         .SelectMany(x => x.Values)
+                                                                         .SelectMany(x => x.headings.Values)
                                                                          .SelectMany(x => x)
                                                                          .ToArray();
 
