@@ -45,7 +45,7 @@ public class GameController : MonoBehaviour
     {
         if (Instance != null)
         {
-            Instance.OnDirtyFlags(flags);
+            Instance.OnDirtyFlags(Flags);
         }
     }
 
