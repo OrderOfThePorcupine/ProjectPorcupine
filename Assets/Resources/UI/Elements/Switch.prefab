@@ -38,7 +38,6 @@ GameObject:
   - component: {fileID: 224000013036247610}
   - component: {fileID: 114000012921276924}
   - component: {fileID: 114000012594959840}
-  - component: {fileID: 114243926741370694}
   m_Layer: 5
   m_Name: Switch
   m_TagString: Untagged
@@ -173,17 +172,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114243926741370694
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010638297662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44d23dc86877a854d80e94a0de1d7f0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!222 &222000011306210914
 CanvasRenderer:
   m_ObjectHideFlags: 1
