@@ -6,11 +6,11 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 // Every specific UI element comes from this
 public abstract class BaseUIElement
@@ -19,6 +19,11 @@ public abstract class BaseUIElement
     /// Internal option data.
     /// </summary>
     public Parameter parameterData;
+
+    /// <summary>
+    /// For internals, to prevent having to load resources every time.
+    /// </summary>
+    private static Dictionary<string, GameObject> loadedResources = new Dictionary<string, GameObject>();
 
     /// <summary>
     /// Returns the name of this object for internal reasons.
@@ -31,11 +36,6 @@ public abstract class BaseUIElement
     /// Pass it back basically.
     /// </summary>
     public abstract GameObject InitializeElement();
-
-    /// <summary>
-    /// For internals, to prevent having to load resources every time.
-    /// </summary>
-    private static Dictionary<string, GameObject> loadedResources = new Dictionary<string, GameObject>();
 
     protected GameObject GetFluidHorizontalBaseElement(string elementTitle = "", bool stretchX = false, bool stretchY = false, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
@@ -134,8 +134,7 @@ public abstract class BaseUIElement
             loadedResources["Text"] = Resources.Load<GameObject>("UI/Elements/Text");
         }
 
-        Text text = SimplePool.Spawn(loadedResources["Text"], Vector3.zero, Quaternion.identity).GetComponent<Text>();
-        text.text = string.Empty;
+        Text text = GameObject.Instantiate(loadedResources["Text"]).GetComponent<Text>();
 
         if (localize)
         {
@@ -150,14 +149,7 @@ public abstract class BaseUIElement
 
         if (autoFit == true)
         {
-            if (text.gameObject.GetComponent<TextScaling>() == null)
-            {
-                text.gameObject.AddComponent<TextScaling>();
-            }
-        }
-        else if (text.gameObject.GetComponent<TextScaling>() != null)
-        {
-            Object.Destroy(text.gameObject.GetComponent<TextScaling>());
+            text.gameObject.AddComponent<TextScaling>();
         }
 
         return text;
@@ -170,9 +162,7 @@ public abstract class BaseUIElement
             loadedResources[type] = Resources.Load<GameObject>("UI/Elements/" + type);
         }
 
-        Toggle toggle = SimplePool.Spawn(loadedResources[type], Vector3.zero, Quaternion.identity).GetComponent<Toggle>();
-        toggle.onValueChanged.RemoveAllListeners();
-        return toggle;
+        return GameObject.Instantiate(loadedResources[type]).GetComponent<Toggle>();
     }
 
     protected InputField CreateInputField(string withText)
@@ -182,12 +172,8 @@ public abstract class BaseUIElement
             loadedResources["Field"] = Resources.Load<GameObject>("UI/Elements/Field");
         }
 
-        InputField field = SimplePool.Spawn(loadedResources["Field"], Vector3.zero, Quaternion.identity).GetComponent<InputField>();
+        InputField field = GameObject.Instantiate(loadedResources["Field"]).GetComponent<InputField>();
         field.text = withText;
-        field.onValidateInput = null;
-        field.onValueChanged.RemoveAllListeners();
-        field.onEndEdit.RemoveAllListeners();
-
         return field;
     }
 
@@ -198,13 +184,12 @@ public abstract class BaseUIElement
             loadedResources["Slider"] = Resources.Load<GameObject>("UI/Elements/Slider");
         }
 
-        Slider slider = SimplePool.Spawn(loadedResources["Slider"], Vector3.zero, Quaternion.identity).GetComponent<Slider>();
+        Slider slider = GameObject.Instantiate(loadedResources["Slider"]).GetComponent<Slider>();
 
         slider.maxValue = range.y;
         slider.minValue = range.x;
         slider.value = value;
         slider.wholeNumbers = wholeNumbers;
-        slider.onValueChanged.RemoveAllListeners();
 
         return slider;
     }
@@ -216,12 +201,7 @@ public abstract class BaseUIElement
             loadedResources["Dropdown"] = Resources.Load<GameObject>("UI/Elements/Dropdown");
         }
 
-        Dropdown dropdown = SimplePool.Spawn(loadedResources["Dropdown"], Vector3.zero, Quaternion.identity).GetComponent<Dropdown>();
-        dropdown.value = 0;
-        dropdown.onValueChanged.RemoveAllListeners();
-        dropdown.options.Clear();
-
-        return dropdown;
+        return GameObject.Instantiate(loadedResources["Dropdown"]).GetComponent<Dropdown>();
     }
 
     protected Dropdown CreateDropdownFromText(string[] textOptions, int value)

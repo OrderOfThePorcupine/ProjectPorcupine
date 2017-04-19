@@ -29,7 +29,7 @@ public abstract class BasePerformanceHUDComponent : BaseUIElement
         EventHandler invoker = UpdateHandler;
         if (invoker != null)
         {
-            invoker(this, null);
+            invoker.Invoke(this, EventArgs.Empty);
         }
     }
 

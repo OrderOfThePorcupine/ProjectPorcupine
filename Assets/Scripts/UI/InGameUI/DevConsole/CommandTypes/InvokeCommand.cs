@@ -9,8 +9,8 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MoonSharp.Interpreter;
 using System.Xml;
+using MoonSharp.Interpreter;
 
 namespace DeveloperConsole.Core
 {

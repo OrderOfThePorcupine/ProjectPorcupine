@@ -53,24 +53,15 @@ public class SettingsMenu : MonoBehaviour
         GameController.Instance.soundController.OnButtonSFX();
 
         instance.changesTracker.Clear();
+        instance.mainRoot.SetActive(true);
 
         if (instance.options.Count > 0)
         {
-            DisplayCategory(instance.options.First().Key, true);
+            DisplayCategory(instance.options.First().Key);
         }
         else
         {
-            DisplayCategory("No Settings Loaded", true);
-        }
-
-        instance.mainRoot.SetActive(true);
-    }
-
-    public static void DisplayCategory(string category, bool initial = false)
-    {
-        if (instance == null)
-        {
-            return;
+            DisplayCategory("No Settings Loaded");
         }
 
         RectTransform rectTransform = instance.mainRoot.GetComponent<RectTransform>();
@@ -83,9 +74,17 @@ public class SettingsMenu : MonoBehaviour
         {
             rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, Screen.height * 0.8f);
         }
+    }
+
+    public static void DisplayCategory(string category)
+    {
+        if (instance == null)
+        {
+            return;
+        }
 
         // Optimisation for saving
-        if (instance.currentCategory != string.Empty && instance.currentCategory != category && instance.options.ContainsKey(instance.currentCategory) && initial == false)
+        if (instance.currentCategory != string.Empty && instance.currentCategory != category && instance.options.ContainsKey(instance.currentCategory))
         {
             foreach (string headingName in instance.options[instance.currentCategory].Keys)
             {
@@ -154,6 +153,8 @@ public class SettingsMenu : MonoBehaviour
             }
         }
 
+        // Update canvases, to allow the normalized position to properly exist.
+        Canvas.ForceUpdateCanvases();
         instance.settingsScrollRect.normalizedPosition = new Vector2(0, 1);
     }
 
@@ -225,6 +226,7 @@ public class SettingsMenu : MonoBehaviour
                         }
 
                         changesTracker.Clear();
+                        currentCategory = string.Empty;
 
                         GameController.Instance.IsModal = false;
                         GameController.Instance.soundController.OnButtonSFX();
@@ -286,34 +288,21 @@ public class SettingsMenu : MonoBehaviour
     // Initial State
     private void Awake()
     {
-        instance = this;
+        if (instance == null || instance == this)
+        {
+            instance = this;
+        }
+        else
+        {
+            UnityDebugger.Debugger.LogError("There can only be one Settings Menu per 'game'.  Deleting instance with name: " + gameObject.name);
+            Destroy(this.gameObject);
+        }
     }
 
     // Use this for initialization
     private void Start()
     {
-        // This just makes sure that the localization is done
-        // It won't always work,
-        // especially if slow internet so cross fingers lol, since there is no 'localization finished thing'
-        StartCoroutine(LateStart());
-    }
-
-    private IEnumerator LateStart()
-    {
-        yield return new WaitForEndOfFrame();
-
         LoadCategories();
-
-        if (options.Count > 0)
-        {
-            DisplayCategory(options.First().Key, true);
-        }
-        else
-        {
-            DisplayCategory("No Settings Loaded", true);
-        }
-
-        yield return null;
     }
 
     private void Update()

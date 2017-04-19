@@ -125,7 +125,6 @@ public class GenericToggle : BaseSettingsElement
         GameObject element = GetHorizontalBaseElement(type, 120, 60, TextAnchor.MiddleLeft);
 
         Text text = CreateText(option.name, true);
-        Debug.LogWarning(text.text);
         text.transform.SetParent(element.transform);
 
         toggleElement = CreateToggle(type);
@@ -186,9 +185,6 @@ public class GenericInputField : BaseSettingsElement
 
         Text text = CreateText(option.name, true);
         text.transform.SetParent(element.transform);
-
-        Debug.LogWarning(text.text);
-
         value = getValue();
 
         fieldElement = CreateInputField(value);

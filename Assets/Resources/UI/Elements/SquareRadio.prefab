@@ -16,13 +16,14 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 224000011034739758}
-  - 114: {fileID: 114000011688845056}
-  - 114: {fileID: 114000012197679114}
+  - component: {fileID: 224000011034739758}
+  - component: {fileID: 114000011688845056}
+  - component: {fileID: 114000012197679114}
+  - component: {fileID: 114996151671553090}
   m_Layer: 5
-  m_Name: SettingsSquareRadio
+  m_Name: SquareRadio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,11 +34,11 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 224000013460186860}
-  - 222: {fileID: 222000013223966074}
-  - 114: {fileID: 114000010407129506}
+  - component: {fileID: 224000013460186860}
+  - component: {fileID: 222000013223966074}
+  - component: {fileID: 114000010407129506}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -50,11 +51,11 @@ GameObject:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 224000011145263260}
-  - 222: {fileID: 222000014068670106}
-  - 114: {fileID: 114000012458001780}
+  - component: {fileID: 224000011145263260}
+  - component: {fileID: 222000014068670106}
+  - component: {fileID: 114000012458001780}
   m_Layer: 5
   m_Name: Checkmark
   m_TagString: Untagged
@@ -172,6 +173,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114996151671553090
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011483629928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d23dc86877a854d80e94a0de1d7f0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &222000013223966074
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -193,11 +205,11 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000013460186860}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -110.000015, y: 30.000011}
@@ -212,10 +224,10 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000013460186860}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 20.17, y: 19.95}
@@ -230,11 +242,11 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000011145263260}
   m_Father: {fileID: 224000011034739758}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 19.999989, y: 20.000004}

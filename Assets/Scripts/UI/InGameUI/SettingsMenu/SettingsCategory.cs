@@ -9,40 +9,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using System.Xml.Linq;
-
-/// <summary>
-/// For XML reader.
-/// </summary>
-public class SettingsOption
-{
-    public string name;
-    public string key;
-    public string defaultValue;
-    public string className;
-    public Parameter options;
-
-    public SettingsOption(string name, string key, string defaultValue, string className, Parameter parameter = null)
-    {
-        this.name = name;
-        this.key = key;
-        this.defaultValue = defaultValue;
-        this.className = className;
-        this.options = parameter;
-    }
-
-    /// <summary>
-    /// A nice little helper (pass it a reader class that is up to the subtree).
-    /// </summary>
-    public SettingsOption(XmlReader reader)
-    {
-        name = reader.GetAttribute("Name");
-        key = reader.GetAttribute("Key");
-        defaultValue = reader.GetAttribute("DefaultValue");
-        className = reader.GetAttribute("ClassName");
-        this.options = (reader != null && reader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter();
-    }
-}
 
 /// <summary>
 /// Holds the category and its options (and name).

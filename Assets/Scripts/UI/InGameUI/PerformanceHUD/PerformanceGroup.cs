@@ -27,7 +27,7 @@ public class PerformanceGroup : IPrototypable
     public bool disableUI;
 
     /// <summary>
-    /// Constructor with parameters
+    /// Constructor with parameters.
     /// </summary>
     /// <param name="name"> The name of the group. </param>
     /// <param name="componentData"> The element data for names of classes to show. </param>
