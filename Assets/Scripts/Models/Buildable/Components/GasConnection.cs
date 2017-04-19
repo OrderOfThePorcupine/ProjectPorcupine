@@ -79,11 +79,12 @@ namespace ProjectPorcupine.Buildable.Components
 
         public override void FixedFrequencyUpdate(float deltaTime)
         {
+            /*
             float efficiency = 1f;
             if (Efficiency != null)
             {
                 efficiency = RetrieveFloatFor(Efficiency, ParentFurniture);
-            }
+            } */
 
             if (Provides != null && Provides.Count > 0)
             {

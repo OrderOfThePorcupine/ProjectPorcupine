@@ -17,15 +17,15 @@ namespace ProjectPorcupine.Rooms
     [MoonSharpUserData]
     public class Room
     {
-        private Dictionary<string, string> deltaGas;
-
+        // private Dictionary<string, string> deltaGas;
         private List<Tile> tiles;
 
         public Room()
         {
             tiles = new List<Tile>();
             Atmosphere = new AtmosphereComponent();
-            deltaGas = new Dictionary<string, string>();
+
+            // deltaGas = new Dictionary<string, string>();
             RoomBehaviors = new Dictionary<string, RoomBehavior>();
         }
 
@@ -52,7 +52,7 @@ namespace ProjectPorcupine.Rooms
 
         public float GetGasPressure()
         {
-            return IsOutsideRoom() ? 0.0f : Atmosphere.GetGasAmount() / TileCount;
+            return IsOutsideRoom() ? 0.0f : Atmosphere.TotalGas / TileCount;
         }
 
         public float GetGasPressure(string gasName)

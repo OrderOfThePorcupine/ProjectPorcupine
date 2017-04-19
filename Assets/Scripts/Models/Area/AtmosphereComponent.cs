@@ -15,11 +15,30 @@ using MoonSharp.Interpreter;
 using ProjectPorcupine.Rooms;
 using UnityEngine;
 
+/// <summary>
+/// An atmosphere component which controls gas and temperature.
+/// </summary>
 [MoonSharpUserData]
 public class AtmosphereComponent
 {
+    /// <summary>
+    /// All the gasses.  Accessible by gas name.
+    /// </summary>
     private Dictionary<string, float> gasses;
 
+    /// <summary>
+    /// The internal temperature storage unit.
+    /// </summary>
+    private TemperatureValue internalTemperature;
+
+    /// <summary>
+    /// Internal thermal energy, do not touch unless through property.
+    /// </summary>
+    private float internalThermalEnergy;
+
+    /// <summary>
+    /// Empty constructor, that initialises variables.
+    /// </summary>
     public AtmosphereComponent()
     {
         TotalGas = 0;
@@ -27,19 +46,33 @@ public class AtmosphereComponent
         ThermalEnergy = 0;
     }
 
+    /// <summary>
+    /// The total gas amount.
+    /// </summary>
     public float TotalGas { get; private set; }
 
-    public float ThermalEnergy { get; private set; }
-
-    #region gas
     /// <summary>
-    /// Gets the total gas stored in this component.
+    /// The thermal energy of this component
+    /// ALWAYS set after gas since,
+    /// this will also update the internal temperature.
     /// </summary>
-    /// <returns>The total gas amount.</returns>
-    public float GetGasAmount()
+    public float ThermalEnergy
     {
-        return TotalGas;
+        get
+        {
+            return internalThermalEnergy;
+        }
+
+        set
+        {
+            internalThermalEnergy = value;
+
+            // Update internal temperature
+            internalTemperature = TotalGas > 0 ? new TemperatureValue(internalThermalEnergy / TotalGas) : TemperatureValue.AbsoluteZero;
+        }
     }
+
+    #region Gas
 
     /// <summary>
     /// Gets the amount of this gas stored in this component.
@@ -71,16 +104,57 @@ public class AtmosphereComponent
     }
 
     /// <summary>
-    /// Sets the amount of gas of this type to the value. Temperature will stay constant.
+    /// Sets the amount of gas of this type to the value.
     /// </summary>
     /// <param name="gasName">The name of the gas whose value is set.</param>
     /// <param name="amount">The amount of gas to set it to.</param>
-    public void SetGas(string gasName, float value)
+    public void SetGas(string gasName, float newValue)
     {
-        float delta = value - GetGasAmount(gasName);
-        ThermalEnergy += delta * GetTemperature();
+        float delta = newValue - GetGasAmount(gasName);
         ChangeGas(gasName, delta);
+        ThermalEnergy += delta * internalTemperature.InKelvin;
         ////UnityDebugger.Debugger.Log("Atmosphere", "Setting " + gasName + ". New value is " + GetGasAmount(gasName));
+    }
+
+    /// <summary>
+    /// Sets the total gas value then evenly spreads it depending on gas fractions.
+    /// </summary>
+    /// <param name="newValue"> The new value for the total gas to be. </param>
+    public void SetGas(float newValue)
+    {
+        float delta = newValue - TotalGas;
+        string[] gasNames = this.GetGasNames();
+        for (int i = 0; i < gasNames.Length; i++)
+        {
+            gasses[gasNames[i]] += delta * GetGasFraction(gasNames[i]);
+        }
+
+        TotalGas = newValue;
+        ThermalEnergy += delta * internalTemperature.InKelvin;
+    }
+
+    /// <summary>
+    /// Update a gas with a new amount.
+    /// </summary>
+    /// <param name="gasName"> The gas to update. </param>
+    /// <param name="amount"> The amount to update by. </param>
+    public void ChangeGas(string gasName, float amount)
+    {
+        if (gasses.ContainsKey(gasName) == false)
+        {
+            gasses[gasName] = 0;
+        }
+
+        if (gasses[gasName] <= -amount)
+        {
+            TotalGas -= gasses[gasName];
+            gasses.Remove(gasName);
+        }
+        else
+        {
+            TotalGas += amount;
+            gasses[gasName] += amount;
+        }
     }
 
     /// <summary>
@@ -115,12 +189,13 @@ public class AtmosphereComponent
         }
 
         amount = Mathf.Min(TotalGas, amount);
-        foreach (var gasName in GetGasNames())
+        string[] gasNames = this.GetGasNames();
+        for (int i = 0; i < gasNames.Length; i++)
         {
-            ChangeGas(gasName, -amount * GetGasFraction(gasName));
+            ChangeGas(gasNames[i], -amount * GetGasFraction(gasNames[i]));
         }
 
-        ThermalEnergy -= amount * GetTemperature();
+        ThermalEnergy -= amount * internalTemperature.InKelvin;
     }
 
     /// <summary>
@@ -137,13 +212,12 @@ public class AtmosphereComponent
         }
 
         amount = Mathf.Min(GetGasAmount(gasName), amount);
-
-        ThermalEnergy -= amount * GetTemperature();
         ChangeGas(gasName, -amount);
+        ThermalEnergy -= amount * internalTemperature.InKelvin;
     }
 
     /// <summary>
-    /// Moves gas to another atmosphere. Thermal energy is transferred accordingly.
+    /// Moves gas to another atmosphere. Temperature is transferred accordingly.
     /// </summary>
     /// <param name="destination">Destination of the gas.</param>
     /// <param name="amount">Amount of gas to move.</param>
@@ -163,16 +237,17 @@ public class AtmosphereComponent
 
         amount = Mathf.Min(this.TotalGas, amount);
 
-        float thermalDelta = amount * this.GetTemperature();
+        string[] gasNames = this.GetGasNames();
+        for (int i = 0; i < gasNames.Length; i++)
+        {
+            float partialAmount = amount * GetGasFraction(gasNames[i]);
+            this.ChangeGas(gasNames[i], -partialAmount);
+            destination.ChangeGas(gasNames[i], partialAmount);
+        }
+
+        float thermalDelta = amount * internalTemperature.InKelvin;
         this.ThermalEnergy -= thermalDelta;
         destination.ThermalEnergy += thermalDelta;
-
-        foreach (var gasName in this.GetGasNames())
-        {
-            float partialAmount = amount * GetGasFraction(gasName);
-            this.ChangeGas(gasName, -partialAmount);
-            destination.ChangeGas(gasName, partialAmount);
-        }
     }
 
     public void MoveGasTo(AtmosphereComponent destination, string gasName, float amount)
@@ -184,30 +259,24 @@ public class AtmosphereComponent
         }
 
         amount = Mathf.Min(this.GetGasAmount(gasName), amount);
-
-        float thermalDelta = amount * this.GetTemperature();
-        this.ThermalEnergy -= thermalDelta;
-        destination.ThermalEnergy += thermalDelta;
-
         this.ChangeGas(gasName, -amount);
         destination.ChangeGas(gasName, amount);
+
+        float thermalDelta = amount * internalTemperature.InKelvin;
+        this.ThermalEnergy -= thermalDelta;
+        destination.ThermalEnergy += thermalDelta;
     }
     #endregion
 
-    #region temperature
-    /// <summary>
-    /// Gets the temperature.
-    /// </summary>
-    /// <returns>The temperature.</returns>
-    public float GetTemperature()
-    {
-        float t = TotalGas.IsZero() ? 0.0f : ThermalEnergy / TotalGas;
-        if (float.IsNaN(t))
-        {
-            UnityDebugger.Debugger.Log("Atmosphere", "NaN result. Total gas = " + TotalGas + ". Energy = " + ThermalEnergy + ".");
-        }
+    #region Temperature
 
-        return TotalGas.IsZero() ? 0.0f : ThermalEnergy / TotalGas;
+    /// <summary>
+    /// Gets the temperature value for this room.
+    /// </summary>
+    /// <returns> The temperature value as <see cref="TemperatureValue"/>. </returns>
+    public TemperatureValue GetTemperature()
+    {
+        return TotalGas.IsZero() ? TemperatureValue.AbsoluteZero : internalTemperature;
     }
 
     /// <summary>
@@ -216,6 +285,7 @@ public class AtmosphereComponent
     /// <param name="temperature">Temperature.</param>
     public void SetTemperature(float temperature)
     {
+        // Also will conversely set the temperature.
         ThermalEnergy = TotalGas * temperature;
     }
 
@@ -228,23 +298,4 @@ public class AtmosphereComponent
         ThermalEnergy += Mathf.Max(-ThermalEnergy, amount);
     }
     #endregion
-
-    private void ChangeGas(string gasName, float amount)
-    {
-        if (gasses.ContainsKey(gasName) == false)
-        {
-            gasses[gasName] = 0;
-        }
-
-        if (gasses[gasName] <= -amount)
-        {
-            TotalGas -= gasses[gasName];
-            gasses.Remove(gasName);
-        }
-        else
-        {
-            TotalGas += amount;
-            gasses[gasName] += amount;
-        }
-    }
 }
