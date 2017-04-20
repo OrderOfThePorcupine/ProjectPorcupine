@@ -33,10 +33,12 @@ public class SettingsOption
     /// </summary>
     public SettingsOption(XmlReader reader)
     {
-        name = reader.GetAttribute("Name");
-        key = reader.GetAttribute("Key");
-        defaultValue = reader.GetAttribute("DefaultValue");
-        className = reader.GetAttribute("ClassName");
-        this.options = (reader != null && reader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter();
+            XmlReader subReader = reader.ReadSubtree();
+            name = reader.GetAttribute("Name");
+            key = reader.GetAttribute("Key");
+            defaultValue = reader.GetAttribute("DefaultValue");
+            className = reader.GetAttribute("ClassName");
+            this.options = (reader != null && subReader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter();
+            subReader.Close();
     }
 }
