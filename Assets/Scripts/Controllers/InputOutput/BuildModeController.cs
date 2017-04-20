@@ -294,24 +294,20 @@ public class BuildModeController
                 if (orderAction != null)
                 {
                     buildingJob = orderAction.CreateJob(tile, tileType.Type);
-                    buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
-                    WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+
+                    if (SettingsKeyHolder.DeveloperMode)
+                    {
+                        buildingJob.tile.SetTileType(buildingJob.JobTileType);
+                    }
+                    else
+                    {
+                        buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
+                        WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                    }
                 }
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no order action called ChangeTileType in tileType: " + tileType.Type);
-                }
-
-                // Add the job to the queue or build immediately if in Dev mode
-                if (SettingsKeyHolder.DeveloperMode)
-                {
-                    buildingJob.tile.SetTileType(buildingJob.JobTileType);
-                }
-                else
-                {
-                    buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
-
-                    WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
                 }
             }
         }
