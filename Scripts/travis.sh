@@ -14,9 +14,6 @@ if [ "$JOB" == "unit-test" ]; then
 fi
 
 if [ "$JOB" == "stylecop" ]; then
-    if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
-      exit 0
-    fi
     ./Scripts/Install/mono.sh
     ./Scripts/Install/stylecop.sh
     ./Scripts/check-style.sh
