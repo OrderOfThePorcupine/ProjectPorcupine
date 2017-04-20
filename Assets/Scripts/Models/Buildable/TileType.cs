@@ -11,13 +11,12 @@ using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
 using ProjectPorcupine.Jobs;
+using ProjectPorcupine.OrderActions;
 
 [MoonSharpUserData]
 public class TileType : IPrototypable, IEquatable<TileType>
 {
     private static readonly string ULogChanelName = "TileType";
-
-    private Job buildingJob;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TileType"/> class.
@@ -95,13 +94,9 @@ public class TileType : IPrototypable, IEquatable<TileType>
     public string UnlocalizedDescription { get; private set; }
 
     /// <summary>
-    /// Gets a clone of construction job prototype for this tileType.
+    /// The order action to create tileType.
     /// </summary>
-    /// <value>The building job.</value>
-    public Job BuildingJob
-    {
-        get { return buildingJob.Clone(); }
-    }
+    public Dictionary<string, OrderAction> orderActions { get; private set; }
 
     public static bool operator ==(TileType left, TileType right)
     {
@@ -133,6 +128,19 @@ public class TileType : IPrototypable, IEquatable<TileType>
         return Type;
     }
 
+    public T GetOrderAction<T>() where T : OrderAction
+    {
+        OrderAction orderAction;
+        if (orderActions.TryGetValue(typeof(T).Name, out orderAction))
+        {
+            return (T)orderAction;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Determines whether this tile type is allowed to be built on the given tile.
     /// </summary>
@@ -162,6 +170,7 @@ public class TileType : IPrototypable, IEquatable<TileType>
     public void ReadXmlPrototype(XmlReader parentReader)
     {
         Type = parentReader.GetAttribute("type");
+        orderActions = new Dictionary<string, OrderAction>();
 
         XmlReader reader = parentReader.ReadSubtree();
         while (reader.Read())
@@ -184,8 +193,12 @@ public class TileType : IPrototypable, IEquatable<TileType>
                     reader.Read();
                     LinksToNeighbours = reader.ReadContentAsBoolean();
                     break;
-                case "BuildingJob":
-                    ReadBuildingJob(reader);
+                case "OrderAction":
+                    OrderAction orderAction = OrderAction.Deserialize(reader);
+                    if (orderAction != null)
+                    {
+                        orderActions[orderAction.Type] = orderAction;
+                    }
                     break;
                 case "CanPlaceHere":
                     CanBuildHereLua = reader.GetAttribute("functionName");
@@ -200,56 +213,5 @@ public class TileType : IPrototypable, IEquatable<TileType>
                     break;
             }
         }
-    }
-
-    /// <summary>
-    /// Reads the building job.
-    /// </summary>
-    /// <param name="parentReader">Parent reader.</param>
-    private void ReadBuildingJob(XmlReader parentReader)
-    {
-        string jobTime = parentReader.GetAttribute("jobTime");
-        float jobTimeValue;
-        if (float.TryParse(jobTime, out jobTimeValue) == false)
-        {
-            UnityDebugger.Debugger.LogErrorFormat(ULogChanelName, "Could not load jobTime for TyleType: {0} -- jobTime readed {1}", Type, jobTime);
-            return;
-        }
-
-        List<RequestedItem> requiredItems = new List<RequestedItem>();
-        XmlReader inventoryReader = parentReader.ReadSubtree();
-
-        while (inventoryReader.Read())
-        {
-            if (inventoryReader.Name != "Inventory")
-            {
-                continue;
-            }
-
-            // Found an inventory requirement, so add it to the list!
-            int amount;
-            string type = inventoryReader.GetAttribute("type");
-            if (int.TryParse(inventoryReader.GetAttribute("amount"), out amount))
-            {
-                requiredItems.Add(new RequestedItem(type, amount));
-            }
-            else
-            {
-                UnityDebugger.Debugger.LogErrorFormat(ULogChanelName, "Could not load Inventory item for TyleType: {0}", Type);
-            }
-        }
-
-        buildingJob = new Job(
-            null,
-            this,
-            Tile.ChangeTileTypeJobComplete,
-            jobTimeValue,
-            requiredItems.ToArray(),
-            Job.JobPriority.High,
-            false,
-            true)
-        {
-            Description = "job_build_floor_" + this
-        };
     }
 }

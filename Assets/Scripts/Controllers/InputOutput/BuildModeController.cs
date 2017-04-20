@@ -289,9 +289,18 @@ public class BuildModeController
                 // This tile position is valid tile type
 
                 // Create a job for it to be build
-                Job buildingJob = tileType.BuildingJob;
-
-                buildingJob.tile = tile;
+                Job buildingJob;
+                OrderAction orderAction = tileType.GetOrderAction<ChangeTileType>();
+                if (orderAction != null)
+                {
+                    buildingJob = orderAction.CreateJob(tile, tileType.Type);
+                    buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
+                    WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                }
+                else
+                {
+                    UnityDebugger.Debugger.LogError("BuildModeController", "There is no order action called ChangeTileType in tileType: " + tileType.Type);
+                }
 
                 // Add the job to the queue or build immediately if in Dev mode
                 if (SettingsKeyHolder.DeveloperMode)

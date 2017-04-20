@@ -44,7 +44,7 @@ public class Job : ISelectable, IPrototypable
     /// Defaults to false.
     /// </summary>
     public bool acceptsAny;
-    
+
     protected float jobTimeRequired;
 
     protected bool jobRepeats = false;
@@ -485,13 +485,13 @@ public class Job : ISelectable, IPrototypable
     public string GetName()
     {
         try
-        {    
+        {
             return LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(Type.ToString()).GetName());
         }
         catch
         {
             return LocalizationTable.GetLocalization(Type);
-        }      
+        }
     }
 
     public string GetDescription()
