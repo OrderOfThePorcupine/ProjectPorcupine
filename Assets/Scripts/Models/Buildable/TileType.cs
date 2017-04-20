@@ -96,7 +96,7 @@ public class TileType : IPrototypable, IEquatable<TileType>
     /// <summary>
     /// The order action to create tileType.
     /// </summary>
-    public Dictionary<string, OrderAction> orderActions { get; private set; }
+    public Dictionary<string, OrderAction> OrderActions { get; private set; }
 
     public static bool operator ==(TileType left, TileType right)
     {
@@ -131,7 +131,7 @@ public class TileType : IPrototypable, IEquatable<TileType>
     public T GetOrderAction<T>() where T : OrderAction
     {
         OrderAction orderAction;
-        if (orderActions.TryGetValue(typeof(T).Name, out orderAction))
+        if (OrderActions.TryGetValue(typeof(T).Name, out orderAction))
         {
             return (T)orderAction;
         }
@@ -170,7 +170,7 @@ public class TileType : IPrototypable, IEquatable<TileType>
     public void ReadXmlPrototype(XmlReader parentReader)
     {
         Type = parentReader.GetAttribute("type");
-        orderActions = new Dictionary<string, OrderAction>();
+        OrderActions = new Dictionary<string, OrderAction>();
 
         XmlReader reader = parentReader.ReadSubtree();
         while (reader.Read())
@@ -197,8 +197,9 @@ public class TileType : IPrototypable, IEquatable<TileType>
                     OrderAction orderAction = OrderAction.Deserialize(reader);
                     if (orderAction != null)
                     {
-                        orderActions[orderAction.Type] = orderAction;
+                        OrderActions[orderAction.Type] = orderAction;
                     }
+
                     break;
                 case "CanPlaceHere":
                     CanBuildHereLua = reader.GetAttribute("functionName");
