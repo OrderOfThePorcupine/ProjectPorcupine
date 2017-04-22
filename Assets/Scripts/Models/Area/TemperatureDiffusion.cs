@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using ProjectPorcupine.Rooms;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 [MoonSharpUserData]
 public class TemperatureDiffusion
@@ -198,8 +197,6 @@ public class TemperatureDiffusion
 
     private void UpdateTemperature(float deltaTime)
     {
-        Profiler.BeginSample("Tem");
-
         if (recomputeOnNextUpdate)
         {
             RecomputeDiffusion();
@@ -230,8 +227,6 @@ public class TemperatureDiffusion
                 }
             }
         }
-
-        Profiler.EndSample();
     }
 
     private void GenerateHeatFromFurniture(Furniture furniture, float deltaTime)
