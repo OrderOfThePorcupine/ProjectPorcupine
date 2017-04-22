@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ComponentGroups>
-  <ComponentGroup Name="Basic" DisableUI="false">
+  <ComponentGroup Name="Basic">
     <Component ClassName="FPSPerformanceComponent" />
   </ComponentGroup>
-  <ComponentGroup Name="Extended" DisableUI="false">
+  <ComponentGroup Name="Extended">
     <Component ClassName="FPSPerformanceComponent" />
     <Component ClassName="FPSRangePerformanceComponent" />
     <Component ClassName="FPSPerformanceComponent">
@@ -14,7 +14,7 @@
       </Params>
     </Component>
   </ComponentGroup>
-  <ComponentGroup Name="Verbose" DisableUI="false">
+  <ComponentGroup Name="Verbose">
     <Component ClassName="FPSPerformanceComponent" />
     <Component ClassName="FPSRangePerformanceComponent" />
     <Component ClassName="FPSPerformanceComponent">

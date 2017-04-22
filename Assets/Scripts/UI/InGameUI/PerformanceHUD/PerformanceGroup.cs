@@ -9,36 +9,52 @@
 using System.Collections.Generic;
 using System.Xml;
 
+/// <summary>
+/// Represents data for a code UI class.
+/// </summary>
+public struct UIClassData
+{
+    /// <summary>
+    /// The class name.
+    /// </summary>
+    public string ClassName { get; private set; }
+
+    /// <summary>
+    /// Parameters for the class.
+    /// </summary>
+    public Parameter ParameterData { get; private set; }
+
+    /// <summary>
+    /// Construct a class of UIClassData.
+    /// </summary>
+    /// <param name="className"> The name of the UI element class. </param>
+    /// <param name="parameterData"> Any parameter data to supply. </param>
+    public UIClassData(string className, Parameter parameterData)
+    {
+        this.ClassName = className;
+        this.ParameterData = parameterData;
+    }
+}
+
+/// <summary>
+/// A group of performance components.
+/// </summary>
 public class PerformanceGroup : IPrototypable
 {
     /// <summary>
     /// What classes to show in each group.
     /// </summary>
-    public List<string> componentData = new List<string>();
-
-    /// <summary>
-    /// Parameter data to pass to classes to implement.
-    /// </summary>
-    public List<Parameter> parameterData = new List<Parameter>();
-
-    /// <summary>
-    /// Disable UI or not.
-    /// </summary>
-    public bool disableUI;
+    public List<UIClassData> classData = new List<UIClassData>();
 
     /// <summary>
     /// Constructor with parameters.
     /// </summary>
     /// <param name="name"> The name of the group. </param>
-    /// <param name="componentData"> The element data for names of classes to show. </param>
-    /// <param name="parameterData"> Parameter data to pass to the classes. </param>
-    /// <param name="disableUI"> Disable UI or not. </param>
-    public PerformanceGroup(string name, List<string> componentData, List<Parameter> parameterData, bool disableUI)
+    /// <param name="classData"> Class data for the group. </param>
+    public PerformanceGroup(string name, List<UIClassData> classData)
     {
         this.Type = name;
-        this.componentData = componentData;
-        this.disableUI = disableUI;
-        this.parameterData = parameterData;
+        this.classData = classData;
     }
 
     /// <summary>
@@ -66,9 +82,6 @@ public class PerformanceGroup : IPrototypable
             throw new System.Exception("Type ('Name') doesn't exist in component group.");
         }
 
-        string disableUIText = parentReader.GetAttribute("DisableUI");
-        bool disableUI = string.IsNullOrEmpty(disableUIText) ? false : XmlConvert.ToBoolean(disableUIText.ToLower());
-
         XmlReader reader = parentReader.ReadSubtree();
 
         while (reader.Read())
@@ -80,8 +93,7 @@ public class PerformanceGroup : IPrototypable
 
                 if (string.IsNullOrEmpty(className) == false)
                 {
-                    componentData.Add(reader.GetAttribute("ClassName"));
-                    parameterData.Add(reader != null && reader.ReadToDescendant("Params") ? Parameter.ReadXml(reader) : new Parameter());
+                    classData.Add(new UIClassData(reader.GetAttribute("ClassName"), reader != null && reader.ReadToDescendant("Params") ? Parameter.ReadXml(reader) : new Parameter()));
                 }
             }
         }

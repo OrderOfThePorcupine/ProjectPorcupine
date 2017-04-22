@@ -348,17 +348,17 @@ public class SettingsMenu : MonoBehaviour
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    if (FunctionsManager.SettingsMenu.HasFunction("Get" + keyValuePair.Value[j].className))
+                    if (FunctionsManager.SettingsMenu.HasFunction("Get" + keyValuePair.Value[j].classData.ClassName))
                     {
-                        BaseSettingsElement element = FunctionsManager.SettingsMenu.Call("Get" + keyValuePair.Value[j].className).ToObject<BaseSettingsElement>();
+                        BaseSettingsElement element = FunctionsManager.SettingsMenu.Call("Get" + keyValuePair.Value[j].classData.ClassName).ToObject<BaseSettingsElement>();
                         element.option = keyValuePair.Value[j];
-                        element.parameterData = keyValuePair.Value[j].options;
+                        element.parameterData = keyValuePair.Value[j].classData.ParameterData;
                         element.InitializeLUA();
                         options[categories[i].Type][keyValuePair.Key][j] = element;
                     }
                     else if (keyValuePair.Value[j].name != null)
                     {
-                        UnityDebugger.Debugger.LogError("Get" + keyValuePair.Value[j].className + "() Doesn't exist");
+                        UnityDebugger.Debugger.LogError("Get" + keyValuePair.Value[j].classData.ClassName + "() Doesn't exist");
                     }
                 }
             }
