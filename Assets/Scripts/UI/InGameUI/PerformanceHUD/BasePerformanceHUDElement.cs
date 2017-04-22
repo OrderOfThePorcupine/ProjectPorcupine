@@ -7,8 +7,6 @@
 // ====================================================
 #endregion
 using System;
-using System.Collections.Generic;
-using UnityEngine.UI;
 
 /// <summary>
 /// Just holds a simple text UI component that can be access either through the public value "text"

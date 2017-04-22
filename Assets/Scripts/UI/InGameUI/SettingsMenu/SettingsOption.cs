@@ -9,36 +9,55 @@
 using System.Xml;
 
 /// <summary>
-/// For XML reader.
+/// A struct representing data of a settings option.
 /// </summary>
-public class SettingsOption
+public struct SettingsOption
 {
+    /// <summary>
+    /// The name of this settings option.
+    /// </summary>
     public string name;
-    public string key;
-    public string defaultValue;
-    public string className;
-    public Parameter options;
 
-    public SettingsOption(string name, string key, string defaultValue, string className, Parameter parameter = null)
+    /// <summary>
+    /// The key to save for this option.
+    /// </summary>
+    public string key;
+
+    /// <summary>
+    /// The default value for this option.
+    /// </summary>
+    public string defaultValue;
+
+    /// <summary>
+    /// Class data associated with this option.
+    /// </summary>
+    public UIClassData classData;
+
+    /// <summary>
+    /// Construct a settings option from parameters.
+    /// </summary>
+    /// <param name="name"> The name of the option (unlocalized). </param>
+    /// <param name="key"> The key to save. </param>
+    /// <param name="defaultValue"> The default value. </param>
+    /// <param name="classData"> Any class data associated with the option. </param>
+    public SettingsOption(string name, string key, string defaultValue, UIClassData classData)
     {
         this.name = name;
         this.key = key;
         this.defaultValue = defaultValue;
-        this.className = className;
-        this.options = parameter;
+        this.classData = classData;
     }
 
     /// <summary>
-    /// A nice little helper (pass it a reader class that is up to the subtree).
+    /// A nice little helper.
     /// </summary>
     public SettingsOption(XmlReader reader)
     {
-            XmlReader subReader = reader.ReadSubtree();
-            name = reader.GetAttribute("Name");
-            key = reader.GetAttribute("Key");
-            defaultValue = reader.GetAttribute("DefaultValue");
-            className = reader.GetAttribute("ClassName");
-            this.options = (reader != null && subReader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter();
-            subReader.Close();
+        XmlReader subReader = reader.ReadSubtree();
+        name = reader.GetAttribute("Name");
+        key = reader.GetAttribute("Key");
+        defaultValue = reader.GetAttribute("DefaultValue");
+        classData = new UIClassData(reader.GetAttribute("ClassName"), (reader != null && subReader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter());
+        subReader.Close();
     }
 }
