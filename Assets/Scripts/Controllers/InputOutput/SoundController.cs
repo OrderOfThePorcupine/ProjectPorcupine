@@ -13,10 +13,6 @@ using UnityEngine;
 
 public struct DriverInfo
 {
-    public int ID { get; private set; }
-    public System.Text.StringBuilder Name { get; private set; }
-    public System.Guid Guid { get; private set; }
-
     public DriverInfo(int id)
     {
         this.ID = id;
@@ -31,6 +27,12 @@ public struct DriverInfo
 
         this.Guid = guid;
     }
+
+    public int ID { get; private set; }
+
+    public System.Text.StringBuilder Name { get; private set; }
+
+    public System.Guid Guid { get; private set; }
 
     public override string ToString()
     {
