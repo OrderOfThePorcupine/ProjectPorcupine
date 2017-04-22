@@ -7,10 +7,6 @@
 // ====================================================
 #endregion
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// A base UI element.
@@ -24,7 +20,7 @@ public abstract class BaseSettingsElement : BaseUIElement
     public SettingsOption option;
 
     /// <summary>
-    /// Has the value changed?
+    /// Has the value changed.
     /// </summary>
     public bool valueChanged;
 

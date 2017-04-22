@@ -10,33 +10,6 @@ using System.Collections.Generic;
 using System.Xml;
 
 /// <summary>
-/// Represents data for a code UI class.
-/// </summary>
-public struct UIClassData
-{
-    /// <summary>
-    /// The class name.
-    /// </summary>
-    public string ClassName { get; private set; }
-
-    /// <summary>
-    /// Parameters for the class.
-    /// </summary>
-    public Parameter ParameterData { get; private set; }
-
-    /// <summary>
-    /// Construct a class of UIClassData.
-    /// </summary>
-    /// <param name="className"> The name of the UI element class. </param>
-    /// <param name="parameterData"> Any parameter data to supply. </param>
-    public UIClassData(string className, Parameter parameterData)
-    {
-        this.ClassName = className;
-        this.ParameterData = parameterData;
-    }
-}
-
-/// <summary>
 /// A group of performance components.
 /// </summary>
 public class PerformanceGroup : IPrototypable
