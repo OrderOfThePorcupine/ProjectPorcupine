@@ -18,8 +18,6 @@ using Random = UnityEngine.Random;
 [MoonSharpUserData]
 public class TradeController
 {
-    public List<TraderShipController> TradeShips;
-
     private readonly ScheduledEvent traderVisitEvaluationEvent;
 
     /// <summary>
@@ -38,7 +36,9 @@ public class TradeController
             true);
         Scheduler.Scheduler.Current.RegisterEvent(traderVisitEvaluationEvent);
     }
-    
+
+    public List<TraderShipController> TradeShips { get; private set; }
+
     /// <summary>
     /// Summon the visit of a trader to a specific landing pad
     /// The trader will be generated randomly from the trader prototypes.
@@ -54,18 +54,12 @@ public class TradeController
         go.transform.parent = WorldController.Instance.transform;
         TraderShipController controller = go.AddComponent<TraderShipController>();
         TradeShips.Add(controller);
-        controller.Trader = trader;
-        controller.Speed = 5f;
         go.transform.position = new Vector3(-10, 50, 0);
-        controller.LandingCoordinates = new Vector3(landingPad.Tile.X + 1, landingPad.Tile.Y + 1, 0);
-        controller.LeavingCoordinates = new Vector3(100, 50, 0);
         go.transform.localScale = new Vector3(1, 1, 1);
         SpriteRenderer spriteRenderer = go.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = SpriteManager.GetSprite("Trader", prototype.AnimationIdle.CurrentFrameName);
         spriteRenderer.sortingLayerName = "TradeShip";
-        controller.AnimationFlying = prototype.AnimationFlying.Clone();
-        controller.AnimationIdle = prototype.AnimationIdle.Clone();
-        controller.Renderer = spriteRenderer;
+        controller.Init(leavingCoords: new Vector3(100, 50, 0), landingCoords: new Vector3(landingPad.Tile.X + 1, landingPad.Tile.Y + 1, 0), speed: 5f, trader: trader, animationIdle: prototype.AnimationIdle.Clone(), animationFlying: prototype.AnimationFlying.Clone(), renderer: spriteRenderer);
     }
 
     /// <summary>

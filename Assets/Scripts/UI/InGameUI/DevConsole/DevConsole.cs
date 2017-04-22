@@ -928,7 +928,7 @@ namespace DeveloperConsole
             {
                 CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false).First();
                 string parameters = string.Join(",", method.GetParameters().Select(x => x.ParameterType.Name + " " + x.Name).ToArray());
-                consoleCommands.Add(new InternalCommand(string.IsNullOrEmpty(attribute.title) ? method.Name : attribute.title, method, attribute.description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.detailedDescription, attribute.Tags));
+                consoleCommands.Add(new InternalCommand(string.IsNullOrEmpty(attribute.Title) ? method.Name : attribute.Title, method, attribute.Description, method.GetParameters().Select(x => x.ParameterType).ToArray(), parameters, attribute.DetailedDescription, attribute.Tags));
             }
         }
 

@@ -19,7 +19,7 @@ public class ContextMenuItem : MonoBehaviour
 
     public void Start()
     {
-        mouseController = WorldController.Instance.mouseController;
+        mouseController = WorldController.Instance.MouseController;
     }
 
     /// <summary>

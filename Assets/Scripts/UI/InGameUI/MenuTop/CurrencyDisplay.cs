@@ -13,7 +13,8 @@ using UnityEngine.UI;
 
 public class CurrencyDisplay : MonoBehaviour
 {
-    public Text text;
+    [SerializeField]
+    private Text text;
     private string[] currencies;
 
     private void Start()
@@ -29,7 +30,7 @@ public class CurrencyDisplay : MonoBehaviour
 
     // Update is called once per frame
     private void Update()
-    {    
+    {
         StringBuilder content = new StringBuilder();
 
         // Populate the text box
@@ -39,7 +40,7 @@ public class CurrencyDisplay : MonoBehaviour
             content.Append(World.Current.Wallet[currency].Balance);
             content.AppendLine();
         }
-        
+
         text.text = content.ToString();
     }
 }
