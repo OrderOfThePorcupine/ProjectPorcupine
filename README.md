@@ -68,6 +68,11 @@ For further information, such as Roadmaps, explanations of systems and features,
 
 Make sure that you are using Unity 5.5.3 [Windows](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Win) | [Mac](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Mac)
 
+## Weeklies
+For prebuilt binaries of weekly progress go to https://bintray.com/orderoftheporcupine/ProjectPorcupine/Prebuilt-Binaries (Windows, Linux, and MacOSX available.
+
+Note: These are weekly automated snapshots, so may contain assorted errors, half-finished features, and other potential issues. They are in no way guaranteed to be reliable, and in fact could almost guaranteed to be quite unreliable. Use at your own risk.
+
 ## Community
 
 * [Offical Discord Channel ](https://discord.gg/68hkpSA)<discord.projectporcupine.com>
