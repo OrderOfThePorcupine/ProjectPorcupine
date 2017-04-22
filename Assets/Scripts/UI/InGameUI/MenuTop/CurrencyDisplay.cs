@@ -11,11 +11,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Text))]
 public class CurrencyDisplay : MonoBehaviour
 {
-    [SerializeField]
     private Text text;
     private string[] currencies;
+
+    private void Awake()
+    {
+        text = GetComponent<Text>();
+    }
 
     private void Start()
     {
