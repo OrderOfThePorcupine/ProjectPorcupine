@@ -36,11 +36,11 @@ public class MenuLeft : MonoBehaviour
         menu.SetActive(true);
         CurrentlyOpen = menu;
 
-        WorldController.Instance.soundController.OnButtonSFX();
+        WorldController.Instance.SoundController.OnButtonSFX();
 
         if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
         {
-            WorldController.Instance.spawnInventoryController.SetUIVisibility(false);
+            WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
         }
     }
 
@@ -52,10 +52,10 @@ public class MenuLeft : MonoBehaviour
 
             if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
             {
-                WorldController.Instance.spawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
+                WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
             }
 
-            WorldController.Instance.soundController.OnButtonSFX();
+            WorldController.Instance.SoundController.OnButtonSFX();
 
             CurrentlyOpen = null;
         }

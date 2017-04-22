@@ -11,10 +11,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Text))]
 public class CurrencyDisplay : MonoBehaviour
 {
-    public Text text;
+    private Text text;
     private string[] currencies;
+
+    private void Awake()
+    {
+        text = GetComponent<Text>();
+    }
 
     private void Start()
     {
@@ -29,7 +35,7 @@ public class CurrencyDisplay : MonoBehaviour
 
     // Update is called once per frame
     private void Update()
-    {    
+    {
         StringBuilder content = new StringBuilder();
 
         // Populate the text box
@@ -39,7 +45,7 @@ public class CurrencyDisplay : MonoBehaviour
             content.Append(World.Current.Wallet[currency].Balance);
             content.AppendLine();
         }
-        
+
         text.text = content.ToString();
     }
 }
