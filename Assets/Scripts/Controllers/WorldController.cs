@@ -56,7 +56,8 @@ public class WorldController : MonoBehaviour
 
     public GameObject InventoryUI { get; private set; }
 
-    public GameObject CircleCursorPrefab { get; private set; }
+    [SerializeField]
+    private GameObject CircleCursorPrefab;
 
     // The world and tile data.
     public World World { get; protected set; }

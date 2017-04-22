@@ -154,7 +154,7 @@ namespace ProjectPorcupine.Rooms
             foreach (Tile tile in exits)
             {
                 // Loop over the exits to find a different room
-                Tile[] neighbours = tile.GetNeighbours();
+                Tile[] neighbours = tile.GetNeighbours(true, false, false);
                 foreach (Tile neighbor in neighbours)
                 {
                     if (neighbor == null || neighbor.Room == null)
@@ -242,7 +242,7 @@ namespace ProjectPorcupine.Rooms
             List<Tile> borderingTiles = new List<Tile>();
             foreach (Tile tile in tiles)
             {
-                Tile[] neighbours = tile.GetNeighbours();
+                Tile[] neighbours = tile.GetNeighbours(true, false, true);
                 foreach (Tile tile2 in neighbours)
                 {
                     if (tile2 != null && tile2.Furniture != null)

@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using ProjectPorcupine.Rooms;
@@ -16,8 +17,10 @@ public class TemperatureDiffusion
 {
     private float[,] diffusion;
     private HashSet<Furniture> sinksAndSources;
-    private bool recomputeOnNextUpdate;
+    private bool recomputeOnNextUpdate = false;
     private World world;
+    private List<Room> roomsToRemove = new List<Room>();
+    private List<Room> roomsToAdd = new List<Room>();
 
     /// <summary>
     /// Create and Initialize arrays with default values.
@@ -27,18 +30,14 @@ public class TemperatureDiffusion
         sinksAndSources = new HashSet<Furniture>();
 
         this.world = world;
-        world.FurnitureManager.Created += OnFurnitureCreated;
-        foreach (Furniture furn in world.FurnitureManager)
-        {
-            if (furn.RoomEnclosure)
-            {
-                furn.Removed += OnFurnitureRemoved;
-            }
-        }
 
-        world.OnTileTypeChanged += OnTileTypeChanged;
+        world.RoomManager.Added += RoomAdded;
+        world.RoomManager.Split += RoomJoinedOrSplit;
+        world.RoomManager.Joined += RoomJoinedOrSplit;
+        world.RoomManager.Removing += RoomRemoving;
 
-        RecomputeDiffusion();
+        InitDiffusionMap();
+
         TimeManager.Instance.FixedFrequency += FixedFrequency;
     }
 
@@ -92,44 +91,46 @@ public class TemperatureDiffusion
     /// </summary>
     public void Resize()
     {
-        RecomputeDiffusion();
+        RebuildMap();
         sinksAndSources = new HashSet<Furniture>();
     }
 
     /// <summary>
-    /// On tile type change update.
+    /// Removes the rooms from the diffusion graph.
     /// </summary>
-    /// <param name="tile"> The tile in question. </param>
-    private void OnTileTypeChanged(Tile tile)
+    /// <param name="room"> The room to remove. </param>
+    private void RoomRemoving(Room room)
     {
         recomputeOnNextUpdate = true;
+        roomsToRemove.Add(room);
     }
 
     /// <summary>
-    /// On furniture creation, recompute.
+    /// Removes the old room and adds the new room.
     /// </summary>
-    /// <param name="furn"></param>
-    private void OnFurnitureCreated(Furniture furn)
+    /// <param name="oldRoom"> The old room. </param>
+    /// <param name="newRoom"> The new room. </param>
+    private void RoomJoinedOrSplit(Room oldRoom, Room newRoom)
     {
-        if (furn.RoomEnclosure)
-        {
-            furn.Removed += OnFurnitureRemoved;
-            recomputeOnNextUpdate = true;
-        }
+        recomputeOnNextUpdate = true;
+        roomsToRemove.Add(oldRoom);
+        roomsToAdd.Add(newRoom);
     }
 
     /// <summary>
-    /// On furniture removal recompute.
+    /// Adds the rooms to the diffusion graph.
     /// </summary>
-    /// <param name="furn"></param>
-    private void OnFurnitureRemoved(Furniture furn)
+    /// <param name="room"> The room to add. </param>
+    private void RoomAdded(Room room)
     {
         recomputeOnNextUpdate = true;
+        roomsToAdd.Add(room);
     }
 
     /// <summary>
     /// Recompute diffusion graph.
     /// </summary>
+    /*
     private void RecomputeDiffusion()
     {
         recomputeOnNextUpdate = false;
@@ -146,14 +147,35 @@ public class TemperatureDiffusion
 
                     if (tile.Furniture != null && tile.Furniture.RoomEnclosure)
                     {
-                        Tile[] neighbours = tile.GetNeighbours(true, false, true);
-
-                        AddDiffusionFromSource(tile.Furniture, tile.North(), neighbours[5], tile.South(), neighbours[6]);
-                        AddDiffusionFromSource(tile.Furniture, tile.East(), neighbours[6], tile.West(), neighbours[7]);
-                        AddDiffusionFromSource(tile.Furniture, tile.South(), neighbours[7], tile.North(), neighbours[4]);
-                        AddDiffusionFromSource(tile.Furniture, tile.West(), neighbours[4], tile.East(), neighbours[5]);
+                        AddDiffusions(tile, andBack: true);
                     }
                 }
+            }
+        }
+    }
+    */
+
+    private void RebuildMap()
+    {
+        recomputeOnNextUpdate = false;
+        InitDiffusionMap();
+
+        foreach (Room room in roomsToAdd)
+        {
+            foreach (Tile tile in room.GetBorderingTiles())
+            {
+                Debug.LogWarning(tile.GetName());
+
+                AddDiffusions(tile, andBack: true);
+            }
+        }
+
+        foreach (Room room in roomsToRemove)
+        {
+            foreach (Room key in room.GetNeighbours().Values)
+            {
+                diffusion[room.ID, key.ID] = 0;
+                diffusion[key.ID, room.ID] = 0;
             }
         }
     }
@@ -161,25 +183,74 @@ public class TemperatureDiffusion
     private void InitDiffusionMap()
     {
         int roomCount = world.RoomManager.Count;
-        diffusion = new float[roomCount, roomCount];
+
+        if (diffusion == null || diffusion.Length == 0)
+        {
+            diffusion = new float[roomCount, roomCount];
+        }
+        else
+        {
+            diffusion = ResizeArray(diffusion, roomCount, roomCount);
+        }
     }
 
-    private void AddDiffusionFromSource(Furniture wall, Tile source, Tile left, Tile middle, Tile right)
+    private T[,] ResizeArray<T>(T[,] original, int x, int y)
     {
-        float diffusivity = wall.Parameters["thermal_diffusivity"].ToFloat(0);
-        if (AreTilesInDifferentRooms(source, left))
+        T[,] newArray = new T[x, y];
+        int minX = Math.Min(original.GetLength(0), newArray.GetLength(0));
+        int minY = Math.Min(original.GetLength(1), newArray.GetLength(1));
+
+        for (int i = 0; i < minY; ++i)
         {
-            AddDiffusionFromTo(source.Room, left.Room, (left.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
+            Array.Copy(original, i * original.GetLength(0), newArray, i * newArray.GetLength(0), minX);
         }
 
-        if (AreTilesInDifferentRooms(source, middle))
-        {
-            AddDiffusionFromTo(source.Room, middle.Room, (middle.Room.IsOutsideRoom() ? 0.02f : 0.5f) * diffusivity);
-        }
+        return newArray;
+    }
 
-        if (AreTilesInDifferentRooms(source, right))
+    private void AddDiffusions(Tile tile, bool andBack)
+    {
+        Tile[] neighbours = tile.GetNeighbours(true, false, true);
+        float diffusivity = tile.Furniture.Parameters["thermal_diffusivity"].ToFloat(0);
+
+        for (int i = 0; i < 4; i++)
         {
-            AddDiffusionFromTo(source.Room, right.Room, (right.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
+            Tile source = neighbours[0];
+            Tile left = neighbours[i < 3 ? i + 5 : 4];
+            Tile middle = neighbours[i < 2 ? i + 2 : i - 2];
+            Tile right = neighbours[i < 2 ? i + 6 : i + 2];
+
+            Debug.LogWarning("RAN");
+
+            if (AreTilesInDifferentRooms(source, left))
+            {
+                AddDiffusionFromTo(source.Room, left.Room, (left.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
+
+                if (andBack)
+                {
+                    AddDiffusionFromTo(left.Room, source.Room, (source.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
+                }
+            }
+
+            if (AreTilesInDifferentRooms(source, middle))
+            {
+                AddDiffusionFromTo(source.Room, middle.Room, (middle.Room.IsOutsideRoom() ? 0.02f : 0.5f) * diffusivity);
+
+                if (andBack)
+                {
+                    AddDiffusionFromTo(middle.Room, source.Room, (source.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
+                }
+            }
+
+            if (AreTilesInDifferentRooms(source, right))
+            {
+                AddDiffusionFromTo(source.Room, right.Room, (right.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
+
+                if (andBack)
+                {
+                    AddDiffusionFromTo(right.Room, source.Room, (source.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
+                }
+            }
         }
     }
 
@@ -199,7 +270,14 @@ public class TemperatureDiffusion
     {
         if (recomputeOnNextUpdate)
         {
-            RecomputeDiffusion();
+            RebuildMap();
+        }
+
+        int roomCount = world.RoomManager.Count;
+
+        if (diffusion.GetLength(0) != roomCount || diffusion.GetLength(1) != roomCount)
+        {
+            InitDiffusionMap();
         }
 
         foreach (var furn in sinksAndSources)
@@ -207,7 +285,6 @@ public class TemperatureDiffusion
             GenerateHeatFromFurniture(furn, deltaTime);
         }
 
-        int roomCount = world.RoomManager.Count;
         Room r1, r2;
         for (int i = 0; i < roomCount; i++)
         {
