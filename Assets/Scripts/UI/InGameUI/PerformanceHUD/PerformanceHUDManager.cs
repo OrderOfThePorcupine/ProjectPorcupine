@@ -59,7 +59,7 @@ public class PerformanceHUDManager : MonoBehaviour
 
         List<PerformanceGroup> groups = PrototypeManager.PerformanceHUD.Values;
 
-        allGroups.Add(new PerformanceGroup("none", new List<UIClassData>()), new BasePerformanceHUDComponent[0]);
+        allGroups.Add(new PerformanceGroup("None", new List<UIClassData>()), new BasePerformanceHUDComponent[0]);
         List<BasePerformanceHUDComponent> elements = new List<BasePerformanceHUDComponent>();
 
         // Convert the dictionary of specialised elements to a more generalised format
@@ -110,7 +110,7 @@ public class PerformanceHUDManager : MonoBehaviour
         // Set group
         if (instance.groupPointer == null || string.IsNullOrEmpty(instance.groupPointer.Type))
         {
-            instance.groupPointer = allGroups.First(x => x.Key.Type == "none").Key;
+            return;
         }
 
         // Draw and Begin UI Functionality
@@ -199,13 +199,16 @@ public class PerformanceHUDManager : MonoBehaviour
     /// <param name="deltaTime"> Time since last update. </param>
     private void Instance_EveryFrame(float deltaTime)
     {
-        // Update UI
-        foreach (BasePerformanceHUDComponent element in allGroups[groupPointer])
+        if (instance.groupPointer != null && string.IsNullOrEmpty(instance.groupPointer.Type) == false)
         {
-            if (element != null)
+            // Update UI
+            foreach (BasePerformanceHUDComponent element in allGroups[groupPointer])
             {
-                element.Update();
-                element.UpdateLUA();
+                if (element != null)
+                {
+                    element.Update();
+                    element.UpdateLUA();
+                }
             }
         }
     }
