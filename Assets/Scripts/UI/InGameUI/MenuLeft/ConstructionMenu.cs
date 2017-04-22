@@ -47,9 +47,9 @@ public class ConstructionMenu : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
+
         this.showAllFurniture = showAllFurniture;
-        
+
         RenderRoomBehaviorButtons();
         RenderTileButtons();
         RenderFurnitureButtons();
@@ -85,7 +85,7 @@ public class ConstructionMenu : MonoBehaviour
         {
             menuLeft.CloseMenu();
         });
-        
+
         RenderRoomBehaviorButtons();
         RenderTileButtons();
         RenderFurnitureButtons();
@@ -270,6 +270,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
             {
                 buildModeController.SetModeBuildTile(tileType);
+                menuLeft.CloseMenu();
             });
 
             LocalizationTable.CBLocalizationFilesChanged += delegate

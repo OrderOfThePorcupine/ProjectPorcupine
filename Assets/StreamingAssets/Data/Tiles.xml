@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Tiles>
-    <!-- TODO: DeconstructionJob -->
-    <Tile type="empty">
-        <BaseMovementCost>1</BaseMovementCost>
-        <LinksToNeighbours>false</LinksToNeighbours>
+  <!-- TODO: DeconstructionJob -->
+  <Tile type="empty">
+    <BaseMovementCost>1</BaseMovementCost>
+    <LinksToNeighbours>false</LinksToNeighbours>
 
-        <BuildingJob jobTime="0"></BuildingJob>
+    <OrderAction type="ChangeTileType">
+      <Job time="0" />
+    </OrderAction>
 
-        <LocalizationCode>tile_empty</LocalizationCode>
-        <UnlocalizedDescription>tile_empty_desc</UnlocalizedDescription>
-    </Tile>
+    <LocalizationCode>tile_empty</LocalizationCode>
+    <UnlocalizedDescription>tile_empty_desc</UnlocalizedDescription>
+  </Tile>
 
-    <Tile type="floor">
-        <BaseMovementCost>1</BaseMovementCost>
-        <LinksToNeighbours>false</LinksToNeighbours>
+  <Tile type="floor">
+    <BaseMovementCost>1</BaseMovementCost>
+    <LinksToNeighbours>false</LinksToNeighbours>
 
-        <BuildingJob jobTime="0.1"></BuildingJob>
+    <OrderAction type="ChangeTileType">
+      <Job time="0.1" />
+    </OrderAction>
 
-        <LocalizationCode>tile_floor</LocalizationCode>
-        <UnlocalizedDescription>tile_floor_desc</UnlocalizedDescription>
-    </Tile>
+    <LocalizationCode>tile_floor</LocalizationCode>
+    <UnlocalizedDescription>tile_floor_desc</UnlocalizedDescription>
+  </Tile>
 
-    <Tile type="ladder">
-        <BaseMovementCost>1.5</BaseMovementCost>
-        <LinksToNeighbours>false</LinksToNeighbours>
+  <Tile type="ladder">
+    <BaseMovementCost>1.5</BaseMovementCost>
+    <LinksToNeighbours>false</LinksToNeighbours>
 
-        <CanPlaceHere functionName="CanBuildHere_Ladder"/>
+    <CanPlaceHere functionName="CanBuildHere_Ladder"/>
 
-        <BuildingJob jobTime="0.5">
-            <Inventory type="Steel Plate" amount="1" />
-        </BuildingJob>
+    <OrderAction type="ChangeTileType">
+      <Job time="0.5" />
+      <Inventory type="steel_plate" amount="1" />
+    </OrderAction>
 
-        <LocalizationCode>tile_ladder</LocalizationCode>
-        <UnlocalizedDescription>tile_ladder_desc</UnlocalizedDescription>
-    </Tile>
+    <LocalizationCode>tile_ladder</LocalizationCode>
+    <UnlocalizedDescription>tile_ladder_desc</UnlocalizedDescription>
+  </Tile>
 </Tiles>
