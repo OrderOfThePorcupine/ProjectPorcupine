@@ -112,7 +112,7 @@ namespace ProjectPorcupine.OrderActions
         public class JobInformation
         {
             [XmlAttribute("time")]
-            public int Time { get; set; }
+            public float Time { get; set; }
 
             [XmlAttribute("fromFunction")]
             public string FromFunction { get; set; }

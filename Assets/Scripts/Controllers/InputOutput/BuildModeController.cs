@@ -275,9 +275,6 @@ public class BuildModeController
         }
         else if (buildMode == BuildMode.FLOOR)
         {
-            // We are in tile-changing mode.
-            ////t.Type = buildModeTile;
-
             TileType tileType = buildModeTile;
 
             if (
