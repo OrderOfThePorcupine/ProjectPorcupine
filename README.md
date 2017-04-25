@@ -69,6 +69,12 @@ For further information, such as Roadmaps, explanations of systems and features,
 Make sure that you are using Unity 5.5.3 [Windows](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Win) | [Mac](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Mac)
 
 ## Weeklies
+
+You can download and play already built 'weekly' versions for Windows, Mac, and Linux [here](https://bintray.com/orderoftheporcupine/ProjectPorcupine/Prebuilt-Binaries).
+
+However, are merely 'snapshots', a preview of the current development build, and are not representative of any type of release. They may contain errors, bugs, partially completed features, and other potential issues.  If you open a bug report please include what week you are using (either the week number or the date is fine) as this will help us find the bug easier and determine if your error has already been fixed.
+
+## Weeklies
 For prebuilt binaries of weekly progress go to https://bintray.com/orderoftheporcupine/ProjectPorcupine/Prebuilt-Binaries (Windows, Linux, and MacOSX available.
 
 Note: These are weekly automated snapshots, so may contain assorted errors, half-finished features, and other potential issues. They are in no way guaranteed to be reliable, and in fact could almost guaranteed to be quite unreliable. Use at your own risk.
