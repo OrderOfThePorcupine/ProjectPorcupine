@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
+using System.Linq;
 
 public class Functions
 {
@@ -73,7 +74,7 @@ public class Functions
         return Call(functionName, true, args);
     }
 
-    public T Call<T>(string functionName, params object[] args)
+    public T Call<T>(string functionName, params DynValue[] args)
     {
         IFunctions functions = GetFunctions(functionName);
         if (functions != null)
@@ -92,25 +93,8 @@ public class Functions
     /// </summary>
     public void Call(List<string> functionNames, params object[] args)
     {
-        for (int i = 0; i < functionNames.Count; i++)
-        {
-            if (functionNames[i] == null)
-            {
-                UnityDebugger.Debugger.LogError(ModFunctionsLogChannel, "'" + functionNames[i] + "'  is not a LUA nor CSharp function!");
-                continue;
-            }
-
-            Call(functionNames[i], false, args);
-        }
-    }
-
-    public void CallWithInstance(List<string> functionNames, object instance, params object[] parameters)
-    {
-        DynValue result;
-        object[] instanceAndParams;
-        instanceAndParams = new object[parameters.Length + 1];
-        instanceAndParams[0] = instance;
-        parameters.CopyTo(instanceAndParams, 1);
+        bool ranLUAArgs = false;
+        DynValue[] luaArgs = new DynValue[args.Length];
 
         for (int i = 0; i < functionNames.Count; i++)
         {
@@ -120,11 +104,23 @@ public class Functions
                 continue;
             }
 
-            result = Call(functionNames[i], instanceAndParams);
+            IFunctions functions = GetFunctions(functionNames[i]);
 
-            if (result != null && result.Type == DataType.String)
+            if (functions is LuaFunctions)
             {
-                UnityDebugger.Debugger.LogError(ModFunctionsLogChannel, result.String);
+                if (ranLUAArgs == false)
+                {
+                    for (int j = 0; j < args.Length; j++)
+                    {
+                        luaArgs[j] = functions.CreateDynValueFromObject(args[j]);
+                    }
+                }
+
+                Call(functionNames[i], false, luaArgs);
+            }
+            else
+            {
+                Call(functionNames[i], false, args);
             }
         }
     }
@@ -138,6 +134,26 @@ public class Functions
     }
 
     private DynValue Call(string functionName, bool throwError, params object[] args)
+    {
+        IFunctions functions = GetFunctions(functionName);
+        if (functions != null)
+        {
+            return functions.Call(functionName, args);
+        }
+        else
+        {
+            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA nor is it a CSharp function!");
+
+            if (throwError)
+            {
+                throw new Exception("'" + functionName + "' is not a LUA nor is it a CSharp function!");
+            }
+
+            return null;
+        }
+    }
+
+    private DynValue Call(string functionName, bool throwError, params DynValue[] args)
     {
         IFunctions functions = GetFunctions(functionName);
         if (functions != null)

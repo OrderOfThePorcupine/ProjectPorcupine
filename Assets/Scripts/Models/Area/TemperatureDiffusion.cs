@@ -15,12 +15,10 @@ using UnityEngine;
 [MoonSharpUserData]
 public class TemperatureDiffusion
 {
-    private float[,] diffusion;
+    private Dictionary<Room, Dictionary<Room, float>> diffusion = new Dictionary<Room, Dictionary<Room, float>>();
     private HashSet<Furniture> sinksAndSources;
-    private bool recomputeOnNextUpdate = false;
+    private bool recomputeOnNextUpdate = true;
     private World world;
-    private List<Room> roomsToRemove = new List<Room>();
-    private List<Room> roomsToAdd = new List<Room>();
 
     /// <summary>
     /// Create and Initialize arrays with default values.
@@ -28,15 +26,11 @@ public class TemperatureDiffusion
     public TemperatureDiffusion(World world)
     {
         sinksAndSources = new HashSet<Furniture>();
+        diffusion = new Dictionary<Room, Dictionary<Room, float>>();
 
         this.world = world;
 
-        world.RoomManager.Added += RoomAdded;
-        world.RoomManager.Split += RoomJoinedOrSplit;
-        world.RoomManager.Joined += RoomJoinedOrSplit;
-        world.RoomManager.Removing += RoomRemoving;
-
-        InitDiffusionMap();
+        world.RoomManager.FloodFillEnded += FloodFillEnded;
 
         TimeManager.Instance.FixedFrequency += FixedFrequency;
     }
@@ -91,128 +85,42 @@ public class TemperatureDiffusion
     /// </summary>
     public void Resize()
     {
-        RebuildMap();
+        diffusion = new Dictionary<Room, Dictionary<Room, float>>();
         sinksAndSources = new HashSet<Furniture>();
-    }
-
-    /// <summary>
-    /// Removes the rooms from the diffusion graph.
-    /// </summary>
-    /// <param name="room"> The room to remove. </param>
-    private void RoomRemoving(Room room)
-    {
         recomputeOnNextUpdate = true;
-        roomsToRemove.Add(room);
     }
 
     /// <summary>
-    /// Removes the old room and adds the new room.
+    /// Flood Fill Began.
     /// </summary>
-    /// <param name="oldRoom"> The old room. </param>
-    /// <param name="newRoom"> The new room. </param>
-    private void RoomJoinedOrSplit(Room oldRoom, Room newRoom)
+    private void FloodFillEnded()
     {
+        diffusion.Clear();
         recomputeOnNextUpdate = true;
-        roomsToRemove.Add(oldRoom);
-        roomsToAdd.Add(newRoom);
     }
-
-    /// <summary>
-    /// Adds the rooms to the diffusion graph.
-    /// </summary>
-    /// <param name="room"> The room to add. </param>
-    private void RoomAdded(Room room)
-    {
-        recomputeOnNextUpdate = true;
-        roomsToAdd.Add(room);
-    }
-
-    /// <summary>
-    /// Recompute diffusion graph.
-    /// </summary>
-    /*
-    private void RecomputeDiffusion()
-    {
-        recomputeOnNextUpdate = false;
-
-        InitDiffusionMap();
-
-        for (int x = 0; x < world.Width; x++)
-        {
-            for (int y = 0; y < world.Height; y++)
-            {
-                for (int z = 0; z < world.Depth; z++)
-                {
-                    Tile tile = world.GetTileAt(x, y, z);
-
-                    if (tile.Furniture != null && tile.Furniture.RoomEnclosure)
-                    {
-                        AddDiffusions(tile, andBack: true);
-                    }
-                }
-            }
-        }
-    }
-    */
 
     private void RebuildMap()
     {
         recomputeOnNextUpdate = false;
-        InitDiffusionMap();
 
-        foreach (Room room in roomsToAdd)
+        foreach (Room room in world.RoomManager)
         {
-            foreach (Tile tile in room.GetBorderingTiles())
+            foreach (Tile tile in room.GetBoundaryTiles())
             {
-                Debug.LogWarning(tile.GetName());
-
-                AddDiffusions(tile, andBack: true);
-            }
-        }
-
-        foreach (Room room in roomsToRemove)
-        {
-            foreach (Room key in room.GetNeighbours().Values)
-            {
-                diffusion[room.ID, key.ID] = 0;
-                diffusion[key.ID, room.ID] = 0;
+                AddDiffusions(tile);
             }
         }
     }
 
-    private void InitDiffusionMap()
-    {
-        int roomCount = world.RoomManager.Count;
-
-        if (diffusion == null || diffusion.Length == 0)
-        {
-            diffusion = new float[roomCount, roomCount];
-        }
-        else
-        {
-            diffusion = ResizeArray(diffusion, roomCount, roomCount);
-        }
-    }
-
-    private T[,] ResizeArray<T>(T[,] original, int x, int y)
-    {
-        T[,] newArray = new T[x, y];
-        int minX = Math.Min(original.GetLength(0), newArray.GetLength(0));
-        int minY = Math.Min(original.GetLength(1), newArray.GetLength(1));
-
-        for (int i = 0; i < minY; ++i)
-        {
-            Array.Copy(original, i * original.GetLength(0), newArray, i * newArray.GetLength(0), minX);
-        }
-
-        return newArray;
-    }
-
-    private void AddDiffusions(Tile tile, bool andBack)
+    private void AddDiffusions(Tile tile)
     {
         Tile[] neighbours = tile.GetNeighbours(true, false, true);
         float diffusivity = tile.Furniture.Parameters["thermal_diffusivity"].ToFloat(0);
 
+        // N => SE, S, SW => 5, 2, 6
+        // E => SW, W, SE => 6, 3, 7
+        // S => NW, N, NE => 7, 0, 4
+        // W => NE, E, SE => 4, 1, 5
         for (int i = 0; i < 4; i++)
         {
             Tile source = neighbours[0];
@@ -220,36 +128,19 @@ public class TemperatureDiffusion
             Tile middle = neighbours[i < 2 ? i + 2 : i - 2];
             Tile right = neighbours[i < 2 ? i + 6 : i + 2];
 
-            Debug.LogWarning("RAN");
-
             if (AreTilesInDifferentRooms(source, left))
             {
                 AddDiffusionFromTo(source.Room, left.Room, (left.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
-
-                if (andBack)
-                {
-                    AddDiffusionFromTo(left.Room, source.Room, (source.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
-                }
             }
 
             if (AreTilesInDifferentRooms(source, middle))
             {
                 AddDiffusionFromTo(source.Room, middle.Room, (middle.Room.IsOutsideRoom() ? 0.02f : 0.5f) * diffusivity);
-
-                if (andBack)
-                {
-                    AddDiffusionFromTo(middle.Room, source.Room, (source.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
-                }
             }
 
             if (AreTilesInDifferentRooms(source, right))
             {
                 AddDiffusionFromTo(source.Room, right.Room, (right.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
-
-                if (andBack)
-                {
-                    AddDiffusionFromTo(right.Room, source.Room, (source.Room.IsOutsideRoom() ? 0.01f : 0.25f) * diffusivity);
-                }
             }
         }
     }
@@ -263,22 +154,28 @@ public class TemperatureDiffusion
 
     private void AddDiffusionFromTo(Room r1, Room r2, float value)
     {
-        diffusion[r1.ID, r2.ID] += value;
+        if (diffusion.ContainsKey(r1) && diffusion[r1].ContainsKey(r2))
+        {
+            diffusion[r1][r2] += value;
+        }
+        else if (diffusion.ContainsKey(r1))
+        {
+            diffusion[r1].Add(r2, value);
+        }
+        else
+        {
+            diffusion.Add(r1, new Dictionary<Room, float>() { { r2, value } });
+        }
     }
 
     private void UpdateTemperature(float deltaTime)
     {
-        if (recomputeOnNextUpdate)
+        if (recomputeOnNextUpdate || (world.RoomManager.Count > 0 && diffusion.Count == 0))
         {
             RebuildMap();
         }
 
         int roomCount = world.RoomManager.Count;
-
-        if (diffusion.GetLength(0) != roomCount || diffusion.GetLength(1) != roomCount)
-        {
-            InitDiffusionMap();
-        }
 
         foreach (var furn in sinksAndSources)
         {
@@ -289,17 +186,20 @@ public class TemperatureDiffusion
         for (int i = 0; i < roomCount; i++)
         {
             r1 = world.RoomManager[i];
-            for (int j = 0; j < roomCount; j++)
+            if (diffusion.ContainsKey(r1))
             {
-                if (diffusion[i, j] != 0)
+                for (int j = 0; j < roomCount; j++)
                 {
                     r2 = world.RoomManager[j];
-                    float temperatureDifference = r1.Atmosphere.GetTemperature().InKelvin - r2.Atmosphere.GetTemperature().InKelvin;
-                    if (temperatureDifference > 0)
+                    if (diffusion[r1].ContainsKey(r2))
                     {
-                        float energyTransfer = diffusion[i, j] * temperatureDifference * Mathf.Sqrt(r1.GetGasPressure()) * Mathf.Sqrt(r2.GetGasPressure()) * deltaTime;
-                        r1.Atmosphere.ChangeEnergy(-energyTransfer);
-                        r2.Atmosphere.ChangeEnergy(energyTransfer);
+                        float temperatureDifference = r1.Atmosphere.GetTemperature().InKelvin - r2.Atmosphere.GetTemperature().InKelvin;
+                        if (temperatureDifference > 0)
+                        {
+                            float energyTransfer = diffusion[r1][r2] * temperatureDifference * Mathf.Sqrt(r1.GetGasPressure()) * Mathf.Sqrt(r2.GetGasPressure()) * deltaTime;
+                            r1.Atmosphere.ChangeEnergy(-energyTransfer);
+                            r2.Atmosphere.ChangeEnergy(energyTransfer);
+                        }
                     }
                 }
             }

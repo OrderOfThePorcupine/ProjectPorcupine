@@ -75,6 +75,16 @@ namespace ProjectPorcupine.Rooms
         public event Action<Room> Removed;
 
         /// <summary>
+        /// Occurs before the floodfill or 'as it begins'.
+        /// </summary>
+        public event Action FloodFillBegan;
+
+        /// <summary>
+        /// Occurs after the floodfill.
+        /// </summary>
+        public event Action FloodFillEnded;
+
+        /// <summary>
         /// Gets the amount of rooms.
         /// </summary>
         /// <value>The number of rooms managed.</value>
@@ -210,6 +220,11 @@ namespace ProjectPorcupine.Rooms
             Room oldRoom = sourceTile.Room;
             if (floodFillingOnTileChange)
             {
+                if (FloodFillBegan != null)
+                {
+                    FloodFillBegan();
+                }
+
                 if (splitting)
                 {
                     // The source tile had a room, so this must be a new piece of furniture
@@ -222,23 +237,31 @@ namespace ProjectPorcupine.Rooms
                     // Save a list of all the rooms to be removed for later calls
                     // TODO: find a way of not doing this, because at the time of the
                     // later calls, this is stale data.
-                    HashSet<Room> oldRooms = new HashSet<Room>();
+                    List<Room> oldRooms = new List<Room>();
 
                     // You need to delete the surrounding rooms so a new room can be created
                     oldRooms.Add(oldRoom);
                     Remove(oldRoom);
 
-                    // Try building new rooms for each of our NESW directions.
-                    foreach (Tile t in new HashSet<Tile>() { sourceTile, sourceTile.Down() })
+                    if (sourceTile != null && sourceTile.Room != null)
                     {
-                        if (t != null && t.Room != null)
-                        {
-                            Room newRoom = ActualFloodFill(t, oldRoom, sizeOfOldRoom);
+                        Room newRoom = ActualFloodFill(sourceTile, oldRoom, sizeOfOldRoom);
 
-                            if (newRoom != null && Split != null)
-                            {
-                                Split(oldRoom, newRoom);
-                            }
+                        if (newRoom != null && Split != null)
+                        {
+                            Split(oldRoom, newRoom);
+                        }
+                    }
+
+                    Tile sourceTileDown = sourceTile.Down();
+
+                    if (sourceTileDown != null && sourceTileDown.Room != null)
+                    {
+                        Room newRoom = ActualFloodFill(sourceTileDown, oldRoom, sizeOfOldRoom);
+
+                        if (newRoom != null && Split != null)
+                        {
+                            Split(oldRoom, newRoom);
                         }
                     }
 
@@ -277,19 +300,25 @@ namespace ProjectPorcupine.Rooms
                     // Save a list of all the rooms to be removed for later calls
                     // TODO: find a way of not doing this, because at the time of the
                     // later calls, this is stale data.
-                    HashSet<Room> oldRooms = new HashSet<Room>();
+                    List<Room> oldRooms = new List<Room>();
 
-                    foreach (Tile t in new HashSet<Tile>() { sourceTile, sourceTile.Down() })
+                    if (sourceTile != null && sourceTile.Room != null && !sourceTile.Room.IsOutsideRoom())
                     {
-                        if (t != null && t.Room != null && !t.Room.IsOutsideRoom())
-                        {
-                            oldRooms.Add(t.Room);
+                        oldRooms.Add(sourceTile.Room);
 
-                            Remove(t.Room);
-                        }
+                        Remove(sourceTile.Room);
                     }
 
-                    if (sourceTile.Down() != null && sourceTile.Down().Room.IsOutsideRoom())
+                    Tile sourceTileDown = sourceTile.Down();
+
+                    if (sourceTileDown != null && sourceTileDown.Room != null && !sourceTileDown.Room.IsOutsideRoom())
+                    {
+                        oldRooms.Add(sourceTileDown.Room);
+
+                        Remove(sourceTileDown.Room);
+                    }
+
+                    if (sourceTileDown != null && sourceTileDown.Room.IsOutsideRoom())
                     {
                         // We're punching a hole to the outside, just skip flood filling and put everything outside
                         sourceTile.Room.ReturnTilesToOutsideRoom();
@@ -362,7 +391,7 @@ namespace ProjectPorcupine.Rooms
                 // Save a list of all the rooms to be removed for later calls
                 // TODO: find a way of not doing this, because at the time of the
                 // later calls, this is stale data.
-                HashSet<Room> oldRooms = new HashSet<Room>();
+                List<Room> oldRooms = new List<Room>();
 
                 // You need to delete the surrounding rooms so a new room can be created
                 foreach (Tile t in sourceTile.GetNeighbours())
@@ -385,6 +414,11 @@ namespace ProjectPorcupine.Rooms
                         Joined(r, newRoom);
                     }
                 }
+            }
+
+            if (FloodFillEnded != null)
+            {
+                FloodFillEnded();
             }
         }
 

@@ -133,7 +133,7 @@ public class GameEvent : IPrototypable
         if (executionActions != null)
         {
             // Execute Lua code like in Furniture ( FurnitureActions ) 
-            FunctionsManager.GameEvent.CallWithInstance(executionActions, this);
+            FunctionsManager.GameEvent.Call(executionActions, this);
         }
 
         if (!Repeat)

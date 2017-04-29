@@ -21,4 +21,6 @@ public interface IFunctions
     T Call<T>(string functionName, params object[] args);
 
     DynValue CallWithError(string functionName, params object[] args);
+
+    DynValue CreateDynValueFromObject(object obj);
 }

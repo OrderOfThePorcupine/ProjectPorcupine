@@ -387,16 +387,15 @@ namespace ProjectPorcupine.Rooms
         public void Control(Room room)
         {
             this.Room = room;
-            List<Tile> innerTiles = room.GetInnerTiles();
-            List<Tile> borderTiles = room.GetBorderingTiles();
-
-            List<Tile> allTiles = innerTiles.Union(borderTiles).ToList();
+            HashSet<Tile> innerTiles = room.GetInnerTiles();
+            HashSet<Tile> borderTiles = room.GetBoundaryTiles();
+            innerTiles.UnionWith(borderTiles);
 
             foreach (FurnitureRequirement requirement in requiredFurniture)
             {
                 string furnitureKey = requirement.type ?? requirement.typeTag;
                 ControlledFurniture.Add(furnitureKey, new List<Furniture>());
-                foreach (Tile tile in allTiles.FindAll(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))))
+                foreach (Tile tile in innerTiles.Where(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))))
                 {
                     ControlledFurniture[furnitureKey].Add(tile.Furniture);
                 }
@@ -426,14 +425,13 @@ namespace ProjectPorcupine.Rooms
                 return false;
             }
 
-            List<Tile> innerTiles = room.GetInnerTiles();
-            List<Tile> borderTiles = room.GetBorderingTiles();
-
-            List<Tile> allTiles = innerTiles.Union(borderTiles).ToList();
+            HashSet<Tile> innerTiles = room.GetInnerTiles();
+            HashSet<Tile> borderTiles = room.GetBoundaryTiles();
+            innerTiles.UnionWith(borderTiles);
 
             foreach (FurnitureRequirement requirement in requiredFurniture)
             {
-                if (allTiles.Count(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))) < requirement.count)
+                if (innerTiles.Count(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))) < requirement.count)
                 {
                     return false;
                 }
