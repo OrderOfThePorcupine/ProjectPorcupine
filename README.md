@@ -7,7 +7,7 @@
 [About](#about)  
 [Copyright & Licensing](#copyright--licensing)  
 [Contributing](#contributing)  
-[Vote on Proposed Features](#vote-on-proposed-features)  
+[Weeklies](#weeklies)  
 [Community](#community)  
 [Contact](#contact) 
 
@@ -67,6 +67,12 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md) file for contribution instru
 For further information, such as Roadmaps, explanations of systems and features, Standards and Conventions, and all your Git needs and troubleshooting see the [Wiki](https://github.com/TeamPorcupine/ProjectPorcupine/wiki)
 
 Make sure that you are using Unity 5.5.3 [Windows](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Win) | [Mac](https://unity3d.com/get-unity/download?thank-you=update&download_nid=46772&os=Mac)
+
+## Weeklies
+
+You can download and play already built 'weekly' versions for Windows, Mac, and Linux [here](https://bintray.com/orderoftheporcupine/ProjectPorcupine/Prebuilt-Binaries).
+
+However, these are merely 'snapshots', a preview of the current development build, and are not representative of any type of release. They may contain errors, bugs, partially completed features, and other potential issues.  If you open a bug report please include what week you are using (either the week number or the date is fine) as this will help us find the bug easier and determine if your error has already been fixed.
 
 ## Community
 

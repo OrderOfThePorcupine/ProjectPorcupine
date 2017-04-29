@@ -11,7 +11,7 @@ function oxygenValueAt(tile)
     if room == nil then
         return 0
     end
-    if (room.GetGasAmount("O2") > 0) then
+    if (room.Atmosphere.GetGasAmount("O2") > 0) then
         return 128
     end
     return 0
@@ -30,7 +30,7 @@ end
 function powerValueAt(tile)
     zero = 128 -- This is middle between 0 and 256
     multiplier = 12,8 -- For now 1 power is 40 in overlay
-	
+
 	local powerComponent = ModUtils.GetPlugablePowerConnectionForTile(tile)
 
 	if (powerComponent == nil) then
@@ -54,7 +54,7 @@ function temperatureValueAt(tile, world)
     --if tile == nil then
     --	return -2
     --end
-    return math.max(math.min(world.temperature.GetTemperature(tile.X, tile.Y, tile.Z) / 3, 254), 0)
+    return math.max(math.min(world.temperature.GetTemperature(tile.X, tile.Y, tile.Z).InKelvin / 3, 254), 0)
 end
 
 
