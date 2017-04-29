@@ -6,11 +6,10 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System;
 using System.Collections.Generic;
-using MoonSharp.Interpreter;
 using System.Linq;
+using MoonSharp.Interpreter;
 
 public class Functions
 {
@@ -93,7 +92,6 @@ public class Functions
     /// </summary>
     public void Call(List<string> functionNames, params object[] args)
     {
-        UnityEngine.Profiling.Profiler.BeginSample("RunFunctions");
         bool ranLUAArgs = false;
         DynValue[] luaArgs = null;
 
@@ -125,7 +123,7 @@ public class Functions
                 Call(functionNames[i], false, args);
             }
         }
-        UnityEngine.Profiling.Profiler.EndSample();
+
     }
 
     public T CreateInstance<T>(string className, bool throwError, params object[] args)
