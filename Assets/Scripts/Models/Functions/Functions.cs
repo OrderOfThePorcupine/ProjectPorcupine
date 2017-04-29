@@ -74,7 +74,7 @@ public class Functions
         return Call(functionName, true, args);
     }
 
-    public T Call<T>(string functionName, params DynValue[] args)
+    public T Call<T>(string functionName, params object[] args)
     {
         IFunctions functions = GetFunctions(functionName);
         if (functions != null)
@@ -93,8 +93,9 @@ public class Functions
     /// </summary>
     public void Call(List<string> functionNames, params object[] args)
     {
+        UnityEngine.Profiling.Profiler.BeginSample("RunFunctions");
         bool ranLUAArgs = false;
-        DynValue[] luaArgs = new DynValue[args.Length];
+        DynValue[] luaArgs = null;
 
         for (int i = 0; i < functionNames.Count; i++)
         {
@@ -110,9 +111,10 @@ public class Functions
             {
                 if (ranLUAArgs == false)
                 {
+                    luaArgs = new DynValue[args.Length];
                     for (int j = 0; j < args.Length; j++)
                     {
-                        luaArgs[j] = functions.CreateDynValueFromObject(args[j]);
+                        luaArgs[j] = functions.CreateInstance(args[j]);
                     }
                 }
 
@@ -122,6 +124,28 @@ public class Functions
             {
                 Call(functionNames[i], false, args);
             }
+        }
+        UnityEngine.Profiling.Profiler.EndSample();
+    }
+
+    public T CreateInstance<T>(string className, bool throwError, params object[] args)
+    {
+        string fullClassName = className + (args.Length > 0 ? string.Join(",", args.Select(x => x.GetType().Name).ToArray()) : string.Empty);
+        IFunctions functions = GetFunctions(fullClassName, true);
+        if (functions != null)
+        {
+            return functions.CreateInstance<T>(fullClassName, args);
+        }
+        else
+        {
+            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + className + "' is not a LUA function nor is it a CSharp constructor!");
+
+            if (throwError)
+            {
+                throw new Exception("'" + className + "' is not a LUA function nor is it a CSharp constructor!");
+            }
+
+            return default(T);
         }
     }
 
@@ -173,11 +197,11 @@ public class Functions
         }
     }
 
-    private IFunctions GetFunctions(string name)
+    private IFunctions GetFunctions(string name, bool constructor = false)
     {
         for (int i = 0; i < FunctionsSets.Count; i++)
         {
-            if (FunctionsSets[i].HasFunction(name))
+            if ((constructor == false && FunctionsSets[i].HasFunction(name)) || (constructor && FunctionsSets[i].HasConstructor(name)))
             {
                 return FunctionsSets[i];
             }

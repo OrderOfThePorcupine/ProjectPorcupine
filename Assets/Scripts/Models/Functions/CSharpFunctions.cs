@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Mono.CSharp;
 using MoonSharp.Interpreter;
+using System.Linq;
 
 public class CSharpFunctions : IFunctions
 {
@@ -19,16 +20,16 @@ public class CSharpFunctions : IFunctions
 
     private Dictionary<string, MethodInfo> methods;
 
+    private Dictionary<string, ConstructorInfo> constructors;
+
     private Evaluator evaluator;
 
     public CSharpFunctions()
     {
         script = new Script();
-
         methods = new Dictionary<string, MethodInfo>();
-
+        constructors = new Dictionary<string, ConstructorInfo>();
         CompilationResult = new CompilingResult();
-
         evaluator = null;
     }
 
@@ -53,6 +54,11 @@ public class CSharpFunctions : IFunctions
     public bool HasFunction(string name)
     {
         return methods.ContainsKey(name);
+    }
+
+    public bool HasConstructor(string className)
+    {
+        return constructors.ContainsKey(className);
     }
 
     /// <summary>
@@ -80,7 +86,7 @@ public class CSharpFunctions : IFunctions
             }
 
             // first, try if it already exists
-            var resAssembly = GetCompiledAssembly(scriptName);
+            Assembly resAssembly = GetCompiledAssembly(scriptName);
 
             if (resAssembly == null)
             {
@@ -145,6 +151,16 @@ public class CSharpFunctions : IFunctions
         return Call(functionName, args);
     }
 
+    public DynValue CreateInstance(object fromObject)
+    {
+        return DynValue.FromObject(script, fromObject);
+    }
+
+    public T CreateInstance<T>(string className, params object[] arguments)
+    {
+        return (T)constructors[className].Invoke(arguments);
+    }
+
     private string GetConnectionPointClassDeclaration(string name)
     {
         return Environment.NewLine + " public struct MonoSharp_DynamicAssembly_" + name + " {}";
@@ -157,11 +173,16 @@ public class CSharpFunctions : IFunctions
 
     private void CreateDelegates(Assembly assembly)
     {
-        foreach (var type in GetAllTypesFromAssembly(assembly))
+        foreach (Type type in GetAllTypesFromAssembly(assembly))
         {
-            foreach (var method in GetAllMethodsFromType(type))
+            foreach (MethodInfo method in GetAllMethodsFromType(type))
             {
                 methods.Add(method.Name, method);
+            }
+
+            foreach (ConstructorInfo constructor in GetAllConstructorsFromType(type))
+            {
+                constructors.Add(constructor.ReflectedType.Name + string.Join(",", constructor.GetParameters().Select(x => x.ParameterType.Name).ToArray()), constructor);
             }
         }
     }
@@ -169,6 +190,11 @@ public class CSharpFunctions : IFunctions
     private MethodInfo[] GetAllMethodsFromType(Type type)
     {
         return type.GetMethods(BindingFlags.Public | BindingFlags.Static);
+    }
+
+    private ConstructorInfo[] GetAllConstructorsFromType(Type type)
+    {
+        return type.GetConstructors();
     }
 
     private Type[] GetAllTypesFromAssembly(Assembly assembly)
