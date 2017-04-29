@@ -15,7 +15,7 @@ using UnityEngine;
 [MoonSharpUserData]
 public class TemperatureDiffusion
 {
-    private Dictionary<Room, Dictionary<Room, float>> diffusion = new Dictionary<Room, Dictionary<Room, float>>();
+    private float[,] diffusion;
     private HashSet<Furniture> sinksAndSources;
     private bool recomputeOnNextUpdate = true;
     private World world;
@@ -26,12 +26,9 @@ public class TemperatureDiffusion
     public TemperatureDiffusion(World world)
     {
         sinksAndSources = new HashSet<Furniture>();
-        diffusion = new Dictionary<Room, Dictionary<Room, float>>();
-
         this.world = world;
 
         world.RoomManager.FloodFillEnded += FloodFillEnded;
-
         TimeManager.Instance.FixedFrequency += FixedFrequency;
     }
 
@@ -85,7 +82,6 @@ public class TemperatureDiffusion
     /// </summary>
     public void Resize()
     {
-        diffusion = new Dictionary<Room, Dictionary<Room, float>>();
         sinksAndSources = new HashSet<Furniture>();
         recomputeOnNextUpdate = true;
     }
@@ -95,12 +91,12 @@ public class TemperatureDiffusion
     /// </summary>
     private void FloodFillEnded()
     {
-        diffusion.Clear();
         recomputeOnNextUpdate = true;
     }
 
     private void RebuildMap()
     {
+        diffusion = new float[world.RoomManager.Count, world.RoomManager.Count];
         recomputeOnNextUpdate = false;
 
         foreach (Room room in world.RoomManager)
@@ -154,23 +150,12 @@ public class TemperatureDiffusion
 
     private void AddDiffusionFromTo(Room r1, Room r2, float value)
     {
-        if (diffusion.ContainsKey(r1) && diffusion[r1].ContainsKey(r2))
-        {
-            diffusion[r1][r2] += value;
-        }
-        else if (diffusion.ContainsKey(r1))
-        {
-            diffusion[r1].Add(r2, value);
-        }
-        else
-        {
-            diffusion.Add(r1, new Dictionary<Room, float>() { { r2, value } });
-        }
+        diffusion[r1.ID, r2.ID] += value;
     }
 
     private void UpdateTemperature(float deltaTime)
     {
-        if (recomputeOnNextUpdate || (world.RoomManager.Count > 0 && diffusion.Count == 0))
+        if (recomputeOnNextUpdate || diffusion == null || world.RoomManager.Count != diffusion.Length)
         {
             RebuildMap();
         }
@@ -186,21 +171,20 @@ public class TemperatureDiffusion
         for (int i = 0; i < roomCount; i++)
         {
             r1 = world.RoomManager[i];
-            if (diffusion.ContainsKey(r1))
+            for (int j = 0; j < roomCount; j++)
             {
-                for (int j = 0; j < roomCount; j++)
+                if (diffusion[i, j] == 0)
                 {
-                    r2 = world.RoomManager[j];
-                    if (diffusion[r1].ContainsKey(r2))
-                    {
-                        float temperatureDifference = r1.Atmosphere.GetTemperature().InKelvin - r2.Atmosphere.GetTemperature().InKelvin;
-                        if (temperatureDifference > 0)
-                        {
-                            float energyTransfer = diffusion[r1][r2] * temperatureDifference * Mathf.Sqrt(r1.GetGasPressure()) * Mathf.Sqrt(r2.GetGasPressure()) * deltaTime;
-                            r1.Atmosphere.ChangeEnergy(-energyTransfer);
-                            r2.Atmosphere.ChangeEnergy(energyTransfer);
-                        }
-                    }
+                    continue;
+                }
+
+                r2 = world.RoomManager[j];
+                float temperatureDifference = r1.Atmosphere.GetTemperature().InKelvin - r2.Atmosphere.GetTemperature().InKelvin;
+                if (temperatureDifference > 0)
+                {
+                    float energyTransfer = diffusion[i, j] * temperatureDifference * Mathf.Sqrt(r1.GetGasPressure()) * Mathf.Sqrt(r2.GetGasPressure()) * deltaTime;
+                    r1.Atmosphere.ChangeEnergy(-energyTransfer);
+                    r2.Atmosphere.ChangeEnergy(energyTransfer);
                 }
             }
         }

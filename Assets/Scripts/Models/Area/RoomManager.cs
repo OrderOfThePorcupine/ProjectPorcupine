@@ -237,7 +237,7 @@ namespace ProjectPorcupine.Rooms
                     // Save a list of all the rooms to be removed for later calls
                     // TODO: find a way of not doing this, because at the time of the
                     // later calls, this is stale data.
-                    List<Room> oldRooms = new List<Room>();
+                    HashSet<Room> oldRooms = new HashSet<Room>();
 
                     // You need to delete the surrounding rooms so a new room can be created
                     oldRooms.Add(oldRoom);
@@ -300,7 +300,7 @@ namespace ProjectPorcupine.Rooms
                     // Save a list of all the rooms to be removed for later calls
                     // TODO: find a way of not doing this, because at the time of the
                     // later calls, this is stale data.
-                    List<Room> oldRooms = new List<Room>();
+                    HashSet<Room> oldRooms = new HashSet<Room>();
 
                     if (sourceTile != null && sourceTile.Room != null && !sourceTile.Room.IsOutsideRoom())
                     {
@@ -391,7 +391,7 @@ namespace ProjectPorcupine.Rooms
                 // Save a list of all the rooms to be removed for later calls
                 // TODO: find a way of not doing this, because at the time of the
                 // later calls, this is stale data.
-                List<Room> oldRooms = new List<Room>();
+                HashSet<Room> oldRooms = new HashSet<Room>();
 
                 // You need to delete the surrounding rooms so a new room can be created
                 foreach (Tile t in sourceTile.GetNeighbours())

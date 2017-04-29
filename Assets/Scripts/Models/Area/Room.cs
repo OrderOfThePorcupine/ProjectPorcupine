@@ -80,7 +80,7 @@ namespace ProjectPorcupine.Rooms
             return null;
         }
 
-        public void AssignTile(Tile tile, bool isBoundary = false)
+        public void AssignTile(Tile tile)
         {
             if (tiles.Contains(tile))
             {
