@@ -123,7 +123,6 @@ public class Functions
                 Call(functionNames[i], false, args);
             }
         }
-
     }
 
     public T CreateInstance<T>(string className, bool throwError, params object[] args)
