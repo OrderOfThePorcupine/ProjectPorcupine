@@ -387,15 +387,14 @@ namespace ProjectPorcupine.Rooms
         public void Control(Room room)
         {
             this.Room = room;
-            HashSet<Tile> innerTiles = room.GetInnerTiles();
-            HashSet<Tile> borderTiles = room.GetBoundaryTiles();
-            innerTiles.UnionWith(borderTiles);
+            HashSet<Tile> allTiles = room.GetInnerTiles();
+            allTiles.UnionWith(room.GetBoundaryTiles());
 
             foreach (FurnitureRequirement requirement in requiredFurniture)
             {
                 string furnitureKey = requirement.type ?? requirement.typeTag;
                 ControlledFurniture.Add(furnitureKey, new List<Furniture>());
-                foreach (Tile tile in innerTiles.Where(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))))
+                foreach (Tile tile in allTiles.Where(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))))
                 {
                     ControlledFurniture[furnitureKey].Add(tile.Furniture);
                 }
@@ -425,13 +424,12 @@ namespace ProjectPorcupine.Rooms
                 return false;
             }
 
-            HashSet<Tile> innerTiles = room.GetInnerTiles();
-            HashSet<Tile> borderTiles = room.GetBoundaryTiles();
-            innerTiles.UnionWith(borderTiles);
+            HashSet<Tile> allTiles = room.GetInnerTiles();
+            allTiles.UnionWith(room.GetBoundaryTiles());
 
             foreach (FurnitureRequirement requirement in requiredFurniture)
             {
-                if (innerTiles.Count(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))) < requirement.count)
+                if (allTiles.Count(tile => (tile.Furniture != null && (tile.Furniture.Type == requirement.type || tile.Furniture.HasTypeTag(requirement.typeTag)))) < requirement.count)
                 {
                     return false;
                 }

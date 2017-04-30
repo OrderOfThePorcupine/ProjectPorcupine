@@ -17,7 +17,6 @@ public class TemperatureDiffusion
 {
     private float[,] diffusion;
     private HashSet<Furniture> sinksAndSources;
-    private bool recomputeOnNextUpdate = true;
     private World world;
 
     /// <summary>
@@ -83,7 +82,7 @@ public class TemperatureDiffusion
     public void Resize()
     {
         sinksAndSources = new HashSet<Furniture>();
-        recomputeOnNextUpdate = true;
+        TimeManager.Instance.RunNextFrame(RebuildMap);
     }
 
     /// <summary>
@@ -91,13 +90,13 @@ public class TemperatureDiffusion
     /// </summary>
     private void FloodFillEnded()
     {
-        recomputeOnNextUpdate = true;
+        TimeManager.Instance.RunNextFrame(RebuildMap);
     }
 
     private void RebuildMap()
     {
         diffusion = new float[world.RoomManager.Count, world.RoomManager.Count];
-        recomputeOnNextUpdate = false;
+        TimeManager.Instance.RunNextFrame(RebuildMap);
 
         foreach (Room room in world.RoomManager)
         {
@@ -155,7 +154,7 @@ public class TemperatureDiffusion
 
     private void UpdateTemperature(float deltaTime)
     {
-        if (recomputeOnNextUpdate || diffusion == null || world.RoomManager.Count != diffusion.Length)
+        if (diffusion == null || world.RoomManager.Count != diffusion.Length)
         {
             RebuildMap();
         }
