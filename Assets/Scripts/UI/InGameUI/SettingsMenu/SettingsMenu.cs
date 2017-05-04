@@ -11,7 +11,6 @@ using System.Linq;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 /// <summary>
 /// Our main options/settings menu class (will contain all options).

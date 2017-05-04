@@ -13,15 +13,7 @@ using UnityEngine.UI;
 
 public class MouseCursor
 {
-    public enum TextPosition
-    {
-        upperLeft,
-        upperRight,
-        lowerLeft,
-        lowerRight
-    }
-
-    public static readonly Color defaultTint = Color.white;
+    public static readonly Color DefaultTint = Color.white;
 
     public bool cursorOverride = false;
     public bool forceShow = false;
@@ -57,6 +49,14 @@ public class MouseCursor
         KeyboardManager.Instance.RegisterInputAction("ToggleCursorTextBox", KeyboardMappedInputType.KeyUp, () => { cursorOverride = !cursorOverride; });
     }
 
+    public enum TextPosition
+    {
+        upperLeft,
+        upperRight,
+        lowerLeft,
+        lowerRight
+    }
+
     public void Update()
     {
         ShowCursor();
@@ -69,7 +69,7 @@ public class MouseCursor
         {
             Text text = textBoxes[(TextPosition)i].text;
             text.text = string.Empty;
-            text.color = defaultTint;
+            text.color = DefaultTint;
         }
     }
 

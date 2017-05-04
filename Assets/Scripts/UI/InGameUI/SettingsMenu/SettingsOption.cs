@@ -19,7 +19,7 @@ public struct SettingsOption
     public string name;
 
     /// <summary>
-    /// Tool tip.
+    /// Tool tip to display in UI Mode.
     /// </summary>
     public string tooltip;
 

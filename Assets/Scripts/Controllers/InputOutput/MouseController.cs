@@ -6,9 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using ProjectPorcupine.Localization;
 using System;
 using System.Collections.Generic;
+using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -219,7 +219,7 @@ public class MouseController
         if (string.IsNullOrEmpty(tooltip) == false)
         {
             Debug.LogWarning(cursor.forceShow);
-            cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperRight, tooltip, MouseCursor.defaultTint);
+            cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperRight, tooltip, MouseCursor.DefaultTint);
         }
     }
 
@@ -227,7 +227,7 @@ public class MouseController
     {
         cursor.Reset();
         Tile t = WorldController.Instance.GetTileAtWorldCoord(pos);
-        cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, infoDisplay.MousePosition(t), MouseCursor.defaultTint);
+        cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, infoDisplay.MousePosition(t), MouseCursor.DefaultTint);
     }
 
     private void GetTooltipBuildMode(Vector2 pos, MouseCursor cursor)
@@ -238,7 +238,7 @@ public class MouseController
         // Placing furniture object.
         if (bmc.BuildMode == BuildMode.FURNITURE)
         {
-            cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, PrototypeManager.Furniture.Get(bmc.BuildModeType).GetName(), MouseCursor.defaultTint);
+            cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, PrototypeManager.Furniture.Get(bmc.BuildModeType).GetName(), MouseCursor.DefaultTint);
 
             // Dragging and placing multiple furniture.
             if (t != null && GetIsDragging() == true && GetDragObjects().Count > 1)
@@ -246,7 +246,7 @@ public class MouseController
                 infoDisplay.GetPlacementValidationCounts();
                 cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperLeft, infoDisplay.ValidBuildPositionCount(), Color.green);
                 cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperRight, infoDisplay.InvalidBuildPositionCount(), Color.red);
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, infoDisplay.GetCurrentBuildRequirements(), MouseCursor.defaultTint);
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, infoDisplay.GetCurrentBuildRequirements(), MouseCursor.DefaultTint);
             }
         }
         else if (bmc.BuildMode == BuildMode.FLOOR)
@@ -254,8 +254,8 @@ public class MouseController
             // Placing tiles and dragging.
             if (t != null && GetIsDragging() == true && GetDragObjects().Count >= 1)
             {
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperLeft, GetDragObjects().Count.ToString(), MouseCursor.defaultTint);
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, LocalizationTable.GetLocalization(bmc.GetFloorTile()), MouseCursor.defaultTint);
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperLeft, GetDragObjects().Count.ToString(), MouseCursor.DefaultTint);
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, LocalizationTable.GetLocalization(bmc.GetFloorTile()), MouseCursor.DefaultTint);
             }
         }
     }
