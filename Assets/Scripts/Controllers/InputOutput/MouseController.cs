@@ -219,7 +219,7 @@ public class MouseController
         if (string.IsNullOrEmpty(tooltip) == false)
         {
             Debug.LogWarning(cursor.forceShow);
-            cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperRight, tooltip, MouseCursor.DefaultTint);
+            cursor.DisplayCursorInfo(MouseCursor.TextPosition.middleRight, tooltip, MouseCursor.DefaultTint);
         }
     }
 
@@ -227,7 +227,7 @@ public class MouseController
     {
         cursor.Reset();
         Tile t = WorldController.Instance.GetTileAtWorldCoord(pos);
-        cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, infoDisplay.MousePosition(t), MouseCursor.DefaultTint);
+        cursor.DisplayCursorInfo(MouseCursor.TextPosition.middleRight, infoDisplay.MousePosition(t), MouseCursor.DefaultTint);
     }
 
     private void GetTooltipBuildMode(Vector2 pos, MouseCursor cursor)

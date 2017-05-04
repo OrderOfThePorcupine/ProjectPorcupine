@@ -26,8 +26,13 @@ public class MouseCursor
     private Dictionary<TextPosition, CursorTextBox> textBoxes = new Dictionary<TextPosition, CursorTextBox>();
 
     private Vector3 upperLeftPostion = new Vector3(-64f, 32f, 0);
+    private Vector3 upperMiddlePosition = new Vector3(0, 32f, 0);
     private Vector3 upperRightPostion = new Vector3(96f, 32f, 0);
+    private Vector3 middleLeftPostion = new Vector3(-64f, 0, 0);
+    private Vector3 middleMiddlePosition = new Vector3(0, 0, 0);
+    private Vector3 middleRightPostion = new Vector3(96f, 0, 0);
     private Vector3 lowerLeftPostion = new Vector3(-64f, -32f, 0);
+    private Vector3 lowerMiddlePosition = new Vector3(0, -32f, 0);
     private Vector3 lowerRightPostion = new Vector3(96f, -32f, 0);
 
     private Vector2 cursorTextBoxSize = new Vector2(140, 70);
@@ -52,8 +57,13 @@ public class MouseCursor
     public enum TextPosition
     {
         upperLeft,
+        upperMiddle,
         upperRight,
+        middleLeft,
+        middleMiddle,
+        middleRight,
         lowerLeft,
+        lowerMiddle,
         lowerRight
     }
 
@@ -65,7 +75,7 @@ public class MouseCursor
 
     public void Reset()
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 9; i++)
         {
             Text text = textBoxes[(TextPosition)i].text;
             text.text = string.Empty;
@@ -111,8 +121,15 @@ public class MouseCursor
         Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
 
         textBoxes[TextPosition.upperLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, upperLeftPostion, cursorTextBoxSize);
+        textBoxes[TextPosition.upperMiddle] = new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, upperMiddlePosition, cursorTextBoxSize);
         textBoxes[TextPosition.upperRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, upperRightPostion, cursorTextBoxSize);
+
+        textBoxes[TextPosition.middleLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, middleLeftPostion, cursorTextBoxSize);
+        textBoxes[TextPosition.middleMiddle] = new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, middleMiddlePosition, cursorTextBoxSize);
+        textBoxes[TextPosition.middleRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, middleRightPostion, cursorTextBoxSize);
+
         textBoxes[TextPosition.lowerLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, lowerLeftPostion, cursorTextBoxSize);
+        textBoxes[TextPosition.lowerMiddle] = new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, lowerMiddlePosition, cursorTextBoxSize);
         textBoxes[TextPosition.lowerRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, lowerRightPostion, cursorTextBoxSize);
     }
 
