@@ -6,12 +6,12 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Our main options/settings menu class (will contain all options).
@@ -146,7 +146,9 @@ public class SettingsMenu : MonoBehaviour
                     if (instance.options[instance.currentCategory][headingName][i] != null)
                     {
                         BaseSettingsElement element = instance.options[instance.currentCategory][headingName][i];
-                        heading.AddObjectToRoot(element.InitializeElement());
+                        GameObject go = element.InitializeElement();
+                        go.AddComponent<TooltipComponent>().tooltip = element.option.tooltip;
+                        heading.AddObjectToRoot(go);
                         element.valueChanged = false;
                     }
                 }

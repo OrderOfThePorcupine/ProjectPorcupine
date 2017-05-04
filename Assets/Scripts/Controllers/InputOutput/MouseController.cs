@@ -6,6 +6,8 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using ProjectPorcupine.Localization;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -30,8 +32,11 @@ public class MouseController
     private BuildModeController bmc;
     private FurnitureSpriteController fsc;
     private UtilitySpriteController usc;
+    private CursorInfoDisplay infoDisplay;
     private ContextMenu contextMenu;
     private MouseCursor mouseCursor;
+    private Dictionary<TooltipMode, Action<Vector2, MouseCursor>> toolTipHandlers;
+    private string tooltip = null;
 
     // Is dragging an area (eg. floor tiles).
     private bool isDragging = false;
@@ -43,22 +48,28 @@ public class MouseController
     private Vector3 panningMouseStart = Vector3.zero;
 
     private MouseMode currentMode = MouseMode.SELECT;
+    private TooltipMode currentTooltipMode = TooltipMode.DEFAULT;
 
     // Use this for initialization.
     public MouseController(BuildModeController buildModeController, FurnitureSpriteController furnitureSpriteController, UtilitySpriteController utilitySpriteController, GameObject cursorObject)
     {
         bmc = buildModeController;
         bmc.SetMouseController(this);
+        infoDisplay = new CursorInfoDisplay(this);
         circleCursorPrefab = cursorObject;
         fsc = furnitureSpriteController;
         usc = utilitySpriteController;
         contextMenu = GameObject.FindObjectOfType<ContextMenu>();
         dragPreviewGameObjects = new List<GameObject>();
         cursorParent = new GameObject("Cursor");
-        mouseCursor = new MouseCursor(this, bmc);
+        mouseCursor = new MouseCursor(this);
         furnitureParent = new GameObject("Furniture Preview Sprites");
+        toolTipHandlers = new Dictionary<TooltipMode, Action<Vector2, MouseCursor>>();
+        toolTipHandlers.Add(TooltipMode.DEFAULT, GetTooltipNormalMode);
+        toolTipHandlers.Add(TooltipMode.BUILD, GetTooltipBuildMode);
+        toolTipHandlers.Add(TooltipMode.UI, GetTooltipUIMode);
 
-        TimeManager.Instance.EveryFrameNotModal += (time) => Update();
+        TimeManager.Instance.EveryFrame += (time) => Update();
     }
 
     public enum MouseMode
@@ -66,6 +77,13 @@ public class MouseController
         SELECT,
         BUILD,
         SPAWN_INVENTORY
+    }
+
+    public enum TooltipMode
+    {
+        DEFAULT,
+        BUILD,
+        UI
     }
 
     /// <summary>
@@ -106,14 +124,33 @@ public class MouseController
         return cursorParent;
     }
 
+    public void StartUIMode(string tooltip)
+    {
+        currentTooltipMode = TooltipMode.UI;
+        this.tooltip = tooltip;
+        mouseCursor.forceShow = true;
+    }
+
+    public void ClearUIMode()
+    {
+        currentTooltipMode = currentMode == MouseMode.BUILD ? TooltipMode.BUILD : TooltipMode.DEFAULT;
+        this.tooltip = null;
+        mouseCursor.forceShow = false;
+    }
+
     public void StartBuildMode()
     {
         currentMode = MouseMode.BUILD;
+        currentTooltipMode = TooltipMode.BUILD;
+        this.tooltip = null;
+        mouseCursor.forceShow = false;
     }
 
     public void StartSpawnMode()
     {
         currentMode = MouseMode.SPAWN_INVENTORY;
+        this.tooltip = null;
+        mouseCursor.forceShow = false;
     }
 
     // Update is called once per frame.
@@ -129,6 +166,12 @@ public class MouseController
         UpdateDragging();
         UpdateCameraMovement();
         UpdateSelection();
+
+        // Tooltip handling
+        if (toolTipHandlers.ContainsKey(currentTooltipMode))
+        {
+            toolTipHandlers[currentTooltipMode](GetMousePosition(), mouseCursor);
+        }
 
         if (SettingsKeyHolder.DeveloperMode)
         {
@@ -156,6 +199,9 @@ public class MouseController
         if (changeMode)
         {
             currentMode = MouseMode.SELECT;
+            currentTooltipMode = TooltipMode.DEFAULT;
+            tooltip = null;
+            mouseCursor.forceShow = false;
         }
     }
 
@@ -163,6 +209,55 @@ public class MouseController
     {
         currFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         currFramePosition.z = WorldController.Instance.CameraController.CurrentLayer;
+    }
+
+    private void GetTooltipUIMode(Vector2 pos, MouseCursor cursor)
+    {
+        cursor.Reset();
+        Debug.LogWarning(cursor.forceShow);
+
+        if (string.IsNullOrEmpty(tooltip) == false)
+        {
+            Debug.LogWarning(cursor.forceShow);
+            cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperRight, tooltip, MouseCursor.defaultTint);
+        }
+    }
+
+    private void GetTooltipNormalMode(Vector2 pos, MouseCursor cursor)
+    {
+        cursor.Reset();
+        Tile t = WorldController.Instance.GetTileAtWorldCoord(pos);
+        cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, infoDisplay.MousePosition(t), MouseCursor.defaultTint);
+    }
+
+    private void GetTooltipBuildMode(Vector2 pos, MouseCursor cursor)
+    {
+        cursor.Reset();
+        Tile t = WorldController.Instance.GetTileAtWorldCoord(pos);
+
+        // Placing furniture object.
+        if (bmc.BuildMode == BuildMode.FURNITURE)
+        {
+            cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, PrototypeManager.Furniture.Get(bmc.BuildModeType).GetName(), MouseCursor.defaultTint);
+
+            // Dragging and placing multiple furniture.
+            if (t != null && GetIsDragging() == true && GetDragObjects().Count > 1)
+            {
+                infoDisplay.GetPlacementValidationCounts();
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperLeft, infoDisplay.ValidBuildPositionCount(), Color.green);
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperRight, infoDisplay.InvalidBuildPositionCount(), Color.red);
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, infoDisplay.GetCurrentBuildRequirements(), MouseCursor.defaultTint);
+            }
+        }
+        else if (bmc.BuildMode == BuildMode.FLOOR)
+        {
+            // Placing tiles and dragging.
+            if (t != null && GetIsDragging() == true && GetDragObjects().Count >= 1)
+            {
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperLeft, GetDragObjects().Count.ToString(), MouseCursor.defaultTint);
+                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, LocalizationTable.GetLocalization(bmc.GetFloorTile()), MouseCursor.defaultTint);
+            }
+        }
     }
 
     private void CheckModeChanges()
@@ -176,6 +271,7 @@ public class MouseController
             else if (currentMode == MouseMode.SPAWN_INVENTORY && isPanning == false)
             {
                 currentMode = MouseMode.SELECT;
+                currentTooltipMode = TooltipMode.DEFAULT;
             }
         }
     }

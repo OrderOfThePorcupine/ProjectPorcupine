@@ -6,48 +6,51 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class MouseCursor
 {
+    public enum TextPosition
+    {
+        upperLeft,
+        upperRight,
+        lowerLeft,
+        lowerRight
+    }
+
+    public static readonly Color defaultTint = Color.white;
+
     public bool cursorOverride = false;
+    public bool forceShow = false;
 
     private MouseController mc;
-    private BuildModeController bmc;
-    private CursorInfoDisplay cid;
 
     private GameObject cursorGO;
     private SpriteRenderer cursorSR;
 
-    private CursorTextBox upperLeft;
-    private CursorTextBox upperRight;
-    private CursorTextBox lowerLeft;
-    private CursorTextBox lowerRight;
+    private Dictionary<TextPosition, CursorTextBox> textBoxes = new Dictionary<TextPosition, CursorTextBox>();
 
     private Vector3 upperLeftPostion = new Vector3(-64f, 32f, 0);
     private Vector3 upperRightPostion = new Vector3(96f, 32f, 0);
     private Vector3 lowerLeftPostion = new Vector3(-64f, -32f, 0);
     private Vector3 lowerRightPostion = new Vector3(96f, -32f, 0);
 
-    private Vector2 cursorTextBoxSize = new Vector2(120, 50);
+    private Vector2 cursorTextBoxSize = new Vector2(140, 70);
 
     private Texture2D cursorTexture;
 
     private GUIStyle style = new GUIStyle();
 
-    private Color defaultTint = Color.white;
-
-    public MouseCursor(MouseController mouseController, BuildModeController buildModeController)
+    public MouseCursor(MouseController mouseController)
     {
         mc = mouseController;
-        bmc = buildModeController;
-        cid = new CursorInfoDisplay(mc, bmc);
 
         style.font = Resources.Load<Font>("Fonts/Arial/Arial") as Font;
         style.fontSize = 15;
-        
+
         LoadCursorTexture();
         BuildCursor();
 
@@ -57,19 +60,28 @@ public class MouseCursor
     public void Update()
     {
         ShowCursor();
-
-        if (cursorOverride == true)
-        {
-            return;
-        }
-
         UpdateCursor();
-        DisplayCursorInfo();        
+    }
+
+    public void Reset()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            Text text = textBoxes[(TextPosition)i].text;
+            text.text = string.Empty;
+            text.color = defaultTint;
+        }
+    }
+
+    public void DisplayCursorInfo(TextPosition pos, string text, Color color)
+    {
+        textBoxes[pos].text.text = text;
+        textBoxes[pos].text.color = color;
     }
 
     private void LoadCursorTexture()
     {
-        cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");        
+        cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
     }
 
     private void BuildCursor()
@@ -95,74 +107,30 @@ public class MouseCursor
         rt1.sizeDelta = new Vector2(64, 64);
         cursorSR = cursorGO.AddComponent<SpriteRenderer>();
         cursorSR.sortingLayerName = "TileUI";
-       
+
         Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
-        
-        upperLeft = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, upperLeftPostion, cursorTextBoxSize);
-        upperRight = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, upperRightPostion, cursorTextBoxSize);
-        lowerLeft = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, lowerLeftPostion, cursorTextBoxSize);
-        lowerRight = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, lowerRightPostion, cursorTextBoxSize);        
+
+        textBoxes[TextPosition.upperLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, upperLeftPostion, cursorTextBoxSize);
+        textBoxes[TextPosition.upperRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, upperRightPostion, cursorTextBoxSize);
+        textBoxes[TextPosition.lowerLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, lowerLeftPostion, cursorTextBoxSize);
+        textBoxes[TextPosition.lowerRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, lowerRightPostion, cursorTextBoxSize);
     }
 
     private void UpdateCursor()
     {
-        cursorGO.transform.position = Input.mousePosition;       
+        cursorGO.transform.position = Input.mousePosition;
     }
 
     private void ShowCursor()
     {
-        if (EventSystem.current.IsPointerOverGameObject() || cursorOverride == true)
-        {            
-            cursorGO.SetActive(false);
-        }
-        else
-        {            
+        if (forceShow || (cursorOverride == false && EventSystem.current.IsPointerOverGameObject() == false))
+        {
             cursorGO.SetActive(true);
         }
-    }
-
-    private void DisplayCursorInfo()
-    {        
-        lowerLeft.text.text = upperLeft.text.text = lowerRight.text.text = upperRight.text.text = string.Empty;        
-
-        Tile t = WorldController.Instance.GetTileAtWorldCoord(mc.GetMousePosition());        
-        
-        if (mc.GetCurrentMode() == MouseController.MouseMode.BUILD)
-        {
-            // Placing furniture object.
-            if (bmc.BuildMode == BuildMode.FURNITURE)
-            {
-                lowerRight.text.text = PrototypeManager.Furniture.Get(bmc.BuildModeType).GetName();
-
-                upperLeft.text.color = Color.green;
-                upperRight.text.color = Color.red;
-
-                // Dragging and placing multiple furniture.
-                if (t != null && mc.GetIsDragging() == true && mc.GetDragObjects().Count > 1)
-                {
-                    cid.GetPlacementValidationCounts();
-                    upperLeft.text.text = cid.ValidBuildPositionCount();
-                    upperRight.text.text = cid.InvalidBuildPositionCount();
-                    lowerLeft.text.text = cid.GetCurrentBuildRequirements();
-                }
-            }
-            else if (bmc.BuildMode == BuildMode.FLOOR)
-            {
-                lowerRight.text.text = string.Empty;
-                upperLeft.text.color = upperRight.text.color = defaultTint;
-
-                // Placing tiles and dragging.
-                if (t != null && mc.GetIsDragging() == true && mc.GetDragObjects().Count >= 1)
-                {
-                    upperLeft.text.text = mc.GetDragObjects().Count.ToString();
-                    lowerLeft.text.text = bmc.GetFloorTile();
-                }                
-            }
-        }
         else
         {
-            lowerRight.text.text = cid.MousePosition(t);            
-        }        
+            cursorGO.SetActive(false);
+        }
     }
 
     public class CursorTextBox
