@@ -21,8 +21,6 @@ public class OverlayDescriptor : IPrototypable
     public OverlayDescriptor()
     {
         ColorMap = ColorMapOption.Jet;
-        Min = 0;
-        Max = 255;
     }
 
     /// <summary>
@@ -60,32 +58,12 @@ public class OverlayDescriptor : IPrototypable
     public string LuaFunctionName { get; private set; }
 
     /// <summary>
-    /// Gets the min bound for clipping coloring.
-    /// </summary>
-    public int Min { get; private set; }
-
-    /// <summary>
-    /// Gets the max bound for clipping coloring.
-    /// </summary>
-    public int Max { get; private set; }
-
-    /// <summary>
     /// Creates an OverlayDescriptor form a xml subtree with node \<Overlay></Overlay>\.
     /// </summary>
     /// <param name="xmlReader">The subtree pointing to Overlay.</param>
     public void ReadXmlPrototype(XmlReader xmlReader)
     {
         Type = xmlReader.GetAttribute("type");
-
-        if (xmlReader.GetAttribute("min") != null)
-        {
-            Min = XmlConvert.ToInt32(xmlReader.GetAttribute("min"));
-        }
-
-        if (xmlReader.GetAttribute("max") != null)
-        {
-            Max = XmlConvert.ToInt32(xmlReader.GetAttribute("max"));
-        }
 
         if (xmlReader.GetAttribute("colorMap") != null)
         {
