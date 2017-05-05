@@ -214,12 +214,11 @@ public class MouseController
     private void GetTooltipUIMode(Vector2 pos, MouseCursor cursor)
     {
         cursor.Reset();
-        Debug.LogWarning(cursor.forceShow);
 
         if (string.IsNullOrEmpty(tooltip) == false)
         {
             Debug.LogWarning(cursor.forceShow);
-            cursor.DisplayCursorInfo(MouseCursor.TextPosition.middleRight, tooltip, MouseCursor.DefaultTint);
+            cursor.DisplayCursorInfo(MouseCursor.TextPosition.middleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
         }
     }
 

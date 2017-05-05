@@ -229,3 +229,37 @@ developer_mode=Developer Mode:
 master_volume=Master Volume:
 music_volume=Music Volume:
 ui_scale=UI Scale:
+
+##########Settings-Tooltips##########
+autosave_every_tooltip=Autosave every x minutes
+max_autosaves_tooltip=Maximum Autosaves
+language_tooltip=Set the language to be used
+auto_update_language_tooltip=Auto-update Language Packs?
+zoom_lerp_time_tooltip=Camera animation time
+zoom_sensitivity_tooltip=Sensitivity for camera
+master_volume_tooltip=Master Volume
+music_volume_tooltip=Music Volume
+game_volume_tooltip=Game Volume
+alert_volume_tooltip=Alert Volume
+ui_volume_tooltip=UI Volume
+sound_device_tooltip=The device to use for all sound
+locational_sound_tooltip=Enable/Disable surround sound
+ui_skin_tooltip=Skins for the UI
+quality_tooltip=Quality Presets
+vsync_tooltip=Helps prevent screen tearing by capping frame rate
+ui_scale_tooltip=Scale the UI manually
+soft_particles_tooltip=Softer particles use more resources 
+shadows_tooltip=Higher level shadows use more resources
+anisotropic_filtering_tooltip=Reduce jaggedness of surfaces
+aa_tooltip=Higher levels use more resources
+fullscreen_tooltip=Toggle fullscreen
+resolution_tooltip=Higher resolutions use more resources
+developer_mode_tooltip='Cheat' mode
+logging_level_tooltip=For testing purposes
+scroll_sensitivity_tooltip=Console scrollbar sensitivity
+time_stamps_tooltip=Console time stamps
+console_enable_tooltip=Enable/Disable the console
+font_size_tooltip=Console font size
+performance_hud_tooltip=Performance Statistics
+
+

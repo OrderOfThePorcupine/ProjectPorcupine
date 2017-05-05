@@ -2,29 +2,29 @@
 <Categories>
   <Category Name="general">
     <OptionHeading Name="autosave">
-      <Option Name="autosave_every" Key="general_autosave_interval" DefaultValue="10" ClassName="AutosaveIntervalInputField" Tooltip="Autosave every x minutes">
+      <Option Name="autosave_every" Key="general_autosave_interval" DefaultValue="10" ClassName="AutosaveIntervalInputField" Tooltip="autosave_every_tooltip">
         <Params>
           <Param name="Verification" value="PositiveInteger" />
         </Params>
       </Option>
-      <Option Name="max_autosaves" Key="general_autosave_maxFiles" DefaultValue="5" ClassName="GenericInputField" Tooltip="Maximum Autosaves">
+      <Option Name="max_autosaves" Key="general_autosave_maxFiles" DefaultValue="5" ClassName="GenericInputField" Tooltip="max_autosaves_tooltip">
         <Params>
           <Param name="Verification" value="PositiveInteger" />
         </Params>
       </Option>
     </OptionHeading>
     <OptionHeading Name="localization">
-      <Option Name="language" Key="general_localization_language" DefaultValue="en_US" ClassName="LocalizationComboBox" Tooltip="Set the language to be used" />
-      <Option Name="auto_update_language" Key="general_localization_autoUpdate" DefaultValue="true" ClassName="GenericToggle" Tooltip="Auto-update Language Packs?" />
+      <Option Name="language" Key="general_localization_language" DefaultValue="en_US" ClassName="LocalizationComboBox" Tooltip="language_tooltip" />
+      <Option Name="auto_update_language" Key="general_localization_autoUpdate" DefaultValue="true" ClassName="GenericToggle" Tooltip="auto_update_language_tooltip" />
     </OptionHeading>
     <OptionHeading Name="Movement">
-      <Option Name="zoom_lerp_time" Key="general_movement_zoomLerp" DefaultValue="10" ClassName="GenericSlider" Tooltip="Camera animation time">
+      <Option Name="zoom_lerp_time" Key="general_movement_zoomLerp" DefaultValue="10" ClassName="GenericSlider" Tooltip="zoom_lerp_time_tooltip">
         <Params>
           <Param name="MinimumValue" value="1" />
           <Param name="MaximumValue" value="20" />
         </Params>
       </Option>
-      <Option Name="zoom_sensitivity" Key="general_movement_zoomSensitivity" DefaultValue="3" ClassName="GenericSlider" Tooltip="Sensitivity for camera">
+      <Option Name="zoom_sensitivity" Key="general_movement_zoomSensitivity" DefaultValue="3" ClassName="GenericSlider" Tooltip="zoom_sensitivity_tooltip">
         <Params>
           <Param name="MinimumValue" value="1" />
           <Param name="MaximumValue" value="9" />
@@ -34,7 +34,7 @@
   </Category>
   <Category Name="sound">
     <OptionHeading Name="volume">
-      <Option Name="master_volume" Key="sound_volume_master" DefaultValue="1" ClassName="SoundSlider" Tooltip="Master Volume">
+      <Option Name="master_volume" Key="sound_volume_master" DefaultValue="1" ClassName="SoundSlider" Tooltip="master_volume_tooltip">
         <Params>
           <Param name="SoundChannel" value="master" />
           <Param name="MinimumValue" value="0" />
@@ -42,7 +42,7 @@
           <Param name="WholeNumbers" value="true" />
         </Params>
       </Option>
-      <Option Name="music_volume" Key="sound_volume_music" DefaultValue="1" ClassName="SoundSlider" Tooltip="Music Volume">
+      <Option Name="music_volume" Key="sound_volume_music" DefaultValue="1" ClassName="SoundSlider" Tooltip="music_volume_tooltip">
         <Params>
           <Param name="SoundChannel" value="music" />
           <Param name="MinimumValue" value="0" />
@@ -50,7 +50,7 @@
           <Param name="WholeNumbers" value="true" />
         </Params>
       </Option>
-      <Option Name="game_volume" Key="sound_volume_game" DefaultValue="1" ClassName="SoundSlider" Tooltip="Game Volume">
+      <Option Name="game_volume" Key="sound_volume_game" DefaultValue="1" ClassName="SoundSlider" Tooltip="game_volume_tooltip">
         <Params>
           <Param name="SoundChannel" value="gameSounds" />
           <Param name="MinimumValue" value="0" />
@@ -58,7 +58,7 @@
           <Param name="WholeNumbers" value="true" />
         </Params>
       </Option>
-      <Option Name="alert_volume" Key="sound_volume_alerts" DefaultValue="1" ClassName="SoundSlider" Tooltip="Alert Volume">
+      <Option Name="alert_volume" Key="sound_volume_alerts" DefaultValue="1" ClassName="SoundSlider" Tooltip="alert_volume_tooltip">
         <Params>
           <Param name="SoundChannel" value="alerts" />
           <Param name="MinimumValue" value="0" />
@@ -66,7 +66,7 @@
           <Param name="WholeNumbers" value="true" />
         </Params>
       </Option>
-      <Option Name="ui_volume" Key="sound_volume_ui" DefaultValue="1" ClassName="SoundSlider" Tooltip="UI Volume">
+      <Option Name="ui_volume" Key="sound_volume_ui" DefaultValue="1" ClassName="SoundSlider" Tooltip="ui_volume_tooltip">
         <Params>
           <Param name="SoundChannel" value="UI" />
           <Param name="MinimumValue" value="0" />
@@ -76,16 +76,16 @@
       </Option>
     </OptionHeading>
     <OptionHeading Name="advanced">
-      <Option Name="sound_device" Key="sound_advanced_device" DefaultValue="0" ClassName="SoundDeviceComboBox" Tooltip="Select a sound device" />
-      <Option Name="locational_sound" Key="sound_advanced_locational" DefaultValue="true" ClassName="GenericToggle" Tooltip="Surround Sound" />
+      <Option Name="sound_device" Key="sound_advanced_device" DefaultValue="0" ClassName="SoundDeviceComboBox" Tooltip="sound_device_tooltip" />
+      <Option Name="locational_sound" Key="sound_advanced_locational" DefaultValue="true" ClassName="GenericToggle" Tooltip="locational_sound_tooltip" />
     </OptionHeading>
   </Category>
   <Category Name="video">
     <OptionHeading Name="general">
-      <Option Name="ui_skin" Key="video_general_uiSkin" DefaultValue="0" ClassName="UISkinComboBox" Tooltip="Skins for UI" />
-      <Option Name="quality" Key="video_general_quality" DefaultValue="2" ClassName="QualityComboBox" Tooltip="Quality presets" />
-      <Option Name="vsync" Key="video_general_vsync" DefaultValue="0" ClassName="VSyncComboBox" Tooltip="Prevents screen tearing" />
-      <Option Name="ui_scale" Key="ui_scale" DefaultValue="1" ClassName="UIScaleSlider" Tooltip="Scale for the UI">
+      <Option Name="ui_skin" Key="video_general_uiSkin" DefaultValue="0" ClassName="UISkinComboBox" Tooltip="ui_skin_tooltip" />
+      <Option Name="quality" Key="video_general_quality" DefaultValue="2" ClassName="QualityComboBox" Tooltip="quality_tooltip" />
+      <Option Name="vsync" Key="video_general_vsync" DefaultValue="0" ClassName="VSyncComboBox" Tooltip="vsync_tooltip" />
+      <Option Name="ui_scale" Key="ui_scale" DefaultValue="1" ClassName="UIScaleSlider" Tooltip="ui_scale_tooltip">
         <Params>
           <Param name="MinimumValue" value="0.5" />
           <Param name="MaximumValue" value="2" />
@@ -93,41 +93,41 @@
       </Option>
     </OptionHeading>
     <OptionHeading Name="advanced">
-      <Option Name="soft_particles" Key="video_advanced_particles" DefaultValue="true" ClassName="SoftParticlesToggle" Tooltip="Softer particles" />
-      <Option Name="shadows" Key="video_advanced_shadows" DefaultValue="0" ClassName="ShadowComboBox" Tooltip="Reduce shadows for speed" />
-      <Option Name="anisotropic_filtering" Key="video_advanced_anisotropicFiltering" DefaultValue="2" ClassName="AnisotropicFilteringComboBox" Tooltip="Reduce jaggedness of surfaces" />
-      <Option Name="aa" Key="video_advanced_aa" DefaultValue="0" ClassName="AAComboBox" Tooltip="Higher levels use more resources" />
+      <Option Name="soft_particles" Key="video_advanced_particles" DefaultValue="true" ClassName="SoftParticlesToggle" Tooltip="soft_particles_tooltip" />
+      <Option Name="shadows" Key="video_advanced_shadows" DefaultValue="0" ClassName="ShadowComboBox" Tooltip="shadows_tooltip" />
+      <Option Name="anisotropic_filtering" Key="video_advanced_anisotropicFiltering" DefaultValue="2" ClassName="AnisotropicFilteringComboBox" Tooltip="anisotropic_filtering_tooltip" />
+      <Option Name="aa" Key="video_advanced_aa" DefaultValue="0" ClassName="AAComboBox" Tooltip="aa_tooltip" />
     </OptionHeading>
     <OptionHeading Name="window">
-      <Option Name="fullscreen" Key="video_window_mode" DefaultValue="true" ClassName="FullScreenToggle" Tooltip="Toggle fullscreen" />
-      <Option Name="resolution" Key="video_window_resoultion" DefaultValue="0" ClassName="ResolutionComboBox" Tooltip="Higher resolutions use more resources" />
+      <Option Name="fullscreen" Key="video_window_mode" DefaultValue="true" ClassName="FullScreenToggle" Tooltip="fullscreen_tooltip" />
+      <Option Name="resolution" Key="video_window_resoultion" DefaultValue="0" ClassName="ResolutionComboBox" Tooltip="resolution_tooltip" />
     </OptionHeading>
   </Category>
   <Category Name="developer">
     <OptionHeading Name="general">
-      <Option Name="developer_mode" Key="developer_general_developerMode" DefaultValue="false" ClassName="GenericToggle" Tooltip="'Cheat' mode">
+      <Option Name="developer_mode" Key="developer_general_developerMode" DefaultValue="false" ClassName="GenericToggle" Tooltip="developer_mode_tooltip">
         <Params>
           <Param name="Type" value="Switch" />
           <Param name="LUAInitializeFunction" value="InitDevMode" />
         </Params>
       </Option>
-      <Option Name="logging_level" Key="developer_general_loggingLevel" DefaultValue="false" ClassName="GenericToggle" Tooltip="For testing purposes" />
+      <Option Name="logging_level" Key="developer_general_loggingLevel" DefaultValue="false" ClassName="GenericToggle" Tooltip="logging_level_tooltip" />
     </OptionHeading>
     <OptionHeading Name="console">
-      <Option Name="scroll_sensitivity" Key="developer_console_scrollSensitivity" DefaultValue="6" ClassName="DeveloperConsoleSlider" Tooltip="Console scrollbar sensitivity">
+      <Option Name="scroll_sensitivity" Key="developer_console_scrollSensitivity" DefaultValue="6" ClassName="DeveloperConsoleSlider" Tooltip="scroll_sensitivity_tooltip">
         <Params>
           <Param name="WholeNumbers" value="true" />
           <Param name="MinimumValue" value="5" />
           <Param name="MaximumValue" value="15" />
         </Params>
       </Option>
-      <Option Name="time_stamps" Key="developer_console_timeStamp" DefaultValue="false" ClassName="DeveloperConsoleToggle" Tooltip="Console time stamps" />
-      <Option Name="console_enable" Key="developer_console_enableDevConsole" DefaultValue="true" ClassName="DeveloperConsoleToggle" Tooltip="Enable the console">
+      <Option Name="time_stamps" Key="developer_console_timeStamp" DefaultValue="false" ClassName="DeveloperConsoleToggle" Tooltip="time_stamps_tooltip" />
+      <Option Name="console_enable" Key="developer_console_enableDevConsole" DefaultValue="true" ClassName="DeveloperConsoleToggle" Tooltip="console_enable_tooltip">
         <Params>
           <Param name="Type" value="Switch" />
         </Params>
       </Option>
-      <Option Name="font_size" Key="developer_console_fontSize" DefaultValue="15" ClassName="DeveloperConsoleSlider" Tooltip="Console font size">
+      <Option Name="font_size" Key="developer_console_fontSize" DefaultValue="15" ClassName="DeveloperConsoleSlider" Tooltip="font_size_tooltip">
         <Params>
           <Param name="WholeNumbers" value="true" />
           <Param name="MinimumValue" value="12" />
@@ -136,7 +136,7 @@
       </Option>
     </OptionHeading>
     <OptionHeading Name="utilities">
-      <Option Name="performance_hud" Key="developer_utilities_performanceHUD" DefaultValue="none" ClassName="PerformanceHUDComboBox" Tooltip="Performance Statistics" />
+      <Option Name="performance_hud" Key="developer_utilities_performanceHUD" DefaultValue="none" ClassName="PerformanceHUDComboBox" Tooltip="performance_hud_tooltip" />
     </OptionHeading>
   </Category>
 </Categories>
