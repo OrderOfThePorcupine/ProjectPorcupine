@@ -96,7 +96,6 @@ public class TemperatureDiffusion
     private void RebuildMap()
     {
         diffusion = new float[world.RoomManager.Count, world.RoomManager.Count];
-        TimeManager.Instance.RunNextFrame(RebuildMap);
 
         foreach (Room room in world.RoomManager)
         {

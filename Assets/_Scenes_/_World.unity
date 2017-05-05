@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 614d1936f989c6949b68336704b91aa8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CircleCursorPrefab: {fileID: 110048, guid: 782976062f887844ca858482495fcdbd, type: 2}
+  circleCursorPrefab: {fileID: 110048, guid: 782976062f887844ca858482495fcdbd, type: 2}
 --- !u!4 &179601669
 Transform:
   m_ObjectHideFlags: 0

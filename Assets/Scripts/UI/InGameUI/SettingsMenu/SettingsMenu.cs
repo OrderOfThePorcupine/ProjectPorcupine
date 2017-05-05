@@ -348,7 +348,6 @@ public class SettingsMenu : MonoBehaviour
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    Debug.LogWarning(keyValuePair.Value[j].classData.ClassName);
                     BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.ClassName, true);
                     element.option = keyValuePair.Value[j];
                     element.parameterData = keyValuePair.Value[j].classData.ParameterData;
