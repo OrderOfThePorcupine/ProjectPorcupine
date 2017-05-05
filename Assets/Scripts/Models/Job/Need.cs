@@ -29,7 +29,6 @@ public class Need : IPrototypable
         Amount = 0;
         Type = other.Type;
         LocalizationID = other.LocalizationID;
-        Name = other.Name;
         GrowthRate = other.GrowthRate;
         highToLow = other.highToLow;
         RestoreNeedFurn = other.RestoreNeedFurn;
@@ -48,8 +47,6 @@ public class Need : IPrototypable
     public string Type { get; private set; }
 
     public string LocalizationID { get; private set; }
-
-    public string Name { get; private set; }
 
     public float Amount
     {
@@ -153,10 +150,6 @@ public class Need : IPrototypable
         {
             switch (reader.Name)
             {
-                case "Name":
-                    reader.Read();
-                    Name = reader.ReadContentAsString();
-                    break;
                 case "RestoreNeedFurnitureType":
                     reader.Read();
                     RestoreNeedFurn = PrototypeManager.Furniture.Get(reader.ReadContentAsString());
