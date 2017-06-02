@@ -18,45 +18,27 @@ using Random = UnityEngine.Random;
 [MoonSharpUserData]
 public class WorldController : MonoBehaviour
 {
+    public SoundController soundController;
+    public TileSpriteController tileSpriteController;
+    public CharacterSpriteController characterSpriteController;
+    public JobSpriteController jobSpriteController;
+    public InventorySpriteController inventorySpriteController;
+    public ShipSpriteController shipSpriteController;
+    public FurnitureSpriteController furnitureSpriteController;
+    public UtilitySpriteController utilitySpriteController;
+    public QuestController questController;
+    public BuildModeController buildModeController;
+    public MouseController mouseController;
+    public CameraController cameraController;
+    public SpawnInventoryController spawnInventoryController;
+    public AutosaveManager autosaveManager;
+    public TradeController TradeController;
+    public ModsManager modsManager;
+    public DialogBoxManager dialogBoxManager;
+    public GameObject inventoryUI;
+    public GameObject circleCursorPrefab;
+
     public static WorldController Instance { get; protected set; }
-
-    public SoundController SoundController { get; private set; }
-
-    public TileSpriteController TileSpriteController { get; private set; }
-
-    public CharacterSpriteController CharacterSpriteController { get; private set; }
-
-    public JobSpriteController JobSpriteController { get; private set; }
-
-    public InventorySpriteController InventorySpriteController { get; private set; }
-
-    public ShipSpriteController ShipSpriteController { get; private set; }
-
-    public FurnitureSpriteController FurnitureSpriteController { get; private set; }
-
-    public UtilitySpriteController UtilitySpriteController { get; private set; }
-
-    public QuestController QuestController { get; private set; }
-
-    public BuildModeController BuildModeController { get; private set; }
-
-    public MouseController MouseController { get; private set; }
-
-    public CameraController CameraController { get; private set; }
-
-    public SpawnInventoryController SpawnInventoryController { get; private set; }
-
-    public AutosaveManager AutosaveManager { get; private set; }
-
-    public TradeController TradeController { get; private set; }
-
-    public ModsManager ModsManager { get; private set; }
-
-    public DialogBoxManager DialogBoxManager { get; private set; }
-
-    public GameObject InventoryUI { get; private set; }
-
-    public GameObject CircleCursorPrefab { get; private set; }
 
     // The world and tile data.
     public World World { get; protected set; }
@@ -83,19 +65,19 @@ public class WorldController : MonoBehaviour
                 "ping_log",
                 (evt) => UnityDebugger.Debugger.LogFormat("Scheduler", "Event {0} fired", evt.Name)));
 
-        ModsManager = new ModsManager();
+        modsManager = new ModsManager();
 
-        if (SceneController.LoadWorldFromFileName != null)
+        if (SceneController.loadWorldFromFileName != null)
         {
-            CreateWorldFromSaveFile(SceneController.LoadWorldFromFileName);
-            SceneController.LoadWorldFromFileName = null;
+            CreateWorldFromSaveFile(SceneController.loadWorldFromFileName);
+            SceneController.loadWorldFromFileName = null;
         }
         else
         {
             CreateEmptyWorld();
         }
 
-        SoundController = new SoundController(World);
+        soundController = new SoundController(World);
     }
 
     public void Start()
@@ -104,29 +86,29 @@ public class WorldController : MonoBehaviour
         new GameObject("VisualPath", typeof(VisualPath));
         GameObject go;
 
-        TileSpriteController = new TileSpriteController(World);
-        CharacterSpriteController = new CharacterSpriteController(World);
-        FurnitureSpriteController = new FurnitureSpriteController(World);
-        UtilitySpriteController = new UtilitySpriteController(World);
-        JobSpriteController = new JobSpriteController(World, FurnitureSpriteController, UtilitySpriteController);
-        InventorySpriteController = new InventorySpriteController(World, InventoryUI);
-        ShipSpriteController = new ShipSpriteController(World);
+        tileSpriteController = new TileSpriteController(World);
+        characterSpriteController = new CharacterSpriteController(World);
+        furnitureSpriteController = new FurnitureSpriteController(World);
+        utilitySpriteController = new UtilitySpriteController(World);
+        jobSpriteController = new JobSpriteController(World, furnitureSpriteController, utilitySpriteController);
+        inventorySpriteController = new InventorySpriteController(World, inventoryUI);
+        shipSpriteController = new ShipSpriteController(World);
 
-        BuildModeController = new BuildModeController();
-        SpawnInventoryController = new SpawnInventoryController();
-        MouseController = new MouseController(BuildModeController, FurnitureSpriteController, UtilitySpriteController, CircleCursorPrefab);
-        QuestController = new QuestController();
-        CameraController = new CameraController();
+        buildModeController = new BuildModeController();
+        spawnInventoryController = new SpawnInventoryController();
+        mouseController = new MouseController(buildModeController, furnitureSpriteController, utilitySpriteController, circleCursorPrefab);
+        questController = new QuestController();
+        cameraController = new CameraController();
         TradeController = new TradeController();
-        AutosaveManager = new AutosaveManager();
+        autosaveManager = new AutosaveManager();
 
         // Register inputs actions
         KeyboardManager.Instance.RegisterInputAction("DevMode", KeyboardMappedInputType.KeyDown, ChangeDevMode);
 
         // Hiding Dev Mode spawn inventory controller if devmode is off.
-        SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
+        spawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
 
-        CameraController.Initialize();
+        cameraController.Initialize();
 
         // Initialising controllers.
         GameObject canvas = GameObject.Find("Canvas");
@@ -153,8 +135,8 @@ public class WorldController : MonoBehaviour
         }
 
         // This will place it after context menu (and the inventory menu) and settings menu
-        DialogBoxManager = GameObject.Find("Dialog Boxes").GetComponent<DialogBoxManager>();
-        DialogBoxManager.transform.SetAsLastSibling();
+        dialogBoxManager = GameObject.Find("Dialog Boxes").GetComponent<DialogBoxManager>();
+        dialogBoxManager.transform.SetAsLastSibling();
 
         GameObject devConsole = (GameObject)Instantiate(Resources.Load("UI/Console/DevConsole"));
 
@@ -197,7 +179,7 @@ public class WorldController : MonoBehaviour
     {
         bool mode = !SettingsKeyHolder.DeveloperMode;
         SettingsKeyHolder.DeveloperMode = mode;
-        SpawnInventoryController.SetUIVisibility(mode);
+        spawnInventoryController.SetUIVisibility(mode);
         ///FurnitureBuildMenu.instance.RebuildMenuButtons(developerMode);
     }
 
@@ -250,7 +232,21 @@ public class WorldController : MonoBehaviour
 
     private void CreateEmptyWorld()
     {
-        World = SceneController.CreateNewWorld();
+        // Set default world size, in case game is loaded from World scene
+        int width = 100;
+        int height = 100;
+        int depth = 5;
+
+        if (SceneController.NewWorldSize != Vector3.zero)
+        {
+            Vector3 worldSize = SceneController.NewWorldSize;
+            width = (int)worldSize.x;
+            height = (int)worldSize.y;
+            depth = (int)worldSize.z;
+        }
+
+        // Create a world with Empty tiles
+        World = new World(width, height, depth);
 
         // Center the Camera
         Camera.main.transform.position = new Vector3(World.Width / 2, World.Height / 2, Camera.main.transform.position.z);

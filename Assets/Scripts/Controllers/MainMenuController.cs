@@ -10,13 +10,11 @@ using UnityEngine;
 
 public class MainMenuController : MonoBehaviour
 {
+    public ModsManager modsManager;
+    public SoundController soundController;
+    public DialogBoxManager dialogBoxManager;
+
     public static MainMenuController Instance { get; protected set; }
-
-    public ModsManager ModsManager { get; private set; }
-
-    public SoundController SoundController { get; private set; }
-
-    public DialogBoxManager DialogBoxManager { get; private set; }
 
     // Use this for initialization.
     public void OnEnable()
@@ -31,7 +29,7 @@ public class MainMenuController : MonoBehaviour
 
         new SpriteManager();
         new AudioManager();
-        ModsManager = new ModsManager();
+        modsManager = new ModsManager();
 
         TimeManager.Instance.IsPaused = true;
 
@@ -64,7 +62,7 @@ public class MainMenuController : MonoBehaviour
         // Create dialogBoxes.
         GameObject dialogBoxes = new GameObject("Dialog Boxes");
         dialogBoxes.transform.SetParent(canvas.transform, false);
-        DialogBoxManager = dialogBoxes.AddComponent<DialogBoxManager>();
+        dialogBoxManager = dialogBoxes.AddComponent<DialogBoxManager>();
 
         // Instantiate a FPSCounter.
         GameObject menuTop = (GameObject)Instantiate(Resources.Load("UI/MenuTop"));

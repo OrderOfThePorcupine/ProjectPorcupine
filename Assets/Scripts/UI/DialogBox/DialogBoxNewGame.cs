@@ -80,7 +80,7 @@ public class DialogBoxNewGame : DialogBox
         if (Seed.text == string.Empty)
         {
             seed = UnityEngine.Random.Range(0, int.MaxValue);
-        }
+        } 
         else if (int.TryParse(Seed.text, out seed) == false)
         {
             seed = Seed.text.GetHashCode();
@@ -91,7 +91,7 @@ public class DialogBoxNewGame : DialogBox
         DialogBoxManager dialogManager = GameObject.FindObjectOfType<DialogBoxManager>();
         dialogManager.dialogBoxPromptOrInfo.SetPrompt("message_creating_new_world");
         dialogManager.dialogBoxPromptOrInfo.ShowDialog();
-        SceneController.LoadNewWorld(width, height, depth, seed, generatorFile, GenerateAsteroids.isOn);
+        SceneController.Instance.LoadNewWorld(width, height, depth, seed, generatorFile, GenerateAsteroids.isOn);
     }
 
     public void VerifyNumericInput(InputField input)

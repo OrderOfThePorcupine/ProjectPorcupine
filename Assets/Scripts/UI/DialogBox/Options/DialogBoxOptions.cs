@@ -58,13 +58,13 @@ public class DialogBoxOptions : DialogBox
         mainMenuButton.GetComponent<Button>().onClick.AddListener(delegate
         {
             this.CloseDialog();
-            SceneController.LoadMainMenu();
+            SceneController.Instance.LoadMainMenu();
         });
 
         GameObject quitButton = CreateButtonGO(buttonPrefab, "QuitGame", "menu_quit_game");
         quitButton.GetComponent<Button>().onClick.AddListener(delegate
         {
-            SceneController.QuitGame();
+            SceneController.Instance.QuitGame();
         });
     }
 
@@ -117,7 +117,7 @@ public class DialogBoxOptions : DialogBox
             dialogManager.dialogBoxPromptOrInfo.SetPrompt("message_creating_new_world");
             dialogManager.dialogBoxPromptOrInfo.ShowDialog();
 
-            SceneController.ConfigureNewWorld();
+            SceneController.Instance.ConfigureNewWorld();
         }
     }
 

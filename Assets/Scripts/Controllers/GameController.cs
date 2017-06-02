@@ -16,14 +16,14 @@ public class GameController : MonoBehaviour
     // If so - beginner task!
     public static readonly string GameVersion = "Someone_will_come_up_with_a_proper_naming_scheme_later";
 
-    public static GameController Instance { get; protected set; }
-
-    public KeyboardManager KeyboardManager { get; private set; }
-
-    public SoundController SoundController { get; private set; }
+    public KeyboardManager KeyboardManager;
+    public SceneController SceneManager;
+    public SoundController soundController;
 
     // If true, a modal dialog box is open, so normal inputs should be ignored.
-    public bool IsModal { get; set; }
+    public bool IsModal;
+
+    public static GameController Instance { get; protected set; }
 
     public bool IsPaused
     {
@@ -55,7 +55,7 @@ public class GameController : MonoBehaviour
     {
         EnableDontDestroyOnLoad();
 
-        SoundController = new SoundController();
+        soundController = new SoundController();
 
         // Load Keyboard Mapping.
         KeyboardManager = KeyboardManager.Instance;
@@ -74,6 +74,8 @@ public class GameController : MonoBehaviour
 
         // Add a gameobject that Localization
         this.gameObject.AddComponent<LocalizationLoader>();
+
+        SceneManager = SceneController.Instance;
     }
 
     private void Update()

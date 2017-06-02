@@ -13,30 +13,24 @@ using UnityEngine;
 
 public struct DriverInfo
 {
+    public int id;
+    public System.Text.StringBuilder name;
+    public System.Guid guid;
+    public int systemRate;
+    public SPEAKERMODE speakerMode;
+    public int speakerModeChannels;
+
     public DriverInfo(int id)
     {
-        this.ID = id;
-        this.Name = new System.Text.StringBuilder(64);
+        this.id = id;
+        this.name = new System.Text.StringBuilder(64);
 
-        System.Guid guid;
-        int systemRate;
-        SPEAKERMODE speakerMode;
-        int speakerModeChannels;
-
-        AudioManager.SoundSystem.getDriverInfo(id, this.Name, 64, out guid, out systemRate, out speakerMode, out speakerModeChannels);
-
-        this.Guid = guid;
+        AudioManager.SoundSystem.getDriverInfo(id, this.name, 64, out this.guid, out this.systemRate, out this.speakerMode, out this.speakerModeChannels);
     }
-
-    public int ID { get; private set; }
-
-    public System.Text.StringBuilder Name { get; private set; }
-
-    public System.Guid Guid { get; private set; }
 
     public override string ToString()
     {
-        return ID.ToString() + ", " + Name.ToString();
+        return id.ToString() + ", " + name.ToString();
     }
 }
 
@@ -196,7 +190,7 @@ public class SoundController
     {
         for (int i = 0; i < GetDriverCount(); i++)
         {
-            if (GetDriverInfo(i).Guid.ToString() == driverGUID)
+            if (GetDriverInfo(i).guid.ToString() == driverGUID)
             {
                 SetAudioDriver(i);
                 break;

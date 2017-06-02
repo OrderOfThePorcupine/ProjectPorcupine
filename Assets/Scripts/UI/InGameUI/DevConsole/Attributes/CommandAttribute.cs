@@ -17,6 +17,21 @@ namespace DeveloperConsole.Core
     public class CommandAttribute : Attribute
     {
         /// <summary>
+        /// The description of what the command does.
+        /// </summary>
+        public string description;
+
+        /// <summary>
+        /// The detailed description of what the command does.
+        /// </summary>
+        public string detailedDescription;
+
+        /// <summary>
+        /// The title of the command, used for calling.
+        /// </summary>
+        public string title;
+
+        /// <summary>
         /// Create a command attribute.
         /// </summary>
         /// <param name="tags"> With tags... </param>
@@ -26,24 +41,12 @@ namespace DeveloperConsole.Core
         }
 
         /// <summary>
-        /// The description of what the command does.
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// The detailed description of what the command does.
-        /// </summary>
-        public string DetailedDescription { get; set; }
-
-        /// <summary>
-        /// The title of the command, used for calling.
-        /// </summary>
-        public string Title { get; set; }
-
-        /// <summary>
         /// The tags of this command, 
         /// you can perform help actions on a specific tag.
         /// </summary>
-        public string[] Tags { get; protected set; }
+        public string[] Tags
+        {
+            get; protected set;
+        }
     }
 }
