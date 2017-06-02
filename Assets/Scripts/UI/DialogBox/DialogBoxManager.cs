@@ -51,7 +51,7 @@ public class DialogBoxManager : MonoBehaviour
         dialogBoxNewGame = tempGoObj.GetComponent<DialogBoxNewGame>();
         DialogBoxes["New Game"] = dialogBoxNewGame;
 
-        if (SceneController.IsAtMainScene())
+        if (SceneController.Instance.IsAtMainScene())
         {
             tempGoObj = CreateDialogGO("DB_SaveFile", "Save File");
             dialogBoxSaveGame = tempGoObj.GetComponent<DialogBoxSaveGame>();
@@ -180,7 +180,7 @@ public class DialogBoxManager : MonoBehaviour
                     break;
                 case ".lua":
                     UnityDebugger.Debugger.Log("ModDialogBox", "Found lua element:" + fileInfo.Name);
-                    WorldController.Instance.ModsManager.LoadFunctionsInFile(fileInfo, "ModDialogBox");
+                    WorldController.Instance.modsManager.LoadFunctionsInFile(fileInfo, "ModDialogBox");
                     break;
             }
         }
