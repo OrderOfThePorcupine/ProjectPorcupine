@@ -38,7 +38,6 @@ public class BuildModeController
 
     public static BuildModeController Instance { get; protected set; }
 
-    // The rotation applied to the object.
     public float CurrentPreviewRotation { get; private set; }
 
     public BuildMode BuildMode { get; private set; }

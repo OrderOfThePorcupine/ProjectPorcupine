@@ -18,6 +18,10 @@ using Random = UnityEngine.Random;
 [MoonSharpUserData]
 public class WorldController : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject circleCursorPrefab;
+
+    #region Instances
     public static WorldController Instance { get; protected set; }
 
     public SoundController SoundController { get; private set; }
@@ -56,12 +60,11 @@ public class WorldController : MonoBehaviour
 
     public GameObject InventoryUI { get; private set; }
 
-    public GameObject CircleCursorPrefab { get; private set; }
-
     // The world and tile data.
     public World World { get; protected set; }
 
-    // Use this for initialization.
+    #endregion
+
     public void OnEnable()
     {
         if (Instance != null)
@@ -114,7 +117,7 @@ public class WorldController : MonoBehaviour
 
         BuildModeController = new BuildModeController();
         SpawnInventoryController = new SpawnInventoryController();
-        MouseController = new MouseController(BuildModeController, FurnitureSpriteController, UtilitySpriteController, CircleCursorPrefab);
+        MouseController = new MouseController(BuildModeController, FurnitureSpriteController, UtilitySpriteController, circleCursorPrefab);
         QuestController = new QuestController();
         CameraController = new CameraController();
         TradeController = new TradeController();

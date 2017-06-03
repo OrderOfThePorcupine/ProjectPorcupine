@@ -295,7 +295,11 @@ public class PowerGridTest
 
     private class MockConnection : IPluggable
     {
-        public event Action Reconnecting;
+        public event Action Reconnecting
+        {
+            add { }
+            remove { }
+        }
 
         public float StoredAmount { get; set; }
 
@@ -323,17 +327,17 @@ public class PowerGridTest
             get { return StoredAmount.AreEqual(StorageCapacity); }
         }
 
-        public string UtilityType 
-        { 
-            get 
-            { 
+        public string UtilityType
+        {
+            get
+            {
                 return "Power";
             }
         }
 
-        public string SubType 
+        public string SubType
         {
-            get 
+            get
             {
                 return string.Empty;
             }

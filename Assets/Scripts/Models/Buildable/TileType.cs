@@ -16,8 +16,6 @@ using ProjectPorcupine.OrderActions;
 [MoonSharpUserData]
 public class TileType : IPrototypable, IEquatable<TileType>
 {
-    private static readonly string ULogChanelName = "TileType";
-
     /// <summary>
     /// Initializes a new instance of the <see cref="TileType"/> class.
     /// </summary>
