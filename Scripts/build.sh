@@ -38,9 +38,9 @@ cat $(pwd)/unity.log
 
 echo 'Attempting to zip builds'
 cd $(pwd)/Build/
-zip -q -r Linux.zip linux/
-zip -q -r MacOSX.zip osx/
-zip -q -r Windows.zip windows/
+zip -q -r Linux-$BUILD_VERSION.zip linux/
+zip -q -r MacOSX-$BUILD_VERSION.zip osx/
+zip -q -r Windows-$BUILD_VERSION.zip windows/
 cd -
 
 # create the config file for Bintray through ERB (an ruby cli-tool)

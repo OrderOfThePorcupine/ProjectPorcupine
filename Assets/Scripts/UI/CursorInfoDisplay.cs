@@ -38,7 +38,7 @@ public class CursorInfoDisplay
         for (int i = 0; i < mc.GetDragObjects().Count; i++)
         {
             Tile t1 = GetTileUnderDrag(mc.GetDragObjects()[i].transform.position);
-            if (World.Current.FurnitureManager.IsPlacementValid(BuildModeController.Instance.BuildModeType, t1) &&
+            if (World.Current.FurnitureManager.IsPlacementValid(BuildModeController.Instance.buildModeType, t1) &&
                (t1.PendingBuildJobs == null || (t1.PendingBuildJobs != null && t1.PendingBuildJobs.Count == 0)))
             {
                 validPostionCount++;
@@ -62,7 +62,7 @@ public class CursorInfoDisplay
 
     public string GetCurrentBuildRequirements()
     {
-        ProjectPorcupine.OrderActions.Build buildOrder = PrototypeManager.Furniture.Get(BuildModeController.Instance.BuildModeType).GetOrderAction<ProjectPorcupine.OrderActions.Build>();
+        ProjectPorcupine.OrderActions.Build buildOrder = PrototypeManager.Furniture.Get(BuildModeController.Instance.buildModeType).GetOrderAction<ProjectPorcupine.OrderActions.Build>();
         if (buildOrder != null)
         {
             StringBuilder sb = new StringBuilder();

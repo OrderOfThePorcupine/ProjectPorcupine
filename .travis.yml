@@ -12,8 +12,11 @@ before_install:
  - chmod +x ./Scripts/check-style.sh
  - chmod +x ./Scripts/travis.sh
 env:
-  - JOB=unit-test
-  - JOB=stylecop
+  global:
+    - BUILD_VERSION=$( date +%Y.%V )
+  matrix:
+    - JOB=unit-test
+    - JOB=stylecop
 script:
 - ./Scripts/travis.sh
 notifications:

@@ -208,7 +208,7 @@ public class MouseController
     private void UpdateCurrentFramePosition()
     {
         currFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        currFramePosition.z = WorldController.Instance.CameraController.CurrentLayer;
+        currFramePosition.z = WorldController.Instance.cameraController.CurrentLayer;
     }
 
     private void GetTooltipUIMode(Vector2 pos, MouseCursor cursor)
@@ -235,9 +235,9 @@ public class MouseController
         Tile t = WorldController.Instance.GetTileAtWorldCoord(pos);
 
         // Placing furniture object.
-        if (bmc.BuildMode == BuildMode.FURNITURE)
+        if (bmc.buildMode == BuildMode.FURNITURE)
         {
-            cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, PrototypeManager.Furniture.Get(bmc.BuildModeType).GetName(), MouseCursor.DefaultTint);
+            cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(bmc.buildModeType).GetName()), MouseCursor.DefaultTint);
 
             // Dragging and placing multiple furniture.
             if (t != null && GetIsDragging() == true && GetDragObjects().Count > 1)
@@ -248,7 +248,7 @@ public class MouseController
                 cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, infoDisplay.GetCurrentBuildRequirements(), MouseCursor.DefaultTint);
             }
         }
-        else if (bmc.BuildMode == BuildMode.FLOOR)
+        else if (bmc.buildMode == BuildMode.FLOOR)
         {
             // Placing tiles and dragging.
             if (t != null && GetIsDragging() == true && GetDragObjects().Count >= 1)
@@ -300,19 +300,19 @@ public class MouseController
     private void StoreFramePosition()
     {
         lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        lastFramePosition.z = WorldController.Instance.CameraController.CurrentLayer;
+        lastFramePosition.z = WorldController.Instance.cameraController.CurrentLayer;
     }
 
     private void CalculatePlacingPosition()
     {
         // If we are placing a multitile object we would like to modify the postilion where the mouse grabs it.
         if (currentMode == MouseMode.BUILD
-            && bmc.BuildMode == BuildMode.FURNITURE
-            && PrototypeManager.Furniture.Has(bmc.BuildModeType)
-            && (PrototypeManager.Furniture.Get(bmc.BuildModeType).Width > 1
-            || PrototypeManager.Furniture.Get(bmc.BuildModeType).Height > 1))
+            && bmc.buildMode == BuildMode.FURNITURE
+            && PrototypeManager.Furniture.Has(bmc.buildModeType)
+            && (PrototypeManager.Furniture.Get(bmc.buildModeType).Width > 1
+            || PrototypeManager.Furniture.Get(bmc.buildModeType).Height > 1))
         {
-            Furniture furnitureToBuild = PrototypeManager.Furniture.Get(bmc.BuildModeType).Clone();
+            Furniture furnitureToBuild = PrototypeManager.Furniture.Get(bmc.buildModeType).Clone();
             furnitureToBuild.SetRotation(bmc.CurrentPreviewRotation);
             Sprite sprite = fsc.GetSpriteForFurniture(furnitureToBuild.Type);
 
@@ -459,25 +459,25 @@ public class MouseController
         {
             for (int y = dragParams.StartY; y <= dragParams.EndY; y++)
             {
-                Tile t = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.CameraController.CurrentLayer);
+                Tile t = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.cameraController.CurrentLayer);
                 if (t != null)
                 {
                     // Display the building hint on top of this tile position.
-                    if (bmc.BuildMode == BuildMode.FURNITURE)
+                    if (bmc.buildMode == BuildMode.FURNITURE)
                     {
-                        Furniture proto = PrototypeManager.Furniture.Get(bmc.BuildModeType);
+                        Furniture proto = PrototypeManager.Furniture.Get(bmc.buildModeType);
                         if (IsPartOfDrag(t, dragParams, proto.DragType))
                         {
-                            ShowFurnitureSpriteAtTile(bmc.BuildModeType, t);
-                            ShowWorkSpotSpriteAtTile(bmc.BuildModeType, t);
+                            ShowFurnitureSpriteAtTile(bmc.buildModeType, t);
+                            ShowWorkSpotSpriteAtTile(bmc.buildModeType, t);
                         }
                     }
-                    else if (bmc.BuildMode == BuildMode.UTILITY)
+                    else if (bmc.buildMode == BuildMode.UTILITY)
                     {
-                        Utility proto = PrototypeManager.Utility.Get(bmc.BuildModeType);
+                        Utility proto = PrototypeManager.Utility.Get(bmc.buildModeType);
                         if (IsPartOfDrag(t, dragParams, proto.DragType))
                         {
-                            ShowUtilitySpriteAtTile(bmc.BuildModeType, t);
+                            ShowUtilitySpriteAtTile(bmc.buildModeType, t);
                         }
                     }
                     else
@@ -491,7 +491,7 @@ public class MouseController
 
     private void ShowGenericVisuals(int x, int y)
     {
-        GameObject go = SimplePool.Spawn(circleCursorPrefab, new Vector3(x, y, WorldController.Instance.CameraController.CurrentLayer), Quaternion.identity);
+        GameObject go = SimplePool.Spawn(circleCursorPrefab, new Vector3(x, y, WorldController.Instance.cameraController.CurrentLayer), Quaternion.identity);
         go.transform.SetParent(cursorParent.transform, true);
         go.GetComponent<SpriteRenderer>().sprite = SpriteManager.GetSprite("UI", "CursorCircle");
         dragPreviewGameObjects.Add(go);
@@ -510,17 +510,17 @@ public class MouseController
 
             for (int y = begin; y != stop; y += increment)
             {
-                Tile tile = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.CameraController.CurrentLayer);
+                Tile tile = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.cameraController.CurrentLayer);
                 if (tile == null)
                 {
                     // Trying to build off the map, bail out of this cycle.
                     continue;
                 }
 
-                if (bmc.BuildMode == BuildMode.FURNITURE)
+                if (bmc.buildMode == BuildMode.FURNITURE)
                 {
                     // Check for furniture dragType.
-                    Furniture proto = PrototypeManager.Furniture.Get(bmc.BuildModeType);
+                    Furniture proto = PrototypeManager.Furniture.Get(bmc.buildModeType);
 
                     if (IsPartOfDrag(tile, dragParams, proto.DragType))
                     {
@@ -528,10 +528,10 @@ public class MouseController
                         bmc.DoBuild(tile);
                     }
                 }
-                else if (bmc.BuildMode == BuildMode.UTILITY)
+                else if (bmc.buildMode == BuildMode.UTILITY)
                 {
                     // Check for furniture dragType.
-                    Utility proto = PrototypeManager.Utility.Get(bmc.BuildModeType);
+                    Utility proto = PrototypeManager.Utility.Get(bmc.buildModeType);
 
                     if (IsPartOfDrag(tile, dragParams, proto.DragType))
                     {
@@ -547,10 +547,10 @@ public class MouseController
         }
 
         // In devmode, utilities don't build their network, and one of the utilities built needs UpdateGrid called explicitly after all are built.
-        if (bmc.BuildMode == BuildMode.UTILITY && SettingsKeyHolder.DeveloperMode)
+        if (bmc.buildMode == BuildMode.UTILITY && SettingsKeyHolder.DeveloperMode)
         {
-            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, WorldController.Instance.CameraController.CurrentLayer);
-            Utility utility = firstTile.Utilities[PrototypeManager.Utility.Get(bmc.BuildModeType).Type];
+            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, WorldController.Instance.cameraController.CurrentLayer);
+            Utility utility = firstTile.Utilities[PrototypeManager.Utility.Get(bmc.buildModeType).Type];
             utility.UpdateGrid(utility);
         }
     }
@@ -587,7 +587,7 @@ public class MouseController
         if (Input.GetMouseButtonUp(0))
         {
             Tile t = GetMouseOverTile();
-            WorldController.Instance.SpawnInventoryController.SpawnInventory(t);
+            WorldController.Instance.spawnInventoryController.SpawnInventory(t);
         }
     }
 
@@ -642,7 +642,7 @@ public class MouseController
 
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
-            WorldController.Instance.CameraController.ChangeZoom(Input.GetAxis("Mouse ScrollWheel"));
+            WorldController.Instance.cameraController.ChangeZoom(Input.GetAxis("Mouse ScrollWheel"));
         }
 
         UpdateCameraBounds();
@@ -716,7 +716,7 @@ public class MouseController
             sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
         }
 
-        go.transform.position = new Vector3(tile.X + proto.Jobs.WorkSpotOffset.x, tile.Y + proto.Jobs.WorkSpotOffset.y, WorldController.Instance.CameraController.CurrentLayer);
+        go.transform.position = new Vector3(tile.X + proto.Jobs.WorkSpotOffset.x, tile.Y + proto.Jobs.WorkSpotOffset.y, WorldController.Instance.cameraController.CurrentLayer);
     }
 
     private void ShowUtilitySpriteAtTile(string type, Tile tile)
@@ -740,7 +740,7 @@ public class MouseController
             sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
         }
 
-        go.transform.position = new Vector3(tile.X, tile.Y, WorldController.Instance.CameraController.CurrentLayer);
+        go.transform.position = new Vector3(tile.X, tile.Y, WorldController.Instance.cameraController.CurrentLayer);
     }
 
     public class DragParameters
