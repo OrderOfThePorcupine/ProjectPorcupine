@@ -77,7 +77,7 @@ public class OrderMenu : MonoBehaviour
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
         Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
 
-        BuildModeController buildModeController = WorldController.Instance.BuildModeController;
+        BuildModeController buildModeController = WorldController.Instance.buildModeController;
 
         GameObject gameObject = (GameObject)Instantiate(buttonPrefab);
         gameObject.transform.SetParent(contentTransform);
@@ -110,7 +110,7 @@ public class OrderMenu : MonoBehaviour
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
         Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
 
-        BuildModeController buildModeController = WorldController.Instance.BuildModeController;
+        BuildModeController buildModeController = WorldController.Instance.buildModeController;
 
         GameObject gameObject = (GameObject)Instantiate(buttonPrefab);
         gameObject.transform.SetParent(contentTransform);

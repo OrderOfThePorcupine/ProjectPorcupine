@@ -20,11 +20,11 @@ public class ModsManager
 
         LoadSharedFiles();
 
-        if (SceneController.IsAtIntroScene())
+        if (SceneController.Instance.IsAtIntroScene())
         {
             LoadIntroFiles();
         }
-        else if (SceneController.IsAtMainScene())
+        else if (SceneController.Instance.IsAtMainScene())
         {
             LoadMainSceneFiles();
         }

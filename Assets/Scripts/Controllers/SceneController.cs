@@ -10,26 +10,38 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class SceneController
+public class SceneController
 {
     // Our current scenes Names
     public const string MainSceneName = "_World";
     public const string MainMenuSceneName = "MainMenu";
 
-    public static string LoadWorldFromFileName { get; set; }
+    public static string loadWorldFromFileName;
 
-    public static Vector3 NewWorldSize { get; private set; }
+    public static Vector3 NewWorldSize;
+    public static int Seed;
+    public static bool GenerateAsteroids = true;
+    public static string GeneratorFile = "Default.xml";
 
-    public static int Seed { get; private set; }
+    private static SceneController instance;
 
-    public static bool GenerateAsteroids { get; private set; }
+    public static SceneController Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = new SceneController();
+            }
 
-    public static string GeneratorFile { get; private set; }
+            return instance;
+        }
+    }
 
     // Load the main scene.
-    public static void LoadNewWorld(int width, int height, int depth, int seed, string generatorFile = "Default.xml", bool generateAsteroids = true)
+    public void LoadNewWorld(int width, int height, int depth, int seed, string generatorFile, bool generateAsteroids = true)
     {
-        NewWorldSize = new Vector3(width, height, depth);
+        NewWorldSize = new Vector3(width, height, depth); 
         Seed = seed;
         GeneratorFile = generatorFile;
         GenerateAsteroids = generateAsteroids;
@@ -37,72 +49,57 @@ public static class SceneController
         SceneManager.LoadScene(MainSceneName);
     }
 
-    public static World CreateNewWorld(string generatorFile = "Default.xml", bool generateAsteroids = true)
-    {
-        GeneratorFile = generatorFile;
-        GenerateAsteroids = generateAsteroids;
-
-        if (NewWorldSize == Vector3.zero)
-        {
-            return new World(100, 100, 5);
-        }
-        else
-        {
-            return new World((int)NewWorldSize.x, (int)NewWorldSize.y, (int)NewWorldSize.z);
-        }
-    }
-
-    public static void ConfigureNewWorld()
+    public void ConfigureNewWorld()
     {
         GameObject.FindObjectOfType<DialogBoxManager>().dialogBoxNewGame.ShowDialog();
     }
 
     // Load a save file.
-    public static void LoadWorld(string fileName)
+    public void LoadWorld(string fileName)
     {
-        LoadWorldFromFileName = fileName;
+        loadWorldFromFileName = fileName;
         CleanInstancesBeforeLoadingScene();
         SceneManager.LoadScene(MainSceneName);
     }
 
     // Load Main Menu.
-    public static void LoadMainMenu()
+    public void LoadMainMenu()
     {
         CleanInstancesBeforeLoadingScene();
         SceneManager.LoadScene(MainMenuSceneName);
     }
 
     // Quit the app whether in editor or a build version.
-    public static void QuitGame()
+    public void QuitGame()
     {
         // Maybe ask the user if he want to save or is sure they want to quit??
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         // Allows you to quit in the editor.
         UnityEditor.EditorApplication.isPlaying = false;
-#else
+        #else
         Application.Quit();
-#endif
+        #endif
     }
 
     // Return the name of the current scene.
-    public static string GetCurrentScene()
+    public string GetCurrentScene()
     {
         return SceneManager.GetActiveScene().name;
     }
 
     // Return the name of the current scene.
-    public static bool IsAtIntroScene()
+    public bool IsAtIntroScene()
     {
         return (GetCurrentScene() == MainMenuSceneName) ? true : false;
     }
 
     // Return the name of the current scene.
-    public static bool IsAtMainScene()
+    public bool IsAtMainScene()
     {
         return (GetCurrentScene() == MainSceneName) ? true : false;
     }
 
-    private static void CleanInstancesBeforeLoadingScene()
+    private void CleanInstancesBeforeLoadingScene()
     {
         if (WorldController.Instance != null)
         {
