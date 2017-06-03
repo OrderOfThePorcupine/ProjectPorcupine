@@ -7,17 +7,21 @@
 // ====================================================
 #endregion
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 
-// Base Class, will be a UI Element
+/// <summary>
+/// A base UI element.
+/// </summary>
 [MoonSharp.Interpreter.MoonSharpUserData]
 public abstract class BaseSettingsElement : BaseUIElement
 {
+    /// <summary>
+    /// Option data for this element.
+    /// </summary>
     public SettingsOption option;
 
+    /// <summary>
+    /// Has the value changed.
+    /// </summary>
     public bool valueChanged;
 
     /// <summary>
@@ -43,10 +47,19 @@ public abstract class BaseSettingsElement : BaseUIElement
         }
     }
 
+    /// <summary>
+    /// Apply setting data.
+    /// </summary>
     public abstract void ApplySetting();
 
+    /// <summary>
+    /// Cancel setting data.
+    /// </summary>
     public abstract void CancelSetting();
 
+    /// <summary>
+    /// Apply setting data, sends events to LUA or C# event handlers.
+    /// </summary>
     public void ApplySettingLUA()
     {
         // Please C# 4.6
@@ -57,6 +70,9 @@ public abstract class BaseSettingsElement : BaseUIElement
         }
     }
 
+    /// <summary>
+    /// Cancel setting data, sends events to LUA or C# event handlers.
+    /// </summary>
     public void CancelSettingLUA()
     {
         // Please C# 4.6

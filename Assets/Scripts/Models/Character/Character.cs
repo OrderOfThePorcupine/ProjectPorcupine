@@ -380,7 +380,7 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
         JObject needsJSon = new JObject();
         foreach (Need need in Needs)
         {
-            needsJSon.Add(need.Name, need.Amount);
+            needsJSon.Add(need.Type, need.Amount);
         }
 
         characterJson.Add("Needs", needsJSon);

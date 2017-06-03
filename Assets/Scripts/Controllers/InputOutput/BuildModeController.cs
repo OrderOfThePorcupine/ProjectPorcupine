@@ -297,9 +297,6 @@ public class BuildModeController
         }
         else if (BuildMode == BuildMode.FLOOR)
         {
-            // We are in tile-changing mode.
-            ////t.Type = buildModeTile;
-
             TileType tileType = buildModeTile;
 
             if (
@@ -311,20 +308,25 @@ public class BuildModeController
                 // This tile position is valid tile type
 
                 // Create a job for it to be build
-                Job buildingJob = tileType.BuildingJob;
-
-                buildingJob.tile = tile;
-
-                // Add the job to the queue or build immediately if in Dev mode
-                if (SettingsKeyHolder.DeveloperMode)
+                Job buildingJob;
+                OrderAction orderAction = tileType.GetOrderAction<ChangeTileType>();
+                if (orderAction != null)
                 {
-                    buildingJob.tile.SetTileType(buildingJob.JobTileType);
+                    buildingJob = orderAction.CreateJob(tile, tileType.Type);
+
+                    if (SettingsKeyHolder.DeveloperMode)
+                    {
+                        buildingJob.tile.SetTileType(buildingJob.JobTileType);
+                    }
+                    else
+                    {
+                        buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
+                        WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                    }
                 }
                 else
                 {
-                    buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
-
-                    WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                    UnityDebugger.Debugger.LogError("BuildModeController", "There is no order action called ChangeTileType in tileType: " + tileType.Type);
                 }
             }
         }

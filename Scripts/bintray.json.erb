@@ -1,14 +1,13 @@
-<% version = Time.now.strftime("%Y.%V") # (year).(week), e.g. 2017.15 %>
 {
     "package": {
-        "name": "Prebuild-Binarys",
+        "name": "Prebuilt-Binaries",
         "repo": "ProjectPorcupine",
         "subject": "orderoftheporcupine",
-        "desc": "Weekly dev-build #<%= version %>"
+        "desc": "Weekly dev-build #<%= ENV['BUILD_VERSION'] %>"
     },
 
     "version": {
-        "name": "<%= version %>",
+        "name": "<%= ENV['BUILD_VERSION'] %>",
         "released": "<%= Time.now.strftime("%Y-%m-%d") %>",
         "attributes": [],
         "gpgSign": false
