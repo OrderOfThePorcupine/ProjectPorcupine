@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using System.Linq;
 
 /// <summary>
 /// Character manager that holds all the characters.
@@ -152,6 +153,28 @@ public class CharacterManager : IEnumerable<Character>
                     Inventory inventory = new Inventory();
                     inventory.FromJson(inventoryToken);
                     World.Current.InventoryManager.PlaceInventory(character, inventory);
+                }
+            }
+
+            if (characterToken["Stats"] != null)
+            {
+                foreach (string stat in character.Stats.Keys)
+                {
+                    if (characterToken["Stats"][stat] != null)
+                    {
+                        character.Stats[stat].Value = (int)characterToken["Stats"][stat];
+                    }
+                }
+            }
+
+            if (characterToken["Needs"] != null)
+            {
+                foreach (Need need in character.Needs)
+                {
+                    if (characterToken["Needs"][need.Type] != null)
+                    {
+                        need.Amount = (int)characterToken["Needs"][need.Type];
+                    }
                 }
             }
 

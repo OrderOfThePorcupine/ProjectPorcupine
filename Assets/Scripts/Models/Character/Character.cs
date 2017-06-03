@@ -47,7 +47,7 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
     /// What direction our character is looking.
     public Facing CharFacing;
 
-    private Dictionary<string, Stat> stats;
+    public Dictionary<string, Stat> Stats { get; protected set; }
 
     /// Current tile the character is standing on.
     private Tile currTile;
@@ -392,9 +392,9 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
         characterJson.Add("Colors", colorsJson);
 
         JObject statsJSon = new JObject();
-        foreach (Stat stat in stats.Values)
+        foreach (string stat in Stats.Keys)
         {
-            needsJSon.Add(stat.Name, stat.Value);
+            statsJSon.Add(stat, Stats[stat].Value);
         }
 
         characterJson.Add("Stats", statsJSon);
@@ -428,9 +428,9 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
             yield return LocalizationTable.GetLocalization(n.LocalizationID, n.DisplayAmount);
         }
 
-        foreach (Stat stat in stats.Values)
+        foreach (string stat in Stats.Keys)
         {
-            yield return LocalizationTable.GetLocalization("stat_" + stat.Type.ToLower(), stat.Value);
+            yield return LocalizationTable.GetLocalization("stat_" + stat.ToLower(), Stats[stat].Value);
         }
     }
 
@@ -461,13 +461,6 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
 
     #endregion
 
-    public Stat GetStat(string statType)
-    {
-        Stat stat = null;
-        stats.TryGetValue(statType, out stat);
-        return stat;
-    }
-
     public void FaceTile(Tile nextTile)
     {
         // Find character facing
@@ -486,39 +479,6 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
         else
         {
             CharFacing = Facing.SOUTH;
-        }
-    }
-
-    public void ReadStatsFromSave(XmlReader reader)
-    {
-        // Protection vs. empty stats
-        if (reader.IsEmptyElement)
-        {
-            return;
-        }
-
-        while (reader.Read())
-        {
-            if (reader.NodeType == XmlNodeType.EndElement)
-            {
-                break;
-            }
-
-            string statType = reader.GetAttribute("type");
-            Stat stat = GetStat(statType);
-            if (stat == null)
-            {
-                continue;
-            }
-
-            int statValue;
-            if (!int.TryParse(reader.GetAttribute("value"), out statValue))
-            {
-                UnityDebugger.Debugger.LogError("Character", "Stat element did not have a value!");
-                continue;
-            }
-
-            stat.Value = statValue;
         }
     }
 
@@ -559,7 +519,7 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
 
     private void LoadStats()
     {
-        stats = new Dictionary<string, Stat>(PrototypeManager.Stat.Count);
+        Stats = new Dictionary<string, Stat>(PrototypeManager.Stat.Count);
         for (int i = 0; i < PrototypeManager.Stat.Count; i++)
         {
             Stat prototypeStat = PrototypeManager.Stat.Values[i];
@@ -568,10 +528,10 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
             // Gets a random value within the min and max range of the stat.
             // TODO: Should there be any bias or any other algorithm applied here to make stats more interesting?
             newStat.Value = UnityEngine.Random.Range(1, 20);
-            stats.Add(newStat.Type, newStat);
+            Stats.Add(newStat.Type, newStat);
         }
 
-        UnityDebugger.Debugger.Log("Character", "Initialized " + stats.Count + " Stats.");
+        UnityDebugger.Debugger.Log("Character", "Initialized " + Stats.Count + " Stats.");
     }
 
     /// <summary>
@@ -580,9 +540,9 @@ public class Character : ISelectable, IContextActionProvider, IUpdatable
     private void UseStats()
     {
         // The speed is equal to (baseSpeed +/-30% of baseSpeed depending on Dexterity)
-        speed = baseSpeed + (0.3f * baseSpeed * ((Convert.ToSingle(stats["Dexterity"].Value) - 10) / 10));
+        speed = baseSpeed + (0.3f * baseSpeed * ((float)Stats["Dexterity"].Value - 10) / 10);
 
         // Base character max health on their constitution.
-        health = new HealthSystem(50 + (Convert.ToSingle(stats["Constitution"].Value) * 5));
+        health = new HealthSystem(50 + ((float)Stats["Constitution"].Value * 5));
     }
 }
