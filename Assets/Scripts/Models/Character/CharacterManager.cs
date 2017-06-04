@@ -79,9 +79,14 @@ namespace ProjectPorcupine.Entities
             return Characters.Where(x => x.Name == name);
         }
 
-        public IEnumerable<Character> GetFromID(int ID)
+        /// <summary>
+        /// Returns the character with the ID wanted.
+        /// </summary>
+        /// <param name="ID"> ID of the character. </param>
+        /// <returns> The character or null if no character has ID supplied. </returns>
+        public Character GetFromID(int ID)
         {
-            return Characters.Where(x => x.ID == ID);
+            return Characters.FirstOrDefault(x => x.ID == ID);
         }
 
         /// <summary>
