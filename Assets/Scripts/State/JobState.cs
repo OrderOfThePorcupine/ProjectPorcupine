@@ -100,7 +100,7 @@ namespace ProjectPorcupine.Entities.States
         private void AbandonJob()
         {
             DebugLog(" - Job abandoned!");
-            UnityDebugger.Debugger.Log("Character", character.GetName() + " abandoned their job.");
+            UnityDebugger.Debugger.Log("Character", string.Format("{0}, {1} abandoned their job.", character.GetName(), character.ID));
 
             Job.OnJobCompleted -= OnJobCompleted;
             Job.OnJobStopped -= OnJobStopped;

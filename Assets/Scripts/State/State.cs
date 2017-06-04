@@ -6,7 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System.Collections.Generic;
 
 namespace ProjectPorcupine.Entities.States
@@ -64,7 +63,7 @@ namespace ProjectPorcupine.Entities.States
 
         protected void DebugLog(string message, params object[] par)
         {
-            string prefixedMessage = string.Format("{0} {1}: {2}", character.GetName(), StateStack(), message);
+            string prefixedMessage = string.Format("{0}, {1} {2}: {3}", character.GetName(), character.ID, StateStack(), message);
             UnityDebugger.Debugger.LogFormat("Character", prefixedMessage, par);
         }
 

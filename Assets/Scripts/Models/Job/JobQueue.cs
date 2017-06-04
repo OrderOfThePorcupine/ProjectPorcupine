@@ -114,7 +114,7 @@ public class JobQueue
     /// </summary>
     public Job GetJob(Character character)
     {
-        DebugLog("{0} GetJob() (Queue size: {1})", character.GetName(), jobQueue.Count);
+        DebugLog("{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
         if (jobQueue.Count == 0)
         {
             return null;

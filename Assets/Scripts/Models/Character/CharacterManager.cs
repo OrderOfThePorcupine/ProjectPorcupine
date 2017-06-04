@@ -79,6 +79,11 @@ namespace ProjectPorcupine.Entities
             return Characters.Where(x => x.Name == name);
         }
 
+        public IEnumerable<Character> GetFromID(int ID)
+        {
+            return Characters.Where(x => x.ID == ID);
+        }
+
         /// <summary>
         /// Gets the characters enumerator.
         /// </summary>

@@ -33,6 +33,12 @@ namespace ProjectPorcupine.Entities
     [MoonSharpUserData]
     public class Character : ISelectable, IContextActionProvider, IUpdatable
     {
+        /// Unique ID of the character.
+        public readonly int ID;
+
+        /// What ID we currently are sitting at
+        private static int currentID = 0;
+
         /// Current tile the character is standing on.
         private Tile currTile;
 
@@ -75,6 +81,7 @@ namespace ProjectPorcupine.Entities
         {
             Needs = new Need[PrototypeManager.Need.Count];
             InitializeCharacterValues();
+            ID = currentID++;
         }
 
         public Character(Tile tile, Color color, Color uniformColor, Color skinColor, string name)
@@ -90,6 +97,7 @@ namespace ProjectPorcupine.Entities
             {
                 new States.NeedState(this)
             };
+            ID = currentID++;
         }
 
         /// A callback to trigger when character information changes (notably, the position).
@@ -224,7 +232,7 @@ namespace ProjectPorcupine.Entities
             {
                 if (value == false)
                 {
-                    VisualPath.Instance.RemoveVisualPoints(Name);
+                    VisualPath.Instance.RemoveVisualPoints(ID);
                 }
 
                 selected = value;

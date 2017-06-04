@@ -109,7 +109,7 @@ namespace ProjectPorcupine.Entities.States
 
             if (character.IsSelected)
             {
-                VisualPath.Instance.SetVisualPoints(character.Name, new List<Tile>(path));
+                VisualPath.Instance.SetVisualPoints(character.ID, new List<Tile>(path));
             }
 
             if (path == null || path.Count == 0)
@@ -146,7 +146,7 @@ namespace ProjectPorcupine.Entities.States
 
             character.IsWalking = false;
 
-            VisualPath.Instance.RemoveVisualPoints(character.Name);
+            VisualPath.Instance.RemoveVisualPoints(character.ID);
         }
 
         public override void Interrupt()
