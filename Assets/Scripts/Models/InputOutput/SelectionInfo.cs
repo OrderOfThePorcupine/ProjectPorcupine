@@ -7,6 +7,7 @@
 // ====================================================
 #endregion
 using System.Collections.Generic;
+using ProjectPorcupine.Entities;
 
 public class SelectionInfo
 {
@@ -73,7 +74,6 @@ public class SelectionInfo
 
     public bool IsCharacterSelected()
     {
-        ISelectable actualSelection = stuffInTile[selectedIndex];
-        return actualSelection is Character;
+        return stuffInTile[selectedIndex] is Character;
     }
 }

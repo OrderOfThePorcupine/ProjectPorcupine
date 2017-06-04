@@ -12,6 +12,7 @@ using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.PowerNetwork;
 using ProjectPorcupine.Rooms;
 using UnityEngine;

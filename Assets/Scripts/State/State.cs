@@ -9,7 +9,7 @@
 
 using System.Collections.Generic;
 
-namespace ProjectPorcupine.State
+namespace ProjectPorcupine.Entities.States
 {
     public abstract class State
     {
@@ -62,11 +62,10 @@ namespace ProjectPorcupine.State
 
         #region Debug
 
-        [System.Diagnostics.Conditional("FSM_DEBUG_LOG")]
         protected void DebugLog(string message, params object[] par)
         {
             string prefixedMessage = string.Format("{0} {1}: {2}", character.GetName(), StateStack(), message);
-            UnityDebugger.Debugger.LogFormat("FSM", prefixedMessage, par);
+            UnityDebugger.Debugger.LogFormat("Character", prefixedMessage, par);
         }
 
         private string StateStack()

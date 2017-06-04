@@ -39,7 +39,10 @@ public static class CommandFunctions
 
         if (ModUtils.GetCurrentWorld(out world))
         {
-            world.CharacterManager.GetFromName(name).Health.CurrentHealth = health;
+            foreach (Character character in world.CharacterManager.GetAllFromName(name))
+            {
+                character.Health.CurrentHealth = health;
+            }
         }
     }
 
@@ -49,7 +52,10 @@ public static class CommandFunctions
 
         if (ModUtils.GetCurrentWorld(out world))
         {
-            world.CharacterManager.GetFromName(name).Health.DamageEntity(amount);
+            foreach (Character character in world.CharacterManager.GetAllFromName(name))
+            {
+                character.Health.DamageEntity(amount);
+            }
         }
     }
 
@@ -60,12 +66,15 @@ public static class CommandFunctions
 
         if (ModUtils.GetCurrentWorld(out world))
         {
-            HealthSystem health = world.CharacterManager.GetFromName(name).Health;
-            health.CanOverheal = overheal;
-            health.CurrentHealth = hp;
-            health.IsHealable = healable;
-            health.IsInvincible = invincible;
-            health.IsRevivable = revivable;
+            foreach (Character character in world.CharacterManager.GetAllFromName(name))
+            {
+                HealthSystem health = character.Health;
+                health.CanOverheal = overheal;
+                health.CurrentHealth = hp;
+                health.IsHealable = healable;
+                health.IsInvincible = invincible;
+                health.IsRevivable = revivable;
+            }
         }
     }
 
@@ -75,7 +84,10 @@ public static class CommandFunctions
 
         if (ModUtils.GetCurrentWorld(out world))
         {
-            world.CharacterManager.GetFromName(name).ClearStateQueue();
+            foreach (Character character in world.CharacterManager.GetAllFromName(name))
+            {
+                character.ClearStateQueue();
+            }
         }
     }
 
@@ -130,7 +142,10 @@ public static class CommandFunctions
 
         if (ModUtils.GetCurrentWorld(out world))
         {
-            world.InventoryManager.PlaceInventory(world.CharacterManager.GetFromName(name), new Inventory(type, (int)stackSizeRange.x, (int)stackSizeRange.y), amount);
+            foreach (Character character in world.CharacterManager.GetAllFromName(name))
+            {
+                world.InventoryManager.PlaceInventory(character, new Inventory(type, (int)stackSizeRange.x, (int)stackSizeRange.y), amount);
+            }
         }
     }
 

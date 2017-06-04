@@ -10,7 +10,7 @@
 using System.Collections.Generic;
 using ProjectPorcupine.Pathfinding;
 
-namespace ProjectPorcupine.State
+namespace ProjectPorcupine.Entities.States
 {
     [System.Diagnostics.DebuggerDisplay("JobState: {job}")]
     public class JobState : State
@@ -68,7 +68,7 @@ namespace ProjectPorcupine.State
                     {
                         Job.CharsCantReach.Add(character);
                     }
-                   
+
                     Interrupt();
                 }
             }

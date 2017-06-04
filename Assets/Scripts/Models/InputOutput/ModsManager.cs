@@ -8,6 +8,7 @@
 #endregion
 using System;
 using System.IO;
+using ProjectPorcupine.Entities;
 using UnityEngine;
 
 public class ModsManager

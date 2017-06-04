@@ -9,176 +9,168 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-using System.Linq;
 
-/// <summary>
-/// Character manager that holds all the characters.
-/// </summary>
-[MoonSharpUserData]
-public class CharacterManager : IEnumerable<Character>
+namespace ProjectPorcupine.Entities
 {
-    public List<Character> characters;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="CharacterManager"/> class.
+    /// Character manager that holds all the characters.
     /// </summary>
-    public CharacterManager()
+    [MoonSharpUserData]
+    public class CharacterManager : IEnumerable<Character>
     {
-        characters = new List<Character>();
-    }
-
-    /// <summary>
-    /// Occurs when a character is created.
-    /// </summary>
-    public event Action<Character> Created;
-
-    /// <summary>
-    /// Create a Character in the specified tile.
-    /// </summary>
-    /// <param name="tile">The tile where the Character is placed.</param>
-    public Character Create(Tile tile)
-    {
-        return Create(tile, ColorUtilities.RandomColor(), ColorUtilities.RandomGrayColor(), ColorUtilities.RandomSkinColor());
-    }
-
-    /// <summary>
-    /// Create a Character in the specified tile, with the specified color, uniform color and skin color.
-    /// </summary>
-    /// <param name="tile">The tile where the Character is placed.</param>
-    /// <param name="color">The uniform strip color.</param>
-    /// <param name="uniformColor">The uniform color.</param>
-    /// <param name="skinColor">The skin color.</param>
-    public Character Create(Tile tile, Color color, Color uniformColor, Color skinColor)
-    {
-        Character character = new Character(tile, color, uniformColor, skinColor);
-
-        character.name = CharacterNameManager.GetNewName();
-        characters.Add(character);
-        TimeManager.Instance.RegisterFastUpdate(character);
-
-        if (Created != null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CharacterManager"/> class.
+        /// </summary>
+        public CharacterManager()
         {
-            Created(character);
+            Characters = new List<Character>();
         }
 
-        return character;
-    }
+        /// <summary>
+        /// Occurs when a character is created.
+        /// </summary>
+        public event Action<Character> Created;
 
-    /// <summary>
-    /// A function to return the Character object from the character's name.
-    /// </summary>
-    /// <param name="name">The name of the character.</param>
-    /// <returns>The character with that name.</returns>
-    public Character GetFromName(string name)
-    {
-        foreach (Character character in characters)
+        public List<Character> Characters { get; private set; }
+
+        /// <summary>
+        /// Create a Character in the specified tile.
+        /// </summary>
+        /// <param name="tile">The tile where the Character is placed.</param>
+        /// <param name="name">The name of the character, will get a new one if it is null.</param>
+        public Character Create(Tile tile, string name = null)
         {
-            if (character.name == name)
+            return Create(tile, ColorUtilities.RandomColor(), ColorUtilities.RandomGrayColor(), ColorUtilities.RandomSkinColor(), name != null ? name : CharacterNameManager.GetNewName());
+        }
+
+        /// <summary>
+        /// Create a Character in the specified tile, with the specified color, uniform color and skin color.
+        /// </summary>
+        /// <param name="tile">The tile where the Character is placed.</param>
+        /// <param name="color">The uniform strip color.</param>
+        /// <param name="uniformColor">The uniform color.</param>
+        /// <param name="skinColor">The skin color.</param>
+        /// <param name="name">The name of the character, will get a new one if it is null.</param>
+        public Character Create(Tile tile, Color color, Color uniformColor, Color skinColor, string name = null)
+        {
+            Character character = new Character(tile, color, uniformColor, skinColor, name != null ? name : CharacterNameManager.GetNewName());
+            Characters.Add(character);
+            TimeManager.Instance.RegisterFastUpdate(character);
+
+            if (Created != null)
             {
-                return character;
+                Created(character);
+            }
+
+            return character;
+        }
+
+        /// <summary>
+        /// A function to return all characters that match the given name.
+        /// </summary>
+        /// <param name="name">The name of the character.</param>
+        /// <returns>The character with that name.</returns>
+        public IEnumerable<Character> GetAllFromName(string name)
+        {
+            return Characters.Where(x => x.Name == name);
+        }
+
+        /// <summary>
+        /// Gets the characters enumerator.
+        /// </summary>
+        /// <returns>The enumerator.</returns>
+        public IEnumerator GetEnumerator()
+        {
+            return Characters.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Gets each character.
+        /// </summary>
+        /// <returns>Each character.</returns>
+        IEnumerator<Character> IEnumerable<Character>.GetEnumerator()
+        {
+            foreach (Character character in Characters)
+            {
+                yield return character;
             }
         }
 
-        return null;
-    }
-
-    /// <summary>
-    /// Gets the characters enumerator.
-    /// </summary>
-    /// <returns>The enumerator.</returns>
-    public IEnumerator GetEnumerator()
-    {
-        return characters.GetEnumerator();
-    }
-
-    /// <summary>
-    /// Gets each character.
-    /// </summary>
-    /// <returns>Each character.</returns>
-    IEnumerator<Character> IEnumerable<Character>.GetEnumerator()
-    {
-        foreach (Character character in characters)
+        public JToken ToJson()
         {
-            yield return character;
-        }
-    }
-
-    public JToken ToJson()
-    {
-        JArray charactersJson = new JArray();
-        foreach (Character character in characters)
-        {
-            charactersJson.Add(character.ToJSon());
-        }
-
-        return charactersJson;
-    }
-
-    public void FromJson(JToken charactersToken)
-    {
-        if (charactersToken == null)
-        {
-            return;
-        }
-
-        JArray charactersJArray = (JArray)charactersToken;
-
-        foreach (JToken characterToken in charactersJArray)
-        {
-            Character character;
-            int x = (int)characterToken["X"];
-            int y = (int)characterToken["Y"];
-            int z = (int)characterToken["Z"];
-            if (characterToken["Colors"] != null)
+            JArray charactersJson = new JArray();
+            foreach (Character character in Characters)
             {
-                JToken colorToken = characterToken["Colors"];
-                Color color = ColorUtilities.ParseColorFromString((string)colorToken["CharacterColor"][0], (string)colorToken["CharacterColor"][1], (string)colorToken["CharacterColor"][2]);
-                Color colorUni = ColorUtilities.ParseColorFromString((string)colorToken["UniformColor"][0], (string)colorToken["UniformColor"][1], (string)colorToken["UniformColor"][2]);
-                Color colorSkin = ColorUtilities.ParseColorFromString((string)colorToken["SkinColor"][0], (string)colorToken["SkinColor"][1], (string)colorToken["SkinColor"][2]);
-                character = Create(World.Current.GetTileAt(x, y, z), color, colorUni, colorSkin);
-            }
-            else
-            {
-                character = Create(World.Current.GetTileAt(x, y, z));
+                charactersJson.Add(character.ToJSON());
             }
 
-            // While it's not strictly necessary to use a foreach here, it *is* an array structure, so it should be treated as such
-            if (characterToken["Inventories"] != null)
+            return charactersJson;
+        }
+
+        public void FromJson(JToken charactersToken)
+        {
+            if (charactersToken == null)
             {
-                foreach (JToken inventoryToken in characterToken["Inventories"])
+                return;
+            }
+
+            JArray charactersJArray = (JArray)charactersToken;
+
+            foreach (JToken characterToken in charactersJArray)
+            {
+                Character character;
+                int x = (int)characterToken["X"];
+                int y = (int)characterToken["Y"];
+                int z = (int)characterToken["Z"];
+                if (characterToken["Colors"] != null)
                 {
-                    Inventory inventory = new Inventory();
-                    inventory.FromJson(inventoryToken);
-                    World.Current.InventoryManager.PlaceInventory(character, inventory);
+                    JToken colorToken = characterToken["Colors"];
+                    Color color = ColorUtilities.ParseColorFromString((string)colorToken["CharacterColor"][0], (string)colorToken["CharacterColor"][1], (string)colorToken["CharacterColor"][2]);
+                    Color colorUni = ColorUtilities.ParseColorFromString((string)colorToken["UniformColor"][0], (string)colorToken["UniformColor"][1], (string)colorToken["UniformColor"][2]);
+                    Color colorSkin = ColorUtilities.ParseColorFromString((string)colorToken["SkinColor"][0], (string)colorToken["SkinColor"][1], (string)colorToken["SkinColor"][2]);
+                    character = Create(World.Current.GetTileAt(x, y, z), color, colorUni, colorSkin, (string)characterToken["Name"]);
                 }
-            }
-
-            if (characterToken["Stats"] != null)
-            {
-                foreach (string stat in character.Stats.Keys)
+                else
                 {
-                    if (characterToken["Stats"][stat] != null)
+                    character = Create(World.Current.GetTileAt(x, y, z), (string)characterToken["Name"]);
+                }
+
+                if (characterToken["Inventories"] != null)
+                {
+                    foreach (JToken inventoryToken in characterToken["Inventories"])
                     {
-                        character.Stats[stat].Value = (int)characterToken["Stats"][stat];
+                        Inventory inventory = new Inventory();
+                        inventory.FromJson(inventoryToken);
+                        World.Current.InventoryManager.PlaceInventory(character, inventory);
+                    }
+                }
+
+                if (characterToken["Stats"] != null)
+                {
+                    foreach (string stat in character.Stats.Keys)
+                    {
+                        if (characterToken["Stats"][stat] != null)
+                        {
+                            character.Stats[stat].Value = (int)characterToken["Stats"][stat];
+                        }
+                    }
+                }
+
+                if (characterToken["Needs"] != null)
+                {
+                    foreach (Need need in character.Needs)
+                    {
+                        if (characterToken["Needs"][need.Type] != null)
+                        {
+                            need.Amount = (int)characterToken["Needs"][need.Type];
+                        }
                     }
                 }
             }
-
-            if (characterToken["Needs"] != null)
-            {
-                foreach (Need need in character.Needs)
-                {
-                    if (characterToken["Needs"][need.Type] != null)
-                    {
-                        need.Amount = (int)characterToken["Needs"][need.Type];
-                    }
-                }
-            }
-
-            character.name = (string)characterToken["Name"];
         }
     }
 }
