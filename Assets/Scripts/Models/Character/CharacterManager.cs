@@ -82,11 +82,11 @@ namespace ProjectPorcupine.Entities
         /// <summary>
         /// Returns the character with the ID wanted.
         /// </summary>
-        /// <param name="ID"> ID of the character. </param>
+        /// <param name="id"> ID of the character. </param>
         /// <returns> The character or null if no character has ID supplied. </returns>
-        public Character GetFromID(int ID)
+        public Character GetFromID(int id)
         {
-            return Characters.FirstOrDefault(x => x.ID == ID);
+            return Characters.FirstOrDefault(x => x.ID == id);
         }
 
         /// <summary>
