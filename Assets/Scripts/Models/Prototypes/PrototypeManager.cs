@@ -7,6 +7,7 @@
 // ====================================================
 #endregion
 
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Rooms;
 using Scheduler;
 

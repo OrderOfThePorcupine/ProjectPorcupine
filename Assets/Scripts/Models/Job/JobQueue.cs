@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 
 public class JobQueue
@@ -68,7 +69,7 @@ public class JobQueue
             jobsWaitingForInventory[missing].Add(job);
         }
         else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
-            job.CharsCantReach.Count == World.Current.CharacterManager.characters.Count)
+            job.CharsCantReach.Count == World.Current.CharacterManager.Characters.Count)
         {
             // No one can reach the job.
             DebugLog("JobQueue", "- Job can't be reached");
@@ -84,7 +85,7 @@ public class JobQueue
 
             DebugLog(" - job ok");
 
-            jobQueue.Add(job.Priority, job);       
+            jobQueue.Add(job.Priority, job);
         }
 
         if (OnJobCreated != null)
@@ -113,7 +114,7 @@ public class JobQueue
     /// </summary>
     public Job GetJob(Character character)
     {
-        DebugLog("{0} GetJob() (Queue size: {1})", character.GetName(), jobQueue.Count);
+        DebugLog("{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
         if (jobQueue.Count == 0)
         {
             return null;
@@ -222,7 +223,7 @@ public class JobQueue
                 {
                     return true;
                 }
-            }   
+            }
         }
 
         return false;

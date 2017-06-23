@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Pathfinding;
 
-namespace ProjectPorcupine.State
+namespace ProjectPorcupine.Entities.States
 {
     public class DumpState : State
     {
@@ -27,21 +27,21 @@ namespace ProjectPorcupine.State
             if (tileInventory == null)
             {
                 DebugLog(" - Dumping");
-                World.Current.InventoryManager.PlaceInventory(character.CurrTile, character.inventory);
+                World.Current.InventoryManager.PlaceInventory(character.CurrTile, character.Inventory);
                 Finished();
                 return;
             }
 
             // Current tile contains the same type and there is room
-            if (tileInventory.Type == character.inventory.Type && (tileInventory.StackSize + character.inventory.StackSize) <= tileInventory.MaxStackSize)
+            if (tileInventory.Type == character.Inventory.Type && (tileInventory.StackSize + character.Inventory.StackSize) <= tileInventory.MaxStackSize)
             {
                 DebugLog(" - Dumping");
-                World.Current.InventoryManager.PlaceInventory(character.CurrTile, character.inventory);
+                World.Current.InventoryManager.PlaceInventory(character.CurrTile, character.Inventory);
                 Finished();
                 return;
             }
 
-            List<Tile> path = Pathfinder.FindPathToDumpInventory(character.CurrTile, character.inventory.Type, character.inventory.StackSize);
+            List<Tile> path = Pathfinder.FindPathToDumpInventory(character.CurrTile, character.Inventory.Type, character.Inventory.StackSize);
             if (path != null && path.Count > 0)
             {
                 character.SetState(new MoveState(character, Pathfinder.GoalTileEvaluator(path.Last(), false), path, this));

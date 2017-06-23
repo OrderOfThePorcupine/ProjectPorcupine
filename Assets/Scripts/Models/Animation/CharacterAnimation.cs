@@ -6,8 +6,8 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System.Collections.Generic;
+using ProjectPorcupine.Entities;
 using UnityEngine;
 
 // these enums should make it easy to add 10 if walking and add 100 if helmet is off
@@ -47,7 +47,7 @@ namespace Animation
 
         // current shown frame
         private int prevFrameIndex;
-        
+
         // Collection of animations
         private Dictionary<AnimationType, SpritenameAnimation> animations;
         private SpritenameAnimation currentAnimation;
@@ -64,7 +64,7 @@ namespace Animation
         }
 
         public int CurrentSortingOrder { get; private set; }
-        
+
         /// <summary>
         /// Sets sortingOrder on the character and returns the value.
         /// </summary>
@@ -157,7 +157,7 @@ namespace Animation
         {
             if (renderer != null)
             {
-                renderer.sprite = SpriteManager.GetSprite("Character", spriteName);                
+                renderer.sprite = SpriteManager.GetSprite("Character", spriteName);
             }
         }
     }

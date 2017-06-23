@@ -12,7 +12,7 @@ using System.Linq;
 using ProjectPorcupine.Pathfinding;
 using UnityEngine;
 
-namespace ProjectPorcupine.State
+namespace ProjectPorcupine.Entities.States
 {
     public class MoveState : State
     {
@@ -109,7 +109,7 @@ namespace ProjectPorcupine.State
 
             if (character.IsSelected)
             {
-                VisualPath.Instance.SetVisualPoints(character.name, new List<Tile>(path));
+                VisualPath.Instance.SetVisualPoints(character.ID, new List<Tile>(path));
             }
 
             if (path == null || path.Count == 0)
@@ -146,7 +146,7 @@ namespace ProjectPorcupine.State
 
             character.IsWalking = false;
 
-            VisualPath.Instance.RemoveVisualPoints(character.name);
+            VisualPath.Instance.RemoveVisualPoints(character.ID);
         }
 
         public override void Interrupt()

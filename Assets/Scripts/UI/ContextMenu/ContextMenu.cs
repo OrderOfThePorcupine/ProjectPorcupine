@@ -8,6 +8,7 @@
 #endregion
 using System.Collections.Generic;
 using System.Linq;
+using ProjectPorcupine.Entities;
 using UnityEngine;
 
 public class ContextMenu : MonoBehaviour
@@ -127,7 +128,7 @@ public class ContextMenu : MonoBehaviour
         {
             contextualActions.AddRange(contextualActionProvider.GetContextMenuActions(this));
         }
-        
+
         return contextualActions;
     }
 }

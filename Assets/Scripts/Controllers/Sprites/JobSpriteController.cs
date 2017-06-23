@@ -6,7 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System.Collections.Generic;
+using ProjectPorcupine.Entities;
 using UnityEngine;
 
 public class JobSpriteController : BaseSpriteController<Job>

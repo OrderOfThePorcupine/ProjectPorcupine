@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using MoonSharp.Interpreter;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.Localization;
 using ProjectPorcupine.Pathfinding;

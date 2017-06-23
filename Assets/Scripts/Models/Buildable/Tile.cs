@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
 using ProjectPorcupine.Pathfinding;
 using ProjectPorcupine.Rooms;

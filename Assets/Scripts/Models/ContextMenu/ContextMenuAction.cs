@@ -7,9 +7,10 @@
 // ====================================================
 #endregion
 using System;
+using ProjectPorcupine.Entities;
 
 public class ContextMenuAction
-{    
+{
     public Action<ContextMenuAction, Character> Action;
     public string Parameter;
 

@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using ProjectPorcupine.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

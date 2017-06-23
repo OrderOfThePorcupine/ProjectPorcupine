@@ -14,6 +14,7 @@ using System.Xml;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using Newtonsoft.Json.Linq;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
 
 namespace ProjectPorcupine.Rooms

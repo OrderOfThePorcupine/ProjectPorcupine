@@ -9,53 +9,49 @@
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Character name manager that holds all the possible names and tries to give a random and unused name everytime is requested.
-/// </summary>
-public class CharacterNameManager
+namespace ProjectPorcupine.Entities
 {
-    private static string[] characterNames;
-    private static int ptr;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="CharacterNameManager"/> class.
+    /// Character name manager that holds all the possible names and tries to give a random and unused name everytime is requested.
     /// </summary>
-    public CharacterNameManager()
+    public class CharacterNameManager
     {
-        characterNames = new string[0];
-    }
+        private static string[] characterNames;
+        private static int ptr;
 
-    /// <summary>
-    /// Load new names to use for Characters.
-    /// </summary>
-    /// <param name="nameStrings">An array of name strings.</param>
-    public static void LoadNames(string[] nameStrings)
-    {
-        // Randomize the given strings
-        // Add all the names to the unused queue in the random order
-        characterNames = characterNames.Concat(nameStrings.OrderBy(c => Random.value)).ToArray();
-    }
-
-    /// <summary>
-    /// Returns a randomly chosen name, prioritizing names which have not been used yet.
-    /// </summary>
-    /// <returns>A randomly chosen name.</returns>
-    public static string GetNewName()
-    {
-        // If character names doesn't exist then just return null
-        if (characterNames.Length == 0)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CharacterNameManager"/> class.
+        /// </summary>
+        public CharacterNameManager()
         {
-            return null;
+            characterNames = new string[0];
         }
 
-        // Re-Loop Pointer
-        if (ptr >= characterNames.Length)
+        /// <summary>
+        /// Load new names to use for Characters.
+        /// </summary>
+        /// <param name="nameStrings">An array of name strings.</param>
+        public static void LoadNames(string[] nameStrings)
         {
-            ptr = 0;
+            // Randomize the given strings
+            // Add all the names to the unused queue in the random order
+            characterNames = characterNames.Concat(nameStrings.OrderBy(c => Random.value)).ToArray();
         }
 
-        // Assign name then iterate pointer
-        string name = characterNames[ptr++];
-        return name;
+        /// <summary>
+        /// Returns a randomly chosen name, prioritizing names which have not been used yet.
+        /// </summary>
+        /// <returns>A randomly chosen name.</returns>
+        public static string GetNewName()
+        {
+            // If character names doesn't exist then just return null
+            if (characterNames == null || characterNames.Length == 0)
+            {
+                return null;
+            }
+
+            // Assign name then iterate pointer, the modulo section bounds it to be within the range of the array
+            return characterNames[ptr++ % characterNames.Length];
+        }
     }
 }
