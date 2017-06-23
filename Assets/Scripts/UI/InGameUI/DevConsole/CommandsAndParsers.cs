@@ -15,7 +15,7 @@ namespace DeveloperConsole.Core
 {
     public static class CommandsAndParsers
     {
-        [Command("System", description = "Logs the current status of the game", title = "Status")]
+        [Command("System", Description = "Logs the current status of the game", Title = "Status")]
         public static void Status()
         {
             // Purely a placeholder, add more content as required.
@@ -23,7 +23,7 @@ namespace DeveloperConsole.Core
             DevConsole.Log("Time is " + (TimeManager.Instance.IsPaused ? "paused" : TimeManager.Instance.TimeScale + "x"), "yellow");
         }
 
-        [Command("System", "Console", description = "Sets the font size, must be between 10 and 20 (inclusive)", detailedDescription = "This command sets the font size of the console.  It takes a single parameter which is a whole number (integer) and has to be between 10 and 20 (inclusive).  The default is 14.", title = "SetFontSize")]
+        [Command("System", "Console", Description = "Sets the font size, must be between 10 and 20 (inclusive)", DetailedDescription = "This command sets the font size of the console.  It takes a single parameter which is a whole number (integer) and has to be between 10 and 20 (inclusive).  The default is 14.", Title = "SetFontSize")]
         public static void SetFontSize(int size = 14)
         {
             if (size < 10)
@@ -49,7 +49,7 @@ namespace DeveloperConsole.Core
         /// <summary>
         /// Exits the console.
         /// </summary>
-        [Command("System", "Console", description = "Exits the console", title = "Exit")]
+        [Command("System", "Console", Description = "Exits the console", Title = "Exit")]
         public static void Exit()
         {
             DevConsole.Close();
@@ -58,7 +58,7 @@ namespace DeveloperConsole.Core
         /// <summary>
         /// Logs all possible parsers.
         /// </summary>
-        [Command("System", "Console", description = "Logs all the types the devconsole can parse", title = "GetParsers")]
+        [Command("System", "Console", Description = "Logs all the types the devconsole can parse", Title = "GetParsers")]
         public static void GetParsers()
         {
             DevConsole.Log("The system can parse all of the following...", "green");
@@ -72,7 +72,7 @@ namespace DeveloperConsole.Core
         /// Sets the text of the dev console.
         /// </summary>
         /// <param name="text"> The text to set to. </param>
-        [Command("System", "Console", description = "Sets the console text", title = "SetText")]
+        [Command("System", "Console", Description = "Sets the console text", Title = "SetText")]
         public static void SetText(string text = "", int cat = 2)
         {
             Text textObj = DevConsole.TextObject();
@@ -86,7 +86,7 @@ namespace DeveloperConsole.Core
         /// <summary>
         /// Logs all the tags in a nice format.
         /// </summary>
-        [Command("System", description = "Logs all the tags used currently by the system", title = "AllTags")]
+        [Command("System", Description = "Logs all the tags used currently by the system", Title = "AllTags")]
         public static void AllTags()
         {
             DevConsole.Log("All the tags: ", "green");
@@ -97,7 +97,7 @@ namespace DeveloperConsole.Core
         /// Just returns help dependent on each command.
         /// </summary>
         /// <param name="tag"> The tag to search for.  If "" then do all tags. </param>
-        [Command("System", description = "Returns information on all commands.  Can take in a parameter as a tag to search for all commands with that tag", title = "Help")]
+        [Command("System", Description = "Returns information on all commands.  Can take in a parameter as a tag to search for all commands with that tag", Title = "Help")]
         public static void Help(string tag = "")
         {
             DevConsole.Log("-- Help --", "green");
@@ -126,7 +126,7 @@ namespace DeveloperConsole.Core
         /// <summary>
         /// Clears the text area and history.
         /// </summary>
-        [Command("System", "Console", description = "Clears the developer console", title = "Clear")]
+        [Command("System", "Console", Description = "Clears the developer console", Title = "Clear")]
         public static void Clear()
         {
             DevConsole.ClearHistory();

@@ -130,9 +130,9 @@ public class MouseCursor
         if (mc.GetCurrentMode() == MouseController.MouseMode.BUILD)
         {
             // Placing furniture object.
-            if (bmc.buildMode == BuildMode.FURNITURE)
+            if (bmc.BuildMode == BuildMode.FURNITURE)
             {
-                lowerRight.text.text = PrototypeManager.Furniture.Get(bmc.buildModeType).GetName();
+                lowerRight.text.text = PrototypeManager.Furniture.Get(bmc.BuildModeType).GetName();
 
                 upperLeft.text.color = Color.green;
                 upperRight.text.color = Color.red;
@@ -146,7 +146,7 @@ public class MouseCursor
                     lowerLeft.text.text = cid.GetCurrentBuildRequirements();
                 }
             }
-            else if (bmc.buildMode == BuildMode.FLOOR)
+            else if (bmc.BuildMode == BuildMode.FLOOR)
             {
                 lowerRight.text.text = string.Empty;
                 upperLeft.text.color = upperRight.text.color = defaultTint;

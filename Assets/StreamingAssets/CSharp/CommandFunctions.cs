@@ -256,17 +256,13 @@ public static class CommandFunctions
     /// Build an object.
     /// </summary>
     /// <param name="buildMode"> Build mode, with int in this order: FLOOR, ROOMBEHAVIOR, FURNITURE, UTILITY, DECONSTRUCT. </param>
-    public static void DoBuild(int buildMode, string type, Vector3 pos)
+    public static void DoBuild(int buildMode, Vector3 pos, string type = null, bool useCrated = false)
     {
         Tile t;
         if (ModUtils.GetTileAt(pos, out t))
         {
-            BuildModeController.Instance.buildMode = (BuildMode)buildMode;
-            BuildModeController.Instance.buildModeType = type;
+            BuildModeController.Instance.SetBuildMode((BuildMode)buildMode, type, useCrated, false);
             BuildModeController.Instance.DoBuild(t);
-
-            BuildModeController.Instance.buildModeType = string.Empty;
-            BuildModeController.Instance.buildMode = BuildMode.FLOOR;
         }
     }
 

@@ -18,6 +18,10 @@ public class MouseController
     private GameObject circleCursorPrefab;
     private GameObject furnitureParent;
 
+    private BuildModeController buildModeController;
+    private FurnitureSpriteController furnitureSpriteController;
+    private UtilitySpriteController utilitySpriteController;
+
     // The world-position of the mouse last frame.
     private Vector3 lastFramePosition;
     private Vector3 currFramePosition;
@@ -27,9 +31,6 @@ public class MouseController
     // The world-position start of our left-mouse drag operation.
     private Vector3 dragStartPosition;
     private List<GameObject> dragPreviewGameObjects;
-    private BuildModeController bmc;
-    private FurnitureSpriteController fsc;
-    private UtilitySpriteController usc;
     private ContextMenu contextMenu;
     private MouseCursor mouseCursor;
 
@@ -47,15 +48,15 @@ public class MouseController
     // Use this for initialization.
     public MouseController(BuildModeController buildModeController, FurnitureSpriteController furnitureSpriteController, UtilitySpriteController utilitySpriteController, GameObject cursorObject)
     {
-        bmc = buildModeController;
-        bmc.SetMouseController(this);
+        buildModeController.SetMouseController(this);
+        this.buildModeController = buildModeController;
+        this.furnitureSpriteController = furnitureSpriteController;
+        this.utilitySpriteController = utilitySpriteController;
         circleCursorPrefab = cursorObject;
-        fsc = furnitureSpriteController;
-        usc = utilitySpriteController;
         contextMenu = GameObject.FindObjectOfType<ContextMenu>();
         dragPreviewGameObjects = new List<GameObject>();
         cursorParent = new GameObject("Cursor");
-        mouseCursor = new MouseCursor(this, bmc);
+        mouseCursor = new MouseCursor(this, buildModeController);
         furnitureParent = new GameObject("Furniture Preview Sprites");
 
         TimeManager.Instance.EveryFrameNotModal += (time) => Update();
@@ -162,7 +163,7 @@ public class MouseController
     private void UpdateCurrentFramePosition()
     {
         currFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        currFramePosition.z = WorldController.Instance.cameraController.CurrentLayer;
+        currFramePosition.z = WorldController.Instance.CameraController.CurrentLayer;
     }
 
     private void CheckModeChanges()
@@ -205,24 +206,24 @@ public class MouseController
     private void StoreFramePosition()
     {
         lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        lastFramePosition.z = WorldController.Instance.cameraController.CurrentLayer;
+        lastFramePosition.z = WorldController.Instance.CameraController.CurrentLayer;
     }
 
     private void CalculatePlacingPosition()
     {
         // If we are placing a multitile object we would like to modify the postilion where the mouse grabs it.
         if (currentMode == MouseMode.BUILD
-            && bmc.buildMode == BuildMode.FURNITURE
-            && PrototypeManager.Furniture.Has(bmc.buildModeType)
-            && (PrototypeManager.Furniture.Get(bmc.buildModeType).Width > 1
-            || PrototypeManager.Furniture.Get(bmc.buildModeType).Height > 1))
+            && buildModeController.BuildMode == BuildMode.FURNITURE
+            && PrototypeManager.Furniture.Has(buildModeController.BuildModeType)
+            && (PrototypeManager.Furniture.Get(buildModeController.BuildModeType).Width > 1
+            || PrototypeManager.Furniture.Get(buildModeController.BuildModeType).Height > 1))
         {
-            Furniture furnitureToBuild = PrototypeManager.Furniture.Get(bmc.buildModeType).Clone();
-            furnitureToBuild.SetRotation(bmc.CurrentPreviewRotation);
-            Sprite sprite = fsc.GetSpriteForFurniture(furnitureToBuild.Type);
+            Furniture furnitureToBuild = PrototypeManager.Furniture.Get(buildModeController.BuildModeType).Clone();
+            furnitureToBuild.SetRotation(buildModeController.CurrentPreviewRotation);
+            Sprite sprite = furnitureSpriteController.GetSpriteForFurniture(furnitureToBuild.Type);
 
             // Use the center of the Furniture.
-            currPlacingPosition = currFramePosition - ImageUtils.SpritePivotOffset(sprite, bmc.CurrentPreviewRotation);
+            currPlacingPosition = currFramePosition - ImageUtils.SpritePivotOffset(sprite, buildModeController.CurrentPreviewRotation);
         }
         else
         {
@@ -302,7 +303,7 @@ public class MouseController
 
         UpdateIsDragging();
 
-        if (isDragging == false || bmc.IsObjectDraggable() == false)
+        if (isDragging == false || buildModeController.IsObjectDraggable() == false)
         {
             dragStartPosition = currPlacingPosition;
         }
@@ -364,25 +365,25 @@ public class MouseController
         {
             for (int y = dragParams.StartY; y <= dragParams.EndY; y++)
             {
-                Tile t = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.cameraController.CurrentLayer);
+                Tile t = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.CameraController.CurrentLayer);
                 if (t != null)
                 {
                     // Display the building hint on top of this tile position.
-                    if (bmc.buildMode == BuildMode.FURNITURE)
+                    if (buildModeController.BuildMode == BuildMode.FURNITURE)
                     {
-                        Furniture proto = PrototypeManager.Furniture.Get(bmc.buildModeType);
+                        Furniture proto = PrototypeManager.Furniture.Get(buildModeController.BuildModeType);
                         if (IsPartOfDrag(t, dragParams, proto.DragType))
                         {
-                            ShowFurnitureSpriteAtTile(bmc.buildModeType, t);
-                            ShowWorkSpotSpriteAtTile(bmc.buildModeType, t);
+                            ShowFurnitureSpriteAtTile(buildModeController.BuildModeType, t);
+                            ShowWorkSpotSpriteAtTile(buildModeController.BuildModeType, t);
                         }
                     }
-                    else if (bmc.buildMode == BuildMode.UTILITY)
+                    else if (buildModeController.BuildMode == BuildMode.UTILITY)
                     {
-                        Utility proto = PrototypeManager.Utility.Get(bmc.buildModeType);
+                        Utility proto = PrototypeManager.Utility.Get(buildModeController.BuildModeType);
                         if (IsPartOfDrag(t, dragParams, proto.DragType))
                         {
-                            ShowUtilitySpriteAtTile(bmc.buildModeType, t);
+                            ShowUtilitySpriteAtTile(buildModeController.BuildModeType, t);
                         }
                     }
                     else
@@ -396,7 +397,7 @@ public class MouseController
 
     private void ShowGenericVisuals(int x, int y)
     {
-        GameObject go = SimplePool.Spawn(circleCursorPrefab, new Vector3(x, y, WorldController.Instance.cameraController.CurrentLayer), Quaternion.identity);
+        GameObject go = SimplePool.Spawn(circleCursorPrefab, new Vector3(x, y, WorldController.Instance.CameraController.CurrentLayer), Quaternion.identity);
         go.transform.SetParent(cursorParent.transform, true);
         go.GetComponent<SpriteRenderer>().sprite = SpriteManager.GetSprite("UI", "CursorCircle");
         dragPreviewGameObjects.Add(go);
@@ -415,47 +416,47 @@ public class MouseController
 
             for (int y = begin; y != stop; y += increment)
             {
-                Tile tile = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.cameraController.CurrentLayer);
+                Tile tile = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.CameraController.CurrentLayer);
                 if (tile == null)
                 {
                     // Trying to build off the map, bail out of this cycle.
                     continue;
                 }
 
-                if (bmc.buildMode == BuildMode.FURNITURE)
+                if (buildModeController.BuildMode == BuildMode.FURNITURE)
                 {
                     // Check for furniture dragType.
-                    Furniture proto = PrototypeManager.Furniture.Get(bmc.buildModeType);
+                    Furniture proto = PrototypeManager.Furniture.Get(buildModeController.BuildModeType);
 
                     if (IsPartOfDrag(tile, dragParams, proto.DragType))
                     {
                         // Call BuildModeController::DoBuild().
-                        bmc.DoBuild(tile);
+                        buildModeController.DoBuild(tile);
                     }
                 }
-                else if (bmc.buildMode == BuildMode.UTILITY)
+                else if (buildModeController.BuildMode == BuildMode.UTILITY)
                 {
                     // Check for furniture dragType.
-                    Utility proto = PrototypeManager.Utility.Get(bmc.buildModeType);
+                    Utility proto = PrototypeManager.Utility.Get(buildModeController.BuildModeType);
 
                     if (IsPartOfDrag(tile, dragParams, proto.DragType))
                     {
                         // Call BuildModeController::DoBuild().
-                        bmc.DoBuild(tile);
+                        buildModeController.DoBuild(tile);
                     }
                 }
                 else
                 {
-                    bmc.DoBuild(tile);
+                    buildModeController.DoBuild(tile);
                 }
             }
         }
 
         // In devmode, utilities don't build their network, and one of the utilities built needs UpdateGrid called explicitly after all are built.
-        if (bmc.buildMode == BuildMode.UTILITY && SettingsKeyHolder.DeveloperMode)
+        if (buildModeController.BuildMode == BuildMode.UTILITY && SettingsKeyHolder.DeveloperMode)
         {
-            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, WorldController.Instance.cameraController.CurrentLayer);
-            Utility utility = firstTile.Utilities[PrototypeManager.Utility.Get(bmc.buildModeType).Type];
+            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, WorldController.Instance.CameraController.CurrentLayer);
+            Utility utility = firstTile.Utilities[PrototypeManager.Utility.Get(buildModeController.BuildModeType).Type];
             utility.UpdateGrid(utility);
         }
     }
@@ -492,7 +493,7 @@ public class MouseController
         if (Input.GetMouseButtonUp(0))
         {
             Tile t = GetMouseOverTile();
-            WorldController.Instance.spawnInventoryController.SpawnInventory(t);
+            WorldController.Instance.SpawnInventoryController.SpawnInventory(t);
         }
     }
 
@@ -547,7 +548,7 @@ public class MouseController
 
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
-            WorldController.Instance.cameraController.ChangeZoom(Input.GetAxis("Mouse ScrollWheel"));
+            WorldController.Instance.CameraController.ChangeZoom(Input.GetAxis("Mouse ScrollWheel"));
         }
 
         UpdateCameraBounds();
@@ -574,11 +575,11 @@ public class MouseController
 
         SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
         sr.sortingLayerName = "Jobs";
-        sr.sprite = fsc.GetSpriteForFurniture(furnitureType);
+        sr.sprite = furnitureSpriteController.GetSpriteForFurniture(furnitureType);
 
-        if (World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile, bmc.CurrentPreviewRotation) &&
+        if (World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile, buildModeController.CurrentPreviewRotation) &&
             World.Current.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
-            bmc.DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType, bmc.CurrentPreviewRotation) == false)
+            buildModeController.DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType, buildModeController.CurrentPreviewRotation) == false)
         {
             sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
         }
@@ -588,8 +589,8 @@ public class MouseController
         }
 
         go.name = furnitureType + "_p_" + tile.X + "_" + tile.Y + "_" + tile.Z;
-        go.transform.position = tile.Vector3 + ImageUtils.SpritePivotOffset(sr.sprite, bmc.CurrentPreviewRotation);
-        go.transform.Rotate(0, 0, bmc.CurrentPreviewRotation);
+        go.transform.position = tile.Vector3 + ImageUtils.SpritePivotOffset(sr.sprite, buildModeController.CurrentPreviewRotation);
+        go.transform.Rotate(0, 0, buildModeController.CurrentPreviewRotation);
     }
 
     private void ShowWorkSpotSpriteAtTile(string furnitureType, Tile tile)
@@ -612,7 +613,7 @@ public class MouseController
 
         if (World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile) &&
             World.Current.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
-            bmc.DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType) == false)
+            buildModeController.DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType) == false)
         {
             sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
         }
@@ -621,7 +622,7 @@ public class MouseController
             sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
         }
 
-        go.transform.position = new Vector3(tile.X + proto.Jobs.WorkSpotOffset.x, tile.Y + proto.Jobs.WorkSpotOffset.y, WorldController.Instance.cameraController.CurrentLayer);
+        go.transform.position = new Vector3(tile.X + proto.Jobs.WorkSpotOffset.x, tile.Y + proto.Jobs.WorkSpotOffset.y, WorldController.Instance.CameraController.CurrentLayer);
     }
 
     private void ShowUtilitySpriteAtTile(string type, Tile tile)
@@ -632,11 +633,11 @@ public class MouseController
 
         SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
         sr.sortingLayerName = "Jobs";
-        sr.sprite = usc.GetSpriteForUtility(type);
+        sr.sprite = utilitySpriteController.GetSpriteForUtility(type);
 
         if (World.Current.UtilityManager.IsPlacementValid(type, tile) &&
-            bmc.DoesSameUtilityTypeAlreadyExist(type, tile) &&
-            bmc.DoesUtilityBuildJobOverlapExistingBuildJob(type, tile) == false)
+            buildModeController.DoesSameUtilityTypeAlreadyExist(type, tile) &&
+            buildModeController.DoesUtilityBuildJobOverlapExistingBuildJob(type, tile) == false)
         {
             sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
         }
@@ -645,7 +646,7 @@ public class MouseController
             sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
         }
 
-        go.transform.position = new Vector3(tile.X, tile.Y, WorldController.Instance.cameraController.CurrentLayer);
+        go.transform.position = new Vector3(tile.X, tile.Y, WorldController.Instance.CameraController.CurrentLayer);
     }
 
     public class DragParameters

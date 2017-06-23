@@ -12,16 +12,37 @@ using UnityEngine;
 
 public class TraderShipController : MonoBehaviour
 {
-    public Vector3 LeavingCoordinates;
-    public Vector3 LandingCoordinates;
-    public float Speed;
-    public float DestinationReachedThreshold = 0.1f;
-    public bool DestinationReached;
-    public bool TradeCompleted;
-    public Trader Trader;
-    public SpritenameAnimation AnimationIdle;
-    public SpritenameAnimation AnimationFlying;
-    public SpriteRenderer Renderer;
+    public bool TradeCompleted { get; set; }
+
+    public Vector3 LeavingCoordinates { get; private set; }
+
+    public Vector3 LandingCoordinates { get; private set; }
+
+    public float Speed { get; private set; }
+
+    public float DestinationReachedThreshold { get; private set; }
+
+    public bool DestinationReached { get; private set; }
+
+    public Trader Trader { get; private set; }
+
+    public SpritenameAnimation AnimationIdle { get; private set; }
+
+    public SpritenameAnimation AnimationFlying { get; private set; }
+
+    public SpriteRenderer Renderer { get; private set; }
+
+    public void Init(Vector3 leavingCoords, Vector3 landingCoords, float speed, Trader trader, SpritenameAnimation animationIdle, SpritenameAnimation animationFlying, SpriteRenderer renderer, float destinationReachedThreshold = 0.1f)
+    {
+        this.LeavingCoordinates = leavingCoords;
+        this.LandingCoordinates = landingCoords;
+        this.Speed = speed;
+        this.DestinationReachedThreshold = destinationReachedThreshold;
+        this.Trader = trader;
+        this.AnimationIdle = animationIdle;
+        this.AnimationFlying = animationFlying;
+        this.Renderer = renderer;
+    }
 
     public void FixedUpdate()
     {
@@ -41,7 +62,7 @@ public class TraderShipController : MonoBehaviour
         {
             destination = LeavingCoordinates;
         }
-        
+
         float distance = Vector3.Distance(transform.position, destination);
 
         if (distance > DestinationReachedThreshold * TimeManager.Instance.TimeScale)
