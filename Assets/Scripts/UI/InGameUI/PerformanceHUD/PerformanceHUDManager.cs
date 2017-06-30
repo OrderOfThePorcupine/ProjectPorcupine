@@ -67,17 +67,10 @@ public class PerformanceHUDManager : MonoBehaviour
         {
             for (int j = 0; j < groups[i].classData.Count; j++)
             {
-                if (FunctionsManager.PerformanceHUD.HasFunction("Get" + groups[i].classData[j].ClassName))
-                {
-                    BasePerformanceHUDComponent element = FunctionsManager.PerformanceHUD.Call("Get" + groups[i].classData[j].ClassName).ToObject<BasePerformanceHUDComponent>();
-                    element.parameterData = groups[i].classData[j].ParameterData;
-                    element.InitializeLUA();
-                    elements.Add(element);
-                }
-                else
-                {
-                    Debug.LogWarning("Get" + groups[i] + groups[i].classData[j].ClassName + "() Doesn't exist");
-                }
+                BasePerformanceHUDComponent element = FunctionsManager.PerformanceHUD.CreateInstance<BasePerformanceHUDComponent>(groups[i].classData[j].ClassName, true);
+                element.parameterData = groups[i].classData[j].ParameterData;
+                element.InitializeLUA();
+                elements.Add(element);
             }
 
             allGroups.Add(groups[i], elements.ToArray());

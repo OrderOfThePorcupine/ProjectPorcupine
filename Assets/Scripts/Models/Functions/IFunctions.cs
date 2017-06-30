@@ -14,6 +14,8 @@ public interface IFunctions
 
     bool HasFunction(string name);
 
+    bool HasConstructor(string name);
+
     bool LoadScript(string text, string scriptName);
 
     DynValue Call(string functionName, params object[] args);
@@ -21,4 +23,8 @@ public interface IFunctions
     T Call<T>(string functionName, params object[] args);
 
     DynValue CallWithError(string functionName, params object[] args);
+
+    DynValue CreateInstance(object fromObject);
+
+    T CreateInstance<T>(string className, params object[] arguments);
 }

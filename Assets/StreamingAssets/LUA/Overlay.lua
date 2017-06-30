@@ -60,10 +60,10 @@ end
 
 -- Returns coloring of thermal diffusivity of tile
 function thermalDiffusivityValueAt(tile, world)
-    if tile == nil then
+    if tile == nil or tile.Furniture == nil then
         return 255
     else
-        return 255
+        return tile.Furniture.Parameters["thermal_diffusivity"].ToFloat(0) * 255;
     end
 end
 
