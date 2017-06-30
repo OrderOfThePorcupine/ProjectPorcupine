@@ -154,7 +154,7 @@ function Stockpile_GetItemsFromFilter( furniture )
 end
 
 function Stockpile_SetNewFilter( furniture, character )
-    WorldController.Instance.dialogBoxManager.ShowDialogBoxByName("Filter")
+    WorldController.Instance.DialogBoxManager.ShowDialogBoxByName("Filter")
 end
 
 function Stockpile_UpdateAction( furniture, deltaTime )
@@ -243,7 +243,7 @@ function Stockpile_JobWorked(job)
     --values = job.GetInventoryRequirementValues();
     for k, inv in pairs(job.DeliveredItems) do
         if(inv.StackSize > 0) then
-            World.Current.inventoryManager.PlaceInventory(job.tile, inv)
+            World.Current.InventoryManager.PlaceInventory(job.tile, inv)
             return -- There should be no way that we ever end up with more than on inventory requirement with StackSize > 0
         end
     end
@@ -289,7 +289,7 @@ end
 
 function MiningDroneStation_JobComplete(job)
 	if (job.buildable.Jobs.OutputSpotTile.Inventory == nil or job.buildable.Jobs.OutputSpotTile.Inventory.Type == job.buildable.Parameters["mine_type"].ToString()) then
-		World.Current.inventoryManager.PlaceInventory(job.buildable.Jobs.OutputSpotTile, Inventory.__new(job.buildable.Parameters["mine_type"].ToString(), 2))
+		World.Current.InventoryManager.PlaceInventory(job.buildable.Jobs.OutputSpotTile, Inventory.__new(job.buildable.Parameters["mine_type"].ToString(), 2))
 	else
 		job.CancelJob()
 	end
@@ -313,7 +313,7 @@ function MetalSmelter_UpdateAction(furniture, deltaTime)
             furniture.Parameters["smelttime"].SetValue(0)
 
             if (outputSpot.Inventory == nil) then
-                World.Current.inventoryManager.PlaceInventory(outputSpot, Inventory.__new("Steel Plate", 5))
+                World.Current.InventoryManager.PlaceInventory(outputSpot, Inventory.__new("Steel Plate", 5))
                 inputSpot.Inventory.StackSize = inputSpot.Inventory.StackSize - 5
 
             elseif (outputSpot.Inventory.StackSize <= outputSpot.Inventory.MaxStackSize - 5) then
@@ -367,7 +367,7 @@ function MetalSmelter_JobWorked(job)
     local inputSpot = job.tile.Furniture.Jobs.InputSpotTile
     for k, inv in pairs(job.DeliveredItems) do
         if(inv ~= nil and inv.StackSize > 0) then
-            World.Current.inventoryManager.PlaceInventory(inputSpot, inv)
+            World.Current.InventoryManager.PlaceInventory(inputSpot, inv)
             inputSpot.Inventory.Locked = true
             return
         end
@@ -602,7 +602,7 @@ function Berth_TestSummoning(furniture, deltaTime)
     if (furniture.Parameters["occupied"].ToFloat() <= 0) then
         Berth_SummonShip(furniture, nil)
         furniture.Parameters["occupied"].SetValue(1)
-    elseif (World.Current.shipManager.IsOccupied(furniture)) then
+    elseif (World.Current.ShipManager.IsOccupied(furniture)) then
         Berth_DismissShip(furniture, nil)
         furniture.Parameters["occupied"].SetValue(0)
     end
@@ -610,15 +610,15 @@ end
 
 function Berth_SummonShip(furniture, character)
     --ModUtils.ULogChannel("Ships", "Summoning ship")
-    local ship = World.Current.shipManager.AddShip("essentia", 0, 0)
+    local ship = World.Current.ShipManager.AddShip("essentia", 0, 0)
     ship.SetDestination(furniture)
 end
 
 function Berth_DismissShip(furniture, character)
-    local shipManager = World.Current.shipManager
-    if (shipManager.IsOccupied(furniture)) then
-        local ship = shipManager.GetBerthedShip(furniture)
-        shipManager.DeberthShip(furniture)
+    local shipManager = World.Current.ShipManager
+    if (ShipManager.IsOccupied(furniture)) then
+        local ship = ShipManager.GetBerthedShip(furniture)
+        ShipManager.DeberthShip(furniture)
         ship.SetDestination(0, 0)
     end
 end
@@ -661,7 +661,7 @@ function OreMine_OreMined(job)
 
     if (inventory.Type ~= "None") then
         -- Place the "mined" ore on the tile
-        World.Current.inventoryManager.PlaceInventory(job.tile, inventory)
+        World.Current.InventoryManager.PlaceInventory(job.tile, inventory)
     end
     
     -- Deconstruct the mined object
@@ -693,7 +693,7 @@ function Berth_TestSummoning(furniture, deltaTime)
     if (furniture.Parameters["occupied"].ToFloat() <= 0) then
         Berth_SummonShip(furniture, nil)
         furniture.Parameters["occupied"].SetValue(1)
-    elseif (World.Current.shipManager.IsOccupied(furniture)) then
+    elseif (World.Current.ShipManager.IsOccupied(furniture)) then
         Berth_DismissShip(furniture, nil)
         furniture.Parameters["occupied"].SetValue(0)
     end

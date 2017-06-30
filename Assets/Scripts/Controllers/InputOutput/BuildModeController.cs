@@ -23,9 +23,6 @@ public enum BuildMode
 
 public class BuildModeController
 {
-    public BuildMode buildMode = BuildMode.FLOOR;
-    public string buildModeType;
-
     private MouseController mouseController;
     private TileType buildModeTile = TileType.Floor;
 
@@ -41,8 +38,11 @@ public class BuildModeController
 
     public static BuildModeController Instance { get; protected set; }
 
-    // The rotation applied to the object.
     public float CurrentPreviewRotation { get; private set; }
+
+    public BuildMode BuildMode { get; private set; }
+
+    public string BuildModeType { get; private set; }
 
     // Use this for initialization
     public void SetMouseController(MouseController currentMouseController)
@@ -52,19 +52,19 @@ public class BuildModeController
 
     public bool IsObjectDraggable()
     {
-        if (buildMode == BuildMode.FLOOR || buildMode == BuildMode.DECONSTRUCT || buildMode == BuildMode.UTILITY || buildMode == BuildMode.MINE)
+        if (BuildMode == BuildMode.FLOOR || BuildMode == BuildMode.DECONSTRUCT || BuildMode == BuildMode.UTILITY || BuildMode == BuildMode.MINE)
         {
             // floors are draggable
             return true;
         }
 
-        if (buildMode == BuildMode.ROOMBEHAVIOR)
+        if (BuildMode == BuildMode.ROOMBEHAVIOR)
         {
             // Room Behaviors are not draggable
             return false;
         }
 
-        Furniture proto = PrototypeManager.Furniture.Get(buildModeType);
+        Furniture proto = PrototypeManager.Furniture.Get(BuildModeType);
 
         return proto.DragType != "single";
     }
@@ -74,9 +74,30 @@ public class BuildModeController
         return buildModeTile.ToString();
     }
 
+    public void SetBuildMode(BuildMode newMode, string type = null, bool useCratedObject = false, bool startBuildMode = true)
+    {
+        BuildMode = newMode;
+        BuildModeType = type;
+
+        if (newMode == BuildMode.FLOOR)
+        {
+            buildModeTile = PrototypeManager.TileType.Get(type);
+        }
+        else if (newMode == BuildMode.FURNITURE)
+        {
+            this.useCratedObject = useCratedObject;
+            CurrentPreviewRotation = 0f;
+        }
+
+        if (startBuildMode)
+        {
+            mouseController.StartBuildMode();
+        }
+    }
+
     public void SetModeBuildTile(TileType type)
     {
-        buildMode = BuildMode.FLOOR;
+        BuildMode = BuildMode.FLOOR;
         buildModeTile = type;
 
         mouseController.StartBuildMode();
@@ -84,16 +105,16 @@ public class BuildModeController
 
     public void SetMode_DesignateRoomBehavior(string type)
     {
-        buildMode = BuildMode.ROOMBEHAVIOR;
-        buildModeType = type;
+        BuildMode = BuildMode.ROOMBEHAVIOR;
+        BuildModeType = type;
         mouseController.StartBuildMode();
     }
 
     public void SetMode_BuildFurniture(string type, bool useCratedObject = false)
     {
         // Wall is not a Tile!  Wall is an "Furniture" that exists on TOP of a tile.
-        buildMode = BuildMode.FURNITURE;
-        buildModeType = type;
+        BuildMode = BuildMode.FURNITURE;
+        BuildModeType = type;
         this.useCratedObject = useCratedObject;
         CurrentPreviewRotation = 0f;
         mouseController.StartBuildMode();
@@ -102,28 +123,28 @@ public class BuildModeController
     public void SetMode_BuildUtility(string type)
     {
         // Wall is not a Tile!  Wall is an "Furniture" that exists on TOP of a tile.
-        buildMode = BuildMode.UTILITY;
-        buildModeType = type;
+        BuildMode = BuildMode.UTILITY;
+        BuildModeType = type;
         mouseController.StartBuildMode();
     }
 
     public void SetMode_Deconstruct()
     {
-        buildMode = BuildMode.DECONSTRUCT;
+        BuildMode = BuildMode.DECONSTRUCT;
         mouseController.StartBuildMode();
     }
 
     public void SetMode_Mine()
     {
-        buildMode = BuildMode.MINE;
+        BuildMode = BuildMode.MINE;
         mouseController.StartBuildMode();
     }
 
     public void DoBuild(Tile tile)
     {
-        if (buildMode == BuildMode.ROOMBEHAVIOR)
+        if (BuildMode == BuildMode.ROOMBEHAVIOR)
         {
-            string roomBehaviorType = buildModeType;
+            string roomBehaviorType = BuildModeType;
 
             if (tile.Room != null && WorldController.Instance.World.IsRoomBehaviorValidForRoom(roomBehaviorType, tile.Room))
             {
@@ -131,12 +152,12 @@ public class BuildModeController
                 tile.Room.DesignateRoomBehavior(proto.Clone());
             }
         }
-        else if (buildMode == BuildMode.FURNITURE)
+        else if (BuildMode == BuildMode.FURNITURE)
         {
             // Create the Furniture and assign it to the tile
             // Can we build the furniture in the selected tile?
             // Run the ValidPlacement function!
-            string furnitureType = buildModeType;
+            string furnitureType = BuildModeType;
 
             if (
                 World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile, CurrentPreviewRotation) &&
@@ -163,7 +184,7 @@ public class BuildModeController
                     {
                         // We want to use a crated furniture, so set requested items to crated version.
                         job.RequestedItems.Clear();
-                        job.RequestedItems.Add(this.buildModeType, new ProjectPorcupine.Jobs.RequestedItem(this.buildModeType, 1));
+                        job.RequestedItems.Add(this.BuildModeType, new ProjectPorcupine.Jobs.RequestedItem(this.BuildModeType, 1));
                         useCratedObject = false;
                     }
 
@@ -222,12 +243,12 @@ public class BuildModeController
                 }
             }
         }
-        else if (buildMode == BuildMode.UTILITY)
+        else if (BuildMode == BuildMode.UTILITY)
         {
             // Create the Furniture and assign it to the tile
             // Can we build the furniture in the selected tile?
             // Run the ValidPlacement function!
-            string utilityType = buildModeType;
+            string utilityType = BuildModeType;
             if (
                 World.Current.UtilityManager.IsPlacementValid(utilityType, tile) &&
                 DoesSameUtilityTypeAlreadyExist(utilityType, tile) == false &&
@@ -273,7 +294,7 @@ public class BuildModeController
                 }
             }
         }
-        else if (buildMode == BuildMode.FLOOR)
+        else if (BuildMode == BuildMode.FLOOR)
         {
             TileType tileType = buildModeTile;
 
@@ -308,7 +329,7 @@ public class BuildModeController
                 }
             }
         }
-        else if (buildMode == BuildMode.DECONSTRUCT)
+        else if (BuildMode == BuildMode.DECONSTRUCT)
         {
             bool canDeconstructAll = SettingsKeyHolder.DeveloperMode;
 
@@ -331,7 +352,7 @@ public class BuildModeController
                 tile.Utilities.Last().Value.SetDeconstructJob();
             }
         }
-        else if (buildMode == BuildMode.MINE)
+        else if (BuildMode == BuildMode.MINE)
         {
             if (tile.Furniture != null)
             {
@@ -460,7 +481,7 @@ public class BuildModeController
     // Rotate the preview furniture to the left.
     private void RotateFurnitireLeft()
     {
-        if (buildMode == BuildMode.FURNITURE && PrototypeManager.Furniture.Get(buildModeType).CanRotate)
+        if (BuildMode == BuildMode.FURNITURE && PrototypeManager.Furniture.Get(BuildModeType).CanRotate)
         {
             CurrentPreviewRotation = (CurrentPreviewRotation + 90) % 360;
         }
@@ -469,7 +490,7 @@ public class BuildModeController
     // Rotate the preview furniture to the right.
     private void RotateFurnitireRight()
     {
-        if (buildMode == BuildMode.FURNITURE && PrototypeManager.Furniture.Get(buildModeType).CanRotate)
+        if (BuildMode == BuildMode.FURNITURE && PrototypeManager.Furniture.Get(BuildModeType).CanRotate)
         {
             CurrentPreviewRotation = (CurrentPreviewRotation - 90) % 360;
         }

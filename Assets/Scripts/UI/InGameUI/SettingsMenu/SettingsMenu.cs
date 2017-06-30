@@ -49,7 +49,7 @@ public class SettingsMenu : MonoBehaviour
         }
 
         GameController.Instance.IsModal = true;
-        GameController.Instance.soundController.OnButtonSFX();
+        GameController.Instance.SoundController.OnButtonSFX();
 
         instance.changesTracker.Clear();
         instance.mainRoot.SetActive(true);
@@ -181,7 +181,7 @@ public class SettingsMenu : MonoBehaviour
         changesTracker.Clear();
 
         GameController.Instance.IsModal = false;
-        GameController.Instance.soundController.OnButtonSFX();
+        GameController.Instance.SoundController.OnButtonSFX();
         mainRoot.SetActive(false);
     }
 
@@ -192,11 +192,11 @@ public class SettingsMenu : MonoBehaviour
 
         if (WorldController.Instance != null)
         {
-            check = WorldController.Instance.dialogBoxManager.dialogBoxPromptOrInfo;
+            check = WorldController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
         }
         else if (MainMenuController.Instance != null)
         {
-            check = MainMenuController.Instance.dialogBoxManager.dialogBoxPromptOrInfo;
+            check = MainMenuController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
         }
         else
         {
@@ -230,12 +230,12 @@ public class SettingsMenu : MonoBehaviour
                         currentCategory = string.Empty;
 
                         GameController.Instance.IsModal = false;
-                        GameController.Instance.soundController.OnButtonSFX();
+                        GameController.Instance.SoundController.OnButtonSFX();
                         mainRoot.SetActive(false);
 
                         break;
                     case DialogBoxResult.No:
-                        GameController.Instance.soundController.OnButtonSFX();
+                        GameController.Instance.SoundController.OnButtonSFX();
                         break;
                 }
             };

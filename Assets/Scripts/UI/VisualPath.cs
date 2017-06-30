@@ -9,13 +9,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VisualPath : MonoBehaviour 
+public class VisualPath : MonoBehaviour
 {
     private static Material lineMaterial;
 
     public static VisualPath Instance { get; private set; }
 
-    public Dictionary<string, List<Tile>> VisualPoints { get; private set; }
+    /// <summary>
+    /// Character IDs to a list of their path.
+    /// </summary>
+    public Dictionary<int, List<Tile>> VisualPoints { get; private set; }
 
     public Color PathColor { get; set; }
 
@@ -24,28 +27,28 @@ public class VisualPath : MonoBehaviour
     /// </summary>
     /// <param name="charName"></param>
     /// <param name="points"></param>
-    public void SetVisualPoints(string charName, List<Tile> points)
+    public void SetVisualPoints(int charID, List<Tile> points)
     {
         // A character changed there path, so we need to update the new path
-        if (VisualPoints.ContainsKey(charName))
+        if (VisualPoints.ContainsKey(charID))
         {
-            VisualPoints[charName] = points;
+            VisualPoints[charID] = points;
             return;
         }
 
-        VisualPoints.Add(charName, points);
+        VisualPoints.Add(charID, points);
     }
 
     /// <summary>
     /// Removes a charcters entry in the VisualPoints dictionary.
     /// </summary>
     /// <param name="charName"></param>
-    public void RemoveVisualPoints(string charName)
+    public void RemoveVisualPoints(int charID)
     {
         // maybe the character has died or we just no longer wnat to see his path any more
-        if (VisualPoints.ContainsKey(charName))
+        if (VisualPoints.ContainsKey(charID))
         {
-            VisualPoints.Remove(charName);
+            VisualPoints.Remove(charID);
         }
     }
 
@@ -74,7 +77,7 @@ public class VisualPath : MonoBehaviour
     private void Awake()
     {
         // initalize dictionary
-        VisualPoints = new Dictionary<string, List<Tile>>();
+        VisualPoints = new Dictionary<int, List<Tile>>();
 
         // default PathColor to red
         PathColor = Color.red;
@@ -101,7 +104,7 @@ public class VisualPath : MonoBehaviour
         // Draw lines
         GL.Begin(GL.LINES);
         GL.Color(PathColor);
-        foreach (string entry in VisualPoints.Keys)
+        foreach (int entry in VisualPoints.Keys)
         {
             for (int i = 0; i < VisualPoints[entry].Count; i++)
             {
@@ -114,7 +117,7 @@ public class VisualPath : MonoBehaviour
                     GL.Vertex3(VisualPoints[entry][i].X, VisualPoints[entry][i].Y, VisualPoints[entry][i].Z);
                 }
 
-                GL.Vertex3(VisualPoints[entry][i].X, VisualPoints[entry][i].Y,  VisualPoints[entry][i].Z);
+                GL.Vertex3(VisualPoints[entry][i].X, VisualPoints[entry][i].Y, VisualPoints[entry][i].Z);
             }
         }
 

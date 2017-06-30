@@ -17,12 +17,12 @@ public class TooltipComponent : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         if (eventData.pointerCurrentRaycast.gameObject != null)
         {
-            WorldController.Instance.mouseController.StartUIMode(tooltip);
+            WorldController.Instance.MouseController.StartUIMode(tooltip);
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        WorldController.Instance.mouseController.ClearUIMode();
+        WorldController.Instance.MouseController.ClearUIMode();
     }
 }

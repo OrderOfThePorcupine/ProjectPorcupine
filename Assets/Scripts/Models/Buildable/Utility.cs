@@ -13,7 +13,7 @@ using System.Xml;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using Newtonsoft.Json.Linq;
-using ProjectPorcupine.Buildable.Components;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.OrderActions;
 using ProjectPorcupine.PowerNetwork;
 using UnityEngine;

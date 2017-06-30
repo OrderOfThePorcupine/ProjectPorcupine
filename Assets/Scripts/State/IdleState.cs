@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using ProjectPorcupine.Pathfinding;
 using Random = UnityEngine.Random;
 
-namespace ProjectPorcupine.State
+namespace ProjectPorcupine.Entities.States
 {
     [System.Diagnostics.DebuggerDisplay("Idle: ")]
     public class IdleState : State

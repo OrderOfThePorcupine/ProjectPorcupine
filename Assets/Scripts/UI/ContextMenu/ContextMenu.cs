@@ -8,6 +8,7 @@
 #endregion
 using System.Collections.Generic;
 using System.Linq;
+using ProjectPorcupine.Entities;
 using UnityEngine;
 
 public class ContextMenu : MonoBehaviour
@@ -56,8 +57,7 @@ public class ContextMenu : MonoBehaviour
     private void BuildInterface(List<ContextMenuAction> contextualActions)
     {
         gameObject.transform.position = Input.mousePosition + new Vector3(10, -10, 0);
-
-        bool characterSelected = WorldController.Instance.mouseController.Selection != null && WorldController.Instance.mouseController.Selection.IsCharacterSelected();
+        bool characterSelected = WorldController.Instance.MouseController.Selection != null && WorldController.Instance.MouseController.Selection.IsCharacterSelected();
 
         foreach (ContextMenuAction contextMenuAction in contextualActions)
         {

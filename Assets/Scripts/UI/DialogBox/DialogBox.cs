@@ -27,7 +27,7 @@ public class DialogBox : MonoBehaviour
 
         GameController.Instance.IsModal = true;
 
-        GameController.Instance.soundController.OnButtonSFX();
+        GameController.Instance.SoundController.OnButtonSFX();
 
         gameObject.transform.SetAsLastSibling();
         gameObject.SetActive(true);
@@ -45,7 +45,7 @@ public class DialogBox : MonoBehaviour
             GameController.Instance.IsModal = false;
         }
 
-        GameController.Instance.soundController.OnButtonSFX();
+        GameController.Instance.SoundController.OnButtonSFX();
         
         gameObject.SetActive(false);
     }

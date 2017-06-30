@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Pathfinding;
 using UnityEngine;
 
@@ -144,7 +145,7 @@ public class InventoryManager
 
     public bool PlaceInventory(Job job, Character character)
     {
-        Inventory sourceInventory = character.inventory;
+        Inventory sourceInventory = character.Inventory;
 
         // Check that it's wanted by the job
         if (job.RequestedItems.ContainsKey(sourceInventory.Type) == false)
@@ -174,29 +175,29 @@ public class InventoryManager
     {
         amount = amount < 0 ? sourceInventory.StackSize : Math.Min(amount, sourceInventory.StackSize);
         sourceInventory.ReleaseClaim(character);
-        if (character.inventory == null)
+        if (character.Inventory == null)
         {
-            character.inventory = sourceInventory.Clone();
-            character.inventory.StackSize = 0;
-            if (Inventories.ContainsKey(character.inventory.Type) == false)
+            character.Inventory = sourceInventory.Clone();
+            character.Inventory.StackSize = 0;
+            if (Inventories.ContainsKey(character.Inventory.Type) == false)
             {
-                Inventories[character.inventory.Type] = new List<Inventory>();
+                Inventories[character.Inventory.Type] = new List<Inventory>();
             }
 
-            Inventories[character.inventory.Type].Add(character.inventory);
+            Inventories[character.Inventory.Type].Add(character.Inventory);
         }
-        else if (character.inventory.Type != sourceInventory.Type)
+        else if (character.Inventory.Type != sourceInventory.Type)
         {
             UnityDebugger.Debugger.LogError(InventoryManagerLogChanel, "Character is trying to pick up a mismatched inventory object type.");
             return false;
         }
 
-        character.inventory.StackSize += amount;
+        character.Inventory.StackSize += amount;
 
-        if (character.inventory.MaxStackSize < character.inventory.StackSize)
+        if (character.Inventory.MaxStackSize < character.Inventory.StackSize)
         {
-            sourceInventory.StackSize = character.inventory.StackSize - character.inventory.MaxStackSize;
-            character.inventory.StackSize = character.inventory.MaxStackSize;
+            sourceInventory.StackSize = character.Inventory.StackSize - character.Inventory.MaxStackSize;
+            character.Inventory.StackSize = character.Inventory.MaxStackSize;
         }
         else
         {
@@ -361,11 +362,11 @@ public class InventoryManager
 
     private void CleanupInventory(Character character)
     {
-        CleanupInventory(character.inventory);
+        CleanupInventory(character.Inventory);
 
-        if (character.inventory.StackSize == 0)
+        if (character.Inventory.StackSize == 0)
         {
-            character.inventory = null;
+            character.Inventory = null;
         }
     }
 

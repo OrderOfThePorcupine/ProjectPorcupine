@@ -20,7 +20,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
     private Dictionary<Furniture, FurnitureChildObjects> childObjectMap;
 
     private Dictionary<BuildableComponent.Requirements, Vector3> statusIndicatorOffsets;
-    
+
     // Use this for initialization
     public FurnitureSpriteController(World world) : base(world, "Furniture")
     {
@@ -81,7 +81,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         {
             return SpriteManager.GetSprite("Furniture", spriteName);
         }
-        
+
         // Otherwise, the sprite name is more complicated.
         spriteName += "_";
 
@@ -146,7 +146,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         sr.sprite = GetSpriteForFurniture(furniture);
         sr.sortingLayerName = "Furniture";
         sr.color = furniture.Tint;
-        
+
         furn_go.name = furniture.Type + "_" + furniture.Tile.X + "_" + furniture.Tile.Y;
         furn_go.transform.position = furniture.Tile.Vector3 + ImageUtils.SpritePivotOffset(sr.sprite, furniture.Rotation);
         furn_go.transform.Rotate(0, 0, furniture.Rotation);
@@ -190,9 +190,9 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         }
 
         UpdateIconObjectsVisibility(furniture, childObjects);
-        
+
         if (furniture.Animation != null)
-        { 
+        {
             furniture.Animation.Renderer = sr;
         }
 
@@ -241,7 +241,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
             furn.Animation.OnFurnitureChanged();
             return;
         }
-        
+
         furn_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForFurniture(furn);
         furn_go.GetComponent<SpriteRenderer>().color = furn.Tint;
 
@@ -251,7 +251,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
             childObjectMap[furn].Overlay.GetComponent<SpriteRenderer>().sprite = overlaySprite;
         }
     }
-        
+
     protected override void OnRemoved(Furniture furn)
     {
         if (objectGameObjectMap.ContainsKey(furn) == false)
@@ -274,7 +274,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
 
         childObjectMap.Remove(furn);
     }
-        
+
     private void OnIsOperatingChanged(Furniture furniture)
     {
         if (furniture == null)
@@ -296,7 +296,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         {
             foreach (BuildableComponent.Requirements req in Enum.GetValues(typeof(BuildableComponent.Requirements)).Cast<BuildableComponent.Requirements>()
                 .Where(x => x != BuildableComponent.Requirements.None && statuses.StatusIndicators.ContainsKey(x)))
-            {                
+            {
                 if ((furniture.Requirements & req) == 0)
                 {
                     statuses.StatusIndicators[req].SetActive(false);
@@ -304,18 +304,18 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
                 else
                 {
                     statuses.StatusIndicators[req].SetActive(true);
-                }                
+                }
             }
         }
     }
 
     private string GetSuffixForNeighbour(Furniture furn, int x, int y, int z, string suffix)
     {
-         Tile t = world.GetTileAt(x, y, z);
-         if (t != null && t.Furniture != null && t.Furniture.LinksToNeighbour == furn.LinksToNeighbour)
-         {
-             return suffix;
-         }
+        Tile t = world.GetTileAt(x, y, z);
+        if (t != null && t.Furniture != null && t.Furniture.LinksToNeighbour == furn.LinksToNeighbour)
+        {
+            return suffix;
+        }
 
         return string.Empty;
     }
@@ -340,7 +340,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         public GameObject Overlay { get; set; }
 
         public Dictionary<BuildableComponent.Requirements, GameObject> StatusIndicators { get; set; }
-        
+
         public void AddStatus(BuildableComponent.Requirements requirements, GameObject gameObj)
         {
             if (StatusIndicators == null)
@@ -350,7 +350,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
 
             StatusIndicators[requirements] = gameObj;
         }
-        
+
         public void Destroy()
         {
             GameObject.Destroy(Overlay);

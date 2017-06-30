@@ -7,7 +7,7 @@
 // ====================================================
 #endregion
 
-namespace ProjectPorcupine.State
+namespace ProjectPorcupine.Entities.States
 {
     public class NeedState : State
     {

@@ -6,9 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System;
 using System.Linq;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,7 +23,7 @@ public class SelectionInfoTextField : MonoBehaviour
     // Use this for initialization.
     private void Start()
     {
-        mc = WorldController.Instance.mouseController;
+        mc = WorldController.Instance.MouseController;
         txt = GetComponent<Text>();
     }
 
