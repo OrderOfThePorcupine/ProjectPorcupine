@@ -242,7 +242,7 @@ public class AtmosphereComponent
 
         // HACK: tracking the amount to transfer with an array and a separate loop is likely
         // innefficient, it may instead be better to adjust amount appropriately by the amount
-        // removed.
+        // removed. In our standard rooms gas ratio should remain 20% O2, 80% N2
         float[] partialAmounts = new float[gasNames.Length];
         for (int i = 0; i < gasNames.Length; i++)
         {
