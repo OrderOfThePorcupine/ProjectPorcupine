@@ -30,7 +30,7 @@ public class SelectionInfoTextField : MonoBehaviour
     // Update is called once per frame.
     private void Update()
     {
-        if (mc.mySelection == null)
+        if (mc.Selection == null)
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
@@ -42,24 +42,24 @@ public class SelectionInfoTextField : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
 
-        ISelectable actualSelection = mc.mySelection.GetSelectedStuff();
+        ISelectable actualSelection = mc.Selection.GetSelectedStuff();
 
         string additionalInfoText = string.Join(Environment.NewLine, actualSelection.GetAdditionalInfo().ToArray());
 
         if (actualSelection.GetType() == typeof(Character))
         {
             // TODO: Change the hitpoint stuff.
-            txt.text = 
-                actualSelection.GetName() + "\n" + 
+            txt.text =
+                actualSelection.GetName() + "\n" +
                 actualSelection.GetDescription() + "\n" +
-                LocalizationTable.GetLocalization(actualSelection.GetJobDescription()) + "\n" + 
+                LocalizationTable.GetLocalization(actualSelection.GetJobDescription()) + "\n" +
                 additionalInfoText;
         }
         else
         {
             // TODO: Change the hitpoint stuff.
-            txt.text = 
-                LocalizationTable.GetLocalization(actualSelection.GetName()) + "\n" + 
+            txt.text =
+                LocalizationTable.GetLocalization(actualSelection.GetName()) + "\n" +
                 LocalizationTable.GetLocalization(actualSelection.GetDescription()) + "\n" +
                 additionalInfoText;
         }

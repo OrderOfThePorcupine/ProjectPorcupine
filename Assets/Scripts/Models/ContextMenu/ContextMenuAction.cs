@@ -9,7 +9,7 @@
 using System;
 
 public class ContextMenuAction
-{    
+{
     public Action<ContextMenuAction, Character> Action;
     public string Parameter;
 
@@ -23,9 +23,9 @@ public class ContextMenuAction
         {
             if (RequireCharacterSelected)
             {
-                if (mouseController.IsCharacterSelected())
+                if (mouseController.Selection != null && mouseController.Selection.IsCharacterSelected())
                 {
-                    ISelectable actualSelection = mouseController.mySelection.GetSelectedStuff();
+                    ISelectable actualSelection = mouseController.Selection.GetSelectedStuff();
                     Action(this, actualSelection as Character);
                 }
             }

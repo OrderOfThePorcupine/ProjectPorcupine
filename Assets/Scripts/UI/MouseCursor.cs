@@ -15,103 +15,48 @@ public class MouseCursor
 {
     public static readonly Color DefaultTint = Color.white;
 
-    public bool cursorOverride = false;
-    public bool forceShow = false;
-
-    private MouseController mc;
+    public static readonly Dictionary<TextAnchor, Vector3> Positions = new Dictionary<TextAnchor, Vector3>
+    {
+        { TextAnchor.UpperLeft, new Vector3(-64f, 32f, 0) },
+        { TextAnchor.UpperCenter, new Vector3(0, 32f, 0) },
+        { TextAnchor.UpperRight, new Vector3(96f, 32f, 0) },
+        { TextAnchor.MiddleLeft, new Vector3(-64f, 0, 0) },
+        { TextAnchor.MiddleCenter, new Vector3(0, 0, 0) },
+        { TextAnchor.MiddleRight, new Vector3(96f, 0, 0) },
+        { TextAnchor.LowerLeft, new Vector3(-64f, -32f, 0) },
+        { TextAnchor.LowerCenter, new Vector3(0, -32f, 0) },
+        { TextAnchor.LowerRight, new Vector3(96f, -32f, 0) },
+    };
 
     private GameObject cursorGO;
     private SpriteRenderer cursorSR;
-
-    private Dictionary<TextPosition, CursorTextBox> textBoxes = new Dictionary<TextPosition, CursorTextBox>();
-
-    private Vector3 upperLeftPostion = new Vector3(-64f, 32f, 0);
-    private Vector3 upperMiddlePosition = new Vector3(0, 32f, 0);
-    private Vector3 upperRightPostion = new Vector3(96f, 32f, 0);
-    private Vector3 middleLeftPostion = new Vector3(-64f, 0, 0);
-    private Vector3 middleMiddlePosition = new Vector3(0, 0, 0);
-    private Vector3 middleRightPostion = new Vector3(96f, 0, 0);
-    private Vector3 lowerLeftPostion = new Vector3(-64f, -32f, 0);
-    private Vector3 lowerMiddlePosition = new Vector3(0, -32f, 0);
-    private Vector3 lowerRightPostion = new Vector3(96f, -32f, 0);
-
     private Vector2 cursorTextBoxSize = new Vector2(140, 70);
-
     private Texture2D cursorTexture;
-
     private GUIStyle style = new GUIStyle();
+    private bool shouldShowCursor; // A more gentle variant to ForceShow.
 
-    public MouseCursor(MouseController mouseController)
+    private Dictionary<TextAnchor, CursorTextBox> textBoxes = new Dictionary<TextAnchor, CursorTextBox>();
+
+    public MouseCursor()
     {
-        mc = mouseController;
+        shouldShowCursor = false;
+        ForceShow = false;
 
         style.font = Resources.Load<Font>("Fonts/Arial/Arial") as Font;
         style.fontSize = 15;
-
-        LoadCursorTexture();
-        BuildCursor();
-
-        KeyboardManager.Instance.RegisterInputAction("ToggleCursorTextBox", KeyboardMappedInputType.KeyUp, () => { cursorOverride = !cursorOverride; });
-    }
-
-    public enum TextPosition
-    {
-        upperLeft,
-        upperMiddle,
-        upperRight,
-        middleLeft,
-        middleMiddle,
-        middleRight,
-        lowerLeft,
-        lowerMiddle,
-        lowerRight
-    }
-
-    public void Update()
-    {
-        ShowCursor();
-        UpdateCursor();
-    }
-
-    public void Reset()
-    {
-        for (int i = 0; i < 9; i++)
-        {
-            Text text = textBoxes[(TextPosition)i].text;
-            text.text = string.Empty;
-            text.color = DefaultTint;
-        }
-    }
-
-    public void DisplayCursorInfo(TextPosition pos, string text, Color color)
-    {
-        textBoxes[pos].text.text = text;
-        textBoxes[pos].text.color = color;
-    }
-
-    private void LoadCursorTexture()
-    {
         cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
+
+        KeyboardManager.Instance.RegisterInputAction("ToggleCursorTextBox", KeyboardMappedInputType.KeyUp, () => { shouldShowCursor = !shouldShowCursor; });
     }
 
-    private void BuildCursor()
+    /// <summary>
+    /// Forcefully show the cursor.
+    /// </summary>
+    public bool ForceShow { get; set; }
+
+    public GameObject BuildCursor()
     {
-        cursorGO = new GameObject();
-        cursorGO.name = "CURSOR";
-        cursorGO.transform.SetParent(mc.GetCursorParent().transform, true);
-        mc.GetCursorParent().name = "Cursor Canvas";
-
-        Canvas cursor_canvas = mc.GetCursorParent().AddComponent<Canvas>();
-        cursor_canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        cursor_canvas.worldCamera = Camera.main;
-        cursor_canvas.sortingLayerName = "TileUI";
-        cursor_canvas.referencePixelsPerUnit = 411.1f;
-        RectTransform rt = mc.GetCursorParent().GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(200, 200);
-
-        CanvasScaler cs = mc.GetCursorParent().AddComponent<CanvasScaler>();
-        cs.dynamicPixelsPerUnit = 100.6f;
-        cs.referencePixelsPerUnit = 411.1f;
+        cursorGO = new GameObject("CURSOR");
 
         RectTransform rt1 = cursorGO.AddComponent<RectTransform>();
         rt1.sizeDelta = new Vector2(64, 64);
@@ -120,27 +65,40 @@ public class MouseCursor
 
         Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
 
-        textBoxes[TextPosition.upperLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, upperLeftPostion, cursorTextBoxSize);
-        textBoxes[TextPosition.upperMiddle] = new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, upperMiddlePosition, cursorTextBoxSize);
-        textBoxes[TextPosition.upperRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, upperRightPostion, cursorTextBoxSize);
+        textBoxes = new Dictionary<TextAnchor, CursorTextBox>()
+        {
+            { TextAnchor.UpperLeft, new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, Positions[TextAnchor.UpperLeft], cursorTextBoxSize) },
+            { TextAnchor.UpperCenter, new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, Positions[TextAnchor.UpperCenter], cursorTextBoxSize) },
+            { TextAnchor.UpperRight, new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, Positions[TextAnchor.UpperRight], cursorTextBoxSize) },
 
-        textBoxes[TextPosition.middleLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, middleLeftPostion, cursorTextBoxSize);
-        textBoxes[TextPosition.middleMiddle] = new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, middleMiddlePosition, cursorTextBoxSize);
-        textBoxes[TextPosition.middleRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, middleRightPostion, cursorTextBoxSize);
+            { TextAnchor.MiddleLeft, new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, Positions[TextAnchor.MiddleLeft], cursorTextBoxSize) },
+            { TextAnchor.MiddleCenter, new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, Positions[TextAnchor.MiddleCenter], cursorTextBoxSize) },
+            { TextAnchor.MiddleRight, new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, Positions[TextAnchor.MiddleRight], cursorTextBoxSize) },
 
-        textBoxes[TextPosition.lowerLeft] = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, lowerLeftPostion, cursorTextBoxSize);
-        textBoxes[TextPosition.lowerMiddle] = new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, lowerMiddlePosition, cursorTextBoxSize);
-        textBoxes[TextPosition.lowerRight] = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, lowerRightPostion, cursorTextBoxSize);
+            { TextAnchor.LowerLeft, new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, Positions[TextAnchor.LowerLeft], cursorTextBoxSize) },
+            { TextAnchor.LowerCenter, new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, Positions[TextAnchor.LowerCenter], cursorTextBoxSize) },
+            { TextAnchor.LowerRight, new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, Positions[TextAnchor.LowerRight], cursorTextBoxSize) },
+        };
+
+        return cursorGO;
     }
 
-    private void UpdateCursor()
+    public void Reset()
     {
-        cursorGO.transform.position = Input.mousePosition;
+        foreach (CursorTextBox box in textBoxes.Values)
+        {
+            box.Set(string.Empty, DefaultTint);
+        }
     }
 
-    private void ShowCursor()
+    public void DisplayCursorInfo(TextAnchor pos, string text, Color color)
     {
-        if (forceShow || (cursorOverride == false && EventSystem.current.IsPointerOverGameObject() == false))
+        textBoxes[pos].Set(text, color);
+    }
+
+    public void Update()
+    {
+        if (ForceShow || (shouldShowCursor == false && EventSystem.current.IsPointerOverGameObject() == false))
         {
             cursorGO.SetActive(true);
         }
@@ -148,12 +106,14 @@ public class MouseCursor
         {
             cursorGO.SetActive(false);
         }
+
+        cursorGO.transform.position = Input.mousePosition;
     }
 
     public class CursorTextBox
     {
         public GameObject textObject;
-        public Text text;
+        public Text textComponent;
         public RectTransform rectTranform;
 
         public CursorTextBox(GameObject parentObject, TextAnchor textAlignment, GUIStyle style, Vector3 localPosition, Vector2 textWidthHeight)
@@ -162,10 +122,10 @@ public class MouseCursor
             textObject.transform.SetParent(parentObject.transform);
             textObject.transform.localPosition = localPosition;
 
-            text = textObject.AddComponent<Text>();
-            text.alignment = textAlignment;
-            text.font = style.font;
-            text.fontSize = style.fontSize;
+            textComponent = textObject.AddComponent<Text>();
+            textComponent.alignment = textAlignment;
+            textComponent.font = style.font;
+            textComponent.fontSize = style.fontSize;
 
             Outline outline = textObject.AddComponent<Outline>();
             outline.effectColor = Color.black;
@@ -173,6 +133,12 @@ public class MouseCursor
 
             rectTranform = textObject.GetComponentInChildren<RectTransform>();
             rectTranform.sizeDelta = textWidthHeight;
+        }
+
+        public void Set(string text, Color color)
+        {
+            textComponent.text = text;
+            textComponent.color = color;
         }
     }
 }

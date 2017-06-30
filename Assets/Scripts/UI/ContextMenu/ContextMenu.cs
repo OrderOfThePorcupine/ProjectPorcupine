@@ -57,7 +57,7 @@ public class ContextMenu : MonoBehaviour
     {
         gameObject.transform.position = Input.mousePosition + new Vector3(10, -10, 0);
 
-        bool characterSelected = WorldController.Instance.mouseController.IsCharacterSelected();
+        bool characterSelected = WorldController.Instance.mouseController.Selection != null && WorldController.Instance.mouseController.Selection.IsCharacterSelected();
 
         foreach (ContextMenuAction contextMenuAction in contextualActions)
         {
@@ -83,7 +83,6 @@ public class ContextMenu : MonoBehaviour
     private List<IContextActionProvider> GetContextualActionProviderOnTile(Tile tile)
     {
         List<IContextActionProvider> providers = new List<IContextActionProvider>();
-
         providers.Add(tile);
 
         if (tile.Furniture != null)
@@ -127,7 +126,7 @@ public class ContextMenu : MonoBehaviour
         {
             contextualActions.AddRange(contextualActionProvider.GetContextMenuActions(this));
         }
-        
+
         return contextualActions;
     }
 }

@@ -8,78 +8,93 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Text;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class MouseController
 {
-    public SelectionInfo mySelection;
-
     private GameObject cursorParent;
     private GameObject circleCursorPrefab;
     private GameObject furnitureParent;
 
-    // The world-position of the mouse last frame.
-    private Vector3 lastFramePosition;
-    private Vector3 currFramePosition;
-
-    private Vector3 currPlacingPosition;
-
-    // The world-position start of our left-mouse drag operation.
-    private Vector3 dragStartPosition;
-    private List<GameObject> dragPreviewGameObjects;
     private BuildModeController bmc;
     private FurnitureSpriteController fsc;
     private UtilitySpriteController usc;
-    private CursorInfoDisplay infoDisplay;
     private ContextMenu contextMenu;
     private MouseCursor mouseCursor;
+
+    private Vector3 lastFramePosition;      // Our last frame position
+    private Vector3 dragStartPosition;      // The world-position start of our left-mouse drag operation.
+
     private Dictionary<TooltipMode, Action<Vector2, MouseCursor>> toolTipHandlers;
     private string tooltip = null;
+    private TooltipMode currentTooltipMode = TooltipMode.DEFAULT;
 
-    // Is dragging an area (eg. floor tiles).
-    private bool isDragging = false;
-
-    // Ìs panning the camera
-    private bool isPanning = false;
+    private int validPostionCount;
+    private int invalidPositionCount;
 
     private float panningThreshold = .015f;
     private Vector3 panningMouseStart = Vector3.zero;
-
     private MouseMode currentMode = MouseMode.SELECT;
-    private TooltipMode currentTooltipMode = TooltipMode.DEFAULT;
+    private List<GameObject> dragPreviewGameObjects;
 
-    // Use this for initialization.
-    public MouseController(BuildModeController buildModeController, FurnitureSpriteController furnitureSpriteController, UtilitySpriteController utilitySpriteController, GameObject cursorObject)
+    /// <summary>
+    /// Construct a new mouse controller.
+    /// </summary>
+    /// <param name="buildModeController"> A reference to the build mode controller. </param>
+    /// <param name="furnitureSpriteController"> A reference to the furniture sprite controller. </param>
+    /// <param name="utilitySpriteController"> A reference to the utility sprite controller. </param>
+    /// <param name="cursorSpriteObject"> A reference to the sprite object to create. </param>
+    public MouseController(BuildModeController buildModeController, FurnitureSpriteController furnitureSpriteController, UtilitySpriteController utilitySpriteController, GameObject cursorSpriteObject)
     {
         bmc = buildModeController;
         bmc.SetMouseController(this);
-        infoDisplay = new CursorInfoDisplay(this);
-        circleCursorPrefab = cursorObject;
+        circleCursorPrefab = cursorSpriteObject;
         fsc = furnitureSpriteController;
         usc = utilitySpriteController;
         contextMenu = GameObject.FindObjectOfType<ContextMenu>();
         dragPreviewGameObjects = new List<GameObject>();
         cursorParent = new GameObject("Cursor");
-        mouseCursor = new MouseCursor(this);
+
+        /* Build the canvas for the cursor to sit in */
+        Canvas cursor_canvas = cursorParent.AddComponent<Canvas>();
+        cursor_canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        cursor_canvas.worldCamera = Camera.main;
+        cursor_canvas.sortingLayerName = "TileUI";
+        cursor_canvas.referencePixelsPerUnit = 411.1f;
+
+        RectTransform rt = cursorParent.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(200, 200);
+
+        CanvasScaler cs = cursorParent.AddComponent<CanvasScaler>();
+        cs.dynamicPixelsPerUnit = 100.6f;
+        cs.referencePixelsPerUnit = 411.1f;
+
+        mouseCursor = new MouseCursor();
+        mouseCursor.BuildCursor().transform.SetParent(cursorParent.transform);
+
         furnitureParent = new GameObject("Furniture Preview Sprites");
-        toolTipHandlers = new Dictionary<TooltipMode, Action<Vector2, MouseCursor>>();
-        toolTipHandlers.Add(TooltipMode.DEFAULT, GetTooltipNormalMode);
-        toolTipHandlers.Add(TooltipMode.BUILD, GetTooltipBuildMode);
-        toolTipHandlers.Add(TooltipMode.UI, GetTooltipUIMode);
+        toolTipHandlers = new Dictionary<TooltipMode, Action<Vector2, MouseCursor>>()
+        {
+            { TooltipMode.DEFAULT, GetTooltipNormalMode },
+            { TooltipMode.BUILD, GetTooltipBuildMode },
+            { TooltipMode.UI, GetTooltipUIMode },
+        };
 
         TimeManager.Instance.EveryFrame += (time) => Update();
     }
 
-    public enum MouseMode
+    private enum MouseMode
     {
         SELECT,
         BUILD,
         SPAWN_INVENTORY
     }
 
-    public enum TooltipMode
+    private enum TooltipMode
     {
         DEFAULT,
         BUILD,
@@ -87,74 +102,89 @@ public class MouseController
     }
 
     /// <summary>
-    /// Gets the mouse position in world space.
+    /// Is the player dragging the mouse?.
     /// </summary>
-    public Vector3 GetMousePosition()
-    {
-        return currFramePosition;
-    }
+    public bool IsDragging { get; private set; }
 
-    public Vector3 GetPlacingPosition()
-    {
-        return currPlacingPosition;
-    }
+    /// <summary>
+    /// Is the player panning the mouse?.
+    /// </summary>
+    public bool IsPanning { get; private set; }
 
-    public MouseMode GetCurrentMode()
-    {
-        return currentMode;
-    }
+    /// <summary>
+    /// Current frame position.
+    /// </summary>
+    public Vector3 CurrentFramePosition { get; private set; }
 
-    public bool GetIsDragging()
-    {
-        return isDragging;
-    }
+    /// <summary>
+    /// Current position placing objects.
+    /// </summary>
+    public Vector3 CurrentPlacingPosition { get; private set; }
 
-    public List<GameObject> GetDragObjects()
-    {
-        return dragPreviewGameObjects;
-    }
+    /// <summary>
+    /// What is currently selected.
+    /// </summary>
+    public SelectionInfo Selection { get; private set; }
 
-    public Tile GetMouseOverTile()
-    {
-        return WorldController.Instance.GetTileAtWorldCoord(currFramePosition);
-    }
-
-    public GameObject GetCursorParent()
-    {
-        return cursorParent;
-    }
-
+    /// <summary>
+    /// Start UI Mode.
+    /// </summary>
+    /// <param name="tooltip"> The tooltip to display. </param>
     public void StartUIMode(string tooltip)
     {
         currentTooltipMode = TooltipMode.UI;
         this.tooltip = tooltip;
-        mouseCursor.forceShow = true;
+        mouseCursor.ForceShow = true;
     }
 
-    public void ClearUIMode()
-    {
-        currentTooltipMode = currentMode == MouseMode.BUILD ? TooltipMode.BUILD : TooltipMode.DEFAULT;
-        this.tooltip = null;
-        mouseCursor.forceShow = false;
-    }
-
+    /// <summary>
+    /// Begin building mode.
+    /// </summary>
     public void StartBuildMode()
     {
         currentMode = MouseMode.BUILD;
         currentTooltipMode = TooltipMode.BUILD;
         this.tooltip = null;
-        mouseCursor.forceShow = false;
+        mouseCursor.ForceShow = false;
     }
 
+    /// <summary>
+    /// Begin spawning mode.
+    /// </summary>
     public void StartSpawnMode()
     {
         currentMode = MouseMode.SPAWN_INVENTORY;
         this.tooltip = null;
-        mouseCursor.forceShow = false;
+        mouseCursor.ForceShow = false;
     }
 
-    // Update is called once per frame.
-    public void Update()
+    /// <summary>
+    /// Stop UI mode.
+    /// </summary>
+    public void ClearUIMode()
+    {
+        currentTooltipMode = currentMode == MouseMode.BUILD ? TooltipMode.BUILD : TooltipMode.DEFAULT;
+        this.tooltip = null;
+        mouseCursor.ForceShow = false;
+    }
+
+    /// <summary>
+    /// Stop the mouse from dragging.
+    /// </summary>
+    /// <param name="changeMode"> Change modes back to defaults. </param>
+    public void StopDragging(bool changeMode = false)
+    {
+        IsDragging = false;
+        if (changeMode)
+        {
+            currentMode = MouseMode.SELECT;
+            currentTooltipMode = TooltipMode.DEFAULT;
+            tooltip = null;
+            mouseCursor.ForceShow = false;
+        }
+    }
+
+    private void Update()
     {
         UpdateCurrentFramePosition();
 
@@ -170,7 +200,7 @@ public class MouseController
         // Tooltip handling
         if (toolTipHandlers.ContainsKey(currentTooltipMode))
         {
-            toolTipHandlers[currentTooltipMode](GetMousePosition(), mouseCursor);
+            toolTipHandlers[currentTooltipMode](CurrentFramePosition, mouseCursor);
         }
 
         if (SettingsKeyHolder.DeveloperMode)
@@ -183,32 +213,56 @@ public class MouseController
         StoreFramePosition();
     }
 
-    public bool IsCharacterSelected()
+    private void GetPlacementValidationCounts()
     {
-        if (mySelection != null)
-        {
-            return mySelection.IsCharacterSelected();
-        }
+        validPostionCount = invalidPositionCount = 0;
 
-        return false;
+        for (int i = 0; i < dragPreviewGameObjects.Count; i++)
+        {
+            Tile t1 = GetTileUnderDrag(dragPreviewGameObjects[i].transform.position);
+            if (World.Current.FurnitureManager.IsPlacementValid(BuildModeController.Instance.buildModeType, t1) &&
+               (t1.PendingBuildJobs == null || (t1.PendingBuildJobs != null && t1.PendingBuildJobs.Count == 0)))
+            {
+                validPostionCount++;
+            }
+            else
+            {
+                invalidPositionCount++;
+            }
+        }
     }
 
-    public void ClearMouseMode(bool changeMode = false)
+    private string GetCurrentBuildRequirements()
     {
-        isDragging = false;
-        if (changeMode)
+        ProjectPorcupine.OrderActions.Build buildOrder = PrototypeManager.Furniture.Get(BuildModeController.Instance.buildModeType).GetOrderAction<ProjectPorcupine.OrderActions.Build>();
+        if (buildOrder != null)
         {
-            currentMode = MouseMode.SELECT;
-            currentTooltipMode = TooltipMode.DEFAULT;
-            tooltip = null;
-            mouseCursor.forceShow = false;
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in buildOrder.Inventory)
+            {
+                string requiredMaterialCount = (item.Amount * validPostionCount).ToString();
+                sb.Append(string.Format("{0}x {1}", requiredMaterialCount, LocalizationTable.GetLocalization(item.Type)));
+                if (buildOrder.Inventory.Count > 1)
+                {
+                    sb.AppendLine();
+                }
+            }
+
+            return sb.ToString();
         }
+
+        return "furnitureJobPrototypes is null";
+    }
+
+    private Tile GetTileUnderDrag(Vector3 gameObject_Position)
+    {
+        return WorldController.Instance.GetTileAtWorldCoord(gameObject_Position);
     }
 
     private void UpdateCurrentFramePosition()
     {
-        currFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        currFramePosition.z = WorldController.Instance.cameraController.CurrentLayer;
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        CurrentFramePosition = new Vector3(mousePos.x, mousePos.y, WorldController.Instance.cameraController.CurrentLayer);
     }
 
     private void GetTooltipUIMode(Vector2 pos, MouseCursor cursor)
@@ -217,8 +271,8 @@ public class MouseController
 
         if (string.IsNullOrEmpty(tooltip) == false)
         {
-            Debug.LogWarning(cursor.forceShow);
-            cursor.DisplayCursorInfo(MouseCursor.TextPosition.middleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
+            Debug.LogWarning(cursor.ForceShow);
+            cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
         }
     }
 
@@ -226,7 +280,10 @@ public class MouseController
     {
         cursor.Reset();
         Tile t = WorldController.Instance.GetTileAtWorldCoord(pos);
-        cursor.DisplayCursorInfo(MouseCursor.TextPosition.middleRight, infoDisplay.MousePosition(t), MouseCursor.DefaultTint);
+        if (t != null)
+        {
+            cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.DefaultTint);
+        }
     }
 
     private void GetTooltipBuildMode(Vector2 pos, MouseCursor cursor)
@@ -237,24 +294,24 @@ public class MouseController
         // Placing furniture object.
         if (bmc.buildMode == BuildMode.FURNITURE)
         {
-            cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(bmc.buildModeType).GetName()), MouseCursor.DefaultTint);
+            cursor.DisplayCursorInfo(TextAnchor.LowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(bmc.buildModeType).GetName()), MouseCursor.DefaultTint);
 
             // Dragging and placing multiple furniture.
-            if (t != null && GetIsDragging() == true && GetDragObjects().Count > 1)
+            if (t != null && IsDragging == true && dragPreviewGameObjects.Count > 1)
             {
-                infoDisplay.GetPlacementValidationCounts();
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperLeft, infoDisplay.ValidBuildPositionCount(), Color.green);
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperRight, infoDisplay.InvalidBuildPositionCount(), Color.red);
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, infoDisplay.GetCurrentBuildRequirements(), MouseCursor.DefaultTint);
+                GetPlacementValidationCounts();
+                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, validPostionCount.ToString(), Color.green);
+                cursor.DisplayCursorInfo(TextAnchor.UpperRight, invalidPositionCount.ToString(), Color.red);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, GetCurrentBuildRequirements(), MouseCursor.DefaultTint);
             }
         }
         else if (bmc.buildMode == BuildMode.FLOOR)
         {
             // Placing tiles and dragging.
-            if (t != null && GetIsDragging() == true && GetDragObjects().Count >= 1)
+            if (t != null && IsDragging == true && dragPreviewGameObjects.Count >= 1)
             {
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.upperLeft, GetDragObjects().Count.ToString(), MouseCursor.DefaultTint);
-                cursor.DisplayCursorInfo(MouseCursor.TextPosition.lowerLeft, LocalizationTable.GetLocalization(bmc.GetFloorTile()), MouseCursor.DefaultTint);
+                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, dragPreviewGameObjects.Count.ToString(), MouseCursor.DefaultTint);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, LocalizationTable.GetLocalization(bmc.GetFloorTile()), MouseCursor.DefaultTint);
             }
         }
     }
@@ -263,11 +320,11 @@ public class MouseController
     {
         if (Input.GetKeyUp(KeyCode.Escape) || Input.GetMouseButtonUp(1))
         {
-            if (currentMode == MouseMode.BUILD && isPanning == false)
+            if (currentMode == MouseMode.BUILD && IsPanning == false)
             {
-                ClearMouseMode(true);
+                StopDragging(true);
             }
-            else if (currentMode == MouseMode.SPAWN_INVENTORY && isPanning == false)
+            else if (currentMode == MouseMode.SPAWN_INVENTORY && IsPanning == false)
             {
                 currentMode = MouseMode.SELECT;
                 currentTooltipMode = TooltipMode.DEFAULT;
@@ -282,15 +339,16 @@ public class MouseController
             // Is the context also supposed to open on ESCAPE? That seems wrong
             if (currentMode == MouseMode.SELECT)
             {
-                if (contextMenu != null && GetMouseOverTile() != null)
+                Tile t = WorldController.Instance.GetTileAtWorldCoord(CurrentFramePosition);
+                if (contextMenu != null && t != null)
                 {
-                    if (isPanning)
+                    if (IsPanning)
                     {
                         contextMenu.Close();
                     }
                     else if (contextMenu != null)
                     {
-                        contextMenu.Open(GetMouseOverTile());
+                        contextMenu.Open(t);
                     }
                 }
             }
@@ -317,11 +375,11 @@ public class MouseController
             Sprite sprite = fsc.GetSpriteForFurniture(furnitureToBuild.Type);
 
             // Use the center of the Furniture.
-            currPlacingPosition = currFramePosition - ImageUtils.SpritePivotOffset(sprite, bmc.CurrentPreviewRotation);
+            CurrentPlacingPosition = CurrentFramePosition - ImageUtils.SpritePivotOffset(sprite, bmc.CurrentPreviewRotation);
         }
         else
         {
-            currPlacingPosition = currFramePosition;
+            CurrentPlacingPosition = CurrentFramePosition;
         }
     }
 
@@ -330,7 +388,7 @@ public class MouseController
         // This handles us left-clicking on furniture or characters to set a selection.
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            mySelection = null;
+            Selection = null;
         }
 
         if (currentMode != MouseMode.SELECT)
@@ -352,7 +410,7 @@ public class MouseController
             }
 
             // We just release the mouse button, so that's our queue to update our selection.
-            Tile tileUnderMouse = GetMouseOverTile();
+            Tile tileUnderMouse = WorldController.Instance.GetTileAtWorldCoord(CurrentFramePosition);
 
             if (tileUnderMouse == null)
             {
@@ -360,16 +418,16 @@ public class MouseController
                 return;
             }
 
-            if (mySelection == null || mySelection.Tile != tileUnderMouse)
+            if (Selection == null || Selection.Tile != tileUnderMouse)
             {
-                if (mySelection != null)
+                if (Selection != null)
                 {
-                    mySelection.GetSelectedStuff().IsSelected = false;
+                    Selection.GetSelectedStuff().IsSelected = false;
                 }
 
                 // We have just selected a brand new tile, reset the info.
-                mySelection = new SelectionInfo(tileUnderMouse);
-                mySelection.GetSelectedStuff().IsSelected = true;
+                Selection = new SelectionInfo(tileUnderMouse);
+                Selection.GetSelectedStuff().IsSelected = true;
             }
             else
             {
@@ -378,10 +436,10 @@ public class MouseController
 
                 // Rebuild the array of possible sub-selection in case characters moved in or out of the tile.
                 // [IsSelected] Set our last stuff to be not selected because were selecting the next stuff
-                mySelection.GetSelectedStuff().IsSelected = false;
-                mySelection.BuildStuffInTile();
-                mySelection.SelectNextStuff();
-                mySelection.GetSelectedStuff().IsSelected = true;
+                Selection.GetSelectedStuff().IsSelected = false;
+                Selection.BuildStuffInTile();
+                Selection.SelectNextStuff();
+                Selection.GetSelectedStuff().IsSelected = true;
             }
         }
     }
@@ -397,9 +455,9 @@ public class MouseController
 
         UpdateIsDragging();
 
-        if (isDragging == false || bmc.IsObjectDraggable() == false)
+        if (IsDragging == false || bmc.IsObjectDraggable() == false)
         {
-            dragStartPosition = currPlacingPosition;
+            dragStartPosition = CurrentPlacingPosition;
         }
 
         DragParameters dragParams = GetDragParameters();
@@ -407,9 +465,9 @@ public class MouseController
         ShowPreviews(dragParams);
 
         // End Drag.
-        if (isDragging && Input.GetMouseButtonUp(0))
+        if (IsDragging && Input.GetMouseButtonUp(0))
         {
-            isDragging = false;
+            IsDragging = false;
 
             // If we're over a UI element, then bail out from this.
             if (EventSystem.current.IsPointerOverGameObject())
@@ -434,22 +492,22 @@ public class MouseController
     private void UpdateIsDragging()
     {
         // TODO Keyboard input does not belong in MouseController. Move to KeyboardController?
-        if (isDragging && (Input.GetMouseButtonUp(1) || Input.GetKeyDown(KeyCode.Escape)))
+        if (IsDragging && (Input.GetMouseButtonUp(1) || Input.GetKeyDown(KeyCode.Escape)))
         {
-            isDragging = false;
+            IsDragging = false;
         }
-        else if (isDragging == false && Input.GetMouseButtonDown(0))
+        else if (IsDragging == false && Input.GetMouseButtonDown(0))
         {
-            isDragging = true;
+            IsDragging = true;
         }
     }
 
     private DragParameters GetDragParameters()
     {
         int startX = Mathf.FloorToInt(dragStartPosition.x + 0.5f);
-        int endX = Mathf.FloorToInt(currPlacingPosition.x + 0.5f);
+        int endX = Mathf.FloorToInt(CurrentPlacingPosition.x + 0.5f);
         int startY = Mathf.FloorToInt(dragStartPosition.y + 0.5f);
-        int endY = Mathf.FloorToInt(currPlacingPosition.y + 0.5f);
+        int endY = Mathf.FloorToInt(CurrentPlacingPosition.y + 0.5f);
         return new DragParameters(startX, endX, startY, endY);
     }
 
@@ -586,7 +644,7 @@ public class MouseController
 
         if (Input.GetMouseButtonUp(0))
         {
-            Tile t = GetMouseOverTile();
+            Tile t = WorldController.Instance.GetTileAtWorldCoord(CurrentFramePosition);
             WorldController.Instance.spawnInventoryController.SpawnInventory(t);
         }
     }
@@ -599,7 +657,7 @@ public class MouseController
             panningMouseStart.z = 0;
         }
 
-        if (!isPanning)
+        if (!IsPanning)
         {
             Vector3 currentMousePosition;
             currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -607,14 +665,14 @@ public class MouseController
 
             if (Vector3.Distance(panningMouseStart, currentMousePosition) > panningThreshold * Camera.main.orthographicSize)
             {
-                isPanning = true;
+                IsPanning = true;
             }
         }
 
         // Handle screen panning.
-        if (isPanning && (Input.GetMouseButton(1) || Input.GetMouseButton(2)))
+        if (IsPanning && (Input.GetMouseButton(1) || Input.GetMouseButton(2)))
         {   // Right or Middle Mouse Button.
-            Vector3 diff = lastFramePosition - currFramePosition;
+            Vector3 diff = lastFramePosition - CurrentFramePosition;
 
             if (diff != Vector3.zero)
             {
@@ -624,13 +682,13 @@ public class MouseController
 
             if (Input.GetMouseButton(1))
             {
-                isDragging = false;
+                IsDragging = false;
             }
         }
 
         if (!Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
-            isPanning = false;
+            IsPanning = false;
         }
 
         // If we're over a UI element or the settings/options menu is open, then bail out from this.
