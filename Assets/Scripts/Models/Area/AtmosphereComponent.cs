@@ -235,7 +235,6 @@ public class AtmosphereComponent
             return;
         }
 
-
         amount = Mathf.Min(this.TotalGas, amount);
 
         string[] gasNames = this.GetGasNames();
