@@ -8,37 +8,40 @@
 #endregion
 using System.Xml;
 
-public class Stat : IPrototypable
+namespace ProjectPorcupine.Entities
 {
-    public Stat()
+    public class Stat : IPrototypable
     {
-    }
+        public Stat()
+        {
+        }
 
-    private Stat(Stat other)
-    {
-        Type = other.Type;
-        Name = other.Name;
-    }
+        private Stat(Stat other)
+        {
+            Type = other.Type;
+            Name = other.Name;
+        }
 
-    public string Type { get; set; }
+        public string Type { get; set; }
 
-    public string Name { get; set; }
+        public string Name { get; set; }
 
-    public int Value { get; set; }
+        public int Value { get; set; }
 
-    public void ReadXmlPrototype(XmlReader parentReader)
-    {
-        Type = parentReader.GetAttribute("type");
-        Name = parentReader.GetAttribute("name");
-    }
+        public void ReadXmlPrototype(XmlReader parentReader)
+        {
+            Type = parentReader.GetAttribute("type");
+            Name = parentReader.GetAttribute("name");
+        }
 
-    public Stat Clone()
-    {
-        return new Stat(this);
-    }
+        public Stat Clone()
+        {
+            return new Stat(this);
+        }
 
-    public override string ToString()
-    {
-        return string.Format("{0}: {1}", Type, Value);
+        public override string ToString()
+        {
+            return string.Format("{0}: {1}", Type, Value);
+        }
     }
 }

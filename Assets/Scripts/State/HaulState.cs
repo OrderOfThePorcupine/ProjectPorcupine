@@ -11,7 +11,7 @@ using System.Linq;
 using ProjectPorcupine.Pathfinding;
 using UnityEngine;
 
-namespace ProjectPorcupine.State
+namespace ProjectPorcupine.Entities.States
 {
     public enum HaulAction
     {
@@ -49,8 +49,8 @@ namespace ProjectPorcupine.State
 
                 case HaulAction.FindMaterial:
                     // Find material somewhere
-                    string[] inventoryTypes = character.inventory != null ?
-                        new string[] { character.inventory.Type } :
+                    string[] inventoryTypes = character.Inventory != null ?
+                        new string[] { character.Inventory.Type } :
                         Job.RequestedItems.Keys.ToArray();
                     path = World.Current.InventoryManager.GetPathToClosestInventoryOfType(inventoryTypes, character.CurrTile, Job.canTakeFromStockpile);
                     if (path != null && path.Count > 0)
@@ -59,7 +59,7 @@ namespace ProjectPorcupine.State
                         inv.Claim(character, (inv.AvailableInventory < Job.RequestedItems[inv.Type].AmountDesired()) ? inv.AvailableInventory : Job.RequestedItems[inv.Type].AmountDesired());
                         character.SetState(new MoveState(character, Pathfinder.GoalTileEvaluator(path.Last(), false), path, this));
                     }
-                    else if (character.inventory == null)
+                    else if (character.Inventory == null)
                     {
                         // The character has no inventory and can't find anything to haul.
                         Interrupt();
@@ -75,7 +75,7 @@ namespace ProjectPorcupine.State
 
                 case HaulAction.PickupMaterial:
                     Inventory tileInventory = character.CurrTile.Inventory;
-                    int amountCarried = character.inventory != null ? character.inventory.StackSize : 0;
+                    int amountCarried = character.Inventory != null ? character.Inventory.StackSize : 0;
                     int amount = Mathf.Min(Job.AmountDesiredOfInventoryType(tileInventory.Type) - amountCarried, tileInventory.StackSize);
                     DebugLog(" - Picked up {0} {1}", amount, tileInventory.Type);
                     World.Current.InventoryManager.PlaceInventory(character, tileInventory, amount);
@@ -96,7 +96,7 @@ namespace ProjectPorcupine.State
                     break;
 
                 case HaulAction.DropOffmaterial:
-                    DebugLog(" - Delivering {0} {1}", character.inventory.StackSize, character.inventory.Type);
+                    DebugLog(" - Delivering {0} {1}", character.Inventory.StackSize, character.Inventory.Type);
                     World.Current.InventoryManager.PlaceInventory(Job, character);
 
                     // Ping the Job system
@@ -112,23 +112,23 @@ namespace ProjectPorcupine.State
             bool jobWantsTileInventory = InventoryManager.CanBePickedUp(tileInventory, Job.canTakeFromStockpile) &&
                                          Job.AmountDesiredOfInventoryType(tileInventory.Type) > 0;
 
-            if (noMoreMaterialFound && character.inventory != null)
+            if (noMoreMaterialFound && character.Inventory != null)
             {
                 return Job.IsTileAtJobSite(character.CurrTile) ? HaulAction.DropOffmaterial : HaulAction.DeliverMaterial;
             }
-            else if (character.inventory != null && Job.AmountDesiredOfInventoryType(character.inventory.Type) == 0)
+            else if (character.Inventory != null && Job.AmountDesiredOfInventoryType(character.Inventory.Type) == 0)
             {
                 return HaulAction.DumpMaterial;
             }
-            else if (character.inventory == null)
+            else if (character.Inventory == null)
             {
                 return jobWantsTileInventory ? HaulAction.PickupMaterial : HaulAction.FindMaterial;
             }
             else
             {
-                int amountWanted = Job.AmountDesiredOfInventoryType(character.inventory.Type);
-                int currentlyCarrying = character.inventory.StackSize;
-                int spaceAvailable = character.inventory.MaxStackSize - currentlyCarrying;
+                int amountWanted = Job.AmountDesiredOfInventoryType(character.Inventory.Type);
+                int currentlyCarrying = character.Inventory.StackSize;
+                int spaceAvailable = character.Inventory.MaxStackSize - currentlyCarrying;
 
                 // Already carrying it
                 if (amountWanted <= currentlyCarrying || spaceAvailable == 0)

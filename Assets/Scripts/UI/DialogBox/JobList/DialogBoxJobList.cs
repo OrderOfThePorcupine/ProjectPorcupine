@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +29,7 @@ public class DialogBoxJobList : DialogBox
         {
             GameObject go = (GameObject)Instantiate(JobListItemPrefab, JobList);
             string jobDescription = LocalizationTable.GetLocalization(character.GetJobDescription(), formatValues);
-            go.GetComponentInChildren<Text>().text = string.Format("<b>{0}</b> - {1}", character.GetName(), jobDescription);
+            go.GetComponentInChildren<Text>().text = string.Format("<b>{0}</b> - {2}", character.GetName(), jobDescription);
 
             JobListItem listItem = go.GetComponent<JobListItem>();
             listItem.character = character;

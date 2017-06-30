@@ -604,7 +604,7 @@ public class SoundDeviceComboBox : GenericComboBox
 
     public override GameObject InitializeElement()
     {
-        GameObject go = DropdownHelperFromOptionData(CreateDeviceDropdown(), WorldController.Instance.soundController.GetCurrentAudioDriver());
+        GameObject go = DropdownHelperFromOptionData(CreateDeviceDropdown(), WorldController.Instance.SoundController.GetCurrentAudioDriver());
 
         dropdownElement.onValueChanged.AddListener(
             (int v) =>
@@ -622,16 +622,16 @@ public class SoundDeviceComboBox : GenericComboBox
 
     private Dropdown.OptionData[] CreateDeviceDropdown()
     {
-        Dropdown.OptionData[] options = new Dropdown.OptionData[WorldController.Instance.soundController.GetDriverCount()];
+        Dropdown.OptionData[] options = new Dropdown.OptionData[WorldController.Instance.SoundController.GetDriverCount()];
 
         for (int i = 0; i < options.Length; i++)
         {
-            DriverInfo info = WorldController.Instance.soundController.GetDriverInfo(i);
+            DriverInfo info = WorldController.Instance.SoundController.GetDriverInfo(i);
 
             options[i] = new DriverDropdownOption
             {
-                text = info.name.ToString(),
-                driverInfo = info.guid.ToString()
+                text = info.Name.ToString(),
+                driverInfo = info.Guid.ToString()
             };
         }
 
@@ -644,7 +644,7 @@ public class SoundDeviceComboBox : GenericComboBox
 
         if (selectedOption != null)
         {
-            WorldController.Instance.soundController.SetAudioDriver(selectedOption.driverInfo);
+            WorldController.Instance.SoundController.SetAudioDriver(selectedOption.driverInfo);
         }
     }
 
@@ -654,7 +654,7 @@ public class SoundDeviceComboBox : GenericComboBox
 
         if (selectedOption != null)
         {
-            WorldController.Instance.soundController.SetAudioDriver(getValue());
+            WorldController.Instance.SoundController.SetAudioDriver(getValue());
         }
     }
 
@@ -668,7 +668,7 @@ public class SoundDeviceComboBox : GenericComboBox
         }
         else
         {
-            return WorldController.Instance.soundController.GetCurrentAudioDriverInfo().guid.ToString();
+            return WorldController.Instance.SoundController.GetCurrentAudioDriverInfo().Guid.ToString();
         }
     }
 }
@@ -913,7 +913,7 @@ public class SoundSlider : GenericSlider
         if (this.parameterData.ContainsKey("SoundChannel"))
         {
             Settings.SetSetting(option.key, sliderElement.normalizedValue);
-            WorldController.Instance.soundController.SetVolume(this.parameterData["SoundChannel"].ToString(), sliderElement.normalizedValue);
+            WorldController.Instance.SoundController.SetVolume(this.parameterData["SoundChannel"].ToString(), sliderElement.normalizedValue);
         }
     }
 
@@ -922,7 +922,7 @@ public class SoundSlider : GenericSlider
         base.CancelSetting();
         if (this.parameterData.ContainsKey("SoundChannel"))
         {
-            WorldController.Instance.soundController.SetVolume(this.parameterData["SoundChannel"].ToString(), getValue());
+            WorldController.Instance.SoundController.SetVolume(this.parameterData["SoundChannel"].ToString(), getValue());
         }
     }
 }
@@ -937,7 +937,7 @@ public class AutosaveIntervalInputField : GenericInputField
         base.ApplySetting();
         if (WorldController.Instance != null)
         {
-            WorldController.Instance.autosaveManager.SetAutosaveInterval(int.Parse(value));
+            WorldController.Instance.AutosaveManager.SetAutosaveInterval(int.Parse(value));
         }
     }
 
@@ -946,7 +946,7 @@ public class AutosaveIntervalInputField : GenericInputField
         base.CancelSetting();
         if (WorldController.Instance != null)
         {
-            WorldController.Instance.autosaveManager.SetAutosaveInterval(int.Parse(getValue()));
+            WorldController.Instance.AutosaveManager.SetAutosaveInterval(int.Parse(getValue()));
         }
     }
 }

@@ -30,7 +30,7 @@ function Quest_Spawn_Inventory(reward)
     if (tile == nil) then
         return
     end
-    World.Current.inventoryManager.PlaceInventory(tile, inv)
+    World.Current.InventoryManager.PlaceInventory(tile, inv)
     reward.IsCollected = true;
 end
 
