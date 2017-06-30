@@ -243,10 +243,11 @@ public class WorldController : MonoBehaviour
     /// <param name="writer">TextWriter that contains serialized World data.</param>
     private void SaveWorldToHdd(JObject worldJson, JsonWriter writer)
     {
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.NullValueHandling = NullValueHandling.Ignore;
-        serializer.Formatting = Formatting.Indented;
-
+        JsonSerializer serializer = new JsonSerializer()
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented
+        };
         serializer.Serialize(writer, worldJson);
 
         writer.Flush();
