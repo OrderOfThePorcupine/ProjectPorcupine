@@ -11,62 +11,38 @@ using System.Linq;
 using FMOD;
 using UnityEngine;
 
-public struct DriverInfo
-{
-    public DriverInfo(int id)
-    {
-        this.ID = id;
-        this.Name = new System.Text.StringBuilder(64);
-
-        System.Guid guid;
-        int systemRate;
-        SPEAKERMODE speakerMode;
-        int speakerModeChannels;
-
-        AudioManager.SoundSystem.getDriverInfo(id, this.Name, 64, out guid, out systemRate, out speakerMode, out speakerModeChannels);
-
-        this.Guid = guid;
-    }
-
-    public int ID { get; private set; }
-
-    public System.Text.StringBuilder Name { get; private set; }
-
-    public System.Guid Guid { get; private set; }
-
-    public override string ToString()
-    {
-        return ID.ToString() + ", " + Name.ToString();
-    }
-}
-
 public class SoundController
 {
+    public AudioManager AudioManager { get; private set; }
+
     private Dictionary<SoundClip, float> cooldowns;
     private VECTOR up;
     private VECTOR forward;
     private VECTOR zero;
     private VECTOR ignore;
 
-    // Use this for initialization
-    public SoundController(World world = null)
+    public SoundController(AudioManager parentManager)
+    {
+        TimeManager.Instance.EveryFrame += Update;
+        zero = GetVectorFrom(Vector3.zero);
+        forward = GetVectorFrom(Vector3.forward);
+        up = GetVectorFrom(Vector3.up);
+        cooldowns = new Dictionary<SoundClip, float>();
+        this.AudioManager = parentManager;
+    }
+
+    public enum AudioChannel
+    {
+        master, UI, gameSounds, alerts, music
+    }
+
+    public void AssignWorld(World world)
     {
         if (world != null)
         {
             world.FurnitureManager.Created += OnFurnitureCreated;
             world.OnTileTypeChanged += OnTileTypeChanged;
         }
-
-        TimeManager.Instance.EveryFrame += Update;
-        zero = GetVectorFrom(Vector3.zero);
-        forward = GetVectorFrom(Vector3.forward);
-        up = GetVectorFrom(Vector3.up);
-        cooldowns = new Dictionary<SoundClip, float>();
-    }
-
-    public enum AudioChannel
-    {
-        master, UI, gameSounds, alerts, music
     }
 
     // Update is called once per frame
@@ -228,7 +204,7 @@ public class SoundController
     /// Returns information on the current driver.
     /// </summary>
     /// <returns> Information covering index, name, GUID, and other information <see cref="DriverInfo"/>. </returns>
-    public DriverInfo GetCurrentAudioDriverInfo()
+    public AudioManager.DriverInfo GetCurrentAudioDriverInfo()
     {
         int audioDriver;
         AudioManager.SoundSystem.getDriver(out audioDriver);
@@ -240,9 +216,9 @@ public class SoundController
     /// </summary>
     /// <param name="id"> The index in question. </param>
     /// <returns> Information covering index, name, GUID, and other information <see cref="DriverInfo"/>. </returns>
-    public DriverInfo GetDriverInfo(int id)
+    public AudioManager.DriverInfo GetDriverInfo(int id)
     {
-        return new DriverInfo(id);
+        return new AudioManager.DriverInfo(id);
     }
 
     /// <summary>

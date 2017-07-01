@@ -82,6 +82,10 @@ public class World
     {
         TimeManager.Instance.EveryFrameUnpaused -= TickEveryFrame;
         TimeManager.Instance.FixedFrequencyUnpaused -= TickFixedFrequency;
+
+        // Not strictly necessary but explicitly stating that we are decoupling the sound controller that we previously coupled.
+        FurnitureManager.Created -= GameController.Instance.AudioManager.SoundController.OnFurnitureCreated;
+        OnTileTypeChanged -= GameController.Instance.AudioManager.SoundController.OnTileTypeChanged;
     }
 
     public event Action<Tile> OnTileChanged;
@@ -180,11 +184,31 @@ public class World
     }
 
     /// <summary>
-    /// Gets the tile data at x and y.
+    /// Gets the tile data 
     /// </summary>
     /// <returns>The <see cref="Tile"/> or null if called with invalid arguments.</returns>
-    /// <param name="x">The x coordinate.</param>
-    /// <param name="y">The y coordinate.</param>
+    /// <param name="position"> The position to round. </param>
+    public Tile GetRoundedTileAt(Vector3 position)
+    {
+        int x = Mathf.RoundToInt(position.x);
+        int y = Mathf.RoundToInt(position.y);
+        int z = Mathf.RoundToInt(position.z);
+
+        if (x >= Width || x < 0 || y >= Height || y < 0 || z >= Depth || z < 0)
+        {
+            return null;
+        }
+
+        return tiles[x, y, z];
+    }
+
+    /// <summary>
+    /// Gets the tile data at x, and y 
+    /// </summary>
+    /// <returns>The <see cref="Tile"/> or null if called with invalid arguments.</returns>
+    /// <param name="x"> The X coord. </param>
+    /// <param name="y"> The Y coord. </param>
+    /// <param name="z"> The Z coord. </param>
     public Tile GetTileAt(int x, int y, int z)
     {
         if (x >= Width || x < 0 || y >= Height || y < 0 || z >= Depth || z < 0)
@@ -308,24 +332,26 @@ public class World
 
     public JObject ToJson()
     {
-        JObject worldJson = new JObject();
-        worldJson.Add("Seed", Seed);
-        worldJson.Add("RandomState", RandomStateToJson());
-        worldJson.Add("Width", Width.ToString());
-        worldJson.Add("Height", Height.ToString());
-        worldJson.Add("Depth", Depth.ToString());
-        worldJson.Add("Rooms", RoomManager.ToJson());
-        worldJson.Add("Tiles", TilesToJson());
-        worldJson.Add("Inventories", InventoryManager.ToJson());
-        worldJson.Add("Furnitures", FurnitureManager.ToJson());
-        worldJson.Add("Utilities", UtilityManager.ToJson());
-        worldJson.Add("RoomBehaviors", RoomManager.BehaviorsToJson());
-        worldJson.Add("Characters", CharacterManager.ToJson());
-        worldJson.Add("CameraData", CameraData.ToJson());
-        worldJson.Add("Skybox", skybox.name);
-        worldJson.Add("Wallet", Wallet.ToJson());
-        worldJson.Add("Time", TimeManager.Instance.ToJson());
-        worldJson.Add("Scheduler", Scheduler.Scheduler.Current.ToJson());
+        JObject worldJson = new JObject
+        {
+            { "Seed", Seed },
+            { "RandomState", RandomStateToJson() },
+            { "Width", Width.ToString() },
+            { "Height", Height.ToString() },
+            { "Depth", Depth.ToString() },
+            { "Rooms", RoomManager.ToJson() },
+            { "Tiles", TilesToJson() },
+            { "Inventories", InventoryManager.ToJson() },
+            { "Furnitures", FurnitureManager.ToJson() },
+            { "Utilities", UtilityManager.ToJson() },
+            { "RoomBehaviors", RoomManager.BehaviorsToJson() },
+            { "Characters", CharacterManager.ToJson() },
+            { "CameraData", CameraData.ToJson() },
+            { "Skybox", skybox.name },
+            { "Wallet", Wallet.ToJson() },
+            { "Time", TimeManager.Instance.ToJson() },
+            { "Scheduler", Scheduler.Scheduler.Current.ToJson() }
+        };
         return worldJson;
     }
 

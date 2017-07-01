@@ -32,7 +32,7 @@ public class CameraData
         cameraJson.Add("Y", Camera.main.transform.position.y);
         cameraJson.Add("Z", Camera.main.transform.position.z);
         cameraJson.Add("ZoomLevel", Camera.main.orthographicSize);
-        cameraJson.Add("ZLevel", WorldController.Instance.CameraController.CurrentLayer);
+        cameraJson.Add("ZLevel", GameController.Instance.CameraController.CurrentLayer);
 
         JArray presetsJson = new JArray();
 

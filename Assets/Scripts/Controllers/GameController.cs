@@ -7,6 +7,7 @@
 // ====================================================
 #endregion
 
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 
@@ -16,15 +17,55 @@ public class GameController : MonoBehaviour
     // If so - beginner task!
     public static readonly string GameVersion = "Someone_will_come_up_with_a_proper_naming_scheme_later";
 
+    #region Instances
+
     public static GameController Instance { get; protected set; }
 
     public KeyboardManager KeyboardManager { get; private set; }
 
-    public SoundController SoundController { get; private set; }
+    public AudioManager AudioManager { get; private set; }
 
-    // If true, a modal dialog box is open, so normal inputs should be ignored.
+    public ModsManager ModsManager { get; private set; }
+
+    public DialogBoxManager DialogBoxManager { get; private set; }
+
+    public FurnitureSpriteController FurnitureSpriteController { get; private set; }
+
+    public UtilitySpriteController UtilitySpriteController { get; private set; }
+
+    public TileSpriteController TileSpriteController { get; private set; }
+
+    public CharacterSpriteController CharacterSpriteController { get; private set; }
+
+    public JobSpriteController JobSpriteController { get; private set; }
+
+    public InventorySpriteController InventorySpriteController { get; private set; }
+
+    public ShipSpriteController ShipSpriteController { get; private set; }
+
+    public BuildModeController BuildModeController { get; private set; }
+
+    public MouseController MouseController { get; private set; }
+
+    public CameraController CameraController { get; private set; }
+
+    public SystemController CurrentSystem { get; private set; }
+
+    public World CurrentWorld { get { return CurrentSystem.CurrentWorld; } }
+
+    #endregion
+
+    [SerializeField]
+    private GameObject circleCursorPrefab;
+
+    /// <summary>
+    /// Is any dialog box open?.
+    /// </summary>
     public bool IsModal { get; set; }
 
+    /// <summary>
+    /// Is the game paused?.
+    /// </summary>
     public bool IsPaused
     {
         get
@@ -38,32 +79,115 @@ public class GameController : MonoBehaviour
         }
     }
 
-    // Path to the saves folder.
-    public string FileSaveBasePath()
-    {
-        return System.IO.Path.Combine(Application.persistentDataPath, "Saves");
-    }
+    /// <summary>
+    /// Path to all file saves.
+    /// </summary>
+    public string FileSaveBasePath { get { return System.IO.Path.Combine(Application.persistentDataPath, "Saves"); } }
 
-    // Path to the world generator folder.
-    public string GeneratorBasePath()
+    /// <summary>
+    /// Path to all the generator files.
+    /// </summary>
+    public string GeneratorBasePath { get { return System.IO.Path.Combine(Application.streamingAssetsPath, "WorldGen"); } }
+
+    /// <summary>
+    /// Change the developper mode.
+    /// </summary>
+    public void ChangeDevMode()
     {
-        return System.IO.Path.Combine(Application.streamingAssetsPath, "WorldGen");
+        bool newMode = !SettingsKeyHolder.DeveloperMode;
+        SettingsKeyHolder.DeveloperMode = newMode;
+
+        if (CurrentSystem != null)
+        {
+            CurrentSystem.ChangeDevMode(newMode);
+        }
     }
 
     // Each time a scene is loaded.
     private void Awake()
     {
-        EnableDontDestroyOnLoad();
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
 
-        SoundController = new SoundController();
+        // FIXME: Do something real here. This is just to show how to register a C# event prototype for the Scheduler.
+        /*
+        PrototypeManager.ScheduledEvent.Add(
+            new ScheduledEvent(
+                "ping_log",
+                (evt) => UnityDebugger.Debugger.LogFormat("Scheduler", "Event {0} fired", evt.Name)));
+        */
+
+        DontDestroyOnLoad(this);
+
+        new FunctionsManager();
+        new PrototypeManager();
+        new CharacterNameManager();
+        new SpriteManager();
 
         // Load Keyboard Mapping.
         KeyboardManager = KeyboardManager.Instance;
 
-        IsModal = false;
-        IsPaused = false;
+        AudioManager = new AudioManager();
+        ModsManager = new ModsManager();
+
+        FurnitureSpriteController = new FurnitureSpriteController();
+        UtilitySpriteController = new UtilitySpriteController();
+        TileSpriteController = new TileSpriteController();
+        CharacterSpriteController = new CharacterSpriteController();
+        JobSpriteController = new JobSpriteController();
+        InventorySpriteController = new InventorySpriteController(Resources.Load<GameObject>("UI/InventoryUI"));
+        ShipSpriteController = new ShipSpriteController();
+
+        BuildModeController = new BuildModeController();
+        MouseController = new MouseController(circleCursorPrefab);
+        CameraController = new CameraController();
+        CameraController.Initialize();
 
         KeyboardManager.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });
+
+        // Initialising controllers.
+        GameObject canvas = GameObject.Find("Canvas");
+
+        // Instantiate a FPSCounter.
+        GameObject menuTop = (GameObject)Instantiate(Resources.Load("UI/MenuTop"));
+        menuTop.name = "MenuTop";
+        menuTop.transform.SetParent(canvas.transform, false);
+        GameObject fpsCounter = menuTop.GetComponentInChildren<PerformanceHUDManager>().gameObject;
+        fpsCounter.SetActive(true);
+
+        DialogBoxManager = new GameObject("Dialog Boxes").AddComponent<DialogBoxManager>();
+        DialogBoxManager.transform.SetParent(canvas.transform, false);
+
+        // Settings UI is a 'dialog box' (kinda), so it comes here.  
+        // Where as DevConsole is a constant menu item (it can appear 'anywhere' so it appears after)
+        GameObject settingsMenu = (GameObject)Instantiate(Resources.Load("UI/SettingsMenu/SettingsMenu"));
+
+        if (settingsMenu != null)
+        {
+            settingsMenu.name = "Settings Menu";
+            settingsMenu.transform.SetParent(canvas.transform, false);
+            settingsMenu.SetActive(true);
+        }
+
+        GameObject devConsole = (GameObject)Instantiate(Resources.Load("UI/Console/DevConsole"));
+
+        if (devConsole != null)
+        {
+            devConsole.name = "DevConsole-Spawned";
+            devConsole.transform.SetParent(canvas.transform, false);
+            devConsole.transform.SetAsLastSibling();
+            devConsole.SetActive(true);
+            DeveloperConsole.DevConsole.Close();
+        }
+
+        IsModal = false;
+        IsPaused = false;
     }
 
     // Only on first time a scene is loaded.
@@ -79,22 +203,6 @@ public class GameController : MonoBehaviour
     private void Update()
     {
         TimeManager.Instance.Update(Time.deltaTime);
-    }
-
-    // Game Controller will persist between scenes. 
-    private void EnableDontDestroyOnLoad()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(this.gameObject);
-            Destroy(this);
-        }
-
-        DontDestroyOnLoad(this);
     }
 
     private void OnApplicationQuit()

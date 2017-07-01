@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,11 +37,12 @@ namespace ProjectPorcupine.Entities
         private Color[] swapSpriteColors;
 
         // Use this for initialization
-        public CharacterSpriteController(World world) : base(world, "Characters")
+        public CharacterSpriteController() : base("Characters")
         {
             // prepare swap texture for shader
             Texture2D colorSwapTex = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
             colorSwapTex.filterMode = FilterMode.Point;
+
             for (int i = 0; i < colorSwapTex.width; ++i)
             {
                 colorSwapTex.SetPixel(i, 0, new Color(0.0f, 0.0f, 0.0f, 0.0f));
@@ -48,28 +50,43 @@ namespace ProjectPorcupine.Entities
 
             colorSwapTex.Apply();
             swapSpriteColors = new Color[colorSwapTex.width];
+        }
 
-            // Register our callback so that our GameObject gets updated whenever
-            // the tile's type changes.
-            world.CharacterManager.Created += OnCreated;
-
-            // Check for pre-existing characters, which won't do the callback.
-            foreach (Character character in world.CharacterManager)
+        /// <summary>
+        /// Register world.
+        /// </summary>
+        /// <param name="world"> World to register. </param>
+        public override void AssignWorld(World world)
+        {
+            if (world != null)
             {
-                OnCreated(character);
+                // Register our callback so that our GameObject gets updated whenever
+                // the tile's type changes.
+                world.CharacterManager.Created += OnCreated;
+
+                // Check for pre-existing characters, which won't do the callback.
+                foreach (Character character in world.CharacterManager)
+                {
+                    OnCreated(character);
+                }
             }
         }
 
-        public override void RemoveAll()
+        /// <summary>
+        /// Unregister world.
+        /// </summary>
+        /// <param name="world"> World to unregister. </param>
+        public override void UnAssignWorld(World world)
         {
-            world.CharacterManager.Created -= OnCreated;
-
-            foreach (Character c in world.CharacterManager)
+            if (world != null)
             {
-                c.OnCharacterChanged -= OnChanged;
-            }
+                world.CharacterManager.Created -= OnCreated;
 
-            base.RemoveAll();
+                foreach (Character c in world.CharacterManager)
+                {
+                    c.OnCharacterChanged -= OnChanged;
+                }
+            }
         }
 
         protected override void OnCreated(Character character)

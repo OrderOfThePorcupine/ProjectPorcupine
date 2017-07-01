@@ -53,7 +53,7 @@ public abstract class MouseOver : MonoBehaviour
             return;
         }
 
-        mouseController = WorldController.Instance.MouseController;
+        mouseController = GameController.Instance.MouseController;
         if (mouseController == null)
         {
             UnityDebugger.Debugger.LogError("MouseOver", "How do we not have an instance of mouse controller?");

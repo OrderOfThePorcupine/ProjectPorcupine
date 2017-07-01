@@ -146,7 +146,7 @@ public class BuildModeController
         {
             string roomBehaviorType = BuildModeType;
 
-            if (tile.Room != null && WorldController.Instance.World.IsRoomBehaviorValidForRoom(roomBehaviorType, tile.Room))
+            if (tile.Room != null && GameController.Instance.CurrentWorld.IsRoomBehaviorValidForRoom(roomBehaviorType, tile.Room))
             {
                 RoomBehavior proto = PrototypeManager.RoomBehavior.Get(roomBehaviorType);
                 tile.Room.DesignateRoomBehavior(proto.Clone());
@@ -217,7 +217,7 @@ public class BuildModeController
                             // FIXME: I don't like having to manually and explicitly set
                             // flags that prevent conflicts. It's too easy to forget to set/clear them!
                             Tile offsetTile = World.Current.GetTileAt(x_off, y_off, tile.Z);
-                            HashSet<Job> pendingBuildJobs = WorldController.Instance.World.GetTileAt(x_off, y_off, tile.Z).PendingBuildJobs;
+                            HashSet<Job> pendingBuildJobs = GameController.Instance.CurrentWorld.GetTileAt(x_off, y_off, tile.Z).PendingBuildJobs;
                             if (pendingBuildJobs != null)
                             {
                                 // if the existing buildJobs furniture is replaceable by the current furnitureType,
@@ -320,7 +320,7 @@ public class BuildModeController
                     else
                     {
                         buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
-                        WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                        GameController.Instance.CurrentWorld.jobQueue.Enqueue(buildingJob);
                     }
                 }
                 else
@@ -399,7 +399,7 @@ public class BuildModeController
         {
             for (int y_off = t.Y; y_off < (t.Y + furnitureToBuild.Height); y_off++)
             {
-                HashSet<Job> pendingBuildJobs = WorldController.Instance.World.GetTileAt(x_off, y_off, t.Z).PendingBuildJobs;
+                HashSet<Job> pendingBuildJobs = GameController.Instance.CurrentWorld.GetTileAt(x_off, y_off, t.Z).PendingBuildJobs;
                 if (pendingBuildJobs != null)
                 {
                     // if the existing buildJobs furniture is replaceable by the current furnitureType,

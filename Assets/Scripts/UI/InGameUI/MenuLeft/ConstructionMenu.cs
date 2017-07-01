@@ -103,7 +103,7 @@ public class ConstructionMenu : MonoBehaviour
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
         Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
 
-        BuildModeController buildModeController = WorldController.Instance.BuildModeController;
+        BuildModeController buildModeController = GameController.Instance.BuildModeController;
 
         // For each furniture prototype in our world, create one instance
         // of the button to be clicked!
@@ -141,7 +141,7 @@ public class ConstructionMenu : MonoBehaviour
                 };
 
             Image image = gameObject.transform.GetChild(0).GetComponentsInChildren<Image>().First();
-            image.sprite = WorldController.Instance.FurnitureSpriteController.GetSpriteForFurniture(furnitureKey);
+            image.sprite = GameController.Instance.FurnitureSpriteController.GetSpriteForFurniture(furnitureKey);
         }
     }
 
@@ -152,7 +152,7 @@ public class ConstructionMenu : MonoBehaviour
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
         Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
 
-        BuildModeController buildModeController = WorldController.Instance.BuildModeController;
+        BuildModeController buildModeController = GameController.Instance.BuildModeController;
 
         // For each furniture prototype in our world, create one instance
         // of the button to be clicked!
@@ -201,7 +201,7 @@ public class ConstructionMenu : MonoBehaviour
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
         Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
 
-        BuildModeController buildModeController = WorldController.Instance.BuildModeController;
+        BuildModeController buildModeController = GameController.Instance.BuildModeController;
 
         // For each furniture prototype in our world, create one instance
         // of the button to be clicked!
@@ -239,7 +239,7 @@ public class ConstructionMenu : MonoBehaviour
                 };
 
             Image image = gameObject.transform.GetChild(0).GetComponentsInChildren<Image>().First();
-            image.sprite = WorldController.Instance.UtilitySpriteController.GetSpriteForUtility(utilityKey);
+            image.sprite = GameController.Instance.UtilitySpriteController.GetSpriteForUtility(utilityKey);
         }
     }
 
@@ -250,7 +250,7 @@ public class ConstructionMenu : MonoBehaviour
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
         Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
 
-        BuildModeController buildModeController = WorldController.Instance.BuildModeController;
+        BuildModeController buildModeController = GameController.Instance.BuildModeController;
 
         foreach (TileType item in PrototypeManager.TileType.Values)
         {

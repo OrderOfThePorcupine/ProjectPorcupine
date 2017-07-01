@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using FMOD;
 
 /// <summary>
@@ -17,14 +18,20 @@ using FMOD;
 /// </summary>
 public class AudioManager
 {
-    public static FMOD.System SoundSystem;
+    public readonly static FMOD.System SoundSystem;
+    public Dictionary<string, ChannelGroup> channelGroups;
+    public ChannelGroup master;
 
-    // Channel Groups
-    public static Dictionary<string, ChannelGroup> channelGroups;
+    private Dictionary<string, SoundClip> audioClips;
 
-    public static ChannelGroup master;
+    public SoundController SoundController { get; private set; }
 
-    private static Dictionary<string, SoundClip> audioClips;
+    static AudioManager()
+    {
+        Factory.System_Create(out SoundSystem);
+        SoundSystem.setDSPBufferSize(1024, 10);
+        SoundSystem.init(32, INITFLAGS.NORMAL, (IntPtr)0);
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AudioManager"/> class.
@@ -32,11 +39,8 @@ public class AudioManager
     public AudioManager()
     {
         channelGroups = new Dictionary<string, ChannelGroup>();
-        Factory.System_Create(out SoundSystem);
-        SoundSystem.setDSPBufferSize(1024, 10);
-        SoundSystem.init(32, INITFLAGS.NORMAL, (IntPtr)0);
         SoundSystem.getMasterChannelGroup(out master);
-        DSPConnection throwaway;
+        DSPConnection connection;
         channelGroups.Add("UI", null);
         channelGroups.Add("gameSounds", null);
         channelGroups.Add("alerts", null);
@@ -45,7 +49,7 @@ public class AudioManager
         {
             ChannelGroup chanGroup;
             SoundSystem.createChannelGroup(key, out chanGroup);
-            master.addGroup(chanGroup, true, out throwaway);
+            master.addGroup(chanGroup, true, out connection);
             channelGroups[key] = chanGroup;
         }
 
@@ -53,6 +57,7 @@ public class AudioManager
 
         SoundSystem.set3DSettings(1f, 1f, .25f);
         audioClips = new Dictionary<string, SoundClip>();
+        SoundController = new SoundController(this);
     }
 
     /// <summary>
@@ -60,7 +65,7 @@ public class AudioManager
     /// Used for debugging.
     /// </summary>
     /// <returns>String containing the information of audioClips.</returns>
-    public static string GetAudioDictionaryString()
+    public string GetAudioDictionaryString()
     {
         Dictionary<string, SoundClip> dictionary = audioClips;
 
@@ -77,7 +82,7 @@ public class AudioManager
     /// </param>
     /// <param name="audioName">The name of the SoundClip.</param>
     /// <returns>SoundClip from the specified category with the specified name.</returns>
-    public static SoundClip GetAudio(string categoryName, string audioName)
+    public SoundClip GetAudio(string categoryName, string audioName)
     {
         SoundClip clip;
 
@@ -116,10 +121,13 @@ public class AudioManager
         }
 
         string[] filesInDir = Directory.GetFiles(directoryPath);
-        LoadAudioFile(filesInDir, directoryPath);
+        GameController.Instance.AudioManager.LoadAudioFile(filesInDir, directoryPath);
     }
 
-    public static void Destroy()
+    /// <summary>
+    /// Should only be called when the game is actually ending!!
+    /// </summary>
+    public void Destroy()
     {
         SoundSystem.close();
 
@@ -130,12 +138,11 @@ public class AudioManager
         }
 
         SoundSystem.release();
-
-        SoundSystem = null;
+        SoundSystem.close();
         audioClips = null;
     }
 
-    private static void LoadAudioFile(string[] filesInDir, string directoryPath)
+    private void LoadAudioFile(string[] filesInDir, string directoryPath)
     {
         foreach (string file in filesInDir)
         {
@@ -168,6 +175,35 @@ public class AudioManager
             {
                 audioClips[filename] = new SoundClip(clip);
             }
+        }
+    }
+
+    public struct DriverInfo
+    {
+        public DriverInfo(int id)
+        {
+            this.ID = id;
+            StringBuilder name = new StringBuilder(64);
+            Guid guid;
+            int systemRate;
+            SPEAKERMODE speakerMode;
+            int speakerModeChannels;
+
+            SoundSystem.getDriverInfo(id, name, 64, out guid, out systemRate, out speakerMode, out speakerModeChannels);
+
+            this.Guid = guid;
+            this.Name = name.ToString();
+        }
+
+        public int ID { get; private set; }
+
+        public string Name { get; private set; }
+
+        public Guid Guid { get; private set; }
+
+        public override string ToString()
+        {
+            return ID.ToString() + ", " + Name;
         }
     }
 }

@@ -20,13 +20,13 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class OverlayMap : MonoBehaviour
-{   
+{
     /// <summary>
     /// Transparency of overlay.
     /// </summary>
     [Range(0, 1)]
     public float transparency = 0.8f;
-    
+
     /// <summary>
     /// Update interval (0 for every Update, inf for never).
     /// </summary>
@@ -272,14 +272,14 @@ public class OverlayMap : MonoBehaviour
             }
 
             bool loggedOnce = false;
-            valueAt = (x, y, z) => 
+            valueAt = (x, y, z) =>
             {
-                if (WorldController.Instance == null)
+                if (GameController.Instance == null)
                 {
                     return 0;
                 }
 
-                Tile tile = WorldController.Instance.GetTileAtWorldCoord(new Vector3(x, y, z));
+                Tile tile = GameController.Instance.CurrentWorld.GetTileAt(x, y, z);
 
                 DynValue result = FunctionsManager.Overlay.Call(descr.LuaFunctionName, new object[] { tile, World.Current });
                 double? value = result.CastToNumber();
@@ -290,10 +290,10 @@ public class OverlayMap : MonoBehaviour
                         UnityDebugger.Debugger.LogError("OverlayMap", string.Format("The return value from the function named '{0}' was null for tile at ({1}, {2}, {3})", descr.LuaFunctionName, x, y, z));
                         loggedOnce = true;
                     }
-                    
+
                     return 0;
                 }
-                
+
                 return (int)value;
             };
 
@@ -376,10 +376,10 @@ public class OverlayMap : MonoBehaviour
             elapsed = 0f;
         }
 
-        if (currentOverlay != "None" && currentLayer != WorldController.Instance.CameraController.CurrentLayer)
+        if (currentOverlay != "None" && currentLayer != GameController.Instance.CameraController.CurrentLayer)
         {
             Bake();
-            currentLayer = WorldController.Instance.CameraController.CurrentLayer;
+            currentLayer = GameController.Instance.CameraController.CurrentLayer;
             elapsed = 0f;
         }
 
@@ -387,7 +387,7 @@ public class OverlayMap : MonoBehaviour
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if (valueAt != null)
         {
-            textView.GetComponent<UnityEngine.UI.Text>().text = string.Format("[DEBUG] Currently over: {0}", valueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), WorldController.Instance.CameraController.CurrentLayer));
+            textView.GetComponent<UnityEngine.UI.Text>().text = string.Format("[DEBUG] Currently over: {0}", valueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), GameController.Instance.CameraController.CurrentLayer));
         }
     }
 
@@ -431,7 +431,7 @@ public class OverlayMap : MonoBehaviour
         int textureWidth = colorMapArray.Length * colorMapWidth;
         int textureHeight = colorMapWidth;
         colorMapTexture = new Texture2D(textureWidth, textureHeight);
-        
+
         // Loop over each color in the palette and build a noisy texture.
         int n = 0;
         foreach (Color32 baseColor in colorMapArray)
@@ -467,7 +467,7 @@ public class OverlayMap : MonoBehaviour
         {
             UnityDebugger.Debugger.LogError("OverlayMap", "No color map texture setted!");
         }
-        
+
         if (!overlayColorMapLookup.ContainsKey(currentOverlay))
         {
             overlayColorMapLookup.Add(currentOverlay, new Dictionary<int, Color>());
@@ -479,12 +479,12 @@ public class OverlayMap : MonoBehaviour
         int textureWidth = sizeX;
         int textureHeight = sizeY;
         Color[] pixels = new Color[textureHeight * textureWidth];
-        
+
         for (int y = 0; y < sizeY; y++)
         {
             for (int x = 0; x < sizeX; x++)
             {
-                float v = valueAt(x, y, WorldController.Instance.CameraController.CurrentLayer);
+                float v = valueAt(x, y, GameController.Instance.CameraController.CurrentLayer);
                 Debug.Assert(v >= 0 && v < 256, "v >= 0 && v < 256");
 
                 int sampleX = ((int)v % 256) * colorMapWidth;
@@ -529,7 +529,7 @@ public class OverlayMap : MonoBehaviour
         newNormals = new Vector3[sizePixelX * sizePixelY];
         newUV = new Vector2[sizePixelX * sizePixelY];
         newTriangles = new int[(sizePixelX - 1) * (sizePixelY - 1) * 6];
-        
+
         for (int y = 0; y < sizePixelY; y++)
         {
             for (int x = 0; x < sizePixelX; x++)

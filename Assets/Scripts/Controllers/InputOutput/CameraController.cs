@@ -125,7 +125,7 @@ public class CameraController
 
         prevPositionTarget = positionTarget;
 
-        WorldController.Instance.SoundController.SetListenerPosition(Camera.main.transform.position.x, Camera.main.transform.position.y, (float)CurrentLayer);
+        GameController.Instance.AudioManager.SoundController.SetListenerPosition(Camera.main.transform.position.x, Camera.main.transform.position.y, (float)CurrentLayer);
     }
 
     public void ChangeZoom(float amount)
@@ -238,15 +238,15 @@ public class CameraController
 
     private void CreateLayerCameras()
     {
-        if (WorldController.Instance.World == null)
+        if (GameController.Instance.CurrentWorld == null)
         {
             return;
         }
 
         // We don't have the right number of cameras for our layers
-        if (layerCameras == null || layerCameras.Length != WorldController.Instance.World.Depth)
+        if (layerCameras == null || layerCameras.Length != GameController.Instance.CurrentWorld.Depth)
         {
-            int depth = WorldController.Instance.World.Depth;
+            int depth = GameController.Instance.CurrentWorld.Depth;
             layerCameras = new Camera[depth];
             for (int i = 0; i < depth; i++)
             {

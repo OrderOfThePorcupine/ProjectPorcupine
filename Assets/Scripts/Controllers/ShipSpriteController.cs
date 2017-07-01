@@ -7,14 +7,31 @@
 // ====================================================
 #endregion
 
+using System;
 using UnityEngine;
 
 public class ShipSpriteController : BaseSpriteController<Ship>
 {
-    public ShipSpriteController(World world) : base(world, "Ships")
+    public ShipSpriteController() : base("Ships")
     {
-        world.ShipManager.ShipCreated += OnCreated;
-        world.ShipManager.ShipRemoved += OnRemoved;
+    }
+
+    public override void AssignWorld(World world)
+    {
+        if (world != null)
+        {
+            world.ShipManager.ShipCreated += OnCreated;
+            world.ShipManager.ShipRemoved += OnRemoved;
+        }
+    }
+
+    public override void UnAssignWorld(World world)
+    {
+        if (world != null)
+        {
+            world.ShipManager.ShipCreated -= OnCreated;
+            world.ShipManager.ShipRemoved -= OnRemoved;
+        }
     }
 
     protected override void OnCreated(Ship ship)

@@ -51,7 +51,7 @@ public class TradeController
         Trader trader = prototype.CreateTrader();
 
         GameObject go = new GameObject(trader.Name);
-        go.transform.parent = WorldController.Instance.transform;
+        go.transform.parent = GameController.Instance.transform;
         TraderShipController controller = go.AddComponent<TraderShipController>();
         TradeShips.Add(controller);
         go.transform.position = new Vector3(-10, 50, 0);

@@ -180,7 +180,7 @@ public class DialogBoxManager : MonoBehaviour
                     break;
                 case ".lua":
                     UnityDebugger.Debugger.Log("ModDialogBox", "Found lua element:" + fileInfo.Name);
-                    WorldController.Instance.ModsManager.LoadFunctionsInFile(fileInfo, "ModDialogBox");
+                    GameController.Instance.ModsManager.LoadFunctionsInFile(fileInfo, "ModDialogBox");
                     break;
             }
         }

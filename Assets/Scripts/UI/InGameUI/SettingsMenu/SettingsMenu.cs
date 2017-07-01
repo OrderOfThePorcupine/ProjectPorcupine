@@ -50,7 +50,7 @@ public class SettingsMenu : MonoBehaviour
         }
 
         GameController.Instance.IsModal = true;
-        GameController.Instance.SoundController.OnButtonSFX();
+        GameController.Instance.AudioManager.SoundController.OnButtonSFX();
 
         instance.changesTracker.Clear();
         instance.mainRoot.SetActive(true);
@@ -180,28 +180,14 @@ public class SettingsMenu : MonoBehaviour
         changesTracker.Clear();
 
         GameController.Instance.IsModal = false;
-        GameController.Instance.SoundController.OnButtonSFX();
+        GameController.Instance.AudioManager.SoundController.OnButtonSFX();
         mainRoot.SetActive(false);
     }
 
     public void Cancel()
     {
         // Open a dialog box to double check
-        DialogBoxPromptOrInfo check;
-
-        if (WorldController.Instance != null)
-        {
-            check = WorldController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
-        }
-        else if (MainMenuController.Instance != null)
-        {
-            check = MainMenuController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
-        }
-        else
-        {
-            mainRoot.SetActive(false);
-            return;
-        }
+        DialogBoxPromptOrInfo check = GameController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
 
         check.SetPrompt("confirm_settings_menu_close");
         check.SetButtons(new DialogBoxResult[] { DialogBoxResult.Yes, DialogBoxResult.No });
@@ -229,12 +215,12 @@ public class SettingsMenu : MonoBehaviour
                         currentCategory = string.Empty;
 
                         GameController.Instance.IsModal = false;
-                        GameController.Instance.SoundController.OnButtonSFX();
+                        GameController.Instance.AudioManager.SoundController.OnButtonSFX();
                         mainRoot.SetActive(false);
 
                         break;
                     case DialogBoxResult.No:
-                        GameController.Instance.SoundController.OnButtonSFX();
+                        GameController.Instance.AudioManager.SoundController.OnButtonSFX();
                         break;
                 }
             };

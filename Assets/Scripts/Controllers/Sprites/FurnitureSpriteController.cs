@@ -22,7 +22,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
     private Dictionary<BuildableComponent.Requirements, Vector3> statusIndicatorOffsets;
 
     // Use this for initialization
-    public FurnitureSpriteController(World world) : base(world, "Furniture")
+    public FurnitureSpriteController() : base("Furniture")
     {
         // Instantiate our dictionary that tracks which GameObject is rendering which Tile data.
         childObjectMap = new Dictionary<Furniture, FurnitureChildObjects>();
@@ -32,29 +32,41 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         statusIndicatorOffsets[BuildableComponent.Requirements.Fluid] = new Vector3(-IndicatorOffset, -IndicatorOffset, 0);
         statusIndicatorOffsets[BuildableComponent.Requirements.Gas] = new Vector3(IndicatorOffset, IndicatorOffset, 0);
         statusIndicatorOffsets[BuildableComponent.Requirements.Production] = new Vector3(-IndicatorOffset, IndicatorOffset, 0);
+    }
 
-        // Register our callback so that our GameObject gets updated whenever
-        // the tile's type changes.
-        world.FurnitureManager.Created += OnCreated;
-
-        // Go through any EXISTING furniture (i.e. from a save that was loaded OnEnable) and call the OnCreated event manually.
-        foreach (Furniture furniture in world.FurnitureManager)
+    public override void AssignWorld(World world)
+    {
+        if (world != null)
         {
-            OnCreated(furniture);
+            // Register our callback so that our GameObject gets updated whenever
+            // the tile's type changes.
+            world.FurnitureManager.Created += OnCreated;
+
+            // Go through any EXISTING furniture (i.e. from a save that was loaded OnEnable) and call the OnCreated event manually.
+            foreach (Furniture furniture in world.FurnitureManager)
+            {
+                OnCreated(furniture);
+            }
+        }
+    }
+
+    public override void UnAssignWorld(World world)
+    {
+        if (world != null)
+        {
+            world.FurnitureManager.Created -= OnCreated;
+
+            foreach (Furniture furniture in world.FurnitureManager)
+            {
+                furniture.Changed -= OnChanged;
+                furniture.Removed -= OnRemoved;
+                furniture.IsOperatingChanged -= OnIsOperatingChanged;
+            }
         }
     }
 
     public override void RemoveAll()
     {
-        world.FurnitureManager.Created -= OnCreated;
-
-        foreach (Furniture furniture in world.FurnitureManager)
-        {
-            furniture.Changed -= OnChanged;
-            furniture.Removed -= OnRemoved;
-            furniture.IsOperatingChanged -= OnIsOperatingChanged;
-        }
-
         foreach (FurnitureChildObjects childObjects in childObjectMap.Values)
         {
             childObjects.Destroy();
@@ -90,17 +102,19 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         int y = furniture.Tile.Y;
         string suffix = string.Empty;
 
-        suffix += GetSuffixForNeighbour(furniture, x, y + 1, furniture.Tile.Z, "N");
-        suffix += GetSuffixForNeighbour(furniture, x + 1, y, furniture.Tile.Z, "E");
-        suffix += GetSuffixForNeighbour(furniture, x, y - 1, furniture.Tile.Z, "S");
-        suffix += GetSuffixForNeighbour(furniture, x - 1, y, furniture.Tile.Z, "W");
+        Tile[] neighbours = furniture.Tile.GetNeighbours(true, false, true);
+
+        suffix += GetSuffixForNeighbour(furniture, neighbours[0], "N");
+        suffix += GetSuffixForNeighbour(furniture, neighbours[1], "E");
+        suffix += GetSuffixForNeighbour(furniture, neighbours[2], "S");
+        suffix += GetSuffixForNeighbour(furniture, neighbours[3], "W");
 
         // Now we check if we have the neighbours in the cardinal directions next to the respective diagonals
         // because pure diagonal checking would leave us with diagonal walls and stockpiles, which make no sense.
-        suffix += GetSuffixForDiagonalNeighbour(suffix, "N", "E", furniture, x + 1, y + 1, furniture.Tile.Z);
-        suffix += GetSuffixForDiagonalNeighbour(suffix, "S", "E", furniture, x + 1, y - 1, furniture.Tile.Z);
-        suffix += GetSuffixForDiagonalNeighbour(suffix, "S", "W", furniture, x - 1, y - 1, furniture.Tile.Z);
-        suffix += GetSuffixForDiagonalNeighbour(suffix, "N", "W", furniture, x - 1, y + 1, furniture.Tile.Z);
+        suffix += GetSuffixForDiagonalNeighbour(suffix, "N", "E", furniture, neighbours[4]);
+        suffix += GetSuffixForDiagonalNeighbour(suffix, "S", "E", furniture, neighbours[5]);
+        suffix += GetSuffixForDiagonalNeighbour(suffix, "S", "W", furniture, neighbours[6]);
+        suffix += GetSuffixForDiagonalNeighbour(suffix, "N", "W", furniture, neighbours[7]);
 
         // For example, if this object has all eight neighbours of
         // the same type, then the string will look like:
@@ -132,8 +146,8 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         {
             // Check to see if we actually have a wall north/south, and if so
             // set the furniture verticalDoor flag to true.
-            Tile northTile = world.GetTileAt(furniture.Tile.X, furniture.Tile.Y + 1, furniture.Tile.Z);
-            Tile southTile = world.GetTileAt(furniture.Tile.X, furniture.Tile.Y - 1, furniture.Tile.Z);
+            Tile northTile = furniture.Tile.North();
+            Tile southTile = furniture.Tile.South();
 
             if (northTile != null && southTile != null && northTile.Furniture != null && southTile.Furniture != null &&
                 northTile.Furniture.HasTypeTag("Wall") && southTile.Furniture.HasTypeTag("Wall"))
@@ -203,52 +217,52 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         furniture.IsOperatingChanged += OnIsOperatingChanged;
     }
 
-    protected override void OnChanged(Furniture furn)
+    protected override void OnChanged(Furniture furniture)
     {
         // Make sure the furniture's graphics are correct.
-        if (objectGameObjectMap.ContainsKey(furn) == false)
+        if (objectGameObjectMap.ContainsKey(furniture) == false)
         {
             UnityDebugger.Debugger.LogError("FurnitureSpriteController", "OnFurnitureChanged -- trying to change visuals for furniture not in our map.");
             return;
         }
 
-        GameObject furn_go = objectGameObjectMap[furn];
+        GameObject furn_go = objectGameObjectMap[furniture];
 
-        if (furn.HasTypeTag("Door"))
+        if (furniture.HasTypeTag("Door"))
         {
             // Check to see if we actually have a wall north/south, and if so
             // set the furniture verticalDoor flag to true.
-            Tile northTile = world.GetTileAt(furn.Tile.X, furn.Tile.Y + 1, furn.Tile.Z);
-            Tile southTile = world.GetTileAt(furn.Tile.X, furn.Tile.Y - 1, furn.Tile.Z);
-            Tile eastTile = world.GetTileAt(furn.Tile.X + 1, furn.Tile.Y, furn.Tile.Z);
-            Tile westTile = world.GetTileAt(furn.Tile.X - 1, furn.Tile.Y, furn.Tile.Z);
+            Tile northTile = furniture.Tile.North();
+            Tile southTile = furniture.Tile.South();
+            Tile eastTile = furniture.Tile.East();
+            Tile westTile = furniture.Tile.West();
 
             if (northTile != null && southTile != null && northTile.Furniture != null && southTile.Furniture != null &&
                 northTile.Furniture.HasTypeTag("Wall") && southTile.Furniture.HasTypeTag("Wall"))
             {
-                furn.VerticalDoor = true;
+                furniture.VerticalDoor = true;
             }
             else if (eastTile != null && westTile != null && eastTile.Furniture != null && westTile.Furniture != null &&
                 eastTile.Furniture.HasTypeTag("Wall") && westTile.Furniture.HasTypeTag("Wall"))
             {
-                furn.VerticalDoor = false;
+                furniture.VerticalDoor = false;
             }
         }
 
         // don't change sprites on furniture with animations
-        if (furn.Animation != null)
+        if (furniture.Animation != null)
         {
-            furn.Animation.OnFurnitureChanged();
+            furniture.Animation.OnFurnitureChanged();
             return;
         }
 
-        furn_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForFurniture(furn);
-        furn_go.GetComponent<SpriteRenderer>().color = furn.Tint;
+        furn_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForFurniture(furniture);
+        furn_go.GetComponent<SpriteRenderer>().color = furniture.Tint;
 
-        Sprite overlaySprite = GetOverlaySpriteForFurniture(furn);
+        Sprite overlaySprite = GetOverlaySpriteForFurniture(furniture);
         if (overlaySprite != null)
         {
-            childObjectMap[furn].Overlay.GetComponent<SpriteRenderer>().sprite = overlaySprite;
+            childObjectMap[furniture].Overlay.GetComponent<SpriteRenderer>().sprite = overlaySprite;
         }
     }
 
@@ -309,10 +323,9 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         }
     }
 
-    private string GetSuffixForNeighbour(Furniture furn, int x, int y, int z, string suffix)
+    private string GetSuffixForNeighbour(Furniture furniture, Tile tile, string suffix)
     {
-        Tile t = world.GetTileAt(x, y, z);
-        if (t != null && t.Furniture != null && t.Furniture.LinksToNeighbour == furn.LinksToNeighbour)
+        if (tile != null && tile.Furniture != null && tile.Furniture.LinksToNeighbour == furniture.LinksToNeighbour)
         {
             return suffix;
         }
@@ -320,11 +333,11 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         return string.Empty;
     }
 
-    private string GetSuffixForDiagonalNeighbour(string suffix, string coord1, string coord2, Furniture furn, int x, int y, int z)
+    private string GetSuffixForDiagonalNeighbour(string suffix, string coord1, string coord2, Furniture furniture, Tile tile)
     {
         if (suffix.Contains(coord1) && suffix.Contains(coord2))
         {
-            return GetSuffixForNeighbour(furn, x, y, z, coord1.ToLower() + coord2.ToLower());
+            return GetSuffixForNeighbour(furniture, tile, coord1.ToLower() + coord2.ToLower());
         }
 
         return string.Empty;

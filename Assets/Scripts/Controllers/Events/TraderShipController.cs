@@ -90,7 +90,7 @@ public class TraderShipController : MonoBehaviour
             }
             else
             {
-                WorldController.Instance.TradeController.ShowTradeDialogBox(this);
+                GameController.Instance.CurrentSystem.TradeController.ShowTradeDialogBox(this);
                 AnimationIdle.Update(Time.fixedDeltaTime);
                 ShowSprite(AnimationIdle.CurrentFrameName);
             }

@@ -36,7 +36,7 @@ public class MainMenu : MonoBehaviour
         {
             if (!GameController.Instance.IsModal)
             {
-                MainMenuController.Instance.DialogBoxManager.dialogBoxLoadGame.ShowDialog();
+                GameController.Instance.DialogBoxManager.dialogBoxLoadGame.ShowDialog();
             }
         });
 

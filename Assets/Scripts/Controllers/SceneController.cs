@@ -104,11 +104,6 @@ public static class SceneController
 
     private static void CleanInstancesBeforeLoadingScene()
     {
-        if (WorldController.Instance != null)
-        {
-            WorldController.Instance.Destroy();
-        }
-
         ProjectPorcupine.Localization.LocalizationTable.UnregisterDelegates();
     }
 }
