@@ -238,11 +238,20 @@ public class AtmosphereComponent
         amount = Mathf.Min(this.TotalGas, amount);
 
         string[] gasNames = this.GetGasNames();
+
+        // HACK: tracking the amount to transfer with an array and a separate loop is likely
+        // innefficient, it may instead be better to adjust amount appropriately by the amount
+        // removed. In our standard rooms gas ratio should remain 20% O2, 80% N2
+        float[] partialAmounts = new float[gasNames.Length];
         for (int i = 0; i < gasNames.Length; i++)
         {
-            float partialAmount = amount * GetGasFraction(gasNames[i]);
-            this.ChangeGas(gasNames[i], -partialAmount);
-            destination.ChangeGas(gasNames[i], partialAmount);
+            partialAmounts[i] = amount * GetGasFraction(gasNames[i]);
+        }
+
+        for (int i = 0; i < gasNames.Length; i++)
+        {
+            this.ChangeGas(gasNames[i], -partialAmounts[i]);
+            destination.ChangeGas(gasNames[i], partialAmounts[i]);
         }
 
         float thermalDelta = amount * internalTemperature.InKelvin;
