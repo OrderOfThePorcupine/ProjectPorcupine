@@ -34,7 +34,7 @@ public class DialogBoxNewGame : DialogBox
         Seed.text = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
 
         // Get list of files in save location
-        string generatorDirectoryPath = GameController.Instance.GeneratorBasePath;
+        string generatorDirectoryPath = GameController.GeneratorBasePath;
 
         DirectoryInfo generatorDir = new DirectoryInfo(generatorDirectoryPath);
 

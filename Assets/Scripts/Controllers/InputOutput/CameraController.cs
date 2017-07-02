@@ -252,7 +252,6 @@ public class CameraController
             {
                 // This creates a new GameObject and adds it to our scene.
                 GameObject camera_go = new GameObject();
-
                 camera_go.name = "Layer Camera (" + i + ")";
                 camera_go.transform.position = new Vector3(0, 0, 9);
                 camera_go.transform.SetParent(Camera.main.transform, false);

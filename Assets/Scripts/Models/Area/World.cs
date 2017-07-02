@@ -184,7 +184,7 @@ public class World
     }
 
     /// <summary>
-    /// Gets the tile data 
+    /// Gets the tile data.
     /// </summary>
     /// <returns>The <see cref="Tile"/> or null if called with invalid arguments.</returns>
     /// <param name="position"> The position to round. </param>
@@ -203,7 +203,7 @@ public class World
     }
 
     /// <summary>
-    /// Gets the tile data at x, and y 
+    /// Gets the tile data at x, and y.
     /// </summary>
     /// <returns>The <see cref="Tile"/> or null if called with invalid arguments.</returns>
     /// <param name="x"> The X coord. </param>

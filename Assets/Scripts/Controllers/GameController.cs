@@ -17,6 +17,25 @@ public class GameController : MonoBehaviour
     // If so - beginner task!
     public static readonly string GameVersion = "Someone_will_come_up_with_a_proper_naming_scheme_later";
 
+    [SerializeField]
+    private GameObject circleCursorPrefab;
+
+    /// <summary>
+    /// Path to all file saves.
+    /// </summary>
+    public static string FileSaveBasePath
+    {
+        get { return System.IO.Path.Combine(Application.persistentDataPath, "Saves"); }
+    }
+
+    /// <summary>
+    /// Path to all the generator files.
+    /// </summary>
+    public static string GeneratorBasePath
+    {
+        get { return System.IO.Path.Combine(Application.streamingAssetsPath, "WorldGen"); }
+    }
+
     #region Instances
 
     public static GameController Instance { get; protected set; }
@@ -51,12 +70,12 @@ public class GameController : MonoBehaviour
 
     public SystemController CurrentSystem { get; private set; }
 
-    public World CurrentWorld { get { return CurrentSystem.CurrentWorld; } }
+    public World CurrentWorld
+    {
+        get { return CurrentSystem.CurrentWorld; }
+    }
 
     #endregion
-
-    [SerializeField]
-    private GameObject circleCursorPrefab;
 
     /// <summary>
     /// Is any dialog box open?.
@@ -78,16 +97,6 @@ public class GameController : MonoBehaviour
             TimeManager.Instance.IsPaused = value;
         }
     }
-
-    /// <summary>
-    /// Path to all file saves.
-    /// </summary>
-    public string FileSaveBasePath { get { return System.IO.Path.Combine(Application.persistentDataPath, "Saves"); } }
-
-    /// <summary>
-    /// Path to all the generator files.
-    /// </summary>
-    public string GeneratorBasePath { get { return System.IO.Path.Combine(Application.streamingAssetsPath, "WorldGen"); } }
 
     /// <summary>
     /// Change the developper mode.

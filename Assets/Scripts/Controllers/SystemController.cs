@@ -15,18 +15,6 @@ using UnityEngine;
 
 public class SystemController
 {
-    public SpawnInventoryController SpawnInventoryController { get; private set; }
-
-    public QuestController QuestController { get; private set; }
-
-    public AutosaveManager AutosaveManager { get; private set; }
-
-    public TradeController TradeController { get; private set; }
-
-    public World CurrentWorld { get; private set; }
-
-    public VisualPath Path { get; private set; }
-
     public SystemController()
     {
         if (SceneController.LoadWorldFromFileName != null)
@@ -43,8 +31,11 @@ public class SystemController
 
         GameObject canvas = GameObject.Find("Canvas");
 
-        GameObject go = GameObject.Instantiate(Resources.Load("UI/ContextMenu"), canvas.transform.position, canvas.transform.rotation, canvas.transform) as GameObject;
-        go.name = "ContextMenu";
+        // Add the currency display
+        GameObject currencyDisplay = GameObject.Instantiate(Resources.Load("UI/CurrencyDisplay"), canvas.GetComponentInChildren<PerformanceHUDManager>().transform.parent) as GameObject;
+
+        GameObject contextMenu = GameObject.Instantiate(Resources.Load("UI/ContextMenu"), canvas.transform.position, canvas.transform.rotation, canvas.transform) as GameObject;
+        contextMenu.name = "ContextMenu";
 
         GameObject timeScale = GameObject.Instantiate(Resources.Load("UI/TimeScale"), GameObject.Find("TopRight").transform, false) as GameObject;
         timeScale.name = "TimeScale";
@@ -63,6 +54,18 @@ public class SystemController
         SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
     }
 
+    public SpawnInventoryController SpawnInventoryController { get; private set; }
+
+    public QuestController QuestController { get; private set; }
+
+    public AutosaveManager AutosaveManager { get; private set; }
+
+    public TradeController TradeController { get; private set; }
+
+    public World CurrentWorld { get; private set; }
+
+    public VisualPath Path { get; private set; }
+
     public void ChangeDevMode(bool newDevMode)
     {
         SpawnInventoryController.SetUIVisibility(newDevMode);
@@ -70,7 +73,38 @@ public class SystemController
 
     public void TearDown()
     {
-        Object.Destroy(Path);
+        GameObject.Destroy(Path);
+    }
+
+    /// <summary>
+    /// Serializes current Instance of the World and starts a thread
+    /// that actually saves serialized world to HDD.
+    /// </summary>
+    /// <param name="filePath">Where to save (Full path).</param>
+    /// <returns>Returns the thread that is currently saving data to HDD.</returns>
+    public Thread SaveWorld(string filePath)
+    {
+        // Make sure the save folder exists.
+        if (Directory.Exists(GameController.FileSaveBasePath) == false)
+        {
+            // NOTE: This can throw an exception if we can't create the folder,
+            // but why would this ever happen? We should, by definition, have the ability
+            // to write to our persistent data folder unless something is REALLY broken
+            // with the computer/device we're running on.
+            Directory.CreateDirectory(GameController.FileSaveBasePath);
+        }
+
+        StreamWriter sw = new StreamWriter(filePath);
+        JsonWriter writer = new JsonTextWriter(sw);
+
+        JObject worldJson = World.Current.ToJson();
+
+        // Launch saving operation in a separate thread.
+        // This reduces lag while saving by a little bit.
+        Thread t = new Thread(new ThreadStart(delegate { SaveWorldToHdd(worldJson, writer); }));
+        t.Start();
+
+        return t;
     }
 
     private void CreateEmptyWorld()
@@ -87,37 +121,6 @@ public class SystemController
 
         CurrentWorld = new World();
         CurrentWorld.ReadJson(fileName);
-    }
-
-    /// <summary>
-    /// Serializes current Instance of the World and starts a thread
-    /// that actually saves serialized world to HDD.
-    /// </summary>
-    /// <param name="filePath">Where to save (Full path).</param>
-    /// <returns>Returns the thread that is currently saving data to HDD.</returns>
-    public Thread SaveWorld(string filePath)
-    {
-        // Make sure the save folder exists.
-        if (Directory.Exists(GameController.Instance.FileSaveBasePath) == false)
-        {
-            // NOTE: This can throw an exception if we can't create the folder,
-            // but why would this ever happen? We should, by definition, have the ability
-            // to write to our persistent data folder unless something is REALLY broken
-            // with the computer/device we're running on.
-            Directory.CreateDirectory(GameController.Instance.FileSaveBasePath);
-        }
-
-        StreamWriter sw = new StreamWriter(filePath);
-        JsonWriter writer = new JsonTextWriter(sw);
-
-        JObject worldJson = World.Current.ToJson();
-
-        // Launch saving operation in a separate thread.
-        // This reduces lag while saving by a little bit.
-        Thread t = new Thread(new ThreadStart(delegate { SaveWorldToHdd(worldJson, writer); }));
-        t.Start();
-
-        return t;
     }
 
     /// <summary>

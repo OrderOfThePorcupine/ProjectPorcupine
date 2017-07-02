@@ -13,8 +13,6 @@ using UnityEngine;
 
 public class SoundController
 {
-    public AudioManager AudioManager { get; private set; }
-
     private Dictionary<SoundClip, float> cooldowns;
     private VECTOR up;
     private VECTOR forward;
@@ -35,6 +33,8 @@ public class SoundController
     {
         master, UI, gameSounds, alerts, music
     }
+
+    public AudioManager AudioManager { get; private set; }
 
     public void AssignWorld(World world)
     {

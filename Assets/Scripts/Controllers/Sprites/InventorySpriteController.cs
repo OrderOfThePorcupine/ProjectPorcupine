@@ -22,34 +22,6 @@ public sealed class InventorySpriteController : BaseSpriteController<Inventory>
         inventoryUIPrefab = inventoryUI;
     }
 
-    public override void AssignWorld(World world)
-    {
-        if (world != null)
-        {
-            // Register our callback so that our GameObject gets updated whenever
-            // the tile's type changes.
-            world.InventoryManager.InventoryCreated += OnCreated;
-
-            // Check for pre-existing inventory, which won't do the callback.
-            foreach (Inventory inventory in world.InventoryManager.Inventories.SelectMany(pair => pair.Value))
-            {
-                OnCreated(inventory);
-            }
-        }
-    }
-
-    public override void UnAssignWorld(World world)
-    {
-        if (world != null)
-        {
-            world.InventoryManager.InventoryCreated -= OnCreated;
-            foreach (Inventory inventory in world.InventoryManager.Inventories.SelectMany(pair => pair.Value))
-            {
-                inventory.StackSizeChanged -= OnChanged;
-            }
-        }
-    }
-
     public static SpriteRenderer SetSprite(GameObject inventoryGO, Inventory inventory, string sortingLayerName = "Inventory")
     {
         SpriteRenderer sr = inventoryGO.GetComponent<SpriteRenderer>();
@@ -99,6 +71,34 @@ public sealed class InventorySpriteController : BaseSpriteController<Inventory>
         }
 
         return sr;
+    }
+
+    public override void AssignWorld(World world)
+    {
+        if (world != null)
+        {
+            // Register our callback so that our GameObject gets updated whenever
+            // the tile's type changes.
+            world.InventoryManager.InventoryCreated += OnCreated;
+
+            // Check for pre-existing inventory, which won't do the callback.
+            foreach (Inventory inventory in world.InventoryManager.Inventories.SelectMany(pair => pair.Value))
+            {
+                OnCreated(inventory);
+            }
+        }
+    }
+
+    public override void UnAssignWorld(World world)
+    {
+        if (world != null)
+        {
+            world.InventoryManager.InventoryCreated -= OnCreated;
+            foreach (Inventory inventory in world.InventoryManager.Inventories.SelectMany(pair => pair.Value))
+            {
+                inventory.StackSizeChanged -= OnChanged;
+            }
+        }
     }
 
     protected override void OnCreated(Inventory inventory)

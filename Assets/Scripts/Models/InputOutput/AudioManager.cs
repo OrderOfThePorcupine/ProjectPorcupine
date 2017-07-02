@@ -18,13 +18,11 @@ using FMOD;
 /// </summary>
 public class AudioManager
 {
-    public readonly static FMOD.System SoundSystem;
+    public static readonly FMOD.System SoundSystem;
     public Dictionary<string, ChannelGroup> channelGroups;
     public ChannelGroup master;
 
     private Dictionary<string, SoundClip> audioClips;
-
-    public SoundController SoundController { get; private set; }
 
     static AudioManager()
     {
@@ -58,6 +56,24 @@ public class AudioManager
         SoundSystem.set3DSettings(1f, 1f, .25f);
         audioClips = new Dictionary<string, SoundClip>();
         SoundController = new SoundController(this);
+    }
+
+    public SoundController SoundController { get; private set; }
+
+    /// <summary>
+    /// Loads all the audio files from the specified directory.
+    /// </summary>
+    /// <param name="directoryPath">The path of the directory you want to load the audio files from.</param>
+    public static void LoadAudioFiles(string directoryPath)
+    {
+        string[] subDirectories = Directory.GetDirectories(directoryPath);
+        foreach (string subDirectory in subDirectories)
+        {
+            LoadAudioFiles(subDirectory);
+        }
+
+        string[] filesInDir = Directory.GetFiles(directoryPath);
+        GameController.Instance.AudioManager.LoadAudioFile(filesInDir, directoryPath);
     }
 
     /// <summary>
@@ -109,23 +125,7 @@ public class AudioManager
     }
 
     /// <summary>
-    /// Loads all the audio files from the specified directory.
-    /// </summary>
-    /// <param name="directoryPath">The path of the directory you want to load the audio files from.</param>
-    public static void LoadAudioFiles(string directoryPath)
-    {
-        string[] subDirectories = Directory.GetDirectories(directoryPath);
-        foreach (string subDirectory in subDirectories)
-        {
-            LoadAudioFiles(subDirectory);
-        }
-
-        string[] filesInDir = Directory.GetFiles(directoryPath);
-        GameController.Instance.AudioManager.LoadAudioFile(filesInDir, directoryPath);
-    }
-
-    /// <summary>
-    /// Should only be called when the game is actually ending!!
+    /// Should only be called when the game is actually ending!.
     /// </summary>
     public void Destroy()
     {
