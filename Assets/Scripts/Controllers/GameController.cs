@@ -271,7 +271,7 @@ public class GameController : MonoBehaviour
         {
             OpenedWorldScene = true;
         }
-        else // If we aren't on the MainScene initially then we are fine!
+        else if (SceneManager.GetActiveScene().name == MainMenuScene)
         {
             // Initialising controllers.
             GameObject canvas = GameObject.Find("Canvas");
@@ -290,6 +290,11 @@ public class GameController : MonoBehaviour
             mainMenu.SetActive(true);
 
             BuildUI();
+        }
+        else
+        {
+            // This means that in the future if any more scenes are added we don't forget to add a case.
+            throw new NotImplementedException("New scene detected, need to add a new case in GameController.Awake");
         }
     }
 
