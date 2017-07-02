@@ -47,18 +47,14 @@ public class World
     /// <param name="width">Width in tiles.</param>
     /// <param name="height">Height in tiles.</param>
     /// <param name="depth">Depth in amount.</param>
-    public World(int width, int height, int depth)
+    public World(int width, int height, int depth, int seed, bool generateAsteroids, string generatorFile)
     {
         // Creates an empty world.
         SetupWorld(width, height, depth);
-        Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-        if (SceneController.NewWorldSize != Vector3.zero)
-        {
-            Seed = SceneController.Seed;
-        }
+        Seed = seed;
 
         Debug.LogWarning("World Seed: " + Seed);
-        WorldGenerator.Instance.Generate(this, Seed);
+        WorldGenerator.Instance.Generate(this, Seed, generateAsteroids, generatorFile);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
         tileGraph = new Path_TileGraph(this);
@@ -69,10 +65,12 @@ public class World
     }
 
     /// <summary>
-    /// Default constructor, used when loading a world from a file.
+    /// Create from JSON.
     /// </summary>
-    public World()
+    public World(string filename)
     {
+        StreamReader reader = File.OpenText(filename);
+        ReadJson((JObject)JToken.ReadFrom(new JsonTextReader(reader)));
     }
 
     /// <summary>
@@ -82,10 +80,6 @@ public class World
     {
         TimeManager.Instance.EveryFrameUnpaused -= TickEveryFrame;
         TimeManager.Instance.FixedFrequencyUnpaused -= TickFixedFrequency;
-
-        // Not strictly necessary but explicitly stating that we are decoupling the sound controller that we previously coupled.
-        FurnitureManager.Created -= GameController.Instance.AudioManager.SoundController.OnFurnitureCreated;
-        OnTileTypeChanged -= GameController.Instance.AudioManager.SoundController.OnTileTypeChanged;
     }
 
     public event Action<Tile> OnTileChanged;
@@ -330,37 +324,6 @@ public class World
         }
     }
 
-    public JObject ToJson()
-    {
-        JObject worldJson = new JObject
-        {
-            { "Seed", Seed },
-            { "RandomState", RandomStateToJson() },
-            { "Width", Width.ToString() },
-            { "Height", Height.ToString() },
-            { "Depth", Depth.ToString() },
-            { "Rooms", RoomManager.ToJson() },
-            { "Tiles", TilesToJson() },
-            { "Inventories", InventoryManager.ToJson() },
-            { "Furnitures", FurnitureManager.ToJson() },
-            { "Utilities", UtilityManager.ToJson() },
-            { "RoomBehaviors", RoomManager.BehaviorsToJson() },
-            { "Characters", CharacterManager.ToJson() },
-            { "CameraData", CameraData.ToJson() },
-            { "Skybox", skybox.name },
-            { "Wallet", Wallet.ToJson() },
-            { "Time", TimeManager.Instance.ToJson() },
-            { "Scheduler", Scheduler.Scheduler.Current.ToJson() }
-        };
-        return worldJson;
-    }
-
-    public void ReadJson(string filename)
-    {
-        StreamReader reader = File.OpenText(filename);
-        ReadJson((JObject)JToken.ReadFrom(new JsonTextReader(reader)));
-    }
-
     public void ReadJson(JObject worldJson)
     {
         if (worldJson["Seed"] != null)
@@ -390,6 +353,31 @@ public class World
         Scheduler.Scheduler.Current.FromJson(worldJson["Scheduler"]);
 
         tileGraph = new Path_TileGraph(this);
+    }
+
+    public JObject ToJson()
+    {
+        JObject worldJson = new JObject
+        {
+            { "Seed", Seed },
+            { "RandomState", RandomStateToJson() },
+            { "Width", Width.ToString() },
+            { "Height", Height.ToString() },
+            { "Depth", Depth.ToString() },
+            { "Rooms", RoomManager.ToJson() },
+            { "Tiles", TilesToJson() },
+            { "Inventories", InventoryManager.ToJson() },
+            { "Furnitures", FurnitureManager.ToJson() },
+            { "Utilities", UtilityManager.ToJson() },
+            { "RoomBehaviors", RoomManager.BehaviorsToJson() },
+            { "Characters", CharacterManager.ToJson() },
+            { "CameraData", CameraData.ToJson() },
+            { "Skybox", skybox.name },
+            { "Wallet", Wallet.ToJson() },
+            { "Time", TimeManager.Instance.ToJson() },
+            { "Scheduler", Scheduler.Scheduler.Current.ToJson() }
+        };
+        return worldJson;
     }
 
     public void ResizeWorld(Vector3 worldSize)

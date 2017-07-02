@@ -24,7 +24,6 @@ public class MainMenuController : MonoBehaviour
         Instance = this;
 
         new SpriteManager();
-        new AudioManager();
 
         TimeManager.Instance.IsPaused = true;
 

@@ -25,11 +25,6 @@ public static class Settings
     private static string userSettingsFilePath = System.IO.Path.Combine(
         Application.persistentDataPath, "Settings.json");
 
-    static Settings()
-    {
-        LoadSettings();
-    }
-
     public static string GetSettingWithOverwrite(string key, string defaultValue)
     {
         if (settingsDict == null)

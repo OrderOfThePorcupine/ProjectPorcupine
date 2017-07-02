@@ -7,51 +7,25 @@
 // ====================================================
 #endregion
 
+using System;
 using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+[MoonSharp.Interpreter.MoonSharpUserData]
 public class SystemController
 {
+    /// <summary>
+    /// We should be in the _WORLD scene, when this is called.
+    /// </summary>
     public SystemController()
     {
-        if (SceneController.LoadWorldFromFileName != null)
-        {
-            CreateWorldFromSaveFile(SceneController.LoadWorldFromFileName);
-            SceneController.LoadWorldFromFileName = null;
-        }
-        else
-        {
-            CreateEmptyWorld();
-        }
-
-        Path = new GameObject("VisualPath").AddComponent<VisualPath>();
-
-        GameObject canvas = GameObject.Find("Canvas");
-
-        // Add the currency display
-        GameObject currencyDisplay = GameObject.Instantiate(Resources.Load("UI/CurrencyDisplay"), canvas.GetComponentInChildren<PerformanceHUDManager>().transform.parent) as GameObject;
-
-        GameObject contextMenu = GameObject.Instantiate(Resources.Load("UI/ContextMenu"), canvas.transform.position, canvas.transform.rotation, canvas.transform) as GameObject;
-        contextMenu.name = "ContextMenu";
-
-        GameObject timeScale = GameObject.Instantiate(Resources.Load("UI/TimeScale"), GameObject.Find("TopRight").transform, false) as GameObject;
-        timeScale.name = "TimeScale";
-
-        GameObject dateTimeDisplay = GameObject.Instantiate(Resources.Load("UI/DateTimeDisplay"), canvas.transform, false) as GameObject;
-        dateTimeDisplay.name = "DateTimeDisplay";
-
-        SpawnInventoryController = new SpawnInventoryController();
         QuestController = new QuestController();
         TradeController = new TradeController();
         AutosaveManager = new AutosaveManager();
-
-        GameController.Instance.DialogBoxManager.transform.SetAsLastSibling();
-
-        // Hiding Dev Mode spawn inventory controller if devmode is off.
-        SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
     }
 
     public SpawnInventoryController SpawnInventoryController { get; private set; }
@@ -65,6 +39,46 @@ public class SystemController
     public World CurrentWorld { get; private set; }
 
     public VisualPath Path { get; private set; }
+
+    public void BuildUI(GameObject uiMenus)
+    {
+        Path = new GameObject("VisualPath").AddComponent<VisualPath>();
+
+        GameObject canvas = GameObject.Find("Canvas");
+
+        SpawnInventoryController = new SpawnInventoryController();
+
+        // Add the currency display
+        GameObject currencyDisplay = GameObject.Instantiate(Resources.Load("UI/CurrencyDisplay"), uiMenus.GetComponentInChildren<PerformanceHUDManager>().transform.parent) as GameObject;
+        currencyDisplay.name = "CurrencyDisplay";
+
+        GameObject gameMenu = GameObject.Instantiate(Resources.Load("UI/GameMenu"), uiMenus.transform) as GameObject;
+        gameMenu.name = "GameMenu";
+
+        GameObject menuleft = GameObject.Instantiate(Resources.Load("UI/MenuLeft"), uiMenus.transform) as GameObject;
+        menuleft.name = "MenuLeft";
+
+        GameObject headlines = GameObject.Instantiate(Resources.Load("UI/Headlines"), uiMenus.transform) as GameObject;
+        headlines.name = "Headlines";
+
+        GameObject menuRight = GameObject.Instantiate(Resources.Load("UI/MenuRight"), uiMenus.transform) as GameObject;
+        menuRight.name = "MenuRight";
+
+        GameObject contextMenu = GameObject.Instantiate(Resources.Load("UI/ContextMenu"), canvas.transform.position, canvas.transform.rotation, canvas.transform) as GameObject;
+        contextMenu.name = "ContextMenu";
+
+        GameObject timeScale = GameObject.Instantiate(Resources.Load("UI/TimeScale"), GameObject.Find("TopRight").transform, false) as GameObject;
+        timeScale.name = "TimeScale";
+
+        GameObject dateTimeDisplay = GameObject.Instantiate(Resources.Load("UI/DateTimeDisplay"), canvas.transform, false) as GameObject;
+        dateTimeDisplay.name = "DateTimeDisplay";
+
+        GameController.Instance.DialogBoxManager.transform.SetAsLastSibling();
+        GameController.Instance.DialogBoxManager.CreateSystemUI();
+
+        // Hiding Dev Mode spawn inventory controller if devmode is off.
+        SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
+    }
 
     public void ChangeDevMode(bool newDevMode)
     {
@@ -107,20 +121,30 @@ public class SystemController
         return t;
     }
 
-    private void CreateEmptyWorld()
+    public void CreateWorld(int width, int height, int depth, int seed, bool generateAsteroids = true, string generatorFile = "Default.xml")
     {
-        CurrentWorld = SceneController.CreateNewWorld();
+        UnityDebugger.Debugger.Log("WorldController", "Empty World");
+        ProjectPorcupine.Localization.LocalizationTable.UnregisterDelegates();
 
-        // Center the Camera
+        CurrentWorld = new World(width, height, depth, seed, generateAsteroids, generatorFile);
         Camera.main.transform.position = new Vector3(CurrentWorld.Width / 2, CurrentWorld.Height / 2, Camera.main.transform.position.z);
     }
 
-    private void CreateWorldFromSaveFile(string fileName)
+    public void LoadWorld(string fileName)
     {
         UnityDebugger.Debugger.Log("WorldController", "CreateWorldFromSaveFile");
+        ProjectPorcupine.Localization.LocalizationTable.UnregisterDelegates();
 
-        CurrentWorld = new World();
-        CurrentWorld.ReadJson(fileName);
+        CurrentWorld = new World(fileName);
+        Camera.main.transform.position = new Vector3(CurrentWorld.Width / 2, CurrentWorld.Height / 2, Camera.main.transform.position.z);
+    }
+
+    public void AssignWorld(World world)
+    {
+    }
+
+    public void UnAssignWorld(World world)
+    {
     }
 
     /// <summary>

@@ -143,7 +143,7 @@ public class DialogBoxLoadGame : DialogBoxLoadSaveGame
         dbm.dialogBoxPromptOrInfo.SetPrompt("message_loading_game");
         dbm.dialogBoxPromptOrInfo.ShowDialog();
 
-        SceneController.LoadWorld(filePath);
+        GameController.Instance.ToMainScene(filePath);
     }
 
     private void Update()

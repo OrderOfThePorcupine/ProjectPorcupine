@@ -43,6 +43,11 @@ public class GameMenuController : MonoBehaviour
 
     private void CreateGameMenu()
     {
+        foreach (Transform transform in this.gameObject.transform)
+        {
+            Destroy(transform.gameObject);
+        }
+
         foreach (GameMenuItem gameMenuItem in GameMenuManager.Instance)
         {
             CreateButton(gameMenuItem);

@@ -91,7 +91,7 @@ public class DialogBoxNewGame : DialogBox
         DialogBoxManager dialogManager = GameObject.FindObjectOfType<DialogBoxManager>();
         dialogManager.dialogBoxPromptOrInfo.SetPrompt("message_creating_new_world");
         dialogManager.dialogBoxPromptOrInfo.ShowDialog();
-        SceneController.LoadNewWorld(width, height, depth, seed, generatorFile, GenerateAsteroids.isOn);
+        GameController.Instance.ToMainScene(width, height, depth, seed, GenerateAsteroids.isOn, generatorFile);
     }
 
     public void VerifyNumericInput(InputField input)

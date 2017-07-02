@@ -16,49 +16,44 @@ using FMOD;
 /// <summary>
 /// The Manager that handles the loading and storing of audio from streamingAssets.
 /// </summary>
-public class AudioManager
+public static class AudioManager
 {
     public static readonly FMOD.System SoundSystem;
-    public Dictionary<string, ChannelGroup> channelGroups;
-    public ChannelGroup master;
-
-    private Dictionary<string, SoundClip> audioClips;
+    private static Dictionary<string, SoundClip> audioClips;
 
     static AudioManager()
     {
         Factory.System_Create(out SoundSystem);
         SoundSystem.setDSPBufferSize(1024, 10);
         SoundSystem.init(32, INITFLAGS.NORMAL, (IntPtr)0);
-    }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AudioManager"/> class.
-    /// </summary>
-    public AudioManager()
-    {
-        channelGroups = new Dictionary<string, ChannelGroup>();
+        ChannelGroups = new Dictionary<string, ChannelGroup>();
+        ChannelGroup master;
         SoundSystem.getMasterChannelGroup(out master);
+        Master = master;
+
         DSPConnection connection;
-        channelGroups.Add("UI", null);
-        channelGroups.Add("gameSounds", null);
-        channelGroups.Add("alerts", null);
-        channelGroups.Add("music", null);
-        foreach (string key in channelGroups.Keys.ToArray())
+        ChannelGroups.Add("UI", null);
+        ChannelGroups.Add("gameSounds", null);
+        ChannelGroups.Add("alerts", null);
+        ChannelGroups.Add("music", null);
+        foreach (string key in ChannelGroups.Keys.ToArray())
         {
             ChannelGroup chanGroup;
             SoundSystem.createChannelGroup(key, out chanGroup);
-            master.addGroup(chanGroup, true, out connection);
-            channelGroups[key] = chanGroup;
+            Master.addGroup(chanGroup, true, out connection);
+            ChannelGroups[key] = chanGroup;
         }
 
-        channelGroups.Add("master", master);
+        ChannelGroups.Add("master", Master);
 
         SoundSystem.set3DSettings(1f, 1f, .25f);
         audioClips = new Dictionary<string, SoundClip>();
-        SoundController = new SoundController(this);
     }
 
-    public SoundController SoundController { get; private set; }
+    public static Dictionary<string, ChannelGroup> ChannelGroups { get; private set; }
+
+    public static ChannelGroup Master { get; private set; }
 
     /// <summary>
     /// Loads all the audio files from the specified directory.
@@ -73,7 +68,7 @@ public class AudioManager
         }
 
         string[] filesInDir = Directory.GetFiles(directoryPath);
-        GameController.Instance.AudioManager.LoadAudioFile(filesInDir, directoryPath);
+        LoadAudioFile(filesInDir, directoryPath);
     }
 
     /// <summary>
@@ -81,7 +76,7 @@ public class AudioManager
     /// Used for debugging.
     /// </summary>
     /// <returns>String containing the information of audioClips.</returns>
-    public string GetAudioDictionaryString()
+    public static string GetAudioDictionaryString()
     {
         Dictionary<string, SoundClip> dictionary = audioClips;
 
@@ -98,7 +93,7 @@ public class AudioManager
     /// </param>
     /// <param name="audioName">The name of the SoundClip.</param>
     /// <returns>SoundClip from the specified category with the specified name.</returns>
-    public SoundClip GetAudio(string categoryName, string audioName)
+    public static SoundClip GetAudio(string categoryName, string audioName)
     {
         SoundClip clip;
 
@@ -127,14 +122,14 @@ public class AudioManager
     /// <summary>
     /// Should only be called when the game is actually ending!.
     /// </summary>
-    public void Destroy()
+    public static void Destroy()
     {
         SoundSystem.close();
 
         // This will also release master, so we don't have to call master.release();
-        foreach (string key in channelGroups.Keys)
+        foreach (string key in ChannelGroups.Keys)
         {
-            channelGroups[key].release();
+            ChannelGroups[key].release();
         }
 
         SoundSystem.release();
@@ -142,7 +137,7 @@ public class AudioManager
         audioClips = null;
     }
 
-    private void LoadAudioFile(string[] filesInDir, string directoryPath)
+    private static void LoadAudioFile(string[] filesInDir, string directoryPath)
     {
         foreach (string file in filesInDir)
         {

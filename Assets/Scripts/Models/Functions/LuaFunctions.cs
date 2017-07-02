@@ -39,6 +39,7 @@ public class LuaFunctions : IFunctions
         RegisterGlobal(typeof(ModUtils));
         RegisterGlobal(typeof(World));
         RegisterGlobal(typeof(GameController));
+        RegisterGlobal(typeof(SystemController));
         RegisterGlobal(typeof(Connection));
         RegisterGlobal(typeof(Scheduler.Scheduler));
         RegisterGlobal(typeof(Scheduler.ScheduledEvent));

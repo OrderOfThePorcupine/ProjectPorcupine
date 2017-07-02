@@ -136,7 +136,8 @@
       </Option>
     </OptionHeading>
     <OptionHeading Name="utilities">
-      <Option Name="performance_hud" Key="developer_utilities_performanceHUD" DefaultValue="none" ClassName="PerformanceHUDComboBox" />
+      <Option Name="performance_hud" Key="developer_utilities_
+              " DefaultValue="none" ClassName="PerformanceHUDComboBox" />
     </OptionHeading>
   </Category>
 </Categories>

@@ -19,14 +19,13 @@ public class SoundController
     private VECTOR zero;
     private VECTOR ignore;
 
-    public SoundController(AudioManager parentManager)
+    public SoundController()
     {
         TimeManager.Instance.EveryFrame += Update;
         zero = GetVectorFrom(Vector3.zero);
         forward = GetVectorFrom(Vector3.forward);
         up = GetVectorFrom(Vector3.up);
         cooldowns = new Dictionary<SoundClip, float>();
-        this.AudioManager = parentManager;
     }
 
     public enum AudioChannel
@@ -34,14 +33,21 @@ public class SoundController
         master, UI, gameSounds, alerts, music
     }
 
-    public AudioManager AudioManager { get; private set; }
-
     public void AssignWorld(World world)
     {
         if (world != null)
         {
             world.FurnitureManager.Created += OnFurnitureCreated;
             world.OnTileTypeChanged += OnTileTypeChanged;
+        }
+    }
+
+    public void UnAssignWorld(World world)
+    {
+        if (world != null)
+        {
+            world.FurnitureManager.Created -= OnFurnitureCreated;
+            world.OnTileTypeChanged -= OnTileTypeChanged;
         }
     }
 
@@ -118,12 +124,12 @@ public class SoundController
     /// <param name="volRange">Volume range in decibels.</param>
     public void PlaySoundAt(Sound clip, Tile tile, string chanGroup = "master", float freqRange = 0f, float volRange = 0f)
     {
-        if (!AudioManager.channelGroups.ContainsKey(chanGroup))
+        if (!AudioManager.ChannelGroups.ContainsKey(chanGroup))
         {
             chanGroup = "master";
         }
 
-        ChannelGroup channelGroup = AudioManager.channelGroups[chanGroup];
+        ChannelGroup channelGroup = AudioManager.ChannelGroups[chanGroup];
 
         FMOD.System soundSystem = AudioManager.SoundSystem;
         Channel channel;
@@ -264,9 +270,9 @@ public class SoundController
 
     public void SetVolume(string channel, float volume)
     {
-        if (AudioManager.channelGroups.ContainsKey(channel))
+        if (AudioManager.ChannelGroups.ContainsKey(channel))
         {
-            AudioManager.channelGroups[channel].setVolume(volume);
+            AudioManager.ChannelGroups[channel].setVolume(volume);
         }
         else
         {
@@ -281,10 +287,10 @@ public class SoundController
 
     public float GetVolume(string channel)
     {
-        if (AudioManager.channelGroups.ContainsKey(channel))
+        if (AudioManager.ChannelGroups.ContainsKey(channel))
         {
             float volume = 0;
-            AudioManager.channelGroups[channel].getVolume(out volume);
+            AudioManager.ChannelGroups[channel].getVolume(out volume);
             return volume;
         }
         else

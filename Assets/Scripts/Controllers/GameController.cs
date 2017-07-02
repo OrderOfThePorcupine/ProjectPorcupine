@@ -7,15 +7,21 @@
 // ====================================================
 #endregion
 
+using System;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+[MoonSharp.Interpreter.MoonSharpUserData]
 public class GameController : MonoBehaviour
 {
     // TODO: Should this be also saved with the world data?
     // If so - beginner task!
-    public static readonly string GameVersion = "Someone_will_come_up_with_a_proper_naming_scheme_later";
+    public const string GameVersion = "Someone_will_come_up_with_a_proper_naming_scheme_later";
+
+    public const string MainScene = "_World";
+    public const string MainMenuScene = "MainMenu";
 
     [SerializeField]
     private GameObject circleCursorPrefab;
@@ -38,11 +44,11 @@ public class GameController : MonoBehaviour
 
     #region Instances
 
-    public static GameController Instance { get; protected set; }
+    public static GameController Instance { get; private set; }
 
     public KeyboardManager KeyboardManager { get; private set; }
 
-    public AudioManager AudioManager { get; private set; }
+    public SoundController SoundController { get; private set; }
 
     public ModsManager ModsManager { get; private set; }
 
@@ -70,6 +76,9 @@ public class GameController : MonoBehaviour
 
     public SystemController CurrentSystem { get; private set; }
 
+    /// <summary>
+    /// Equivalent to <see cref="CurrentSystem"/>.CurrentWorld.
+    /// </summary>
     public World CurrentWorld
     {
         get { return CurrentSystem.CurrentWorld; }
@@ -98,6 +107,18 @@ public class GameController : MonoBehaviour
         }
     }
 
+    // Quit the app whether in editor or a build version.
+    public static void QuitGame()
+    {
+        // Maybe ask the user if he want to save or is sure they want to quit??
+#if UNITY_EDITOR
+        // Allows you to quit in the editor.
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
     /// <summary>
     /// Change the developper mode.
     /// </summary>
@@ -110,6 +131,81 @@ public class GameController : MonoBehaviour
         {
             CurrentSystem.ChangeDevMode(newMode);
         }
+    }
+
+    public void ToMainScene(int width, int height, int depth, int seed, bool generateAsteroids, string generatorFile)
+    {
+        // Load Main World
+        CreateSystem();
+        CurrentSystem.CreateWorld(width, height, depth, seed, generateAsteroids, generatorFile);
+        SceneManager.LoadScene(MainScene);
+    }
+
+    public void ToMainScene(string fileName)
+    {
+        // Load Main World
+        CreateSystem();
+        CurrentSystem.LoadWorld(fileName);
+        SceneManager.LoadScene(MainScene);
+    }
+
+    public void ToMainMenu()
+    {
+        // Should unassign all worlds!!
+        // But since this only allows for multi-worlds not enables it
+        // I won't include it
+        UnAssignWorld(CurrentWorld);
+        CurrentSystem.TearDown();
+        CurrentSystem = null; // Removal of current system
+        SceneManager.LoadScene(MainMenuScene);
+    }
+
+    public void ActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+        if (newScene.name == MainScene)
+        {
+            if (oldScene.name == null)
+            {
+                // This is for people loading up from _World
+                CreateSystem();
+                CurrentSystem.CreateWorld(100, 100, 5, UnityEngine.Random.Range(int.MinValue, int.MaxValue), true, "Default.xml");
+            }
+
+            CurrentSystem.BuildUI(GameObject.Find("UIMenus"));
+            AssignWorld(CurrentWorld);
+        }
+    }
+
+    public void AssignWorld(World world)
+    {
+        CharacterSpriteController.AssignWorld(world);
+        FurnitureSpriteController.AssignWorld(world);
+        InventorySpriteController.AssignWorld(world);
+        JobSpriteController.AssignWorld(world);
+        ShipSpriteController.AssignWorld(world);
+        TileSpriteController.AssignWorld(world);
+        UtilitySpriteController.AssignWorld(world);
+
+        SoundController.AssignWorld(world);
+
+        CameraController.Initialize(world);
+
+        CurrentSystem.AssignWorld(world);
+    }
+
+    public void UnAssignWorld(World world)
+    {
+        CharacterSpriteController.UnAssignWorld(world);
+        FurnitureSpriteController.UnAssignWorld(world);
+        InventorySpriteController.UnAssignWorld(world);
+        JobSpriteController.UnAssignWorld(world);
+        ShipSpriteController.UnAssignWorld(world);
+        TileSpriteController.UnAssignWorld(world);
+        UtilitySpriteController.UnAssignWorld(world);
+
+        SoundController.UnAssignWorld(world);
+
+        CurrentSystem.UnAssignWorld(world);
     }
 
     // Each time a scene is loaded.
@@ -133,16 +229,18 @@ public class GameController : MonoBehaviour
         */
 
         DontDestroyOnLoad(this);
+        SceneManager.activeSceneChanged += ActiveSceneChanged;
+        IsModal = false;
+        IsPaused = false;
 
-        new FunctionsManager();
-        new PrototypeManager();
-        new CharacterNameManager();
-        new SpriteManager();
+        new FunctionsManager();     // We don't need to maintain a reference for this
+        new PrototypeManager();     // We don't need to maintain a reference for this
+        new CharacterNameManager(); // We don't need to maintain a reference for this
+        new SpriteManager();        // We don't need to maintain a reference for this
 
         // Load Keyboard Mapping.
         KeyboardManager = KeyboardManager.Instance;
-
-        AudioManager = new AudioManager();
+        SoundController = new SoundController();
         ModsManager = new ModsManager();
 
         FurnitureSpriteController = new FurnitureSpriteController();
@@ -156,22 +254,37 @@ public class GameController : MonoBehaviour
         BuildModeController = new BuildModeController();
         MouseController = new MouseController(circleCursorPrefab);
         CameraController = new CameraController();
-        CameraController.Initialize();
 
         KeyboardManager.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });
+
+        // Load settings.
+        Settings.LoadSettings();
+
+        // Add a gameobject that applies localization to scene
+        this.gameObject.AddComponent<LocalizationLoader>();
 
         // Initialising controllers.
         GameObject canvas = GameObject.Find("Canvas");
 
+        GameObject uiMenus = new GameObject("UIMenus");
+        uiMenus.transform.SetParent(canvas.transform);
+        uiMenus.transform.SetAsFirstSibling();
+        RectTransform uiMenuTransform = uiMenus.AddComponent<RectTransform>();
+        uiMenuTransform.anchorMin = Vector2.zero;
+        uiMenuTransform.anchorMax = Vector2.one;
+        uiMenuTransform.offsetMin = Vector2.zero;
+        uiMenuTransform.offsetMax = Vector2.zero;
+
         // Instantiate a FPSCounter.
         GameObject menuTop = (GameObject)Instantiate(Resources.Load("UI/MenuTop"));
         menuTop.name = "MenuTop";
-        menuTop.transform.SetParent(canvas.transform, false);
+        menuTop.transform.SetParent(uiMenus.transform, false);
         GameObject fpsCounter = menuTop.GetComponentInChildren<PerformanceHUDManager>().gameObject;
         fpsCounter.SetActive(true);
 
         DialogBoxManager = new GameObject("Dialog Boxes").AddComponent<DialogBoxManager>();
         DialogBoxManager.transform.SetParent(canvas.transform, false);
+        DialogBoxManager.CreateUI();
 
         // Settings UI is a 'dialog box' (kinda), so it comes here.  
         // Where as DevConsole is a constant menu item (it can appear 'anywhere' so it appears after)
@@ -194,19 +307,21 @@ public class GameController : MonoBehaviour
             devConsole.SetActive(true);
             DeveloperConsole.DevConsole.Close();
         }
-
-        IsModal = false;
-        IsPaused = false;
     }
 
-    // Only on first time a scene is loaded.
     private void Start()
     {
-        // Load settings.
-        Settings.LoadSettings();
+    }
 
-        // Add a gameobject that Localization
-        this.gameObject.AddComponent<LocalizationLoader>();
+    private void CreateSystem()
+    {
+        if (CurrentSystem != null)
+        {
+            // We already have a system
+            throw new Exception("CurrentSystem is already allocated, so a system has already been created.");
+        }
+
+        CurrentSystem = new SystemController();
     }
 
     private void Update()

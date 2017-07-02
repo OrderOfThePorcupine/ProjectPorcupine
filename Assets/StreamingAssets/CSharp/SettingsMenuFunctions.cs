@@ -604,7 +604,7 @@ public class SoundDeviceComboBox : GenericComboBox
 
     public override GameObject InitializeElement()
     {
-        GameObject go = DropdownHelperFromOptionData(CreateDeviceDropdown(), WorldController.Instance.SoundController.GetCurrentAudioDriver());
+        GameObject go = DropdownHelperFromOptionData(CreateDeviceDropdown(), GameController.Instance.SoundController.GetCurrentAudioDriver());
 
         dropdownElement.onValueChanged.AddListener(
             (int v) =>
@@ -622,11 +622,11 @@ public class SoundDeviceComboBox : GenericComboBox
 
     private Dropdown.OptionData[] CreateDeviceDropdown()
     {
-        Dropdown.OptionData[] options = new Dropdown.OptionData[WorldController.Instance.SoundController.GetDriverCount()];
+        Dropdown.OptionData[] options = new Dropdown.OptionData[GameController.Instance.SoundController.GetDriverCount()];
 
         for (int i = 0; i < options.Length; i++)
         {
-            DriverInfo info = WorldController.Instance.SoundController.GetDriverInfo(i);
+            AudioManager.DriverInfo info = GameController.Instance.SoundController.GetDriverInfo(i);
 
             options[i] = new DriverDropdownOption
             {
@@ -644,7 +644,7 @@ public class SoundDeviceComboBox : GenericComboBox
 
         if (selectedOption != null)
         {
-            WorldController.Instance.SoundController.SetAudioDriver(selectedOption.driverInfo);
+            GameController.Instance.SoundController.SetAudioDriver(selectedOption.driverInfo);
         }
     }
 
@@ -654,7 +654,7 @@ public class SoundDeviceComboBox : GenericComboBox
 
         if (selectedOption != null)
         {
-            WorldController.Instance.SoundController.SetAudioDriver(getValue());
+            GameController.Instance.SoundController.SetAudioDriver(getValue());
         }
     }
 
@@ -668,7 +668,7 @@ public class SoundDeviceComboBox : GenericComboBox
         }
         else
         {
-            return WorldController.Instance.SoundController.GetCurrentAudioDriverInfo().Guid.ToString();
+            return GameController.Instance.SoundController.GetCurrentAudioDriverInfo().Guid.ToString();
         }
     }
 }
@@ -913,7 +913,7 @@ public class SoundSlider : GenericSlider
         if (this.parameterData.ContainsKey("SoundChannel"))
         {
             Settings.SetSetting(option.key, sliderElement.normalizedValue);
-            WorldController.Instance.SoundController.SetVolume(this.parameterData["SoundChannel"].ToString(), sliderElement.normalizedValue);
+            GameController.Instance.SoundController.SetVolume(this.parameterData["SoundChannel"].ToString(), sliderElement.normalizedValue);
         }
     }
 
@@ -922,7 +922,7 @@ public class SoundSlider : GenericSlider
         base.CancelSetting();
         if (this.parameterData.ContainsKey("SoundChannel"))
         {
-            WorldController.Instance.SoundController.SetVolume(this.parameterData["SoundChannel"].ToString(), getValue());
+            GameController.Instance.SoundController.SetVolume(this.parameterData["SoundChannel"].ToString(), getValue());
         }
     }
 }
@@ -935,18 +935,18 @@ public class AutosaveIntervalInputField : GenericInputField
     public override void ApplySetting()
     {
         base.ApplySetting();
-        if (WorldController.Instance != null)
+        if (GameController.Instance.CurrentSystem != null)
         {
-            WorldController.Instance.AutosaveManager.SetAutosaveInterval(int.Parse(value));
+            GameController.Instance.CurrentSystem.AutosaveManager.SetAutosaveInterval(int.Parse(value));
         }
     }
 
     public override void CancelSetting()
     {
         base.CancelSetting();
-        if (WorldController.Instance != null)
+        if (GameController.Instance.CurrentSystem != null)
         {
-            WorldController.Instance.AutosaveManager.SetAutosaveInterval(int.Parse(getValue()));
+            GameController.Instance.CurrentSystem.AutosaveManager.SetAutosaveInterval(int.Parse(getValue()));
         }
     }
 }

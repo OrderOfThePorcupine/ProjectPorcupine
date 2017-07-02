@@ -36,7 +36,7 @@ public class MenuLeft : MonoBehaviour
         menu.SetActive(true);
         CurrentlyOpen = menu;
 
-        GameController.Instance.AudioManager.SoundController.OnButtonSFX();
+        GameController.Instance.SoundController.OnButtonSFX();
 
         if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
         {
@@ -55,7 +55,7 @@ public class MenuLeft : MonoBehaviour
                 GameController.Instance.CurrentSystem.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
             }
 
-            GameController.Instance.AudioManager.SoundController.OnButtonSFX();
+            GameController.Instance.SoundController.OnButtonSFX();
 
             CurrentlyOpen = null;
         }
