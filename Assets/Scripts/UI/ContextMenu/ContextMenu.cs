@@ -58,7 +58,7 @@ public class ContextMenu : MonoBehaviour
     {
         gameObject.transform.position = Input.mousePosition + new Vector3(10, -10, 0);
 
-        bool characterSelected = GameController.Instance.MouseController.IsCharacterSelected();
+        bool characterSelected = GameController.Instance.CurrentSystem.MouseController.IsCharacterSelected();
 
         foreach (ContextMenuAction contextMenuAction in contextualActions)
         {

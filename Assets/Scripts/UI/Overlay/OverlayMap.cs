@@ -376,10 +376,10 @@ public class OverlayMap : MonoBehaviour
             elapsed = 0f;
         }
 
-        if (currentOverlay != "None" && currentLayer != GameController.Instance.CameraController.CurrentLayer)
+        if (currentOverlay != "None" && currentLayer != GameController.Instance.CurrentSystem.CameraController.CurrentLayer)
         {
             Bake();
-            currentLayer = GameController.Instance.CameraController.CurrentLayer;
+            currentLayer = GameController.Instance.CurrentSystem.CameraController.CurrentLayer;
             elapsed = 0f;
         }
 
@@ -387,7 +387,7 @@ public class OverlayMap : MonoBehaviour
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if (valueAt != null)
         {
-            textView.GetComponent<UnityEngine.UI.Text>().text = string.Format("[DEBUG] Currently over: {0}", valueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), GameController.Instance.CameraController.CurrentLayer));
+            textView.GetComponent<UnityEngine.UI.Text>().text = string.Format("[DEBUG] Currently over: {0}", valueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), GameController.Instance.CurrentSystem.CameraController.CurrentLayer));
         }
     }
 
@@ -484,7 +484,7 @@ public class OverlayMap : MonoBehaviour
         {
             for (int x = 0; x < sizeX; x++)
             {
-                float v = valueAt(x, y, GameController.Instance.CameraController.CurrentLayer);
+                float v = valueAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
                 Debug.Assert(v >= 0 && v < 256, "v >= 0 && v < 256");
 
                 int sampleX = ((int)v % 256) * colorMapWidth;

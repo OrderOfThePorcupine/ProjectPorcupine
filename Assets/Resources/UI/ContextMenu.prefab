@@ -16,15 +16,15 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 224000011377820364}
-  - 222: {fileID: 222000013824823538}
-  - 114: {fileID: 114000013225789384}
-  - 114: {fileID: 114000011413206680}
-  - 114: {fileID: 114000013108134710}
-  - 114: {fileID: 114000011622113432}
-  - 114: {fileID: 114000013495731334}
+  - component: {fileID: 224000011377820364}
+  - component: {fileID: 222000013824823538}
+  - component: {fileID: 114000013225789384}
+  - component: {fileID: 114000011413206680}
+  - component: {fileID: 114000013108134710}
+  - component: {fileID: 114000011622113432}
+  - component: {fileID: 114000013495731334}
   m_Layer: 5
   m_Name: ContextMenu
   m_TagString: Untagged
@@ -104,6 +104,8 @@ MonoBehaviour:
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
 --- !u!114 &114000013495731334
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -132,10 +134,10 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}

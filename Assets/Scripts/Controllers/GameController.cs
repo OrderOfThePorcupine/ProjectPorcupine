@@ -70,10 +70,6 @@ public class GameController : MonoBehaviour
 
     public BuildModeController BuildModeController { get; private set; }
 
-    public MouseController MouseController { get; private set; }
-
-    public CameraController CameraController { get; private set; }
-
     public SystemController CurrentSystem { get; private set; }
 
     /// <summary>
@@ -107,6 +103,11 @@ public class GameController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Whether or not the user opened the game from _World.
+    /// </summary>
+    public bool OpenedWorldScene { get; private set; }
+
     // Quit the app whether in editor or a build version.
     public static void QuitGame()
     {
@@ -138,7 +139,7 @@ public class GameController : MonoBehaviour
         // Load Main World
         CreateSystem();
         CurrentSystem.CreateWorld(width, height, depth, seed, generateAsteroids, generatorFile);
-        SceneManager.LoadScene(MainScene);
+        SceneManager.LoadSceneAsync(MainScene);
     }
 
     public void ToMainScene(string fileName)
@@ -146,7 +147,7 @@ public class GameController : MonoBehaviour
         // Load Main World
         CreateSystem();
         CurrentSystem.LoadWorld(fileName);
-        SceneManager.LoadScene(MainScene);
+        SceneManager.LoadSceneAsync(MainScene);
     }
 
     public void ToMainMenu()
@@ -154,24 +155,29 @@ public class GameController : MonoBehaviour
         // Should unassign all worlds!!
         // But since this only allows for multi-worlds not enables it
         // I won't include it
+        Destroy(GetComponentInChildren<OverlayMap>().gameObject);
         UnAssignWorld(CurrentWorld);
         CurrentSystem.TearDown();
         CurrentSystem = null; // Removal of current system
-        SceneManager.LoadScene(MainMenuScene);
+        SceneManager.LoadScene(MainMenuScene); // We don't care what the old scene was.
     }
 
     public void ActiveSceneChanged(Scene oldScene, Scene newScene)
     {
         if (newScene.name == MainScene)
         {
-            if (oldScene.name == null)
+            if (OpenedWorldScene)
             {
                 // This is for people loading up from _World
                 CreateSystem();
                 CurrentSystem.CreateWorld(100, 100, 5, UnityEngine.Random.Range(int.MinValue, int.MaxValue), true, "Default.xml");
             }
 
-            CurrentSystem.BuildUI(GameObject.Find("UIMenus"));
+            IsModal = false;
+            IsPaused = false;
+            BuildUI();
+            Instantiate(Resources.Load("UI/Overlay"), this.transform);
+            CurrentSystem.BuildUI(GameObject.Find("UIMenus"), circleCursorPrefab);
             AssignWorld(CurrentWorld);
         }
     }
@@ -187,8 +193,6 @@ public class GameController : MonoBehaviour
         UtilitySpriteController.AssignWorld(world);
 
         SoundController.AssignWorld(world);
-
-        CameraController.Initialize(world);
 
         CurrentSystem.AssignWorld(world);
     }
@@ -208,16 +212,18 @@ public class GameController : MonoBehaviour
         CurrentSystem.UnAssignWorld(world);
     }
 
-    // Each time a scene is loaded.
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance == null || Instance == this)
         {
             Instance = this;
         }
         else
         {
+            // This is fine!
+            Debug.LogWarning("We already have a GameController, so we are going to destroy 'this' copy.  This is fine, and will occur once per scene change.");
             Destroy(this.gameObject);
+            return;
         }
 
         // FIXME: Do something real here. This is just to show how to register a C# event prototype for the Scheduler.
@@ -231,7 +237,7 @@ public class GameController : MonoBehaviour
         DontDestroyOnLoad(this);
         SceneManager.activeSceneChanged += ActiveSceneChanged;
         IsModal = false;
-        IsPaused = false;
+        IsPaused = true;
 
         new FunctionsManager();     // We don't need to maintain a reference for this
         new PrototypeManager();     // We don't need to maintain a reference for this
@@ -252,8 +258,6 @@ public class GameController : MonoBehaviour
         ShipSpriteController = new ShipSpriteController();
 
         BuildModeController = new BuildModeController();
-        MouseController = new MouseController(circleCursorPrefab);
-        CameraController = new CameraController();
 
         KeyboardManager.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });
 
@@ -263,6 +267,34 @@ public class GameController : MonoBehaviour
         // Add a gameobject that applies localization to scene
         this.gameObject.AddComponent<LocalizationLoader>();
 
+        if (SceneManager.GetActiveScene().name == MainScene)
+        {
+            OpenedWorldScene = true;
+        }
+        else // If we aren't on the MainScene initially then we are fine!
+        {
+            // Initialising controllers.
+            GameObject canvas = GameObject.Find("Canvas");
+
+            GameObject backgroundGO = new GameObject("Background");
+            backgroundGO.AddComponent<SpriteRenderer>().sprite = SpriteManager.GetRandomSprite("Background");
+
+            // Create a Title.
+            GameObject title = (GameObject)Instantiate(Resources.Load("UI/TitleMainMenu"));
+            title.transform.SetParent(canvas.transform, false);
+            title.SetActive(true);
+
+            // Display Main Menu.
+            GameObject mainMenu = (GameObject)Instantiate(Resources.Load("UI/MainMenu"));
+            mainMenu.transform.SetParent(canvas.transform, false);
+            mainMenu.SetActive(true);
+
+            BuildUI();
+        }
+    }
+
+    private void BuildUI()
+    {
         // Initialising controllers.
         GameObject canvas = GameObject.Find("Canvas");
 
@@ -282,10 +314,6 @@ public class GameController : MonoBehaviour
         GameObject fpsCounter = menuTop.GetComponentInChildren<PerformanceHUDManager>().gameObject;
         fpsCounter.SetActive(true);
 
-        DialogBoxManager = new GameObject("Dialog Boxes").AddComponent<DialogBoxManager>();
-        DialogBoxManager.transform.SetParent(canvas.transform, false);
-        DialogBoxManager.CreateUI();
-
         // Settings UI is a 'dialog box' (kinda), so it comes here.  
         // Where as DevConsole is a constant menu item (it can appear 'anywhere' so it appears after)
         GameObject settingsMenu = (GameObject)Instantiate(Resources.Load("UI/SettingsMenu/SettingsMenu"));
@@ -297,6 +325,15 @@ public class GameController : MonoBehaviour
             settingsMenu.SetActive(true);
         }
 
+        DialogBoxManager = new GameObject("Dialog Boxes").AddComponent<DialogBoxManager>();
+        DialogBoxManager.transform.SetParent(canvas.transform, false);
+        RectTransform dialogBoxManagerRectTransform = DialogBoxManager.gameObject.AddComponent<RectTransform>();
+        dialogBoxManagerRectTransform.anchorMin = Vector2.zero;
+        dialogBoxManagerRectTransform.anchorMax = Vector2.one;
+        dialogBoxManagerRectTransform.offsetMin = Vector2.zero;
+        dialogBoxManagerRectTransform.offsetMax = Vector2.zero;
+        DialogBoxManager.CreateUI();
+
         GameObject devConsole = (GameObject)Instantiate(Resources.Load("UI/Console/DevConsole"));
 
         if (devConsole != null)
@@ -307,10 +344,6 @@ public class GameController : MonoBehaviour
             devConsole.SetActive(true);
             DeveloperConsole.DevConsole.Close();
         }
-    }
-
-    private void Start()
-    {
     }
 
     private void CreateSystem()

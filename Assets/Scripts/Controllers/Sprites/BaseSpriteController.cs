@@ -14,10 +14,11 @@ public abstract class BaseSpriteController<T>
 {
     protected Dictionary<T, GameObject> objectGameObjectMap;
     protected GameObject objectParent;
+    protected string parentName;
 
     public BaseSpriteController(string parentName)
     {
-        objectParent = new GameObject(parentName);
+        this.parentName = parentName;
         objectGameObjectMap = new Dictionary<T, GameObject>();
     }
 
@@ -31,7 +32,13 @@ public abstract class BaseSpriteController<T>
     /// Register world.
     /// </summary>
     /// <param name="world"> World to register. </param>
-    public abstract void AssignWorld(World world);
+    public virtual void AssignWorld(World world)
+    {
+        if (objectParent == null)
+        {
+            objectParent = new GameObject(parentName);
+        }
+    }
 
     /// <summary>
     /// Unregister world.

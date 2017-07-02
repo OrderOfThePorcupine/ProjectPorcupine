@@ -15,13 +15,13 @@ using UnityEngine.UI;
 /// is under the mouse and then updates the GetComponent<Text>.text
 /// parameter of the object it is attached to.
 /// </summary>
-public abstract class MouseOver : MonoBehaviour 
+public abstract class MouseOver : MonoBehaviour
 {
     private Text text;
     private MouseController mouseController;
 
     // Update is called once per frame
-    public void Update() 
+    public void Update()
     {
         Tile tile = mouseController.GetMouseOverTile();
 
@@ -53,7 +53,7 @@ public abstract class MouseOver : MonoBehaviour
             return;
         }
 
-        mouseController = GameController.Instance.MouseController;
+        mouseController = GameController.Instance.CurrentSystem.MouseController;
         if (mouseController == null)
         {
             UnityDebugger.Debugger.LogError("MouseOver", "How do we not have an instance of mouse controller?");

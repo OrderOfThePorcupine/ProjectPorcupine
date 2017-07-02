@@ -156,7 +156,7 @@ public class MouseController
     private void UpdateCurrentFramePosition()
     {
         currFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        currFramePosition.z = GameController.Instance.CameraController.CurrentLayer;
+        currFramePosition.z = GameController.Instance.CurrentSystem.CameraController.CurrentLayer;
     }
 
     private void CheckModeChanges()
@@ -199,7 +199,7 @@ public class MouseController
     private void StoreFramePosition()
     {
         lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        lastFramePosition.z = GameController.Instance.CameraController.CurrentLayer;
+        lastFramePosition.z = GameController.Instance.CurrentSystem.CameraController.CurrentLayer;
     }
 
     private void CalculatePlacingPosition()
@@ -358,7 +358,7 @@ public class MouseController
         {
             for (int y = dragParams.StartY; y <= dragParams.EndY; y++)
             {
-                Tile t = GameController.Instance.CurrentWorld.GetTileAt(x, y, GameController.Instance.CameraController.CurrentLayer);
+                Tile t = GameController.Instance.CurrentWorld.GetTileAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
                 if (t != null)
                 {
                     // Display the building hint on top of this tile position.
@@ -390,7 +390,7 @@ public class MouseController
 
     private void ShowGenericVisuals(int x, int y)
     {
-        GameObject go = SimplePool.Spawn(circleCursorPrefab, new Vector3(x, y, GameController.Instance.CameraController.CurrentLayer), Quaternion.identity);
+        GameObject go = SimplePool.Spawn(circleCursorPrefab, new Vector3(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer), Quaternion.identity);
         go.transform.SetParent(cursorParent.transform, true);
         go.GetComponent<SpriteRenderer>().sprite = SpriteManager.GetSprite("UI", "CursorCircle");
         dragPreviewGameObjects.Add(go);
@@ -409,7 +409,7 @@ public class MouseController
 
             for (int y = begin; y != stop; y += increment)
             {
-                Tile tile = GameController.Instance.CurrentWorld.GetTileAt(x, y, GameController.Instance.CameraController.CurrentLayer);
+                Tile tile = GameController.Instance.CurrentWorld.GetTileAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
                 if (tile == null)
                 {
                     // Trying to build off the map, bail out of this cycle.
@@ -448,7 +448,7 @@ public class MouseController
         // In devmode, utilities don't build their network, and one of the utilities built needs UpdateGrid called explicitly after all are built.
         if (GameController.Instance.BuildModeController.BuildMode == BuildMode.UTILITY && SettingsKeyHolder.DeveloperMode)
         {
-            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, GameController.Instance.CameraController.CurrentLayer);
+            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
             Utility utility = firstTile.Utilities[PrototypeManager.Utility.Get(GameController.Instance.BuildModeController.BuildModeType).Type];
             utility.UpdateGrid(utility);
         }
@@ -541,7 +541,7 @@ public class MouseController
 
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
-            GameController.Instance.CameraController.ChangeZoom(Input.GetAxis("Mouse ScrollWheel"));
+            GameController.Instance.CurrentSystem.CameraController.ChangeZoom(Input.GetAxis("Mouse ScrollWheel"));
         }
 
         UpdateCameraBounds();
@@ -615,7 +615,7 @@ public class MouseController
             sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
         }
 
-        go.transform.position = new Vector3(tile.X + proto.Jobs.WorkSpotOffset.x, tile.Y + proto.Jobs.WorkSpotOffset.y, GameController.Instance.CameraController.CurrentLayer);
+        go.transform.position = new Vector3(tile.X + proto.Jobs.WorkSpotOffset.x, tile.Y + proto.Jobs.WorkSpotOffset.y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
     }
 
     private void ShowUtilitySpriteAtTile(string type, Tile tile)
@@ -639,7 +639,7 @@ public class MouseController
             sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
         }
 
-        go.transform.position = new Vector3(tile.X, tile.Y, GameController.Instance.CameraController.CurrentLayer);
+        go.transform.position = new Vector3(tile.X, tile.Y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
     }
 
     public class DragParameters

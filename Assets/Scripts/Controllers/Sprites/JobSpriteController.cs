@@ -19,6 +19,7 @@ public class JobSpriteController : BaseSpriteController<Job>
 
     public override void AssignWorld(World world)
     {
+        base.AssignWorld(world);
         if (world != null)
         {
             world.jobQueue.OnJobCreated += OnCreated;

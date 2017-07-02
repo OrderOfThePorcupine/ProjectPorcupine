@@ -36,12 +36,19 @@ public class SystemController
 
     public TradeController TradeController { get; private set; }
 
+    public MouseController MouseController { get; private set; }
+
+    public CameraController CameraController { get; private set; }
+
     public World CurrentWorld { get; private set; }
 
     public VisualPath Path { get; private set; }
 
-    public void BuildUI(GameObject uiMenus)
+    public void BuildUI(GameObject uiMenus, GameObject circleCursorPrefab)
     {
+        MouseController = new MouseController(circleCursorPrefab);
+        CameraController = new CameraController();
+
         Path = new GameObject("VisualPath").AddComponent<VisualPath>();
 
         GameObject canvas = GameObject.Find("Canvas");
@@ -72,6 +79,8 @@ public class SystemController
 
         GameObject dateTimeDisplay = GameObject.Instantiate(Resources.Load("UI/DateTimeDisplay"), canvas.transform, false) as GameObject;
         dateTimeDisplay.name = "DateTimeDisplay";
+
+        uiMenus.transform.SetAsLastSibling();
 
         GameController.Instance.DialogBoxManager.transform.SetAsLastSibling();
         GameController.Instance.DialogBoxManager.CreateSystemUI();
@@ -127,7 +136,6 @@ public class SystemController
         ProjectPorcupine.Localization.LocalizationTable.UnregisterDelegates();
 
         CurrentWorld = new World(width, height, depth, seed, generateAsteroids, generatorFile);
-        Camera.main.transform.position = new Vector3(CurrentWorld.Width / 2, CurrentWorld.Height / 2, Camera.main.transform.position.z);
     }
 
     public void LoadWorld(string fileName)
@@ -136,11 +144,12 @@ public class SystemController
         ProjectPorcupine.Localization.LocalizationTable.UnregisterDelegates();
 
         CurrentWorld = new World(fileName);
-        Camera.main.transform.position = new Vector3(CurrentWorld.Width / 2, CurrentWorld.Height / 2, Camera.main.transform.position.z);
     }
 
     public void AssignWorld(World world)
     {
+        CameraController.Initialize(world);
+        Camera.main.transform.position = new Vector3(CurrentWorld.Width / 2, CurrentWorld.Height / 2, Camera.main.transform.position.z);
     }
 
     public void UnAssignWorld(World world)

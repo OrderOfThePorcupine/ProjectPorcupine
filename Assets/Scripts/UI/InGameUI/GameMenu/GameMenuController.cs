@@ -20,7 +20,7 @@ public class GameMenuController : MonoBehaviour
     public void DeactivateAll()
     {
         menuLeft.CloseMenu();
-        GameController.Instance.MouseController.ClearMouseMode(true);
+        GameController.Instance.CurrentSystem.MouseController.ClearMouseMode(true);
     }
 
     // Toggles whether menu is active.

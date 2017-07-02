@@ -19,6 +19,7 @@ public class UtilitySpriteController : BaseSpriteController<Utility>
 
     public override void AssignWorld(World world)
     {
+        base.AssignWorld(world);
         if (world != null)
         {
             // Register our callback so that our GameObject gets updated whenever

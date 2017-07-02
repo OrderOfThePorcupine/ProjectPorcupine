@@ -19,6 +19,7 @@ public class TileSpriteController : BaseSpriteController<Tile>
 
     public override void AssignWorld(World world)
     {
+        base.AssignWorld(world);
         if (world != null)
         {
             world.OnTileChanged += OnChanged;

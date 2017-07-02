@@ -18,6 +18,7 @@ public class ShipSpriteController : BaseSpriteController<Ship>
 
     public override void AssignWorld(World world)
     {
+        base.AssignWorld(world);
         if (world != null)
         {
             world.ShipManager.ShipCreated += OnCreated;

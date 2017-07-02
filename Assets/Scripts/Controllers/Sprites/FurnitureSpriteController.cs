@@ -36,6 +36,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
 
     public override void AssignWorld(World world)
     {
+        base.AssignWorld(world);
         if (world != null)
         {
             // Register our callback so that our GameObject gets updated whenever

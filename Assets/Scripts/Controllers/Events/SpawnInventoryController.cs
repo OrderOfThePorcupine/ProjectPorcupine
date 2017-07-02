@@ -185,6 +185,6 @@ public class SpawnInventoryController
     {
         InventoryToBuild = invName;
         AmountToCreate = amount;
-        GameController.Instance.MouseController.StartSpawnMode();
+        GameController.Instance.CurrentSystem.MouseController.StartSpawnMode();
     }
 }

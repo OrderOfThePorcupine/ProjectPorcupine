@@ -26,23 +26,26 @@ public class CameraData
 
     public JToken ToJson()
     {
-        JObject cameraJson = new JObject();
-
-        cameraJson.Add("X", Camera.main.transform.position.x);
-        cameraJson.Add("Y", Camera.main.transform.position.y);
-        cameraJson.Add("Z", Camera.main.transform.position.z);
-        cameraJson.Add("ZoomLevel", Camera.main.orthographicSize);
-        cameraJson.Add("ZLevel", GameController.Instance.CameraController.CurrentLayer);
+        JObject cameraJson = new JObject
+        {
+            { "X", Camera.main.transform.position.x },
+            { "Y", Camera.main.transform.position.y },
+            { "Z", Camera.main.transform.position.z },
+            { "ZoomLevel", Camera.main.orthographicSize },
+            { "ZLevel", GameController.Instance.CurrentSystem.CameraController.CurrentLayer }
+        };
 
         JArray presetsJson = new JArray();
 
         foreach (Preset preset in presets)
         {
-            JObject presetJson = new JObject();
-            presetJson.Add("X", preset.position.x);
-            presetJson.Add("Y", preset.position.y);
-            presetJson.Add("Z", preset.position.z);
-            presetJson.Add("ZoomLevel", preset.zoomLevel);
+            JObject presetJson = new JObject
+            {
+                { "X", preset.position.x },
+                { "Y", preset.position.y },
+                { "Z", preset.position.z },
+                { "ZoomLevel", preset.zoomLevel }
+            };
             presetsJson.Add(presetJson);
         }
 
