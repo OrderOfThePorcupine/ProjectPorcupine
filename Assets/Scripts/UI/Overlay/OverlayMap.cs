@@ -38,11 +38,6 @@ public class OverlayMap : MonoBehaviour
     private const float UpdateInterval = 5f;
 
     /// <summary>
-    /// The panel this gameobject is associated with.
-    /// </summary>
-    private GameObject parentPanel;
-
-    /// <summary>
     /// Random colours.
     /// </summary>
     private static List<Color32> randomColors;
@@ -53,6 +48,11 @@ public class OverlayMap : MonoBehaviour
     private static List<Color32> paletteColors;
 
     /// <summary>
+    /// The panel this gameobject is associated with.
+    /// </summary>
+    private GameObject parentPanel;
+
+    /// <summary>
     /// The current layer, held so we can detect when the layers change.
     /// </summary>
     private int currentLayer;
@@ -61,23 +61,6 @@ public class OverlayMap : MonoBehaviour
     /// Whether or not to generate the map.
     /// </summary>
     private bool generateMap = false;
-
-    /// <summary>
-    /// Current Overlay.
-    /// </summary>
-    public string CurrentOverlay { get; private set; }
-
-    /// <summary>
-    /// You can set any function, overlay will display value of func at point (x,y)
-    /// Depending on how many colors the ColorMapSG has, the displayed values will cycle.
-    /// </summary>
-    public Func<int, int, int, int> ValueAt { get; private set; }
-
-    /// <summary>
-    /// In memory color map lookup per overlay to speed up the overlay texture generation
-    /// and avoid too much call to the GetPixel method.
-    /// </summary>
-    public Dictionary<string, Dictionary<int, Color>> OverlayColorMapLookup { get; private set; }
 
     /// <summary>
     /// Starting left corner (x,y) and z-coordinate of mesh and (3d left corner).
@@ -130,6 +113,23 @@ public class OverlayMap : MonoBehaviour
 
     // The texture applied to the entire overlay map.
     private Texture2D texture;
+
+    /// <summary>
+    /// Current Overlay.
+    /// </summary>
+    public string CurrentOverlay { get; private set; }
+
+    /// <summary>
+    /// You can set any function, overlay will display value of func at point (x,y)
+    /// Depending on how many colors the ColorMapSG has, the displayed values will cycle.
+    /// </summary>
+    public Func<int, int, int, int> ValueAt { get; private set; }
+
+    /// <summary>
+    /// In memory color map lookup per overlay to speed up the overlay texture generation
+    /// and avoid too much call to the GetPixel method.
+    /// </summary>
+    public Dictionary<string, Dictionary<int, Color>> OverlayColorMapLookup { get; private set; }
 
     public OverlayDescriptor.ColorMapOption ColorMapSG
     {
