@@ -176,7 +176,6 @@ public class GameController : MonoBehaviour
             IsModal = false;
             IsPaused = false;
             BuildUI();
-            Instantiate(Resources.Load("UI/Overlay"), this.transform);
             CurrentSystem.BuildUI(GameObject.Find("UIMenus"), circleCursorPrefab);
             AssignWorld(CurrentWorld);
         }
@@ -303,31 +302,31 @@ public class GameController : MonoBehaviour
         // Initialising controllers.
         GameObject canvas = GameObject.Find("Canvas");
 
-        GameObject uiMenus = new GameObject("UIMenus");
-        uiMenus.transform.SetParent(canvas.transform);
-        uiMenus.transform.SetAsFirstSibling();
-        RectTransform uiMenuTransform = uiMenus.AddComponent<RectTransform>();
-        uiMenuTransform.anchorMin = Vector2.zero;
-        uiMenuTransform.anchorMax = Vector2.one;
-        uiMenuTransform.offsetMin = Vector2.zero;
-        uiMenuTransform.offsetMax = Vector2.zero;
+        GameObject uiMenu = new GameObject("UIMenus");
+        uiMenu.transform.SetParent(canvas.transform);
+        uiMenu.transform.SetAsFirstSibling();
+        RectTransform tempTransform = uiMenu.AddComponent<RectTransform>();
+        tempTransform.anchorMin = Vector2.zero;
+        tempTransform.anchorMax = Vector2.one;
+        tempTransform.offsetMin = Vector2.zero;
+        tempTransform.offsetMax = Vector2.zero;
 
         // Instantiate a FPSCounter.
-        GameObject menuTop = (GameObject)Instantiate(Resources.Load("UI/MenuTop"));
-        menuTop.name = "MenuTop";
-        menuTop.transform.SetParent(uiMenus.transform, false);
-        GameObject fpsCounter = menuTop.GetComponentInChildren<PerformanceHUDManager>().gameObject;
+        GameObject temp = (GameObject)Instantiate(Resources.Load("UI/MenuTop"));
+        temp.name = "MenuTop";
+        temp.transform.SetParent(uiMenu.transform, false);
+        GameObject fpsCounter = temp.GetComponentInChildren<PerformanceHUDManager>().gameObject;
         fpsCounter.SetActive(true);
 
         // Settings UI is a 'dialog box' (kinda), so it comes here.  
         // Where as DevConsole is a constant menu item (it can appear 'anywhere' so it appears after)
-        GameObject settingsMenu = (GameObject)Instantiate(Resources.Load("UI/SettingsMenu/SettingsMenu"));
+        temp = (GameObject)Instantiate(Resources.Load("UI/SettingsMenu/SettingsMenu"));
 
-        if (settingsMenu != null)
+        if (temp != null)
         {
-            settingsMenu.name = "Settings Menu";
-            settingsMenu.transform.SetParent(canvas.transform, false);
-            settingsMenu.SetActive(true);
+            temp.name = "Settings Menu";
+            temp.transform.SetParent(canvas.transform, false);
+            temp.SetActive(true);
         }
 
         DialogBoxManager = new GameObject("Dialog Boxes").AddComponent<DialogBoxManager>();
@@ -339,14 +338,14 @@ public class GameController : MonoBehaviour
         dialogBoxManagerRectTransform.offsetMax = Vector2.zero;
         DialogBoxManager.CreateUI();
 
-        GameObject devConsole = (GameObject)Instantiate(Resources.Load("UI/Console/DevConsole"));
+        temp = (GameObject)Instantiate(Resources.Load("UI/Console/DevConsole"));
 
-        if (devConsole != null)
+        if (temp != null)
         {
-            devConsole.name = "DevConsole-Spawned";
-            devConsole.transform.SetParent(canvas.transform, false);
-            devConsole.transform.SetAsLastSibling();
-            devConsole.SetActive(true);
+            temp.name = "DevConsole-Spawned";
+            temp.transform.SetParent(canvas.transform, false);
+            temp.transform.SetAsLastSibling();
+            temp.SetActive(true);
             DeveloperConsole.DevConsole.Close();
         }
     }

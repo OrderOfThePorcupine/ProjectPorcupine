@@ -22,51 +22,62 @@ using UnityEngine;
 public class OverlayMap : MonoBehaviour
 {
     /// <summary>
+    /// Internal storage of color map width.
+    /// </summary>
+    public const int ColorMapWidth = 20;
+
+    /// <summary>
     /// Transparency of overlay.
     /// </summary>
     [Range(0, 1)]
-    public float transparency = 0.8f;
+    private const float Transparency = 0.8f;
 
     /// <summary>
     /// Update interval (0 for every Update, inf for never).
     /// </summary>
-    public float updateInterval = 5f;
+    private const float UpdateInterval = 5f;
 
     /// <summary>
-    /// Internal storage of size of map.
+    /// The panel this gameobject is associated with.
     /// </summary>
-    public int sizeX = 10;
-    public int sizeY = 10;
+    private GameObject parentPanel;
 
     /// <summary>
-    /// Internal storage of color map width.
+    /// Random colours.
     /// </summary>
-    public int colorMapWidth = 20;
+    private static List<Color32> randomColors;
+
+    /// <summary>
+    /// All the palette colors.
+    /// </summary>
+    private static List<Color32> paletteColors;
+
+    /// <summary>
+    /// The current layer, held so we can detect when the layers change.
+    /// </summary>
+    private int currentLayer;
+
+    /// <summary>
+    /// Whether or not to generate the map.
+    /// </summary>
+    private bool generateMap = false;
 
     /// <summary>
     /// Current Overlay.
     /// </summary>
-    public string currentOverlay;
+    public string CurrentOverlay { get; private set; }
 
     /// <summary>
     /// You can set any function, overlay will display value of func at point (x,y)
     /// Depending on how many colors the ColorMapSG has, the displayed values will cycle.
     /// </summary>
-    public Func<int, int, int, int> valueAt;
-
-    public GameObject parentPanel;
+    public Func<int, int, int, int> ValueAt { get; private set; }
 
     /// <summary>
     /// In memory color map lookup per overlay to speed up the overlay texture generation
     /// and avoid too much call to the GetPixel method.
     /// </summary>
-    public Dictionary<string, Dictionary<int, Color>> overlayColorMapLookup;
-
-    private static List<Color32> randomColors;
-
-    private static List<Color32> paletteColors;
-
-    private int currentLayer = 0;
+    public Dictionary<string, Dictionary<int, Color>> OverlayColorMapLookup { get; private set; }
 
     /// <summary>
     /// Starting left corner (x,y) and z-coordinate of mesh and (3d left corner).
@@ -221,17 +232,34 @@ public class OverlayMap : MonoBehaviour
     }
 
     /// <summary>
-    /// Set size of texture and mesh, recreates mesh.
+    /// Assign a parent panel.
     /// </summary>
-    /// <param name="x">Num tiles x-dir.</param>
-    /// <param name="y">Num tiles y-dir.</param>
-    public void SetSize(int x, int y)
+    /// <param name="parentPanel"> The panel to assign. </param>
+    public void Init(GameObject parentPanel)
     {
-        sizeX = x;
-        sizeY = y;
-        if (meshRenderer != null)
+        this.parentPanel = parentPanel;
+        Material mat = Resources.Load<Material>("Shaders/Transparent-Diffuse");
+        meshRenderer.material = mat;
+        CreateGUI();
+        initialized = true;
+        Bake();
+        SetOverlay("None");
+    }
+
+    /// <summary>
+    /// World changed.
+    /// </summary>
+    public void OnWorldChange(World world)
+    {
+        if (world != null)
         {
-            Init();
+            generateMap = true;
+            GenerateMesh();
+            GenerateColorMap();
+        }
+        else
+        {
+            generateMap = false;
         }
     }
 
@@ -240,7 +268,7 @@ public class OverlayMap : MonoBehaviour
     /// </summary>
     public void Bake()
     {
-        if (initialized && valueAt != null)
+        if (initialized && ValueAt != null)
         {
             GenerateTexture();
         }
@@ -255,14 +283,14 @@ public class OverlayMap : MonoBehaviour
         if (name == "None")
         {
             meshRenderer.enabled = false;
-            currentOverlay = name;
+            CurrentOverlay = name;
             HideGUITooltip();
             return;
         }
         else if (PrototypeManager.Overlay.Has(name))
         {
             meshRenderer.enabled = true;
-            currentOverlay = name;
+            CurrentOverlay = name;
             OverlayDescriptor descr = PrototypeManager.Overlay.Get(name);
 
             if (FunctionsManager.Overlay.HasFunction(descr.LuaFunctionName) == false)
@@ -272,7 +300,7 @@ public class OverlayMap : MonoBehaviour
             }
 
             bool loggedOnce = false;
-            valueAt = (x, y, z) =>
+            ValueAt = (x, y, z) =>
             {
                 if (GameController.Instance == null)
                 {
@@ -346,37 +374,18 @@ public class OverlayMap : MonoBehaviour
     }
 
     /// <summary>
-    /// Grabs references, sets a dummy size and evaluation function.
-    /// </summary>
-    private void Start()
-    {
-        // Grab references.
-        meshRenderer = GetComponent<MeshRenderer>();
-        meshFilter = GetComponent<MeshFilter>();
-
-        overlayColorMapLookup = new Dictionary<string, Dictionary<int, Color>>();
-
-        // Build GUI.
-        CreateGUI();
-
-        // TODO: remove this dummy set size.
-        SetOverlay("None");
-        SetSize(100, 100);
-    }
-
-    /// <summary>
     /// If update is required, redraw texture ("bake") (kinda expensive).
     /// </summary>
     private void Update()
     {
         elapsed += Time.deltaTime;
-        if (currentOverlay != "None" && elapsed > updateInterval)
+        if (CurrentOverlay != "None" && elapsed > UpdateInterval)
         {
             Bake();
             elapsed = 0f;
         }
 
-        if (currentOverlay != "None" && currentLayer != GameController.Instance.CurrentSystem.CameraController.CurrentLayer)
+        if (CurrentOverlay != "None" && currentLayer != GameController.Instance.CurrentSystem.CameraController.CurrentLayer)
         {
             Bake();
             currentLayer = GameController.Instance.CurrentSystem.CameraController.CurrentLayer;
@@ -385,9 +394,9 @@ public class OverlayMap : MonoBehaviour
 
         // TODO: Prettify.
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        if (valueAt != null)
+        if (ValueAt != null)
         {
-            textView.GetComponent<UnityEngine.UI.Text>().text = string.Format("[DEBUG] Currently over: {0}", valueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), GameController.Instance.CurrentSystem.CameraController.CurrentLayer));
+            textView.GetComponent<UnityEngine.UI.Text>().text = string.Format("[DEBUG] Currently over: {0}", ValueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), GameController.Instance.CurrentSystem.CameraController.CurrentLayer));
         }
     }
 
@@ -396,27 +405,9 @@ public class OverlayMap : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        parentPanel = GameObject.Find("OverlayPanel");
-        Bake();
-    }
-
-    /// <summary>
-    /// Generates the mesh and the texture for the colormap..
-    /// </summary>
-    private void Init()
-    {
-        GenerateMesh();
-        GenerateColorMap();
-
-        // Set material.
-        Material mat = Resources.Load<Material>("Shaders/Transparent-Diffuse");
-        meshRenderer.material = mat;
-        if (mat == null || meshRenderer == null)
-        {
-            UnityDebugger.Debugger.LogError("OverlayMap", "Material or renderer is null. Failing.");
-        }
-
-        initialized = true;
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshFilter = GetComponent<MeshFilter>();
+        OverlayColorMapLookup = new Dictionary<string, Dictionary<int, Color>>();
     }
 
     /// <summary>
@@ -428,26 +419,26 @@ public class OverlayMap : MonoBehaviour
         colorMapArray = ColorMap(ColorMapSG, 255);
 
         // Colormap texture.
-        int textureWidth = colorMapArray.Length * colorMapWidth;
-        int textureHeight = colorMapWidth;
+        int textureWidth = colorMapArray.Length * ColorMapWidth;
+        int textureHeight = ColorMapWidth;
         colorMapTexture = new Texture2D(textureWidth, textureHeight);
 
         // Loop over each color in the palette and build a noisy texture.
         int n = 0;
         foreach (Color32 baseColor in colorMapArray)
         {
-            for (int y = 0; y < colorMapWidth; y++)
+            for (int y = 0; y < ColorMapWidth; y++)
             {
-                for (int x = 0; x < colorMapWidth; x++)
+                for (int x = 0; x < ColorMapWidth; x++)
                 {
                     Color colorCopy = baseColor;
-                    colorCopy.a = transparency;
+                    colorCopy.a = Transparency;
 
                     // Add some noise to "prettify".
                     colorCopy.r += UnityEngine.Random.Range(-0.03f, 0.03f);
                     colorCopy.b += UnityEngine.Random.Range(-0.03f, 0.03f);
                     colorCopy.g += UnityEngine.Random.Range(-0.03f, 0.03f);
-                    colorMapTexture.SetPixel((n * colorMapWidth) + x, y, colorCopy);
+                    colorMapTexture.SetPixel((n * ColorMapWidth) + x, y, colorCopy);
                 }
             }
 
@@ -463,31 +454,37 @@ public class OverlayMap : MonoBehaviour
     /// </summary>
     private void GenerateTexture()
     {
+        if (generateMap == false)
+        {
+            UnityDebugger.Debugger.LogWarning("Tried to generate map, when no map is selected");
+            return;
+        }
+
         if (colorMapTexture == null)
         {
             UnityDebugger.Debugger.LogError("OverlayMap", "No color map texture setted!");
         }
 
-        if (!overlayColorMapLookup.ContainsKey(currentOverlay))
+        if (!OverlayColorMapLookup.ContainsKey(CurrentOverlay))
         {
-            overlayColorMapLookup.Add(currentOverlay, new Dictionary<int, Color>());
+            OverlayColorMapLookup.Add(CurrentOverlay, new Dictionary<int, Color>());
         }
 
-        Dictionary<int, Color> colorMapLookup = overlayColorMapLookup[currentOverlay];
+        Dictionary<int, Color> colorMapLookup = OverlayColorMapLookup[CurrentOverlay];
 
         // Size in pixels of overlay texture and create texture.
-        int textureWidth = sizeX;
-        int textureHeight = sizeY;
+        int textureWidth = GameController.Instance.CurrentWorld.Width;
+        int textureHeight = GameController.Instance.CurrentWorld.Height;
         Color[] pixels = new Color[textureHeight * textureWidth];
 
-        for (int y = 0; y < sizeY; y++)
+        for (int y = 0; y < textureHeight; y++)
         {
-            for (int x = 0; x < sizeX; x++)
+            for (int x = 0; x < textureWidth; x++)
             {
-                float v = valueAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
+                float v = ValueAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
                 Debug.Assert(v >= 0 && v < 256, "v >= 0 && v < 256");
 
-                int sampleX = ((int)v % 256) * colorMapWidth;
+                int sampleX = ((int)v % 256) * ColorMapWidth;
 
                 if (!colorMapLookup.ContainsKey(sampleX))
                 {
@@ -495,7 +492,7 @@ public class OverlayMap : MonoBehaviour
                 }
 
                 Color pixel = colorMapLookup[sampleX];
-                int tilePixelIndex = (y * sizeX) + x;
+                int tilePixelIndex = (y * textureWidth) + x;
                 pixels[tilePixelIndex] = pixel;
             }
         }
@@ -516,14 +513,20 @@ public class OverlayMap : MonoBehaviour
     /// </summary>
     private void GenerateMesh()
     {
+        if (generateMap == false)
+        {
+            UnityDebugger.Debugger.LogWarning("Tried to generate map, when no map is selected");
+            return;
+        }
+
         Mesh mesh = new Mesh();
         if (meshFilter != null)
         {
             meshFilter.mesh = mesh;
         }
 
-        int sizePixelX = sizeX + 1;
-        int sizePixelY = sizeY + 1;
+        int sizePixelX = GameController.Instance.CurrentWorld.Width + 1;
+        int sizePixelY = GameController.Instance.CurrentWorld.Height + 1;
 
         newVertices = new Vector3[sizePixelX * sizePixelY];
         newNormals = new Vector3[sizePixelX * sizePixelY];
@@ -536,7 +539,7 @@ public class OverlayMap : MonoBehaviour
             {
                 newVertices[(y * sizePixelX) + x] = new Vector3(x, y, 0) + leftBottomCorner;
                 newNormals[(x * sizePixelY) + y] = Vector3.up;
-                newUV[(y * sizePixelX) + x] = new Vector2((float)x / sizeX, (float)y / sizeY);
+                newUV[(y * sizePixelX) + x] = new Vector2((float)x / GameController.Instance.CurrentWorld.Width, (float)y / GameController.Instance.CurrentWorld.Height);
             }
         }
 
@@ -573,9 +576,10 @@ public class OverlayMap : MonoBehaviour
             return;
         }
 
-        colorMapView = new GameObject();
+        colorMapView = new GameObject("Preview");
         colorMapView.AddComponent<UnityEngine.UI.Image>();
         colorMapView.transform.SetParent(parentPanel.transform);
+        colorMapView.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(120f, -40f, 0);
         colorMapView.AddComponent<UnityEngine.UI.Text>();
         colorMapView.AddComponent<UnityEngine.UI.LayoutElement>();
         colorMapView.GetComponent<UnityEngine.UI.LayoutElement>().minHeight = 30;
@@ -583,12 +587,13 @@ public class OverlayMap : MonoBehaviour
         Material overlayMaterial = new Material(Resources.Load<Material>("Shaders/UI-Unlit-Transparent"));
         colorMapView.GetComponent<UnityEngine.UI.Image>().material = overlayMaterial;
 
-        textView = new GameObject();
+        textView = new GameObject("DEBUG");
         textView.AddComponent<UnityEngine.UI.Text>();
         textView.AddComponent<UnityEngine.UI.LayoutElement>();
         textView.GetComponent<UnityEngine.UI.LayoutElement>().minHeight = 30;
         textView.GetComponent<UnityEngine.UI.LayoutElement>().minWidth = 150;
         textView.transform.SetParent(parentPanel.transform);
+        textView.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(120, -40f, 0);
         textView.GetComponent<UnityEngine.UI.Text>().text = "Currently Selected:";
         textView.GetComponent<UnityEngine.UI.Text>().fontSize = 14;
         textView.GetComponent<UnityEngine.UI.Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");

@@ -40,45 +40,71 @@ public class SystemController
 
     public CameraController CameraController { get; private set; }
 
+    public OverlayMap OverlayMap { get; private set; }
+
     public World CurrentWorld { get; private set; }
 
     public VisualPath Path { get; private set; }
 
     public void BuildUI(GameObject uiMenus, GameObject circleCursorPrefab)
     {
+        GameObject canvas = GameObject.Find("Canvas");
+
+        GameObject temp = GameObject.Instantiate(Resources.Load<GameObject>("UI/ContextMenu")) as GameObject;
+        temp.name = "ContextMenu";
+        temp.transform.SetParent(canvas.transform);
+        temp.transform.SetAsFirstSibling();
+        RectTransform tempTransform = temp.GetComponent<RectTransform>();
+        tempTransform.anchorMin = new Vector2(0, 1);
+        tempTransform.anchorMax = new Vector2(0, 1);
+        tempTransform.offsetMin = Vector2.zero;
+        tempTransform.offsetMax = new Vector2(10, 0);
+
+        GameObject topRight = GameObject.Instantiate(Resources.Load<GameObject>("UI/TopRight")) as GameObject;
+        topRight.name = "TopRight";
+        topRight.transform.SetParent(canvas.transform);
+        topRight.transform.SetAsFirstSibling();
+        tempTransform = topRight.GetComponent<RectTransform>();
+        tempTransform.anchorMin = Vector2.one;
+        tempTransform.anchorMax = Vector2.one;
+        tempTransform.anchoredPosition3D = new Vector3(-171.2f, 0f, 0f);
+        tempTransform.sizeDelta = new Vector2(343.9f, 100f);
+        tempTransform.pivot = new Vector2(0.5f, 1f);
+
+        OverlayMap = ((GameObject)GameObject.Instantiate(Resources.Load("UI/Overlay"), GameController.Instance.transform)).GetComponent<OverlayMap>();
+        OverlayMap.Init(topRight);
+
         MouseController = new MouseController(circleCursorPrefab);
         CameraController = new CameraController();
 
         Path = new GameObject("VisualPath").AddComponent<VisualPath>();
 
-        GameObject canvas = GameObject.Find("Canvas");
-
         SpawnInventoryController = new SpawnInventoryController();
 
         // Add the currency display
-        GameObject currencyDisplay = GameObject.Instantiate(Resources.Load("UI/CurrencyDisplay"), uiMenus.GetComponentInChildren<PerformanceHUDManager>().transform.parent) as GameObject;
-        currencyDisplay.name = "CurrencyDisplay";
+        temp = GameObject.Instantiate(Resources.Load("UI/CurrencyDisplay"), uiMenus.GetComponentInChildren<PerformanceHUDManager>().transform.parent) as GameObject;
+        temp.name = "CurrencyDisplay";
 
-        GameObject gameMenu = GameObject.Instantiate(Resources.Load("UI/GameMenu"), uiMenus.transform) as GameObject;
-        gameMenu.name = "GameMenu";
+        temp = GameObject.Instantiate(Resources.Load("UI/GameMenu"), uiMenus.transform) as GameObject;
+        temp.name = "GameMenu";
 
-        GameObject menuleft = GameObject.Instantiate(Resources.Load("UI/MenuLeft"), uiMenus.transform) as GameObject;
-        menuleft.name = "MenuLeft";
+        temp = GameObject.Instantiate(Resources.Load("UI/MenuLeft"), uiMenus.transform) as GameObject;
+        temp.name = "MenuLeft";
 
-        GameObject headlines = GameObject.Instantiate(Resources.Load("UI/Headlines"), uiMenus.transform) as GameObject;
-        headlines.name = "Headlines";
+        temp = GameObject.Instantiate(Resources.Load("UI/Headlines"), uiMenus.transform) as GameObject;
+        temp.name = "Headlines";
 
-        GameObject menuRight = GameObject.Instantiate(Resources.Load("UI/MenuRight"), uiMenus.transform) as GameObject;
-        menuRight.name = "MenuRight";
+        temp = GameObject.Instantiate(Resources.Load("UI/MenuRight"), uiMenus.transform) as GameObject;
+        temp.name = "MenuRight";
 
-        GameObject contextMenu = GameObject.Instantiate(Resources.Load("UI/ContextMenu"), canvas.transform.position, canvas.transform.rotation, canvas.transform) as GameObject;
-        contextMenu.name = "ContextMenu";
+        temp = GameObject.Instantiate(Resources.Load("UI/ContextMenu"), canvas.transform.position, canvas.transform.rotation, canvas.transform) as GameObject;
+        temp.name = "ContextMenu";
 
-        GameObject timeScale = GameObject.Instantiate(Resources.Load("UI/TimeScale"), GameObject.Find("TopRight").transform, false) as GameObject;
-        timeScale.name = "TimeScale";
+        temp = GameObject.Instantiate(Resources.Load("UI/TimeScale"), topRight.transform, false) as GameObject;
+        temp.name = "TimeScale";
 
-        GameObject dateTimeDisplay = GameObject.Instantiate(Resources.Load("UI/DateTimeDisplay"), canvas.transform, false) as GameObject;
-        dateTimeDisplay.name = "DateTimeDisplay";
+        temp = GameObject.Instantiate(Resources.Load("UI/DateTimeDisplay"), canvas.transform, false) as GameObject;
+        temp.name = "DateTimeDisplay";
 
         uiMenus.transform.SetAsLastSibling();
 
@@ -150,10 +176,12 @@ public class SystemController
     {
         CameraController.Initialize(world);
         Camera.main.transform.position = new Vector3(CurrentWorld.Width / 2, CurrentWorld.Height / 2, Camera.main.transform.position.z);
+        OverlayMap.OnWorldChange(world);
     }
 
     public void UnAssignWorld(World world)
     {
+        OverlayMap.OnWorldChange(null);
     }
 
     /// <summary>
