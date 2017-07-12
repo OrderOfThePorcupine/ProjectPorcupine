@@ -34,7 +34,7 @@ public class OrderMenu : MonoBehaviour
 
     public void FilterTextChanged(string filterText)
     {
-        Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
+        Transform contentTransform = this.transform.Find("Scroll View").Find("Viewport").Find("Content");
 
         List<Transform> childs = contentTransform.Cast<Transform>().ToList();
 
@@ -57,7 +57,7 @@ public class OrderMenu : MonoBehaviour
 
         menuLeft = this.transform.GetComponentInParent<MenuLeft>();
 
-        this.transform.FindChild("Close Button").GetComponent<Button>().onClick.AddListener(delegate
+        this.transform.Find("Close Button").GetComponent<Button>().onClick.AddListener(delegate
         {
             menuLeft.CloseMenu();
         });
@@ -75,7 +75,7 @@ public class OrderMenu : MonoBehaviour
         taskItems = new List<GameObject>();
 
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
-        Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
+        Transform contentTransform = this.transform.Find("Scroll View").Find("Viewport").Find("Content");
 
         BuildModeController buildModeController = WorldController.Instance.BuildModeController;
 
@@ -108,7 +108,7 @@ public class OrderMenu : MonoBehaviour
         taskItems = new List<GameObject>();
 
         UnityEngine.Object buttonPrefab = Resources.Load("UI/MenuLeft/ConstructionMenu/Button");
-        Transform contentTransform = this.transform.FindChild("Scroll View").FindChild("Viewport").FindChild("Content");
+        Transform contentTransform = this.transform.Find("Scroll View").Find("Viewport").Find("Content");
 
         BuildModeController buildModeController = WorldController.Instance.BuildModeController;
 

@@ -85,8 +85,8 @@ git push origin my-feature-branch-name
 The pull request should automatically update to reflect your changes.
 
 # Unity Version
-We are using Unity version 5.4.2.
-All pull requests must build in 5.4.2 to be a valid patch.  Though you can use `#IF UNITY_X_Y_Z` with x, y, z referring to the version details such as 5.4.2 or 5.6.1, More details [here](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html)
+We are using Unity version 5.6.2.
+All pull requests must build in 5.6.2 to be a valid patch.  Though you can use `#IF UNITY_X_Y_Z` with x, y, z referring to the version details such as 5.4.2 or 5.6.1, More details [here](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html)
 
 # General resources
 * [Github Tutorial by Quill18](https://www.youtube.com/watch?v=R2fl17eEpwI)
