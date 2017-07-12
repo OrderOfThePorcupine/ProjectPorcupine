@@ -18,11 +18,14 @@ namespace ProjectPorcupine.Rooms
     public class Room
     {
         // private Dictionary<string, string> deltaGas;
-        private List<Tile> tiles;
+        private HashSet<Tile> tiles;
+
+        private HashSet<Tile> boundaryTiles;
 
         public Room()
         {
-            tiles = new List<Tile>();
+            tiles = new HashSet<Tile>();
+            boundaryTiles = new HashSet<Tile>();
             Atmosphere = new AtmosphereComponent();
 
             // deltaGas = new Dictionary<string, string>();
@@ -97,6 +100,11 @@ namespace ProjectPorcupine.Rooms
 
         public void UnassignTile(Tile tile)
         {
+            if (boundaryTiles.Contains(tile))
+            {
+                boundaryTiles.Remove(tile);
+            }
+
             if (tiles.Contains(tile) == false)
             {
                 // This tile in not in this room.
@@ -109,10 +117,10 @@ namespace ProjectPorcupine.Rooms
 
         public void ReturnTilesToOutsideRoom()
         {
-            for (int i = 0; i < tiles.Count; i++)
+            foreach (Tile tile in tiles)
             {
                 // Assign to outside.
-                tiles[i].Room = World.Current.RoomManager.OutsideRoom;
+                tile.Room = World.Current.RoomManager.OutsideRoom;
             }
 
             tiles.Clear();
@@ -154,7 +162,7 @@ namespace ProjectPorcupine.Rooms
             foreach (Tile tile in exits)
             {
                 // Loop over the exits to find a different room
-                Tile[] neighbours = tile.GetNeighbours();
+                Tile[] neighbours = tile.GetNeighbours(true, false, false);
                 foreach (Tile neighbor in neighbours)
                 {
                     if (neighbor == null || neighbor.Room == null)
@@ -232,31 +240,33 @@ namespace ProjectPorcupine.Rooms
             return true;
         }
 
-        public List<Tile> GetInnerTiles()
+        public HashSet<Tile> GetInnerTiles()
         {
             return tiles;
         }
 
-        public List<Tile> GetBorderingTiles()
+        public HashSet<Tile> GetBoundaryTiles()
         {
-            List<Tile> borderingTiles = new List<Tile>();
-            foreach (Tile tile in tiles)
+            if (boundaryTiles.Count == 0)
             {
-                Tile[] neighbours = tile.GetNeighbours();
-                foreach (Tile tile2 in neighbours)
+                foreach (Tile tile in tiles)
                 {
-                    if (tile2 != null && tile2.Furniture != null)
+                    Tile[] neighbours = tile.GetNeighbours();
+                    foreach (Tile tile2 in neighbours)
                     {
-                        if (tile2.Furniture.RoomEnclosure)
+                        if (tile2 != null && tile2.Furniture != null)
                         {
-                            // We have found an enclosing furniture, which means it is on our border
-                            borderingTiles.Add(tile2);
+                            if (tile2.Furniture.RoomEnclosure)
+                            {
+                                // We have found an enclosing furniture, which means it is on our border
+                                boundaryTiles.Add(tile2);
+                            }
                         }
                     }
                 }
             }
 
-            return borderingTiles;
+            return boundaryTiles;
         }
 
         public bool HasRoomBehavior(string behaviorKey)

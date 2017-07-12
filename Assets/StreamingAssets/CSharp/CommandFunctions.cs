@@ -3,6 +3,7 @@ using DeveloperConsole;
 using UnityEngine;
 using UnityEngine.UI;
 using ProjectPorcupine.Rooms;
+using ProjectPorcupine.Entities;
 
 public static class CommandFunctions
 {
@@ -246,22 +247,17 @@ public static class CommandFunctions
         SettingsKeyHolder.DeveloperMode = isOn;
     }
 
-    public static void NewCharacter(Vector3 pos, string name = "")
+    public static void NewCharacter(Vector3 pos, string name = null)
     {
         World world;
         Tile t;
 
         if (ModUtils.GetCurrentWorld(out world) && ModUtils.GetTileAt(pos, out t))
         {
-            Character character = world.CharacterManager.Create(t);
+            Character character = world.CharacterManager.Create(t, name);
 
             if (character != null)
             {
-                if (name != string.Empty)
-                {
-                    character.name = name;
-                }
-
                 DevConsole.Log("Say hello to: " + character.GetName());
             }
         }

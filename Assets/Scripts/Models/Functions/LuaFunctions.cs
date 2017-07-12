@@ -52,6 +52,11 @@ public class LuaFunctions : IFunctions
         return name != null && script.Globals[name] != null;
     }
 
+    public bool HasConstructor(string className)
+    {
+        return className != null && script.Globals[className] != null;
+    }
+
     /// <summary>
     /// Loads the script from the specified text.
     /// </summary>
@@ -86,6 +91,16 @@ public class LuaFunctions : IFunctions
     public T Call<T>(string functionName, params object[] args)
     {
         return Call(functionName, args).ToObject<T>();
+    }
+
+    public DynValue CreateInstance(object fromObject)
+    {
+        return DynValue.FromObject(script, fromObject);
+    }
+
+    public T CreateInstance<T>(string className, params object[] arguments)
+    {
+        return Call<T>(className, arguments);
     }
 
     public void RegisterType(Type type)

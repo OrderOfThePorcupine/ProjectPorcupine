@@ -6,9 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MoonSharp.Interpreter;
 
 public class Functions
@@ -92,6 +92,9 @@ public class Functions
     /// </summary>
     public void Call(List<string> functionNames, params object[] args)
     {
+        bool ranLUAArgs = false;
+        DynValue[] luaArgs = null;
+
         for (int i = 0; i < functionNames.Count; i++)
         {
             if (functionNames[i] == null)
@@ -100,32 +103,46 @@ public class Functions
                 continue;
             }
 
-            Call(functionNames[i], false, args);
+            IFunctions functions = GetFunctions(functionNames[i]);
+
+            if (functions is LuaFunctions)
+            {
+                if (ranLUAArgs == false)
+                {
+                    luaArgs = new DynValue[args.Length];
+                    for (int j = 0; j < args.Length; j++)
+                    {
+                        luaArgs[j] = functions.CreateInstance(args[j]);
+                    }
+                }
+
+                Call(functionNames[i], false, luaArgs);
+            }
+            else
+            {
+                Call(functionNames[i], false, args);
+            }
         }
     }
 
-    public void CallWithInstance(List<string> functionNames, object instance, params object[] parameters)
+    public T CreateInstance<T>(string className, bool throwError, params object[] args)
     {
-        DynValue result;
-        object[] instanceAndParams;
-        instanceAndParams = new object[parameters.Length + 1];
-        instanceAndParams[0] = instance;
-        parameters.CopyTo(instanceAndParams, 1);
-
-        for (int i = 0; i < functionNames.Count; i++)
+        string fullClassName = className + (args.Length > 0 ? string.Join(",", args.Select(x => x.GetType().Name).ToArray()) : string.Empty);
+        IFunctions functions = GetFunctions(fullClassName, true);
+        if (functions != null)
         {
-            if (functionNames[i] == null)
+            return functions.CreateInstance<T>(fullClassName, args);
+        }
+        else
+        {
+            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + className + "' is not a LUA function nor is it a CSharp constructor!");
+
+            if (throwError)
             {
-                UnityDebugger.Debugger.LogError(ModFunctionsLogChannel, "'" + functionNames[i] + "'  is not a LUA nor CSharp function!");
-                continue;
+                throw new Exception("'" + className + "' is not a LUA function nor is it a CSharp constructor!");
             }
 
-            result = Call(functionNames[i], instanceAndParams);
-
-            if (result != null && result.Type == DataType.String)
-            {
-                UnityDebugger.Debugger.LogError(ModFunctionsLogChannel, result.String);
-            }
+            return default(T);
         }
     }
 
@@ -157,11 +174,31 @@ public class Functions
         }
     }
 
-    private IFunctions GetFunctions(string name)
+    private DynValue Call(string functionName, bool throwError, params DynValue[] args)
+    {
+        IFunctions functions = GetFunctions(functionName);
+        if (functions != null)
+        {
+            return functions.Call(functionName, args);
+        }
+        else
+        {
+            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA nor is it a CSharp function!");
+
+            if (throwError)
+            {
+                throw new Exception("'" + functionName + "' is not a LUA nor is it a CSharp function!");
+            }
+
+            return null;
+        }
+    }
+
+    private IFunctions GetFunctions(string name, bool constructor = false)
     {
         for (int i = 0; i < FunctionsSets.Count; i++)
         {
-            if (FunctionsSets[i].HasFunction(name))
+            if ((constructor == false && FunctionsSets[i].HasFunction(name)) || (constructor && FunctionsSets[i].HasConstructor(name)))
             {
                 return FunctionsSets[i];
             }
