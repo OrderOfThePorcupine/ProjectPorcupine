@@ -146,7 +146,7 @@ public class SettingsMenu : MonoBehaviour
                     {
                         BaseSettingsElement element = instance.options[instance.currentCategory][headingName][i];
                         GameObject go = element.InitializeElement();
-                        go.AddComponent<TooltipComponent>().tooltip = element.option.tooltip;
+                        go.AddComponent<TooltipComponent>().Tooltip = element.option.tooltip;
                         heading.AddObjectToRoot(go);
                         element.valueChanged = false;
                     }

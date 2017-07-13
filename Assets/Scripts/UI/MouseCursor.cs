@@ -40,7 +40,7 @@ public class MouseCursor
     public MouseCursor()
     {
         shouldShowCursor = false;
-        ForceShow = false;
+        UIMode = false;
 
         style.font = Resources.Load<Font>("Fonts/Arial/Arial") as Font;
         style.fontSize = 15;
@@ -52,7 +52,7 @@ public class MouseCursor
     /// <summary>
     /// Forcefully show the cursor.
     /// </summary>
-    public bool ForceShow { get; set; }
+    public bool UIMode { get; set; }
 
     public GameObject BuildCursor()
     {
@@ -98,7 +98,8 @@ public class MouseCursor
 
     public void Update()
     {
-        if (ForceShow || (shouldShowCursor == false && EventSystem.current.IsPointerOverGameObject() == false))
+        // If we should show cursor and we aren't over a ui element (unless we are UI mode) then show cursor.
+        if (shouldShowCursor && (EventSystem.current.IsPointerOverGameObject() == false || UIMode))
         {
             cursorGO.SetActive(true);
         }

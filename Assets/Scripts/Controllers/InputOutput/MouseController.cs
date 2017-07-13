@@ -29,16 +29,15 @@ public class MouseController
     private Vector3 lastFramePosition;      // Our last frame position
     private Vector3 dragStartPosition;      // The world-position start of our left-mouse drag operation.
 
-    private Dictionary<TooltipMode, Action<Vector2, MouseCursor>> toolTipHandlers;
-    private string tooltip = null;
-    private TooltipMode currentTooltipMode = TooltipMode.DEFAULT;
+    private Dictionary<MouseMode, Action<Vector2, MouseCursor>> toolTipHandlers;
+    private string tooltip = null; // If not null then will handle tooltip.
+    private MouseMode currentMode = MouseMode.DEFAULT;
 
     private int validPostionCount;
     private int invalidPositionCount;
 
     private float panningThreshold = .015f;
     private Vector3 panningMouseStart = Vector3.zero;
-    private MouseMode currentMode = MouseMode.SELECT;
     private List<GameObject> dragPreviewGameObjects;
 
     /// <summary>
@@ -76,28 +75,54 @@ public class MouseController
         mouseCursor = new MouseCursor();
         mouseCursor.BuildCursor().transform.SetParent(cursorParent.transform);
         furnitureParent = new GameObject("Furniture Preview Sprites");
-        toolTipHandlers = new Dictionary<TooltipMode, Action<Vector2, MouseCursor>>()
+        toolTipHandlers = new Dictionary<MouseMode, Action<Vector2, MouseCursor>>()
         {
-            { TooltipMode.DEFAULT, GetTooltipNormalMode },
-            { TooltipMode.BUILD, GetTooltipBuildMode },
-            { TooltipMode.UI, GetTooltipUIMode },
+            { MouseMode.DEFAULT, GetTooltipNormalMode },
+            { MouseMode.BUILD, GetTooltipBuildMode },
+          //  { MouseMode.UI, GetTooltipUIMode },
         };
 
         TimeManager.Instance.EveryFrame += (time) => Update();
     }
 
-    private enum MouseMode
+    public enum MouseMode
     {
-        SELECT,
-        BUILD,
-        SPAWN_INVENTORY
-    }
-
-    private enum TooltipMode
-    {
+        /// <summary>
+        /// Default mode is for selecting objects.
+        /// Will present information like coords.
+        /// TooltipInfo:
+        ///     Small information that is around 5-10 characters.
+        /// </summary>
         DEFAULT,
+
+        /// <summary>
+        /// When build mode is activated.
+        /// Tooltip:
+        ///     Build information.  Contains a lot of data.
+        /// </summary>
         BUILD,
-        UI
+
+        /// <summary>
+        /// Enabled by the <see cref="TooltipComponent"/>.
+        /// Tooltip:
+        /// Around a sentence.
+        /// </summary>
+        LIGHT_UI,
+
+        /// <summary>
+        /// Enabled by the <see cref="TooltipComponent.UseHeavyTextMode"/>.
+        /// Tooltip:
+        ///     More then a sentence / a block of text.
+        /// </summary>
+        HEAVY_UI,
+
+        /// <summary>
+        /// When inventory is activated.
+        /// Tooltip:
+        ///     None.
+        /// </summary>
+        INVENTORY,
+
     }
 
     /// <summary>
@@ -126,35 +151,23 @@ public class MouseController
     public SelectionInfo Selection { get; private set; }
 
     /// <summary>
-    /// Start UI Mode.
+    /// Changes the mouse mode.
     /// </summary>
-    /// <param name="tooltip"> The tooltip to display. </param>
-    public void StartUIMode(string tooltip)
+    /// <param name="newMode"> The new mode to change to. </param>
+    /// <param name="tooltip"> Tooltip if any. </param>
+    /// <param name="forceShow"> If enabled will show mouse cu </param>
+    public void ChangeMouseMode(MouseMode newMode, string tooltip = null)
     {
-        currentTooltipMode = TooltipMode.UI;
         this.tooltip = tooltip;
-        mouseCursor.ForceShow = true;
+        currentMode = newMode;
+        mouseCursor.UIMode = newMode == MouseMode.HEAVY_UI || newMode == MouseMode.LIGHT_UI;
     }
 
-    /// <summary>
-    /// Begin building mode.
-    /// </summary>
-    public void StartBuildMode()
+    public void ClearMouseMode()
     {
-        currentMode = MouseMode.BUILD;
-        currentTooltipMode = TooltipMode.BUILD;
         this.tooltip = null;
-        mouseCursor.ForceShow = false;
-    }
-
-    /// <summary>
-    /// Begin spawning mode.
-    /// </summary>
-    public void StartSpawnMode()
-    {
-        currentMode = MouseMode.SPAWN_INVENTORY;
-        this.tooltip = null;
-        mouseCursor.ForceShow = false;
+        mouseCursor.UIMode = false;
+        currentMode = buildModeController.BuildModeType == null ? MouseMode.DEFAULT : MouseMode.BUILD;
     }
 
     /// <summary>
@@ -162,9 +175,9 @@ public class MouseController
     /// </summary>
     public void ClearUIMode()
     {
-        currentTooltipMode = currentMode == MouseMode.BUILD ? TooltipMode.BUILD : TooltipMode.DEFAULT;
+        currentMode = currentMode == MouseMode.BUILD ? MouseMode.BUILD : MouseMode.DEFAULT;
         this.tooltip = null;
-        mouseCursor.ForceShow = false;
+        mouseCursor.UIMode = false;
     }
 
     /// <summary>
@@ -176,10 +189,9 @@ public class MouseController
         IsDragging = false;
         if (changeMode)
         {
-            currentMode = MouseMode.SELECT;
-            currentTooltipMode = TooltipMode.DEFAULT;
+            currentMode = MouseMode.DEFAULT;
             tooltip = null;
-            mouseCursor.ForceShow = false;
+            mouseCursor.UIMode = false;
         }
     }
 
@@ -197,9 +209,9 @@ public class MouseController
         UpdateSelection();
 
         // Tooltip handling
-        if (toolTipHandlers.ContainsKey(currentTooltipMode))
+        if (toolTipHandlers.ContainsKey(currentMode))
         {
-            toolTipHandlers[currentTooltipMode](CurrentFramePosition, mouseCursor);
+            toolTipHandlers[currentMode](CurrentFramePosition, mouseCursor);
         }
 
         if (SettingsKeyHolder.DeveloperMode)
@@ -270,7 +282,7 @@ public class MouseController
 
         if (string.IsNullOrEmpty(tooltip) == false)
         {
-            Debug.LogWarning(cursor.ForceShow);
+            Debug.LogWarning(cursor.UIMode);
             cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
         }
     }
@@ -323,10 +335,9 @@ public class MouseController
             {
                 StopDragging(true);
             }
-            else if (currentMode == MouseMode.SPAWN_INVENTORY && IsPanning == false)
+            else if (currentMode == MouseMode.INVENTORY && IsPanning == false)
             {
-                currentMode = MouseMode.SELECT;
-                currentTooltipMode = TooltipMode.DEFAULT;
+                currentMode = MouseMode.DEFAULT;
             }
         }
     }
@@ -363,7 +374,7 @@ public class MouseController
     private void CalculatePlacingPosition()
     {
         // If we are placing a multitile object we would like to modify the postilion where the mouse grabs it.
-        if (currentMode == MouseMode.BUILD
+        if (currentMode == global::MouseMode.BUILD
             && buildModeController.BuildMode == BuildMode.FURNITURE
             && PrototypeManager.Furniture.Has(buildModeController.BuildModeType)
             && (PrototypeManager.Furniture.Get(buildModeController.BuildModeType).Width > 1
@@ -390,7 +401,7 @@ public class MouseController
             Selection = null;
         }
 
-        if (currentMode != MouseMode.SELECT)
+        if (currentMode != global::MouseMode.SELECT)
         {
             return;
         }
@@ -447,7 +458,7 @@ public class MouseController
     {
         CleanUpDragPreviews();
 
-        if (currentMode != MouseMode.BUILD)
+        if (currentMode != global::MouseMode.BUILD)
         {
             return;
         }
@@ -631,7 +642,7 @@ public class MouseController
 
     private void UpdateSpawnClicking()
     {
-        if (currentMode != MouseMode.SPAWN_INVENTORY)
+        if (currentMode != global::MouseMode.SPAWN_INVENTORY)
         {
             return;
         }
