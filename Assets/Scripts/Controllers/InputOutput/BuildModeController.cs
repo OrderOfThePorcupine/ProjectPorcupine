@@ -64,7 +64,7 @@ public class BuildModeController : IMouseHandler
     {
         get
         {
-            return IsObjectDraggable();
+            return IsObjectDraggable() == false;
         }
     }
 

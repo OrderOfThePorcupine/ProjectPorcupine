@@ -264,7 +264,8 @@ public class MouseController
                 mouseCursor.UIMode = false;
             }
 
-            OnEscape();
+            IsDragging = false;
+            Selection = null;
 
             if (mouseButton0Up)
             {
@@ -293,11 +294,11 @@ public class MouseController
 
         // If callback for handling drag is enabled then handle the drag
         bool dragEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG) == MouseHandlerCallbacks.HANDLE_DRAG;
-        bool dragVisualEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_VISUAL) == MouseHandlerCallbacks.HANDLE_DRAG;
+        bool dragVisualEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_VISUAL) == MouseHandlerCallbacks.HANDLE_DRAG_VISUAL;
 
         if (dragEnabled || dragVisualEnabled)
         {
-            if (handler.SinglePlacementDraggingEnabled || IsDragging == false)
+            if (handler.SinglePlacementDraggingEnabled || (IsDragging == false && performDragThisFrame == false))
             {
                 dragStartPosition = CurrentPlacingPosition;
             }
