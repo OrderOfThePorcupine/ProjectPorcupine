@@ -22,6 +22,9 @@ public class WorldController : MonoBehaviour
     [SerializeField]
     private GameObject circleCursorPrefab;
 
+    [SerializeField]
+    private GameObject inventoryUI;
+
     #region Instances
     public static WorldController Instance { get; protected set; }
 
@@ -58,8 +61,6 @@ public class WorldController : MonoBehaviour
     public ModsManager ModsManager { get; private set; }
 
     public DialogBoxManager DialogBoxManager { get; private set; }
-
-    public GameObject InventoryUI { get; private set; }
 
     // The world and tile data.
     public World World { get; protected set; }
@@ -113,7 +114,7 @@ public class WorldController : MonoBehaviour
         FurnitureSpriteController = new FurnitureSpriteController(World);
         UtilitySpriteController = new UtilitySpriteController(World);
         JobSpriteController = new JobSpriteController(World, FurnitureSpriteController, UtilitySpriteController);
-        InventorySpriteController = new InventorySpriteController(World, InventoryUI);
+        InventorySpriteController = new InventorySpriteController(World, inventoryUI);
         ShipSpriteController = new ShipSpriteController(World);
 
         BuildModeController = new BuildModeController();

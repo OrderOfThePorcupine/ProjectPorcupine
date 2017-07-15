@@ -29,10 +29,9 @@ public class PowerGridTest
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PlugInArgumentNullException()
     {
-        grid.PlugIn(null);
+        Assert.That(() => grid.PlugIn(null), Throws.ArgumentNullException);
     }
 
     [Test]
