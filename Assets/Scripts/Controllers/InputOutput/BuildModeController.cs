@@ -56,7 +56,7 @@ public class BuildModeController : IMouseHandler
     {
         get
         {
-            return MouseHandlerCallbacks.HANDLE_DRAG & MouseHandlerCallbacks.HANDLE_DRAG_VISUAL & MouseHandlerCallbacks.HANDLE_TOOLTIP & MouseHandlerCallbacks.HANDLE_PLACING_POSITION;
+            return MouseHandlerCallbacks.HANDLE_DRAG | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION;
         }
     }
 

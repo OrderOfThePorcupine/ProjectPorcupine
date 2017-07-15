@@ -106,7 +106,7 @@ public class MouseController
         };
 
         TimeManager.Instance.EveryFrame += (time) => Update();
-        KeyboardManager.Instance.RegisterInputAction("Escpae", KeyboardMappedInputType.KeyUp, OnEscape);
+        KeyboardManager.Instance.RegisterInputAction("Escape", KeyboardMappedInputType.KeyUp, OnEscape);
     }
 
     public enum MouseMode
@@ -223,18 +223,6 @@ public class MouseController
 
         IsDragging = false;
         Selection = null;
-
-        if (currentMode == MouseMode.DEFAULT)
-        {
-            Tile t = WorldController.Instance.GetTileAtWorldCoord(CurrentFramePosition);
-            if (contextMenu != null && t != null)
-            {
-                if (IsPanning)
-                {
-                    contextMenu.Close();
-                }
-            }
-        }
 
         if (currentMode == MouseMode.BUILD || currentMode == MouseMode.INVENTORY || currentMode == MouseMode.DEFAULT)
         {
@@ -412,8 +400,7 @@ public class MouseController
         }
 
         // If we're over a UI element or the settings/options menu is open, then bail out from this.
-        if (EventSystem.current.IsPointerOverGameObject()
-            || GameController.Instance.IsModal)
+        if (EventSystem.current.IsPointerOverGameObject() || GameController.Instance.IsModal)
         {
             return;
         }
@@ -423,19 +410,10 @@ public class MouseController
             WorldController.Instance.CameraController.ChangeZoom(Input.GetAxis("Mouse ScrollWheel"));
         }
 
-        UpdateCameraBounds();
-    }
-
-    /// <summary>
-    /// Make the camera stay within the world boundaries.
-    /// </summary>
-    private void UpdateCameraBounds()
-    {
+        // Update camera bounds
         Vector3 oldPos = Camera.main.transform.position;
-
         oldPos.x = Mathf.Clamp(oldPos.x, 0, World.Current.Width - 1);
         oldPos.y = Mathf.Clamp(oldPos.y, 0, World.Current.Height - 1);
-
         Camera.main.transform.position = oldPos;
     }
 
@@ -521,7 +499,18 @@ public class MouseController
         {
             get
             {
-                return MouseHandlerCallbacks.HANDLE_TOOLTIP;
+                if (handles == MouseMode.HEAVY_UI || handles == MouseMode.LIGHT_UI)
+                {
+                    return MouseHandlerCallbacks.HANDLE_TOOLTIP;
+                }
+                else if (handles == MouseMode.DEFAULT)
+                {
+                    return MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_CLICK;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
 
@@ -553,7 +542,6 @@ public class MouseController
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        Debug.LogWarning(cursor.UIMode);
                         cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
                     }
 
@@ -563,7 +551,6 @@ public class MouseController
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        Debug.LogWarning(cursor.UIMode);
                         cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
                     }
 
@@ -619,6 +606,24 @@ public class MouseController
                         selection.BuildStuffInTile();
                         selection.SelectNextStuff();
                         selection.GetSelectedStuff().IsSelected = true;
+                    }
+
+                    // This will make sure that if we created new selectioninformation it is reflected
+                    WorldController.Instance.MouseController.Selection = selection;
+                }
+                else if (mouseKey == 1)
+                {
+                    Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
+                    if (WorldController.Instance.MouseController.contextMenu != null && t != null)
+                    {
+                        if (WorldController.Instance.MouseController.IsPanning)
+                        {
+                            WorldController.Instance.MouseController.contextMenu.Close();
+                        }
+                        else
+                        {
+                            WorldController.Instance.MouseController.contextMenu.Open(t);
+                        }
                     }
                 }
             }

@@ -30,7 +30,7 @@ public class SelectionInfoTextField : MonoBehaviour
     // Update is called once per frame.
     private void Update()
     {
-        if (mc.Selection == null)
+        if (mc.Selection == null || mc.Selection.StuffInTile == false)
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
