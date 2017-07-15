@@ -1,0 +1,32 @@
+{
+    "gear":{
+        "SpaceSuite":{
+            "inventory":{
+                "MaxStackSize":10,
+                "StackSize":1,
+                "BasePrice":20.1,
+                "Category":"Gear",
+                "Locked": false,
+                "localizationName":"inv_steel_plate",
+                "localizationDesc":"inv_steel_plate_desc"
+            },
+            "properties":{
+                "testing": "test"
+            }
+        },
+        "SpaceSuite1":{
+            "inventory":{
+                "MaxStackSize":12,
+                "StackSize":1,
+                "BasePrice":20.1,
+                "Category":"Gear",
+                "Locked": false,
+                "localizationName":"inv_steel_plate",
+                "localizationDesc":"inv_steel_plate_desc"
+            },
+            "properties":{
+                "testing": "test"
+            }
+        }
+    }
+}

@@ -713,4 +713,8 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
             Changed(util);
         }
     }
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -219,4 +219,9 @@ public class TraderPrototype : IPrototypable
     {
         return PrototypeManager.Inventory.Values.Where(i => i.Category == category).ToList();
     }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new System.NotImplementedException();
+    }
 }

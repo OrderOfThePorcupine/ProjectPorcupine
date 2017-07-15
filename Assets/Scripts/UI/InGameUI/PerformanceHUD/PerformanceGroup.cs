@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -70,5 +71,10 @@ public class PerformanceGroup : IPrototypable
                 }
             }
         }
+    }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1445,4 +1445,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             }
         }
     }
+
+    public void ReadJSONPrototype(JProperty property)
+    {
+        throw new NotImplementedException();
+    }
 }

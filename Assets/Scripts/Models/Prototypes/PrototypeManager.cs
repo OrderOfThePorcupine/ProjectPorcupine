@@ -22,6 +22,7 @@ public class PrototypeManager
     public PrototypeManager()
     {
         Inventory = new PrototypeMap<Inventory>("Inventories", "Inventory");
+        Gear = new PrototypeMap<Gear>("gear", true);
         TileType = new PrototypeMap<TileType>("Tiles", "Tile");
         Furniture = new PrototypeMap<Furniture>("Furnitures", "Furniture");
         Utility = new PrototypeMap<Utility>("Utilities", "Utility");
@@ -69,6 +70,12 @@ public class PrototypeManager
     /// </summary>
     /// <value>The inventory prototype map.</value>
     public static PrototypeMap<Inventory> Inventory { get; private set; }
+
+    /// <summary>
+    /// Gets the Gear prototype map.
+    /// </summary>
+    /// <value>The inventory prototype map.</value>
+    public static PrototypeMap<Gear> Gear { get; private set; }
 
     /// <summary>
     /// Gets the need prototype map.

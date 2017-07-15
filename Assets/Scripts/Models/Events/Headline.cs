@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Xml;
 
 /// <summary>
@@ -52,5 +53,10 @@ public class Headline : IPrototypable
     {
         reader.Read();
         Text = reader.ReadContentAsString();
+    }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
     }
 }

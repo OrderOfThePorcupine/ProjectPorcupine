@@ -213,4 +213,9 @@ public class TileType : IPrototypable, IEquatable<TileType>
             }
         }
     }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using System;
 
 [MoonSharpUserData]
 public class Quest : IPrototypable
@@ -89,5 +90,10 @@ public class Quest : IPrototypable
                     break;
             }
         }
+    }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
     }
 }

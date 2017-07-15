@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using System;
 
 namespace ProjectPorcupine.Entities
 {
@@ -217,6 +218,11 @@ namespace ProjectPorcupine.Entities
         {
             // TODO: Default for empty need should probably be taking damage, but shouldn't be implemented until characters are 
             //       better able to handle getting their oxygen and maybe have real space suits.
+        }
+
+        public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Xml;
 
 public class Currency : IPrototypable
@@ -68,5 +69,10 @@ public class Currency : IPrototypable
     {
         Name = reader.GetAttribute("Name");
         ShortName = reader.GetAttribute("ShortName");
+    }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
     }
 }

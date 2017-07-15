@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -65,5 +66,10 @@ public class SettingsCategory : IPrototypable
         {
             headings.Add(currentHeading, options);
         }
+    }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
     }
 }

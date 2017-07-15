@@ -28,6 +28,20 @@ public class ModsManager
         else if (SceneController.IsAtMainScene())
         {
             LoadMainSceneFiles();
+            String invent = "";
+            foreach(string s in PrototypeManager.Inventory.Keys)
+            {
+                invent += s + ", ";
+            }
+            Debug.Log(invent);
+            String gear = "";
+            foreach (string sg in PrototypeManager.Gear.Keys)
+            {
+                gear += sg + ", ";
+            }
+            Debug.Log(gear);
+
+
         }
     }
 
@@ -86,6 +100,7 @@ public class ModsManager
         LoadPrototypes("Utility.xml", PrototypeManager.Utility.LoadPrototypes);
         LoadPrototypes("RoomBehavior.xml", (text) => PrototypeManager.RoomBehavior.LoadPrototypes(text));
         LoadPrototypes("Inventory.xml", PrototypeManager.Inventory.LoadPrototypes);
+        LoadPrototypes("Gear.json", PrototypeManager.Gear.LoadPrototypes);
         LoadPrototypes("Need.xml", PrototypeManager.Need.LoadPrototypes);
         LoadPrototypes("Trader.xml", PrototypeManager.Trader.LoadPrototypes);
         LoadPrototypes("Currency.xml", PrototypeManager.Currency.LoadPrototypes);

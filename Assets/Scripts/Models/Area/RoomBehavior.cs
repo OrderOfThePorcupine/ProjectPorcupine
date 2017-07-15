@@ -485,6 +485,11 @@ namespace ProjectPorcupine.Rooms
             }
         }
 
+        public void ReadJSONPrototype(JProperty property)
+        {
+            throw new NotImplementedException();
+        }
+
         private struct FurnitureRequirement
         {
             public string type, typeTag;

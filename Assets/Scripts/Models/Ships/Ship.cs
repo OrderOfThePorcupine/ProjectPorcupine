@@ -512,4 +512,9 @@ public class Ship : IPrototypable
             }
         }
     }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
 }

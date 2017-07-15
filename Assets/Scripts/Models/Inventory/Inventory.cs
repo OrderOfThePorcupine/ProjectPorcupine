@@ -39,7 +39,7 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         claims = new List<InventoryClaim>();
     }
 
-    private Inventory(Inventory other)
+    protected Inventory(Inventory other)
     {
         Type = other.Type;
         MaxStackSize = other.MaxStackSize;
@@ -64,17 +64,17 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
 
     public event Action<Inventory> StackSizeChanged;
 
-    public string Type { get; private set; }
+    public string Type { get; protected set; }
 
     public int MaxStackSize { get; set; }
 
     public float BasePrice { get; set; }
 
-    public string Category { get; private set; }
+    public string Category { get; protected set; }
 
-    public string LocalizationName { get; private set; }
+    public string LocalizationName { get; protected set; }
 
-    public string LocalizationDescription { get; private set; }
+    public string LocalizationDescription { get; protected set; }
 
     public Tile Tile { get; set; }
 
@@ -313,5 +313,10 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
             this.character = character;
             this.amount = amount;
         }
+    }
+
+    public virtual void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
     }
 }

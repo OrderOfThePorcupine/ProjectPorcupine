@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
 using UnityEngine;
+using System;
 
 [MoonSharpUserData]
 public class GameEvent : IPrototypable
@@ -174,5 +175,9 @@ public class GameEvent : IPrototypable
                     break;
             }
         }
+    }
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
     }
 }
