@@ -107,6 +107,7 @@ public class KeyboardManager
         RegisterInputMapping("DevConsole", KeyboardInputModifier.Control, KeyCode.BackQuote);
 
         RegisterInputMapping("ToggleCursorTextBox", KeyboardInputModifier.Control, KeyCode.M);
+        RegisterInputMapping("Escape", KeyboardInputModifier.None, KeyCode.Escape);
     }
 
     /// <summary>

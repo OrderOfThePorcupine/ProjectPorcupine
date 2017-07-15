@@ -39,7 +39,7 @@ public class TooltipComponent : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         if (!Disable && eventData.pointerCurrentRaycast.gameObject != null)
         {
-            WorldController.Instance.MouseController.StartUIMode(Tooltip);
+            WorldController.Instance.MouseController.ChangeMouseMode(UseHeavyTextMode ? MouseController.MouseMode.HEAVY_UI : MouseController.MouseMode.LIGHT_UI, Tooltip);
         }
     }
 
@@ -51,7 +51,7 @@ public class TooltipComponent : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         if (!Disable)
         {
-            WorldController.Instance.MouseController.ClearUIMode();
+            WorldController.Instance.MouseController.ClearMouseMode();
         }
     }
 }

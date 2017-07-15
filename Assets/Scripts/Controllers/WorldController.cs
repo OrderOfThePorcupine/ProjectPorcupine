@@ -67,6 +67,14 @@ public class WorldController : MonoBehaviour
 
     #endregion
 
+    public GameObject CircleCursorPrefab
+    {
+        get
+        {
+            return circleCursorPrefab;
+        }
+    }
+
     public void OnEnable()
     {
         if (Instance != null)
@@ -119,7 +127,7 @@ public class WorldController : MonoBehaviour
 
         BuildModeController = new BuildModeController();
         SpawnInventoryController = new SpawnInventoryController();
-        MouseController = new MouseController(BuildModeController, FurnitureSpriteController, UtilitySpriteController, circleCursorPrefab);
+        MouseController = new MouseController();
         QuestController = new QuestController();
         CameraController = new CameraController();
         TradeController = new TradeController();

@@ -7,13 +7,15 @@
 // ====================================================
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
 
 [MoonSharp.Interpreter.MoonSharpUserData]
-public class SpawnInventoryController
+public class SpawnInventoryController : IMouseHandler
 {
     private GameObject spawnUI;
 
@@ -26,6 +28,22 @@ public class SpawnInventoryController
     public string InventoryToBuild { get; protected set; }
 
     public int AmountToCreate { get; protected set; }
+
+    public MouseHandlerCallbacks CallbacksEnabled
+    {
+        get
+        {
+            return MouseHandlerCallbacks.HANDLE_CLICK;
+        }
+    }
+
+    public bool SinglePlacementDraggingEnabled
+    {
+        get
+        {
+            return true; // No dragging for spawn inventory controller
+        }
+    }
 
     public void HideUI()
     {
@@ -62,6 +80,47 @@ public class SpawnInventoryController
         {
             World.Current.InventoryManager.PlaceInventory(t, inventoryChange);
         }
+    }
+
+    public void HandleClick(Vector2 position, int mouseKey)
+    {
+        if (mouseKey == 0 && SettingsKeyHolder.DeveloperMode)
+        {
+            Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
+            WorldController.Instance.SpawnInventoryController.SpawnInventory(t);
+        }
+    }
+
+    /// <summary>
+    /// NOT IMPLEMENTED BY SPAWN INVENTORY CONTROLLER.  Will throw on call.
+    /// </summary>
+    public void HandleTooltip(Vector2 position, MouseCursor cursor, bool isDragging)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// NOT IMPLEMENTED BY SPAWN INVENTORY CONTROLLER.  Will throw on call.
+    /// </summary>
+    public void HandleDrag(MouseController.DragParameters parameters)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// NOT IMPLEMENTED BY SPAWN INVENTORY CONTROLLER.  Will throw on call.
+    /// </summary>
+    public List<GameObject> HandleDragVisual(MouseController.DragParameters parameters, Transform parent)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// NOT IMPLEMENTED BY SPAWN INVENTORY CONTROLLER.  Will throw on call.
+    /// </summary>
+    public Vector3 HandlePlacingPosition(Vector3 position)
+    {
+        throw new NotImplementedException();
     }
 
     private void CreateSpawnUI()
@@ -178,6 +237,6 @@ public class SpawnInventoryController
     {
         InventoryToBuild = invName;
         AmountToCreate = amount;
-        WorldController.Instance.MouseController.StartSpawnMode();
+        WorldController.Instance.MouseController.ChangeMouseMode(MouseController.MouseMode.INVENTORY);
     }
 }
