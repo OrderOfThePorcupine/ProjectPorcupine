@@ -15,6 +15,14 @@ public class ContextMenu : MonoBehaviour
 {
     public GameObject ContextualMenuItemPrefab;
 
+    public bool Opened
+    {
+        get
+        {
+            return gameObject.activeInHierarchy;
+        }
+    }
+
     /// <summary>
     /// Open the context menu at the specified tile.
     /// </summary>

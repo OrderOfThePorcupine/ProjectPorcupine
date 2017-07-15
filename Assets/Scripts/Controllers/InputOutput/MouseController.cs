@@ -224,7 +224,6 @@ public class MouseController
         IsDragging = false;
         Selection = null;
 
-        // Is the context also supposed to open on ESCAPE? That seems wrong
         if (currentMode == MouseMode.DEFAULT)
         {
             Tile t = WorldController.Instance.GetTileAtWorldCoord(CurrentFramePosition);
@@ -233,10 +232,6 @@ public class MouseController
                 if (IsPanning)
                 {
                     contextMenu.Close();
-                }
-                else if (contextMenu != null)
-                {
-                    contextMenu.Open(t);
                 }
             }
         }
@@ -335,7 +330,7 @@ public class MouseController
             }
         }
 
-        UpdateCameraMovement(mouseButton1Up, mouseButton2Up);
+        UpdateCameraMovement();
 
         // Tooltip handling
         if ((handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_TOOLTIP) == MouseHandlerCallbacks.HANDLE_TOOLTIP)
@@ -371,9 +366,12 @@ public class MouseController
         lastFramePosition.z = WorldController.Instance.CameraController.CurrentLayer;
     }
 
-    private void UpdateCameraMovement(bool mouseButton1Up, bool mouseButton2Up)
+    private void UpdateCameraMovement()
     {
-        if (mouseButton1Up || mouseButton2Up)
+        bool mouseButton1 = Input.GetMouseButton(1);
+        bool mouseButton2 = Input.GetMouseButton(2);
+
+        if (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
         {
             panningMouseStart = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             panningMouseStart.z = 0;
@@ -392,7 +390,7 @@ public class MouseController
         }
 
         // Handle screen panning.
-        if (IsPanning && (mouseButton1Up || mouseButton2Up))
+        if (IsPanning && (mouseButton1 || mouseButton2))
         {   // Right or Middle Mouse Button.
             Vector3 diff = lastFramePosition - CurrentFramePosition;
 
@@ -402,13 +400,13 @@ public class MouseController
                 Camera.main.transform.Translate(diff);
             }
 
-            if (mouseButton1Up)
+            if (mouseButton1)
             {
                 IsDragging = false;
             }
         }
 
-        if (!mouseButton1Up && !mouseButton2Up)
+        if (!mouseButton1 && !mouseButton2)
         {
             IsPanning = false;
         }
