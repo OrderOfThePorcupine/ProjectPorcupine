@@ -13,114 +13,136 @@ using UnityEngine.UI;
 
 public class MouseCursor
 {
+    /// <summary>
+    /// The default tint.
+    /// </summary>
     public static readonly Color DefaultTint = Color.white;
-
-    public static readonly Dictionary<TextAnchor, Vector3> Positions = new Dictionary<TextAnchor, Vector3>
-    {
-        { TextAnchor.UpperLeft, new Vector3(-64f, 32f, 0) },
-        { TextAnchor.UpperCenter, new Vector3(0, 32f, 0) },
-        { TextAnchor.UpperRight, new Vector3(96f, 32f, 0) },
-        { TextAnchor.MiddleLeft, new Vector3(-64f, 0, 0) },
-        { TextAnchor.MiddleCenter, new Vector3(0, 0, 0) },
-        { TextAnchor.MiddleRight, new Vector3(96f, 0, 0) },
-        { TextAnchor.LowerLeft, new Vector3(-64f, -32f, 0) },
-        { TextAnchor.LowerCenter, new Vector3(0, -32f, 0) },
-        { TextAnchor.LowerRight, new Vector3(96f, -32f, 0) },
-    };
 
     private GameObject cursorGO;
     private SpriteRenderer cursorSR;
     private Vector2 cursorTextBoxSize = new Vector2(140, 70);
     private Texture2D cursorTexture;
-    private GUIStyle style = new GUIStyle();
-    private bool shouldShowCursor; // A more gentle variant to ForceShow.
+    private GUIStyle style;
+    private bool shouldShowCursor;
+    private RectTransform cachedTransform; // The overhead of calling gameobject.transform every update is expensive
 
-    private Dictionary<TextAnchor, CursorTextBox> textBoxes = new Dictionary<TextAnchor, CursorTextBox>();
+    /// <summary>
+    /// Uses the fact that <see cref="TextAnchor"/> is an enum and we can cast it to int.
+    /// This not only is more memory safe, and contingent which makes it faster, but also
+    /// allows us to iterate through it with ease which is called every frame to reset it,
+    /// and the cast overhead is minimal.
+    /// </summary>
+    private CursorTextBox[] textBoxes;
 
-    public MouseCursor()
+    /// <summary>
+    /// Create a new mouse cursor with the supplied style.
+    /// </summary>
+    /// <param name="style"> If null it will instead use a default style which is 15pt Arial, alignment being middle center.</param>
+    public MouseCursor(GUIStyle style = null)
     {
-        shouldShowCursor = false;
+        shouldShowCursor = true;
         UIMode = false;
 
-        style.font = Resources.Load<Font>("Fonts/Arial/Arial") as Font;
-        style.fontSize = 15;
+        if (style == null)
+        {
+            this.style = new GUIStyle() { font = Resources.Load<Font>("Fonts/Arial/Arial") as Font, fontSize = 15, alignment = TextAnchor.MiddleCenter };
+        }
+
         cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
 
         KeyboardManager.Instance.RegisterInputAction("ToggleCursorTextBox", KeyboardMappedInputType.KeyUp, () => { shouldShowCursor = !shouldShowCursor; });
     }
 
     /// <summary>
-    /// Forcefully show the cursor.
+    /// Enable this to let the mouse cursor show tooltips on UI elements.
     /// </summary>
     public bool UIMode { get; set; }
 
+    /// <summary>
+    /// Build builds the cursor.
+    /// </summary>
+    /// <returns> The cursor object. </returns>
     public GameObject BuildCursor()
     {
         cursorGO = new GameObject("CURSOR");
 
-        RectTransform rt1 = cursorGO.AddComponent<RectTransform>();
-        rt1.sizeDelta = new Vector2(64, 64);
+        cachedTransform = cursorGO.AddComponent<RectTransform>();
+        cachedTransform.sizeDelta = new Vector2(64, 64);
         cursorSR = cursorGO.AddComponent<SpriteRenderer>();
         cursorSR.sortingLayerName = "TileUI";
 
         Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
 
-        textBoxes = new Dictionary<TextAnchor, CursorTextBox>()
+        textBoxes = new CursorTextBox[]
         {
-            { TextAnchor.UpperLeft, new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, Positions[TextAnchor.UpperLeft], cursorTextBoxSize) },
-            { TextAnchor.UpperCenter, new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, Positions[TextAnchor.UpperCenter], cursorTextBoxSize) },
-            { TextAnchor.UpperRight, new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, Positions[TextAnchor.UpperRight], cursorTextBoxSize) },
+            new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, new Vector3(-64f, 32f, 0), cursorTextBoxSize),   // UpperLeft
+            new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, new Vector3(0, 32f, 0), cursorTextBoxSize),     // UpperCenter
+            new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, new Vector3(96f, 32f, 0), cursorTextBoxSize),     // UpperRight
+            new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, new Vector3(-64f, 0, 0), cursorTextBoxSize),     // MiddleLeft,
+            new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, new Vector3(0, 0, 0), cursorTextBoxSize),       // MiddleCenter
+            new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, new Vector3(96f, 0, 0), cursorTextBoxSize),       // MiddleRight
 
-            { TextAnchor.MiddleLeft, new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, Positions[TextAnchor.MiddleLeft], cursorTextBoxSize) },
-            { TextAnchor.MiddleCenter, new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, Positions[TextAnchor.MiddleCenter], cursorTextBoxSize) },
-            { TextAnchor.MiddleRight, new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, Positions[TextAnchor.MiddleRight], cursorTextBoxSize) },
-
-            { TextAnchor.LowerLeft, new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, Positions[TextAnchor.LowerLeft], cursorTextBoxSize) },
-            { TextAnchor.LowerCenter, new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, Positions[TextAnchor.LowerCenter], cursorTextBoxSize) },
-            { TextAnchor.LowerRight, new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, Positions[TextAnchor.LowerRight], cursorTextBoxSize) },
+            new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style,  new Vector3(-64f, -32f, 0), cursorTextBoxSize), // LowerLeft
+            new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, new Vector3(0, -32f, 0), cursorTextBoxSize),    // LowerCenter
+            new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style,  new Vector3(96f, -32f, 0), cursorTextBoxSize),   // LowerRight
         };
 
         return cursorGO;
     }
 
+    /// <summary>
+    /// Resets all the text on this cursor.
+    /// </summary>
     public void Reset()
     {
-        foreach (CursorTextBox box in textBoxes.Values)
+        for (int i = 0; i < textBoxes.Length; i++)
         {
-            box.Set(string.Empty, DefaultTint);
+            textBoxes[i].Set(string.Empty, DefaultTint, false);
         }
     }
 
-    public void DisplayCursorInfo(TextAnchor pos, string text, Color color)
+    /// <summary>
+    /// Displays cursor information given the parameters.
+    /// </summary>
+    /// <param name="pos"> The text box to place the text in. </param>
+    /// <param name="text"> The text to place. </param>
+    /// <param name="color"> The color for the text. </param>
+    public void DisplayCursorInfo(TextAnchor pos, string text, Color color, bool withBackground)
     {
-        textBoxes[pos].Set(text, color);
+        textBoxes[(int)pos].Set(text, color, withBackground);
     }
 
-    public void Update()
+    /// <summary>
+    /// Update the cursor should be called by the parent class.
+    /// </summary>
+    public void UpdateCursor()
     {
         // If we should show cursor and we aren't over a ui element (unless we are UI mode) then show cursor.
-        if (shouldShowCursor && (EventSystem.current.IsPointerOverGameObject() == false || UIMode))
-        {
-            cursorGO.SetActive(true);
-        }
-        else
-        {
-            cursorGO.SetActive(false);
-        }
-
-        cursorGO.transform.position = Input.mousePosition;
+        cursorGO.SetActive(shouldShowCursor && (EventSystem.current.IsPointerOverGameObject() == false || UIMode));
+        cachedTransform.position = Input.mousePosition;
     }
 
-    public class CursorTextBox
+    /// <summary>
+    /// Handles the text boxes for this cursor.
+    /// </summary>
+    private class CursorTextBox
     {
-        public GameObject textObject;
-        public Text textComponent;
-        public RectTransform rectTranform;
+        public static readonly Color BackgroundColor = Color.blue;
+
+        private Image background;
+        private Text textComponent;
 
         public CursorTextBox(GameObject parentObject, TextAnchor textAlignment, GUIStyle style, Vector3 localPosition, Vector2 textWidthHeight)
         {
-            textObject = new GameObject("Cursor-Text");
-            textObject.transform.SetParent(parentObject.transform);
+            background = new GameObject("Background: " + textAlignment).AddComponent<Image>();
+            background.color = BackgroundColor;
+            background.enabled = false;
+            background.gameObject.AddComponent<ContentSizeFitter>();
+            background.transform.SetParent(parentObject.transform);
+            background.transform.localPosition = Vector3.zero;
+
+            GameObject textObject = new GameObject("Cursor-Text: " + textAlignment);
+            textObject.transform.SetParent(background.transform);
             textObject.transform.localPosition = localPosition;
 
             textComponent = textObject.AddComponent<Text>();
@@ -132,14 +154,14 @@ public class MouseCursor
             outline.effectColor = Color.black;
             outline.effectDistance = new Vector2(1.5f, 1.5f);
 
-            rectTranform = textObject.GetComponentInChildren<RectTransform>();
-            rectTranform.sizeDelta = textWidthHeight;
+            textObject.GetComponentInChildren<RectTransform>().sizeDelta = textWidthHeight;
         }
 
-        public void Set(string text, Color color)
+        public void Set(string text, Color color, bool withBackground)
         {
             textComponent.text = text;
             textComponent.color = color;
+            background.enabled = withBackground;
         }
     }
 }

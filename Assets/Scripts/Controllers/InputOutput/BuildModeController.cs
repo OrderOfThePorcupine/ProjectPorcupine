@@ -56,11 +56,11 @@ public class BuildModeController : IMouseHandler
     {
         get
         {
-            return MouseHandlerCallbacks.HANDLE_DRAG | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION;
+            return MouseHandlerCallbacks.HANDLE_DRAG_FINISHED | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION;
         }
     }
 
-    public bool SinglePlacementDraggingEnabled
+    public bool DisableDragging
     {
         get
         {
@@ -486,7 +486,7 @@ public class BuildModeController : IMouseHandler
         // Placing furniture object.
         if (BuildMode == BuildMode.FURNITURE)
         {
-            cursor.DisplayCursorInfo(TextAnchor.LowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(BuildModeType).GetName()), MouseCursor.DefaultTint);
+            cursor.DisplayCursorInfo(TextAnchor.LowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(BuildModeType).GetName()), MouseCursor.DefaultTint, false);
 
             // Dragging and placing multiple furniture.
             if (t != null && isDragging == true && dragPreviewGameObjects.Count > 1)
@@ -527,9 +527,9 @@ public class BuildModeController : IMouseHandler
                     UnityDebugger.Debugger.LogError("BuildOrder is null");
                 }
 
-                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, validPostionCount.ToString(), Color.green);
-                cursor.DisplayCursorInfo(TextAnchor.UpperRight, invalidPositionCount.ToString(), Color.red);
-                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, currentBuildRequirements, MouseCursor.DefaultTint);
+                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, validPostionCount.ToString(), Color.green, false);
+                cursor.DisplayCursorInfo(TextAnchor.UpperRight, invalidPositionCount.ToString(), Color.red, false);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, currentBuildRequirements, MouseCursor.DefaultTint, false);
             }
         }
         else if (BuildMode == BuildMode.FLOOR)
@@ -537,13 +537,13 @@ public class BuildModeController : IMouseHandler
             // Placing tiles and dragging.
             if (t != null && isDragging == true && dragPreviewGameObjects.Count >= 1)
             {
-                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, dragPreviewGameObjects.Count.ToString(), MouseCursor.DefaultTint);
-                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, LocalizationTable.GetLocalization(GetFloorTile()), MouseCursor.DefaultTint);
+                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, dragPreviewGameObjects.Count.ToString(), MouseCursor.DefaultTint, false);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, LocalizationTable.GetLocalization(GetFloorTile()), MouseCursor.DefaultTint, false);
             }
         }
     }
 
-    public void HandleDrag(MouseController.DragParameters dragParams)
+    public void HandleDragFinished(MouseController.DragParameters dragParams)
     {
         for (int x = dragParams.StartX; x <= dragParams.EndX; x++)
         {
@@ -619,7 +619,11 @@ public class BuildModeController : IMouseHandler
                         if (IsTilePartOfDrag(t, dragParams, proto.DragType))
                         {
                             objects.Add(ShowFurnitureSpriteAtTile(BuildModeType, t));
-                            objects.Add(ShowWorkSpotSpriteAtTile(BuildModeType, t));
+                            GameObject go = ShowWorkSpotSpriteAtTile(BuildModeType, t);
+                            if (go != null)
+                            {
+                                objects.Add(go);
+                            }
                         }
                     }
                     else if (BuildMode == BuildMode.UTILITY)

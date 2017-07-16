@@ -37,7 +37,7 @@ public class SpawnInventoryController : IMouseHandler
         }
     }
 
-    public bool SinglePlacementDraggingEnabled
+    public bool DisableDragging
     {
         get
         {
@@ -102,7 +102,7 @@ public class SpawnInventoryController : IMouseHandler
     /// <summary>
     /// NOT IMPLEMENTED BY SPAWN INVENTORY CONTROLLER.  Will throw on call.
     /// </summary>
-    public void HandleDrag(MouseController.DragParameters parameters)
+    public void HandleDragFinished(MouseController.DragParameters parameters)
     {
         throw new NotImplementedException();
     }

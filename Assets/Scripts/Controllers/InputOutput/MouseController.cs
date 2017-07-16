@@ -14,32 +14,108 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// Flags to indicate which mouse callbacks you handle.
+/// This allows you to put <see cref="NotImplementedException"/> so that if they are called its clear that they weren't meant to,
+/// rather than just returning instantly.
+/// It also speeds up the call since calling virtual methods are slightly more expensive then just normal calls and lets not call things we don't need to.
+/// </summary>
 [Flags]
 public enum MouseHandlerCallbacks
 {
+    /// <summary>
+    /// Note: Using `|` or `&` on this will wipe all settings.
+    /// Should be used alone to indicate that you don't handle any callbacks,
+    /// In reality could be omitted from this list but is here for completeness.
+    /// </summary>
     NONE = 0,
+
+    /// <summary>
+    /// Enable this if you are going to handle tooltips.
+    /// </summary>
     HANDLE_TOOLTIP = 1 << 0,
+
+    /// <summary>
+    /// Enable this if you are going to handle clicks.
+    /// </summary>
     HANDLE_CLICK = 1 << 1,
-    HANDLE_DRAG = 1 << 2,
+
+    /// <summary>
+    /// Enable this if you are going to handle dragging.
+    /// </summary>
+    HANDLE_DRAG_FINISHED = 1 << 2,
+
+    /// <summary>
+    /// Enable this if you are going to handle the visuals for dragging.
+    /// </summary>
     HANDLE_DRAG_VISUAL = 1 << 3,
+
+    /// <summary>
+    /// Enable this if you are going to edit the placing position.
+    /// Such as adding an offset for rotation.
+    /// </summary>
     HANDLE_PLACING_POSITION = 1 << 4,
 }
 
+/// <summary>
+/// This interface is to enable your ability to handle mouse events.
+/// This won't automatically make you handle mouse events you will have to add yourself to the array <see cref="MouseController.mouseHandlers"/> and add an enum mode.
+/// This enables later for us to make this effectively all modded, with a bunch of JSON properties.
+/// </summary>
+/// <remarks> If you aren't going to implement a function don't leave it empty put a <see cref="NotImplementedException"/> inside it so we get proper errors. </remarks>
 public interface IMouseHandler
 {
+    /// <summary>
+    /// Return what callbacks you are going to handle to reduce the amount of calls needed.
+    /// </summary>
     MouseHandlerCallbacks CallbacksEnabled { get; }
 
-    bool SinglePlacementDraggingEnabled { get; }
+    /// <summary>
+    /// Enable this to disable all dragging.
+    /// This will result in a single tile drag parameter,
+    /// where StartX and StartY equal EndX and EndY (respectively).
+    /// </summary>
+    bool DisableDragging { get; }
 
-    void HandleTooltip(Vector2 position, MouseCursor cursor, bool isDragging);
+    /// <summary>
+    /// Implement this if you are going to handle tooltips.
+    /// </summary>
+    /// <param name="mousePosition"> The position of the mouse. </param>
+    /// <param name="cursor"> The cursor object that allows you to do <see cref="MouseCursor.DisplayCursorInfo(TextAnchor, string, Color, bool)"/>.</param>
+    /// <param name="isDragging"> Is the system currently dragging. Equivalent to <see cref="MouseController.IsDragging"/>.</param>
+    void HandleTooltip(Vector2 mousePosition, MouseCursor cursor, bool isDragging);
 
-    void HandleClick(Vector2 position, int mouseKey);
+    /// <summary>
+    /// Implement this if you are going to handle clicks.
+    /// </summary>
+    /// <param name="mousePosition"> The position of the mouse. </param>
+    /// <param name="mouseKey"> What mouse button was pressed; 0 is left button, 1 is right button, and 2 is the middle (scroll wheel) button. </param>
+    void HandleClick(Vector2 mousePosition, int mouseKey);
 
-    void HandleDrag(MouseController.DragParameters parameters);
+    /// <summary>
+    /// Implement this if you are going to handle dragging the mouse.
+    /// This occurs once the user 'confirms the drag' by lifting up the left mouse button.
+    /// This won't occur if the user cancels the drag by clicking either the right or middle (scroll wheel) mouse button or escape key.
+    /// </summary>
+    /// <param name="dragParams"> The drag parameters created from the start drag position and end drag position. </param>
+    void HandleDragFinished(MouseController.DragParameters dragParams);
 
-    List<GameObject> HandleDragVisual(MouseController.DragParameters parameters, Transform parent);
+    /// <summary>
+    /// Implement this if you are going to handle the visual side of dragging the mouse.
+    /// You do not need to cleanup but you have to return all the gameobjects that you created.
+    /// </summary>
+    /// <param name="dragParams"> The drag parameters created from the start drag position and end drag position. </param>
+    /// <param name="parent"> The parent to attach all your gameobjects to, however you can attach it to any gameobject. </param>
+    /// <returns> Return all the gameobjects that you have created. </returns>
+    List<GameObject> HandleDragVisual(MouseController.DragParameters dragParams, Transform parent);
 
-    Vector3 HandlePlacingPosition(Vector3 position);
+    /// <summary>
+    /// Implement this if you are going to override the placing position.
+    /// Such as if you wanted to offset for rotation.
+    /// </summary>
+    /// <param name="currentFramePosition"> The current frame position and what would have been set. </param>
+    /// <returns> The new placing position. </returns>
+    Vector3 HandlePlacingPosition(Vector3 currentFramePosition);
 }
 
 /// <summary>
@@ -47,27 +123,61 @@ public interface IMouseHandler
 /// - Dragging
 /// - Clicking
 /// - Moving the mouse
-/// Anything else (such as what occurs after a drag stops) is handled by actions.
+/// Anything else (such as what occurs after a drag stops) is handled by <see cref="IMouseHandler"/>s.
 /// </summary>
 public class MouseController
 {
+    /// <summary>
+    /// The threshold for when to start panning.
+    /// </summary>
+    private const float panningThreshold = 0.015f;
+
+    /// <summary>
+    /// The cursor parent where most drag preview objects should be parented to.
+    /// </summary>
     private GameObject cursorParent;
 
+    /// <summary>
+    /// Reference to the context menu.
+    /// </summary>
     private ContextMenu contextMenu;
+
+    /// <summary>
+    /// Reference to the mouse cursor.
+    /// </summary>
     private MouseCursor mouseCursor;
 
-    private Vector3 lastFramePosition;          // Our last frame position
-    private Vector3 dragStartPosition;          // The world-position start of our left-mouse drag operation.
+    /// <summary>
+    /// The position of the mouse from the last update.
+    /// </summary>
+    private Vector3 lastFramePosition;
 
-    private IMouseHandler[] mouseHandlers;      // Handles mouse events
+    /// <summary>
+    /// The starting position of the drag.
+    /// If <see cref="IMouseHandler.DisableDragging"/> is enabled then this will equal PlacingPosition,
+    /// resulting in a singular 'tile' drag.
+    /// </summary>
+    private Vector3 dragStartPosition;
 
-    private string tooltip = null; // If not null then will handle tooltip.
+    /// <summary>
+    /// Handlers which handle all the events that the mouse controller catches.
+    /// </summary>
+    private IMouseHandler[] mouseHandlers;
+
+    /// <summary>
+    /// The tooltip for the UI, this is needed for UIModes.
+    /// </summary>
+    private string uiTooltip = null;
+
+    /// <summary>
+    /// The current mouse mode set using <see cref="ChangeMouseMode(MouseMode, string)"/>.
+    /// Acts as a ptr to <see cref="mouseHandlers"/> via cast to int.
+    /// </summary>
     private MouseMode currentMode = MouseMode.DEFAULT;
 
-    private int validPostionCount;
-    private int invalidPositionCount;
-
-    private float panningThreshold = 0.015f;
+    /// <summary>
+    /// Where the panning started.
+    /// </summary>
     private Vector3 panningMouseStart = Vector3.zero;
 
     /// <summary>
@@ -109,6 +219,9 @@ public class MouseController
         KeyboardManager.Instance.RegisterInputAction("Escape", KeyboardMappedInputType.KeyUp, OnEscape);
     }
 
+    /// <summary>
+    /// A set of mouse modes.
+    /// </summary>
     public enum MouseMode
     {
         /// <summary>
@@ -129,7 +242,7 @@ public class MouseController
         /// <summary>
         /// Enabled by the <see cref="TooltipComponent"/>.
         /// Tooltip:
-        /// Around a sentence.
+        ///     Around a sentence.
         /// </summary>
         LIGHT_UI,
 
@@ -186,7 +299,7 @@ public class MouseController
     /// <param name="forceShow"> If enabled will show mouse in UI mode. </param>
     public void ChangeMouseMode(MouseMode newMode, string tooltip = null)
     {
-        this.tooltip = tooltip;
+        this.uiTooltip = tooltip;
         currentMode = newMode;
         mouseCursor.UIMode = newMode == MouseMode.HEAVY_UI || newMode == MouseMode.LIGHT_UI;
     }
@@ -198,7 +311,7 @@ public class MouseController
     /// <param name="stopDragging"> Stop dragging?. </param>
     public void ClearMouseMode(bool stopDragging = false)
     {
-        this.tooltip = null;
+        this.uiTooltip = null;
         mouseCursor.UIMode = false;
         currentMode = BuildModeController.Instance.Building ? MouseMode.BUILD : MouseMode.DEFAULT;
 
@@ -235,8 +348,12 @@ public class MouseController
         }
     }
 
+    /// <summary>
+    /// Updates all the little components of mouse controller.
+    /// </summary>
     private void Update()
     {
+        // This prevents having to reobtain these, since the call is expensive enough to warrant this
         bool mouseButton0Up = Input.GetMouseButtonUp(0);
         bool mouseButton1Up = Input.GetMouseButtonUp(1);
         bool mouseButton2Up = Input.GetMouseButtonUp(2);
@@ -260,7 +377,7 @@ public class MouseController
         {
             if (IsPanning == false)
             {
-                tooltip = null;
+                uiTooltip = null;
                 mouseCursor.UIMode = false;
             }
 
@@ -281,7 +398,7 @@ public class MouseController
             dragStartPosition = CurrentPlacingPosition;
         }
 
-        mouseCursor.Update();
+        mouseCursor.UpdateCursor();
 
         // HANDLE DRAG
         // Clear all the drag objects
@@ -293,17 +410,17 @@ public class MouseController
         DragPreviewGameObjects.Clear();
 
         // If callback for handling drag is enabled then handle the drag
-        bool dragEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG) == MouseHandlerCallbacks.HANDLE_DRAG;
+        bool dragEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_FINISHED) == MouseHandlerCallbacks.HANDLE_DRAG_FINISHED;
         bool dragVisualEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_VISUAL) == MouseHandlerCallbacks.HANDLE_DRAG_VISUAL;
 
         if (dragEnabled || dragVisualEnabled)
         {
-            if (handler.SinglePlacementDraggingEnabled || (IsDragging == false && performDragThisFrame == false))
+            if (handler.DisableDragging || (IsDragging == false && performDragThisFrame == false))
             {
                 dragStartPosition = CurrentPlacingPosition;
             }
 
-            DragParameters dragParams = new DragParameters(dragStartPosition, CurrentFramePosition);
+            DragParameters dragParams = new DragParameters(dragStartPosition, CurrentPlacingPosition);
 
             if (dragVisualEnabled)
             {
@@ -315,7 +432,7 @@ public class MouseController
             if (dragEnabled && performDragThisFrame)
             {
                 // HANDLE DRAG
-                handler.HandleDrag(dragParams);
+                handler.HandleDragFinished(dragParams);
             }
         }
 
@@ -355,6 +472,9 @@ public class MouseController
         lastFramePosition.z = WorldController.Instance.CameraController.CurrentLayer;
     }
 
+    /// <summary>
+    /// Updates the camera movement.s
+    /// </summary>
     private void UpdateCameraMovement()
     {
         bool mouseButton1 = Input.GetMouseButton(1);
@@ -368,8 +488,7 @@ public class MouseController
 
         if (!IsPanning)
         {
-            Vector3 currentMousePosition;
-            currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             currentMousePosition.z = 0;
 
             if (Vector3.Distance(panningMouseStart, currentMousePosition) > panningThreshold * Camera.main.orthographicSize)
@@ -418,8 +537,63 @@ public class MouseController
         Camera.main.transform.position = oldPos;
     }
 
-    public class DragParameters
+    /// <summary>
+    /// These are parameters for dragging the mouse.
+    /// </summary>
+    public struct DragParameters
     {
+        /// <summary>
+        /// The raw starting value for x.
+        /// This could be lower or higher than <see cref="RawEndX"/>.
+        /// </summary>
+        public readonly int RawStartX;
+
+        /// <summary>
+        /// The raw ending value for x.
+        /// This could be lower or higher than <see cref="RawStartX"/>.
+        /// </summary>
+        public readonly int RawEndX;
+
+        /// <summary>
+        /// The raw starting value for y.
+        /// This could be lower or higher than <see cref="RawEndY"/>.
+        /// </summary>
+        public readonly int RawStartY;
+
+        /// <summary>
+        /// The raw ending value for y.
+        /// This could be lower or higher than <see cref="RawStartY"/>.
+        /// </summary>
+        public readonly int RawEndY;
+
+        /// <summary>
+        /// The actual starting position for x.  Will always be lower than <see cref="EndX"/>.
+        /// These will make it so that the smaller value is the 'beginning value',
+        /// this means that its more efficient and one can always use an increasing iterator.
+        /// </summary>
+        public readonly int StartX;
+
+        /// <summary>
+        /// The actual ending position for x.  Will always be higher than <see cref="StartX"/>.
+        /// These will make it so that the smaller value is the 'beginning value',
+        /// this means that its more efficient and one can always use an increasing iterator.
+        /// </summary>
+        public readonly int EndX;
+
+        /// <summary>
+        /// The actual starting position for y.  Will always be lower than <see cref="EndY"/>.
+        /// These will make it so that the smaller value is the 'beginning value',
+        /// this means that its more efficient and one can always use an increasing iterator.
+        /// </summary>
+        public readonly int StartY;
+
+        /// <summary>
+        /// The actual ending position for y.  Will always be higher than <see cref="StartY"/>.
+        /// These will make it so that the smaller value is the 'beginning value',
+        /// this means that its more efficient and one can always use an increasing iterator.
+        /// </summary>
+        public readonly int EndY;
+
         /// <summary>
         /// Create using Vector2 the x and y coords are used and are rounded to integers.
         /// </summary>
@@ -464,47 +638,41 @@ public class MouseController
             this.RawStartY = startY;
             this.RawEndY = endY;
 
-            this.StartX = Mathf.Min(RawStartX, RawEndX);
-            this.EndX = Mathf.Max(RawStartX, RawEndX);
-            this.StartY = Mathf.Min(RawStartY, RawEndY);
-            this.EndY = Mathf.Max(RawStartY, RawEndY);
+            MathUtilities.MinAndMax(startX, endX, out StartX, out EndX);
+            MathUtilities.MinAndMax(startY, endY, out StartY, out EndY);
         }
-
-        public int RawStartX { get; private set; }
-
-        public int RawEndX { get; private set; }
-
-        public int RawStartY { get; private set; }
-
-        public int RawEndY { get; private set; }
-
-        public int StartX { get; private set; }
-
-        public int EndX { get; private set; }
-
-        public int StartY { get; private set; }
-
-        public int EndY { get; private set; }
     }
 
+    /// <summary>
+    /// Handles cases; <see cref="MouseMode.BUILD"/>, <see cref="MouseMode.LIGHT_UI"/>, <see cref="MouseMode.HEAVY_UI"/>.
+    /// </summary>
     private class MultiMouseHandler : IMouseHandler
     {
-        private MouseMode handles;
+        private MouseMode modeToHandle; // The mode to handle
 
-        public MultiMouseHandler(MouseMode handles)
+        /// <summary>
+        /// Create a new handler handling the mode supplied.
+        /// </summary>
+        /// <param name="modeToHandle"></param>
+        public MultiMouseHandler(MouseMode modeToHandle)
         {
-            this.handles = handles;
+            this.modeToHandle = modeToHandle;
         }
 
+        /// <summary>
+        /// What callbacks are enabled for this mousemode.
+        /// If the <see cref="modeToHandle"/> is <see cref="MouseMode.HEAVY_UI"/> or <see cref="MouseMode.LIGHT_UI"/> then it handles only tooltip.
+        /// Else if its <see cref="MouseMode.DEFAULT"/> then it handles tooltip and clicking.
+        /// </summary>
         public MouseHandlerCallbacks CallbacksEnabled
         {
             get
             {
-                if (handles == MouseMode.HEAVY_UI || handles == MouseMode.LIGHT_UI)
+                if (modeToHandle == MouseMode.HEAVY_UI || modeToHandle == MouseMode.LIGHT_UI)
                 {
                     return MouseHandlerCallbacks.HANDLE_TOOLTIP;
                 }
-                else if (handles == MouseMode.DEFAULT)
+                else if (modeToHandle == MouseMode.DEFAULT)
                 {
                     return MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_CLICK;
                 }
@@ -515,7 +683,10 @@ public class MouseController
             }
         }
 
-        public bool SinglePlacementDraggingEnabled
+        /// <summary>
+        /// Will always return false.
+        /// </summary>
+        public bool DisableDragging
         {
             get
             {
@@ -523,18 +694,21 @@ public class MouseController
             }
         }
 
+        /// <summary>
+        /// Handles the tooltip mode.
+        /// </summary>
         public void HandleTooltip(Vector2 position, MouseCursor cursor, bool isDragging)
         {
-            string tooltip = WorldController.Instance.MouseController.tooltip;
+            string tooltip = WorldController.Instance.MouseController.uiTooltip;
 
-            switch (handles)
+            switch (modeToHandle)
             {
                 case MouseMode.DEFAULT:
                     cursor.Reset();
                     Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
                     if (t != null)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.DefaultTint);
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.DefaultTint, false);
                     }
 
                     break;
@@ -543,7 +717,7 @@ public class MouseController
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint, false);
                     }
 
                     break;
@@ -552,7 +726,7 @@ public class MouseController
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint);
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint, true);
                     }
 
                     break;
@@ -562,9 +736,12 @@ public class MouseController
             }
         }
 
+        /// <summary>
+        /// Handles clicking, in this mode it is about selecting objects.
+        /// </summary>
         public void HandleClick(Vector2 position, int mouseKey)
         {
-            if (handles == MouseMode.DEFAULT)
+            if (modeToHandle == MouseMode.DEFAULT)
             {
                 // These ifs are separate since we want to error out if the handle != MouseMode.DEFAULT, but we don't want to error out if mouseKey != 0
                 if (mouseKey == 0)
@@ -638,7 +815,7 @@ public class MouseController
         /// <summary>
         /// NOT IMPLEMENTED BY DEFAULT MOUSE HANDLER.  Will throw on call.
         /// </summary>
-        public void HandleDrag(DragParameters parameters)
+        public void HandleDragFinished(DragParameters parameters)
         {
             throw new NotImplementedException();
         }
