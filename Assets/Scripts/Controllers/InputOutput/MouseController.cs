@@ -130,7 +130,7 @@ public class MouseController
     /// <summary>
     /// The threshold for when to start panning.
     /// </summary>
-    private const float panningThreshold = 0.015f;
+    private const float PanningThreshold = 0.015f;
 
     /// <summary>
     /// The cursor parent where most drag preview objects should be parented to.
@@ -473,7 +473,7 @@ public class MouseController
     }
 
     /// <summary>
-    /// Updates the camera movement.s
+    /// Updates the camera movement.
     /// </summary>
     private void UpdateCameraMovement()
     {
@@ -491,7 +491,7 @@ public class MouseController
             Vector3 currentMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             currentMousePosition.z = 0;
 
-            if (Vector3.Distance(panningMouseStart, currentMousePosition) > panningThreshold * Camera.main.orthographicSize)
+            if (Vector3.Distance(panningMouseStart, currentMousePosition) > PanningThreshold * Camera.main.orthographicSize)
             {
                 IsPanning = true;
             }
