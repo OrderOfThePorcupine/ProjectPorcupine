@@ -14,17 +14,33 @@ using UnityEngine.UI;
 public class MouseCursor
 {
     /// <summary>
-    /// The default tint.
+    /// The default color for the text.
     /// </summary>
-    public static readonly Color DefaultTint = Color.white;
+    public static readonly Color TextColor = Color.white;
 
-    private GameObject cursorGO;
-    private SpriteRenderer cursorSR;
-    private Vector2 cursorTextBoxSize = new Vector2(140, 70);
+    /// <summary>
+    /// The color of the background.
+    /// </summary>
+    public static readonly Color BackgroundColor = new Color(7f / 255f, 69f / 255f, 87f / 255f, 1f);
+
+    /// <summary>
+    /// The color of the outline of the text.
+    /// </summary>
+    public static readonly Color OutlineColor = new Color(7f / 255f, 70f / 255f, 92f / 255f, 1f);
+
+    /// <summary>
+    /// The cursor game object.
+    /// </summary>
+    public GameObject CursorGameObject { get; private set; }
+
     private Texture2D cursorTexture;
     private GUIStyle style;
-    private bool shouldShowCursor;
     private RectTransform cachedTransform; // The overhead of calling gameobject.transform every update is expensive
+
+    /// <summary>
+    /// User override.
+    /// </summary>
+    private bool shouldShowCursor;
 
     /// <summary>
     /// Uses the fact that <see cref="TextAnchor"/> is an enum and we can cast it to int.
@@ -49,8 +65,15 @@ public class MouseCursor
         }
 
         cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
-
         KeyboardManager.Instance.RegisterInputAction("ToggleCursorTextBox", KeyboardMappedInputType.KeyUp, () => { shouldShowCursor = !shouldShowCursor; });
+    }
+
+    /// <summary>
+    /// Deconstructor.
+    /// </summary>
+    ~MouseCursor()
+    {
+        KeyboardManager.Instance.UnRegisterInputAction("ToggleCursorTextBox");
     }
 
     /// <summary>
@@ -64,30 +87,49 @@ public class MouseCursor
     /// <returns> The cursor object. </returns>
     public GameObject BuildCursor()
     {
-        cursorGO = new GameObject("CURSOR");
+        Canvas canvas = new GameObject("Cursor_Canvas").AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.worldCamera = Camera.main;
+        canvas.sortingOrder = 1;
+        canvas.referencePixelsPerUnit = 100f;
+        canvas.pixelPerfect = true;
 
-        cachedTransform = cursorGO.AddComponent<RectTransform>();
+        RectTransform rt = canvas.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(200, 200);
+
+        CanvasScaler cs = canvas.gameObject.AddComponent<CanvasScaler>();
+        cs.scaleFactor = 1;
+        cs.referencePixelsPerUnit = 100f;
+
+        CursorGameObject = new GameObject("Cursor_Parent");
+        CanvasGroup cg = CursorGameObject.AddComponent<CanvasGroup>();
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+
+        cachedTransform = CursorGameObject.AddComponent<RectTransform>();
         cachedTransform.sizeDelta = new Vector2(64, 64);
-        cursorSR = cursorGO.AddComponent<SpriteRenderer>();
-        cursorSR.sortingLayerName = "TileUI";
+        cachedTransform.SetParent(canvas.transform);
+
+        canvas.gameObject.AddComponent<UIRescaler>();
 
         Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
 
         textBoxes = new CursorTextBox[]
         {
-            new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, new Vector3(-64f, 32f, 0), cursorTextBoxSize),   // UpperLeft
-            new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, new Vector3(0, 32f, 0), cursorTextBoxSize),     // UpperCenter
-            new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, new Vector3(96f, 32f, 0), cursorTextBoxSize),     // UpperRight
-            new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, new Vector3(-64f, 0, 0), cursorTextBoxSize),     // MiddleLeft,
-            new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, new Vector3(0, 0, 0), cursorTextBoxSize),       // MiddleCenter
-            new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, new Vector3(96f, 0, 0), cursorTextBoxSize),       // MiddleRight
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.UpperLeft),      // UpperLeft
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.UpperCenter),   // UpperCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.UpperRight),      // UpperRight
 
-            new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style,  new Vector3(-64f, -32f, 0), cursorTextBoxSize), // LowerLeft
-            new CursorTextBox(cursorGO, TextAnchor.MiddleCenter, style, new Vector3(0, -32f, 0), cursorTextBoxSize),    // LowerCenter
-            new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style,  new Vector3(96f, -32f, 0), cursorTextBoxSize),   // LowerRight
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.MiddleLeft),     // MiddleLeft,
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.MiddleCenter),  // MiddleCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.MiddleRight),     // MiddleRight
+
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style,  TextAnchor.LowerLeft),     // LowerLeft
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.LowerCenter),   // LowerCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style,  TextAnchor.LowerRight),     // LowerRight
         };
 
-        return cursorGO;
+        return CursorGameObject;
     }
 
     /// <summary>
@@ -97,7 +139,7 @@ public class MouseCursor
     {
         for (int i = 0; i < textBoxes.Length; i++)
         {
-            textBoxes[i].Set(string.Empty, DefaultTint, false);
+            textBoxes[i].Set(string.Empty, TextColor, false);
         }
     }
 
@@ -118,7 +160,7 @@ public class MouseCursor
     public void UpdateCursor()
     {
         // If we should show cursor and we aren't over a ui element (unless we are UI mode) then show cursor.
-        cursorGO.SetActive(shouldShowCursor && (EventSystem.current.IsPointerOverGameObject() == false || UIMode));
+        CursorGameObject.SetActive(shouldShowCursor && (UIMode || EventSystem.current.IsPointerOverGameObject() == false));
         cachedTransform.position = Input.mousePosition;
     }
 
@@ -127,40 +169,96 @@ public class MouseCursor
     /// </summary>
     private class CursorTextBox
     {
-        public static readonly Color BackgroundColor = Color.blue;
-
         private Image background;
         private Text textComponent;
 
-        public CursorTextBox(GameObject parentObject, TextAnchor textAlignment, GUIStyle style, Vector3 localPosition, Vector2 textWidthHeight)
+        public CursorTextBox(GameObject parentObject, TextAnchor textAlignment, GUIStyle style, TextAnchor location)
         {
-            background = new GameObject("Background: " + textAlignment).AddComponent<Image>();
-            background.color = BackgroundColor;
+            Vector3 localPosition;
+            switch (location)
+            {
+                case TextAnchor.UpperLeft:
+                    localPosition = new Vector3(-64f, 32f, 0f);
+                    break;
+                case TextAnchor.UpperCenter:
+                    localPosition = new Vector3(0f, 32f, 0f);
+                    break;
+                case TextAnchor.UpperRight:
+                    localPosition = new Vector3(120f, 32f, 0f);
+                    break;
+
+                case TextAnchor.MiddleLeft:
+                    localPosition = new Vector3(-64f, 0f, 0f);
+                    break;
+                case TextAnchor.MiddleCenter:
+                    localPosition = new Vector3(0f, 0f, 0f);
+                    break;
+                case TextAnchor.MiddleRight:
+                    localPosition = new Vector3(120f, 0f, 0f);
+                    break;
+
+                case TextAnchor.LowerLeft:
+                    localPosition = new Vector3(-64f, -32f, 0f);
+                    break;
+                case TextAnchor.LowerCenter:
+                    localPosition = new Vector3(0f, -32f, 0f);
+                    break;
+                case TextAnchor.LowerRight:
+                    localPosition = new Vector3(120f, -32f, 0f);
+                    break;
+
+                default:
+                    localPosition = Vector3.zero;
+                    break;
+            }
+
+            GameObject rootMaster = new GameObject("Root: " + location);
+            ContentSizeFitter fitter = rootMaster.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            HorizontalLayoutGroup horizontalLayout = rootMaster.AddComponent<HorizontalLayoutGroup>();
+            horizontalLayout.childForceExpandHeight = false;
+            horizontalLayout.childForceExpandWidth = false;
+            rootMaster.transform.SetParent(parentObject.transform);
+            rootMaster.transform.localPosition = localPosition;
+            rootMaster.GetComponent<RectTransform>().sizeDelta = new Vector2(170f, 0f);
+
+            background = new GameObject("Background: " + location).AddComponent<Image>();
+            background.color = MouseCursor.BackgroundColor;
             background.enabled = false;
-            background.gameObject.AddComponent<ContentSizeFitter>();
-            background.transform.SetParent(parentObject.transform);
+
+            VerticalLayoutGroup group = background.gameObject.AddComponent<VerticalLayoutGroup>();
+            group.childForceExpandHeight = false;
+            group.childForceExpandWidth = false;
+
+            background.transform.SetParent(rootMaster.transform);
             background.transform.localPosition = Vector3.zero;
 
-            GameObject textObject = new GameObject("Cursor-Text: " + textAlignment);
+            GameObject textObject = new GameObject("Cursor-Text: " + location);
             textObject.transform.SetParent(background.transform);
-            textObject.transform.localPosition = localPosition;
+            textObject.transform.localPosition = Vector3.zero;
 
             textComponent = textObject.AddComponent<Text>();
             textComponent.alignment = textAlignment;
             textComponent.font = style.font;
             textComponent.fontSize = style.fontSize;
+            textComponent.verticalOverflow = VerticalWrapMode.Overflow;
 
             Outline outline = textObject.AddComponent<Outline>();
-            outline.effectColor = Color.black;
+            outline.effectColor = MouseCursor.OutlineColor;
             outline.effectDistance = new Vector2(1.5f, 1.5f);
-
-            textObject.GetComponentInChildren<RectTransform>().sizeDelta = textWidthHeight;
         }
 
-        public void Set(string text, Color color, bool withBackground)
+        /// <summary>
+        /// Sets the text component values.
+        /// </summary>
+        /// <param name="text"> The text to set. </param>
+        /// <param name="textColor"> The text color to set. </param>
+        /// <param name="withBackground"> Enable background. </param>
+        public void Set(string text, Color textColor, bool withBackground)
         {
             textComponent.text = text;
-            textComponent.color = color;
+            textComponent.color = textColor;
             background.enabled = withBackground;
         }
     }

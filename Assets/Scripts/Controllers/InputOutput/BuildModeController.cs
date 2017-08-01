@@ -486,7 +486,7 @@ public class BuildModeController : IMouseHandler
         // Placing furniture object.
         if (BuildMode == BuildMode.FURNITURE)
         {
-            cursor.DisplayCursorInfo(TextAnchor.LowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(BuildModeType).GetName()), MouseCursor.DefaultTint, false);
+            cursor.DisplayCursorInfo(TextAnchor.LowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(BuildModeType).GetName()), MouseCursor.TextColor, false);
 
             // Dragging and placing multiple furniture.
             if (t != null && isDragging == true && dragPreviewGameObjects.Count > 1)
@@ -529,7 +529,7 @@ public class BuildModeController : IMouseHandler
 
                 cursor.DisplayCursorInfo(TextAnchor.UpperLeft, validPostionCount.ToString(), Color.green, false);
                 cursor.DisplayCursorInfo(TextAnchor.UpperRight, invalidPositionCount.ToString(), Color.red, false);
-                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, currentBuildRequirements, MouseCursor.DefaultTint, false);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, currentBuildRequirements, MouseCursor.TextColor, false);
             }
         }
         else if (BuildMode == BuildMode.FLOOR)
@@ -537,8 +537,8 @@ public class BuildModeController : IMouseHandler
             // Placing tiles and dragging.
             if (t != null && isDragging == true && dragPreviewGameObjects.Count >= 1)
             {
-                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, dragPreviewGameObjects.Count.ToString(), MouseCursor.DefaultTint, false);
-                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, LocalizationTable.GetLocalization(GetFloorTile()), MouseCursor.DefaultTint, false);
+                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, dragPreviewGameObjects.Count.ToString(), MouseCursor.TextColor, false);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, LocalizationTable.GetLocalization(GetFloorTile()), MouseCursor.TextColor, false);
             }
         }
     }

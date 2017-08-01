@@ -133,11 +133,6 @@ public class MouseController
     private const float PanningThreshold = 0.015f;
 
     /// <summary>
-    /// The cursor parent where most drag preview objects should be parented to.
-    /// </summary>
-    private GameObject cursorParent;
-
-    /// <summary>
     /// Reference to the context menu.
     /// </summary>
     private ContextMenu contextMenu;
@@ -188,35 +183,28 @@ public class MouseController
         BuildModeController.Instance.SetMouseController(this);
         contextMenu = GameObject.FindObjectOfType<ContextMenu>();
         DragPreviewGameObjects = new List<GameObject>();
-        cursorParent = new GameObject("Cursor");
-
-        /* Build the canvas for the cursor to sit in */
-        Canvas cursor_canvas = cursorParent.AddComponent<Canvas>();
-        cursor_canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        cursor_canvas.worldCamera = Camera.main;
-        cursor_canvas.sortingLayerName = "TileUI";
-        cursor_canvas.referencePixelsPerUnit = 411.1f;
-
-        RectTransform rt = cursorParent.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(200, 200);
-
-        CanvasScaler cs = cursorParent.AddComponent<CanvasScaler>();
-        cs.dynamicPixelsPerUnit = 100.6f;
-        cs.referencePixelsPerUnit = 411.1f;
 
         mouseCursor = new MouseCursor();
-        mouseCursor.BuildCursor().transform.SetParent(cursorParent.transform);
+        mouseCursor.BuildCursor();
         mouseHandlers = new IMouseHandler[]
         {
             new MultiMouseHandler(MouseMode.DEFAULT), // Default
             BuildModeController.Instance, // Build
             new MultiMouseHandler(MouseMode.LIGHT_UI), // Light UI
-            new MultiMouseHandler(MouseMode.LIGHT_UI), // Heavy UI
+            new MultiMouseHandler(MouseMode.HEAVY_UI), // Heavy UI
             WorldController.Instance.SpawnInventoryController // Inventory
         };
 
         TimeManager.Instance.EveryFrame += (time) => Update();
         KeyboardManager.Instance.RegisterInputAction("Escape", KeyboardMappedInputType.KeyUp, OnEscape);
+    }
+
+    /// <summary>
+    /// Deconstructor.
+    /// </summary>
+    ~MouseController()
+    {
+        KeyboardManager.Instance.UnRegisterInputAction("Escape");
     }
 
     /// <summary>
@@ -425,7 +413,7 @@ public class MouseController
             if (dragVisualEnabled)
             {
                 // HANDLE VISUAL
-                DragPreviewGameObjects = handler.HandleDragVisual(dragParams, cursorParent.transform);
+                DragPreviewGameObjects = handler.HandleDragVisual(dragParams, mouseCursor.CursorGameObject.transform);
             }
 
             // If we have dragEnabled and we are to perform it on our next frame (which is this frame) perform it
@@ -708,7 +696,7 @@ public class MouseController
                     Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
                     if (t != null)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.DefaultTint, false);
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.TextColor, false);
                     }
 
                     break;
@@ -717,7 +705,7 @@ public class MouseController
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint, false);
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, false);
                     }
 
                     break;
@@ -726,7 +714,8 @@ public class MouseController
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.DefaultTint, true);
+                        Debug.LogWarning("Yes");
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, true);
                     }
 
                     break;
