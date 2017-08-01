@@ -28,11 +28,6 @@ public class MouseCursor
     /// </summary>
     public static readonly Color OutlineColor = new Color(7f / 255f, 70f / 255f, 92f / 255f, 1f);
 
-    /// <summary>
-    /// The cursor game object.
-    /// </summary>
-    public GameObject CursorGameObject { get; private set; }
-
     private Texture2D cursorTexture;
     private GUIStyle style;
     private RectTransform cachedTransform; // The overhead of calling gameobject.transform every update is expensive
@@ -75,6 +70,11 @@ public class MouseCursor
     {
         KeyboardManager.Instance.UnRegisterInputAction("ToggleCursorTextBox");
     }
+
+    /// <summary>
+    /// The cursor game object.
+    /// </summary>
+    public GameObject CursorGameObject { get; private set; }
 
     /// <summary>
     /// Enable this to let the mouse cursor show tooltips on UI elements.
