@@ -61,6 +61,8 @@ public class MouseCursor
 
         cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
         KeyboardManager.Instance.RegisterInputAction("ToggleCursorTextBox", KeyboardMappedInputType.KeyUp, () => { shouldShowCursor = !shouldShowCursor; });
+
+        BuildCursor();
     }
 
     /// <summary>
@@ -77,60 +79,14 @@ public class MouseCursor
     public GameObject CursorGameObject { get; private set; }
 
     /// <summary>
+    /// The cursor game object.
+    /// </summary>
+    public GameObject CursorCanvasGameObject { get; private set; }
+
+    /// <summary>
     /// Enable this to let the mouse cursor show tooltips on UI elements.
     /// </summary>
     public bool UIMode { get; set; }
-
-    /// <summary>
-    /// Build builds the cursor.
-    /// </summary>
-    /// <returns> The cursor object. </returns>
-    public GameObject BuildCursor()
-    {
-        Canvas canvas = new GameObject("Cursor_Canvas").AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.worldCamera = Camera.main;
-        canvas.sortingOrder = 1;
-        canvas.referencePixelsPerUnit = 100f;
-        canvas.pixelPerfect = true;
-
-        RectTransform rt = canvas.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(200, 200);
-
-        CanvasScaler cs = canvas.gameObject.AddComponent<CanvasScaler>();
-        cs.scaleFactor = 1;
-        cs.referencePixelsPerUnit = 100f;
-
-        CursorGameObject = new GameObject("Cursor_Parent");
-        CanvasGroup cg = CursorGameObject.AddComponent<CanvasGroup>();
-        cg.blocksRaycasts = false;
-        cg.interactable = false;
-
-        cachedTransform = CursorGameObject.AddComponent<RectTransform>();
-        cachedTransform.sizeDelta = new Vector2(64, 64);
-        cachedTransform.SetParent(canvas.transform);
-
-        canvas.gameObject.AddComponent<UIRescaler>();
-
-        Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
-
-        textBoxes = new CursorTextBox[]
-        {
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.UpperLeft),      // UpperLeft
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.UpperCenter),   // UpperCenter
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.UpperRight),      // UpperRight
-
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.MiddleLeft),     // MiddleLeft,
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.MiddleCenter),  // MiddleCenter
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.MiddleRight),     // MiddleRight
-
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style,  TextAnchor.LowerLeft),     // LowerLeft
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.LowerCenter),   // LowerCenter
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style,  TextAnchor.LowerRight),     // LowerRight
-        };
-
-        return CursorGameObject;
-    }
 
     /// <summary>
     /// Resets all the text on this cursor.
@@ -162,6 +118,56 @@ public class MouseCursor
         // If we should show cursor and we aren't over a ui element (unless we are UI mode) then show cursor.
         CursorGameObject.SetActive(shouldShowCursor && (UIMode || EventSystem.current.IsPointerOverGameObject() == false));
         cachedTransform.position = Input.mousePosition;
+    }
+
+    /// <summary>
+    /// Build builds the cursor.
+    /// </summary>
+    /// <returns> The cursor object. </returns>
+    private void BuildCursor()
+    {
+        CursorCanvasGameObject = new GameObject("Cursor_Canvas");
+        Canvas cursorCanvas = CursorCanvasGameObject.AddComponent<Canvas>();
+        cursorCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        cursorCanvas.worldCamera = Camera.main;
+        cursorCanvas.sortingOrder = 1;
+        cursorCanvas.referencePixelsPerUnit = 100f;
+        cursorCanvas.pixelPerfect = true;
+
+        RectTransform rt = CursorCanvasGameObject.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(200, 200);
+
+        CanvasScaler cs = CursorCanvasGameObject.gameObject.AddComponent<CanvasScaler>();
+        cs.scaleFactor = 1;
+        cs.referencePixelsPerUnit = 100f;
+
+        CursorGameObject = new GameObject("Cursor_Parent");
+        CanvasGroup cg = CursorGameObject.AddComponent<CanvasGroup>();
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+
+        cachedTransform = CursorGameObject.AddComponent<RectTransform>();
+        cachedTransform.sizeDelta = new Vector2(64, 64);
+        cachedTransform.SetParent(CursorCanvasGameObject.transform);
+
+        CursorCanvasGameObject.gameObject.AddComponent<UIRescaler>();
+
+        Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
+
+        textBoxes = new CursorTextBox[]
+        {
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.UpperLeft),      // UpperLeft
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.UpperCenter),   // UpperCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.UpperRight),      // UpperRight
+
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.MiddleLeft),     // MiddleLeft,
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.MiddleCenter),  // MiddleCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.MiddleRight),     // MiddleRight
+
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style,  TextAnchor.LowerLeft),     // LowerLeft
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.LowerCenter),   // LowerCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style,  TextAnchor.LowerRight),     // LowerRight
+        };
     }
 
     /// <summary>

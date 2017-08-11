@@ -8,11 +8,9 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Text;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 /// <summary>
 /// Flags to indicate which mouse callbacks you handle.
@@ -185,7 +183,6 @@ public class MouseController
         DragPreviewGameObjects = new List<GameObject>();
 
         mouseCursor = new MouseCursor();
-        mouseCursor.BuildCursor();
         mouseHandlers = new IMouseHandler[]
         {
             new MultiMouseHandler(MouseMode.DEFAULT), // Default
@@ -413,7 +410,7 @@ public class MouseController
             if (dragVisualEnabled)
             {
                 // HANDLE VISUAL
-                DragPreviewGameObjects = handler.HandleDragVisual(dragParams, mouseCursor.CursorGameObject.transform);
+                DragPreviewGameObjects = handler.HandleDragVisual(dragParams, mouseCursor.CursorCanvasGameObject.transform);
             }
 
             // If we have dragEnabled and we are to perform it on our next frame (which is this frame) perform it
