@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ProjectPorcupine.Localization;
+using ProjectPorcupine.Mouse;
 using ProjectPorcupine.OrderActions;
 using ProjectPorcupine.Rooms;
 using UnityEngine;
@@ -115,7 +116,7 @@ public class BuildModeController : IMouseHandler
 
         if (startBuildMode)
         {
-            mouseController.ChangeMouseMode(MouseController.MouseMode.BUILD);
+            mouseController.ChangeMouseMode(MouseMode.BUILD);
         }
     }
 
@@ -124,7 +125,7 @@ public class BuildModeController : IMouseHandler
         Building = true;
         BuildMode = BuildMode.FLOOR;
         buildModeTile = type;
-        mouseController.ChangeMouseMode(MouseController.MouseMode.BUILD);
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_DesignateRoomBehavior(string type)
@@ -132,7 +133,7 @@ public class BuildModeController : IMouseHandler
         Building = true;
         BuildMode = BuildMode.ROOMBEHAVIOR;
         BuildModeType = type;
-        mouseController.ChangeMouseMode(MouseController.MouseMode.BUILD);
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_BuildFurniture(string type, bool useCratedObject = false)
@@ -143,7 +144,7 @@ public class BuildModeController : IMouseHandler
         BuildModeType = type;
         this.useCratedObject = useCratedObject;
         CurrentPreviewRotation = 0f;
-        mouseController.ChangeMouseMode(MouseController.MouseMode.BUILD);
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_BuildUtility(string type)
@@ -152,21 +153,21 @@ public class BuildModeController : IMouseHandler
         Building = true;
         BuildMode = BuildMode.UTILITY;
         BuildModeType = type;
-        mouseController.ChangeMouseMode(MouseController.MouseMode.BUILD);
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_Deconstruct()
     {
         Building = true;
         BuildMode = BuildMode.DECONSTRUCT;
-        mouseController.ChangeMouseMode(MouseController.MouseMode.BUILD);
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_Mine()
     {
         Building = true;
         BuildMode = BuildMode.MINE;
-        mouseController.ChangeMouseMode(MouseController.MouseMode.BUILD);
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void DoBuild(Tile tile)
@@ -223,9 +224,11 @@ public class BuildModeController : IMouseHandler
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + furnitureType + "'");
-                    job = new Job(tile, furnitureType, World.Current.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
-                    job.adjacent = true;
-                    job.Description = "job_build_" + furnitureType + "_desc";
+                    job = new Job(tile, furnitureType, World.Current.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High)
+                    {
+                        adjacent = true,
+                        Description = "job_build_" + furnitureType + "_desc"
+                    };
                 }
 
                 Furniture furnitureToBuild = PrototypeManager.Furniture.Get(furnitureType).Clone();
@@ -300,8 +303,10 @@ public class BuildModeController : IMouseHandler
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + utilityType + "'");
-                    job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
-                    job.Description = "job_build_" + utilityType + "_desc";
+                    job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High)
+                    {
+                        Description = "job_build_" + utilityType + "_desc"
+                    };
                 }
 
                 job.buildablePrototype = PrototypeManager.Utility.Get(utilityType);
@@ -511,7 +516,7 @@ public class BuildModeController : IMouseHandler
                 if (buildOrder != null)
                 {
                     StringBuilder sb = new StringBuilder();
-                    foreach (var item in buildOrder.Inventory)
+                    foreach (OrderAction.InventoryInfo item in buildOrder.Inventory)
                     {
                         sb.Append(string.Format("{0}x {1}", item.Amount * validPostionCount, LocalizationTable.GetLocalization(item.Type)));
                         if (buildOrder.Inventory.Count > 1)
@@ -674,7 +679,7 @@ public class BuildModeController : IMouseHandler
     /// </summary>
     public void HandleClick(Vector2 position, int mouseKey)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("Not supported by this class");
     }
 
     #region HelperFunctions

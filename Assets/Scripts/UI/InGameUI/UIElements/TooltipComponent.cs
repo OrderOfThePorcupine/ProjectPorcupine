@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using ProjectPorcupine.Mouse;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -39,7 +40,7 @@ public class TooltipComponent : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         if (!Disable && eventData.pointerCurrentRaycast.gameObject != null)
         {
-            WorldController.Instance.MouseController.ChangeMouseMode(UseHeavyTextMode ? MouseController.MouseMode.HEAVY_UI : MouseController.MouseMode.LIGHT_UI, Tooltip);
+            WorldController.Instance.MouseController.ChangeMouseMode(UseHeavyTextMode ? MouseMode.HEAVY_UI : MouseMode.LIGHT_UI, Tooltip);
         }
     }
 

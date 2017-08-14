@@ -490,7 +490,7 @@ namespace ProjectPorcupine.Entities
 
         public void FixedFrequencyUpdate(float deltaTime)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException("Not supported by this class");
         }
 
         private States.State FindInitiatingState()

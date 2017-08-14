@@ -47,7 +47,7 @@ public class JobQueue
     /// <param name="job">The job to be inserted into the Queue.</param>
     public void Enqueue(Job job)
     {
-        DebugLog("Enqueue({0})", job.Type);
+        UnityDebugger.Debugger.LogErrorFormat("JobSystem", "Enqueue({0})", job.Type);
         if (job.JobTime < 0)
         {
             // Job has a negative job time, so it's not actually
@@ -60,7 +60,7 @@ public class JobQueue
         if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
         {
             string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            DebugLog(" - missingInventory {0}", missing);
+            UnityDebugger.Debugger.LogErrorFormat("JobSystem", " - missingInventory {0}", missing);
             if (jobsWaitingForInventory.ContainsKey(missing) == false)
             {
                 jobsWaitingForInventory[missing] = new List<Job>();
@@ -72,18 +72,18 @@ public class JobQueue
             job.CharsCantReach.Count == World.Current.CharacterManager.Characters.Count)
         {
             // No one can reach the job.
-            DebugLog("JobQueue", "- Job can't be reached");
+            UnityDebugger.Debugger.LogError("JobQueue", "- Job can't be reached");
             unreachableJobs.Enqueue(job);
         }
         else
         {
-            DebugLog(" - {0}", job.acceptsAny ? "Any" : "All");
+            UnityDebugger.Debugger.LogErrorFormat("JobSystem", " - {0}", job.acceptsAny ? "Any" : "All");
             foreach (RequestedItem item in job.RequestedItems.Values)
             {
-                DebugLog("   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
+                UnityDebugger.Debugger.LogErrorFormat("JobSystem", "   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
             }
 
-            DebugLog(" - job ok");
+            UnityDebugger.Debugger.LogError(" - job ok");
 
             jobQueue.Add(job.Priority, job);
         }
@@ -114,7 +114,7 @@ public class JobQueue
     /// </summary>
     public Job GetJob(Character character)
     {
-        DebugLog("{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
+        UnityDebugger.Debugger.LogErrorFormat("JobSystem", "{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
         if (jobQueue.Count == 0)
         {
             return null;
@@ -144,12 +144,14 @@ public class JobQueue
                     continue;
                 }
 
+
                 return job;
             }
 
-            DebugLog(" - job failed requirements, test the next.");
+            UnityDebugger.Debugger.LogError(" - job failed requirements, test the next.");
         }
 
+        UnityDebugger.Debugger.LogError(" All jobs failed requirements");
         return null;
     }
 
@@ -169,6 +171,13 @@ public class JobQueue
                 }
             }
         }
+    }
+
+    private void ReInsertHelper(Job job)
+    {
+        jobQueue.Reverse();
+        Enqueue(job);
+        jobQueue.Reverse();
     }
 
     /// <summary>
@@ -196,7 +205,7 @@ public class JobQueue
     public void ReevaluateReachability()
     {
         // TODO: Should this be an event on the furniture object?
-        DebugLog(" - Reevaluate reachability of {0} jobs", unreachableJobs.Count);
+        UnityDebugger.Debugger.LogErrorFormat("JobSystem", " - Reevaluate reachability of {0} jobs", unreachableJobs.Count);
         Queue<Job> jobsToReevaluate = unreachableJobs;
         unreachableJobs = new Queue<Job>();
 
@@ -231,7 +240,7 @@ public class JobQueue
 
     public void ReevaluateWaitingQueue(Inventory inv)
     {
-        DebugLog("ReevaluateWaitingQueue() new resource: {0}, count: {1}", inv.Type, inv.StackSize);
+        UnityDebugger.Debugger.LogErrorFormat("JobSystem", "ReevaluateWaitingQueue() new resource: {0}, count: {1}", inv.Type, inv.StackSize);
 
         List<Job> waitingJobs = null;
 
@@ -262,18 +271,5 @@ public class JobQueue
                 Enqueue(job);
             }
         }
-    }
-
-    private void ReInsertHelper(Job job)
-    {
-        jobQueue.Reverse();
-        Enqueue(job);
-        jobQueue.Reverse();
-    }
-
-    [System.Diagnostics.Conditional("FSM_DEBUG_LOG")]
-    private void DebugLog(string message, params object[] par)
-    {
-        UnityDebugger.Debugger.LogFormat("FSM", message, par);
     }
 }

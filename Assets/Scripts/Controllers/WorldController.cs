@@ -12,9 +12,9 @@ using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
+using ProjectPorcupine.Mouse;
 using Scheduler;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 [MoonSharpUserData]
 public class WorldController : MonoBehaviour
@@ -132,6 +132,9 @@ public class WorldController : MonoBehaviour
         CameraController = new CameraController();
         TradeController = new TradeController();
         AutosaveManager = new AutosaveManager();
+
+        MouseController.RegisterModeHandler(MouseMode.BUILD, BuildModeController);
+        MouseController.RegisterModeHandler(MouseMode.INVENTORY, SpawnInventoryController);
 
         // Register inputs actions
         KeyboardManager.Instance.RegisterInputAction("DevMode", KeyboardMappedInputType.KeyDown, ChangeDevMode);
