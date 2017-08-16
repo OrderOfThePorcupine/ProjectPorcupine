@@ -229,6 +229,7 @@ developer_mode=Developer Mode:
 master_volume=Master Volume:
 music_volume=Music Volume:
 ui_scale=UI Scale:
+tooltip_options=Select Popup Text To Toggle:
 
 ##########Settings-Tooltips##########
 autosave_every_tooltip=Autosave every x minutes
@@ -246,7 +247,7 @@ sound_device_tooltip=The device to use for all sound
 locational_sound_tooltip=Enable/Disable surround sound
 ui_skin_tooltip=Skins for the UI
 quality_tooltip=Quality Presets
-vsync_tooltip=Helps prevent screen tearing by capping frame rate.  This is a further test to show how far it can go before it breaks, it shouldn't be too hard to go this far but lets hope it does go this far.
+vsync_tooltip=Helps prevent screen tearing by capping frame rate
 ui_scale_tooltip=Scale the UI manually
 soft_particles_tooltip=Softer particles use more resources 
 shadows_tooltip=Higher level shadows use more resources
@@ -261,5 +262,5 @@ time_stamps_tooltip=Console time stamps
 console_enable_tooltip=Enable/Disable the console
 font_size_tooltip=Console font size
 performance_hud_tooltip=Performance Statistics
-
-
+tooltip_options_tooltip=Toggle tooltips and other visual text, you can toggle each option independently.
+tooltip_options_toggle=Toggle Popup Text:

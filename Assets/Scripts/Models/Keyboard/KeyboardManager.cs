@@ -106,7 +106,6 @@ public class KeyboardManager
         RegisterInputMapping("DevMode", KeyboardInputModifier.None, KeyCode.F12);
         RegisterInputMapping("DevConsole", KeyboardInputModifier.Control, KeyCode.BackQuote);
 
-        RegisterInputMapping("ToggleCursorTextBox", KeyboardInputModifier.Control, KeyCode.M);
         RegisterInputMapping("Escape", KeyboardInputModifier.None, KeyCode.Escape);
     }
 

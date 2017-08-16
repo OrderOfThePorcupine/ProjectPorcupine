@@ -60,7 +60,7 @@ public class UIRescaler : MonoBehaviour
 
     public void AdjustScale()
     {
-        Settings.GetSetting("ui_scale", out scale);
+        scale = SettingsKeyHolder.UIScale;
         this.GetComponent<CanvasScaler>().scaleFactor = (Screen.height / 1080f) * scale;
     }
 }

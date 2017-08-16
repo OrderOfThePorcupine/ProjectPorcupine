@@ -118,11 +118,11 @@ public class SpawnInventoryController : IMouseHandler
 
             if (t.Furniture == null && (t.Inventory == null || t.Inventory.Type == InventoryToBuild) && t.Type != TileType.Empty)
             {
-                InventorySpriteController.SetSprite(go, CurrentInventory).color = Color.green;// = new Color(0.5f, 1f, 0.5f, 0.25f);
+                InventorySpriteController.SetSprite(go, CurrentInventory).color = Color.green; // = new Color(0.5f, 1f, 0.5f, 0.25f);
             }
             else
             {
-                InventorySpriteController.SetSprite(go, CurrentInventory).color = Color.red;// new Color(1f, 0.5f, 0.5f, 0.25f);
+                InventorySpriteController.SetSprite(go, CurrentInventory).color = Color.red; // new Color(1f, 0.5f, 0.5f, 0.25f);
             }
 
             objects.Add(go);

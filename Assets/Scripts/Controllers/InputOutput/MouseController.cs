@@ -8,6 +8,8 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,6 +27,7 @@ namespace ProjectPorcupine.Mouse
         /// TooltipInfo:
         ///     Small information that is around 5-10 characters.
         /// </summary>
+        [Description("Coordinates")]
         DEFAULT,
 
         /// <summary>
@@ -32,6 +35,7 @@ namespace ProjectPorcupine.Mouse
         /// Tooltip:
         ///     Build information.  Contains a lot of data.
         /// </summary>
+        [Description("Build Mode Information")]
         BUILD,
 
         /// <summary>
@@ -39,6 +43,7 @@ namespace ProjectPorcupine.Mouse
         /// Tooltip:
         ///     Around a sentence.
         /// </summary>
+        [Description("Tooltips")]
         LIGHT_UI,
 
         /// <summary>
@@ -46,13 +51,15 @@ namespace ProjectPorcupine.Mouse
         /// Tooltip:
         ///     More then a sentence / a block of text.
         /// </summary>
+        [Description("Heavy Tooltips")]
         HEAVY_UI,
 
         /// <summary>
         /// When inventory is activated.
         /// Tooltip:
-        ///     None.
+        ///     The amount and type of inventory.
         /// </summary>
+        [Description("Spawn Inventory")]
         INVENTORY,
 
         /// <summary>
@@ -61,6 +68,7 @@ namespace ProjectPorcupine.Mouse
         /// <remarks> 
         /// Should always be the last element in this enum.
         /// </remarks>
+        [Description("Number of Mouse Modes")]
         NUMBER_OF_MODES,
     }
 
@@ -82,6 +90,11 @@ namespace ProjectPorcupine.Mouse
         /// Handlers which handle all the events that the mouse controller catches.
         /// </summary>
         private readonly IMouseHandler[] mouseHandlers = new IMouseHandler[(int)MouseMode.NUMBER_OF_MODES];
+
+        /// <summary>
+        /// The statuses of the modes.
+        /// </summary>
+        private bool[] statusOfModes = new bool[(int)MouseMode.NUMBER_OF_MODES];
 
         /// <summary>
         /// Reference to the context menu.
@@ -121,6 +134,8 @@ namespace ProjectPorcupine.Mouse
         /// </summary>
         private Vector3 panningMouseStart = Vector3.zero;
 
+        private bool[] situationsEnabled;
+
         /// <summary>
         /// Construct a new mouse controller.
         /// </summary>
@@ -137,7 +152,7 @@ namespace ProjectPorcupine.Mouse
             RegisterModeHandler(MouseMode.HEAVY_UI, new MultiMouseHandler(MouseMode.HEAVY_UI));
 
             TimeManager.Instance.EveryFrame += (time) => Update();
-            KeyboardManager.Instance.RegisterInputAction("Escape", KeyboardMappedInputType.KeyUp, OnEscape);
+            RefreshSettings();
         }
 
         /// <summary>
@@ -146,7 +161,6 @@ namespace ProjectPorcupine.Mouse
         ~MouseController()
         {
             // No need to unregister the array, it will get destroyed thus 'unregistering'
-            KeyboardManager.Instance.UnRegisterInputAction("Escape");
         }
 
         /// <summary>
@@ -229,6 +243,25 @@ namespace ProjectPorcupine.Mouse
         }
 
         /// <summary>
+        /// Refresh the status of the modes.
+        /// </summary>
+        /// <param name="newStatus"></param>
+        public void RefreshSettings()
+        {
+            statusOfModes = SettingsKeyHolder.TooltipOptions.Split(',').Select(x => x == "1").ToArray();
+        }
+
+        /// <summary>
+        /// Does reflection to get all the mouse modes in text format.
+        /// </summary>
+        /// <returns> All the mouse modes in text format. </returns>
+        /// <remarks> Doesn't return <see cref="MouseMode.NUMBER_OF_MODES"/>. </remarks>
+        public string[] GetAllModes()
+        {
+            return Enum.GetValues(typeof(MouseMode)).Cast<MouseMode>().Select(x => typeof(MouseMode).GetMember(x.ToString()).First()).Take((int)MouseMode.NUMBER_OF_MODES - 1).SelectMany(x => x.GetCustomAttributes(typeof(DescriptionAttribute), true)).Cast<DescriptionAttribute>().Select(x => x.Description).ToArray();
+        }
+
+        /// <summary>
         /// This action is performed when you want the system to treat it as if 'escape' was pressed.
         /// </summary>
         private void OnEscape()
@@ -260,6 +293,12 @@ namespace ProjectPorcupine.Mouse
         /// </summary>
         private void Update()
         {
+            // The mode is disabled
+            if (statusOfModes[(int)currentMode] == false)
+            {
+                return;
+            }
+
             // This prevents having to reobtain these, since the call is expensive enough to warrant this
             bool mouseButton0Up = Input.GetMouseButtonUp(0);
             bool mouseButton1Up = Input.GetMouseButtonUp(1);

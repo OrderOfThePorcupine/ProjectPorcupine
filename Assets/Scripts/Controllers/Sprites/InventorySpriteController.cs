@@ -31,8 +31,6 @@ public sealed class InventorySpriteController : BaseSpriteController<Inventory>
         }
     }
 
-
-
     public static SpriteRenderer SetSprite(GameObject inventoryGO, Inventory inventory, string sortingLayerName = "Inventory")
     {
         SpriteRenderer sr = inventoryGO.GetComponent<SpriteRenderer>();

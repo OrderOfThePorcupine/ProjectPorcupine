@@ -85,12 +85,13 @@
       <Option Name="ui_skin" Key="video_general_uiSkin" DefaultValue="0" ClassName="UISkinComboBox" Tooltip="ui_skin_tooltip" />
       <Option Name="quality" Key="video_general_quality" DefaultValue="2" ClassName="QualityComboBox" Tooltip="quality_tooltip" />
       <Option Name="vsync" Key="video_general_vsync" DefaultValue="0" ClassName="VSyncComboBox" Tooltip="vsync_tooltip" />
-      <Option Name="ui_scale" Key="ui_scale" DefaultValue="1" ClassName="UIScaleSlider" Tooltip="ui_scale_tooltip">
+      <Option Name="ui_scale" Key="video_general_ui_scale" DefaultValue="1" ClassName="UIScaleSlider" Tooltip="ui_scale_tooltip">
         <Params>
           <Param name="MinimumValue" value="0.5" />
           <Param name="MaximumValue" value="2" />
         </Params>
       </Option>
+      <Option Name="tooltip_options" Key="video_general_tooltip_options" DefaultValue="1,1,1,1,1" ClassName="TooltipOptionsMultiSelect" Tooltip="tooltip_options_tooltip"></Option>
     </OptionHeading>
     <OptionHeading Name="advanced">
       <Option Name="soft_particles" Key="video_advanced_particles" DefaultValue="true" ClassName="SoftParticlesToggle" Tooltip="soft_particles_tooltip" />

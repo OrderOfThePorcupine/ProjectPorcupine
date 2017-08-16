@@ -251,6 +251,34 @@ public static partial class SettingsKeyHolder
         }
     }
 
+    public static float UIScale
+    {
+        get
+        {
+            float temp;
+            return Settings.GetSetting("video_general_ui_scale", out temp) ? temp : 1f;
+        }
+
+        set
+        {
+            Settings.SetSetting("video_general_ui_scale", value);
+        }
+    }
+
+    public static string TooltipOptions
+    {
+        get
+        {
+            string temp;
+            return Settings.GetSetting("video_general_tooltip_options", out temp) ? temp : string.Empty;
+        }
+
+        set
+        {
+            Settings.SetSetting("video_general_tooltip_options", value);
+        }
+    }
+
     public static bool SoftParticles
     {
         get

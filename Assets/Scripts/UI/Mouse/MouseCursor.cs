@@ -27,7 +27,12 @@ namespace ProjectPorcupine.Mouse
         /// <summary>
         /// The color of the outline of the text.
         /// </summary>
-        public static readonly Color OutlineColor = new Color(7f / 255f, 70f / 255f, 92f / 255f, 1f);
+        public static readonly Color TextOutlineColor = new Color(7f / 255f, 70f / 255f, 92f / 255f, 1f);
+
+        /// <summary>
+        /// The color of the outline of the text.
+        /// </summary>
+        public static readonly Color BackgroundOutlineColor = new Color(206f / 255f, 242f / 255f, 242f / 255f, 1f);
 
         private Texture2D cursorTexture;
         private GUIStyle style;
@@ -131,7 +136,7 @@ namespace ProjectPorcupine.Mouse
             Canvas cursorCanvas = CursorCanvasGameObject.AddComponent<Canvas>();
             cursorCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             cursorCanvas.worldCamera = Camera.main;
-            cursorCanvas.sortingOrder = 1;
+            cursorCanvas.sortingOrder = 32767; // This is the maximum sorting layer value one can have
             cursorCanvas.referencePixelsPerUnit = 100f;
             cursorCanvas.pixelPerfect = true;
 
@@ -233,10 +238,14 @@ namespace ProjectPorcupine.Mouse
                 background = new GameObject("Background: " + location).AddComponent<Image>();
                 background.color = MouseCursor.BackgroundColor;
                 background.enabled = false;
+                Outline outline = background.gameObject.AddComponent<Outline>();
+                outline.effectColor = MouseCursor.BackgroundOutlineColor;
+                outline.effectDistance = new Vector2(1.5f, 1.5f);
 
                 VerticalLayoutGroup group = background.gameObject.AddComponent<VerticalLayoutGroup>();
                 group.childForceExpandHeight = false;
                 group.childForceExpandWidth = false;
+                group.padding = new RectOffset(5, 5, 5, 5);
 
                 background.transform.SetParent(rootMaster.transform);
                 background.transform.localPosition = Vector3.zero;
@@ -251,8 +260,8 @@ namespace ProjectPorcupine.Mouse
                 textComponent.fontSize = style.fontSize;
                 textComponent.verticalOverflow = VerticalWrapMode.Overflow;
 
-                Outline outline = textObject.AddComponent<Outline>();
-                outline.effectColor = MouseCursor.OutlineColor;
+                outline = textObject.AddComponent<Outline>();
+                outline.effectColor = MouseCursor.TextOutlineColor;
                 outline.effectDistance = new Vector2(1.5f, 1.5f);
             }
 
