@@ -28,20 +28,20 @@ public class ModsManager
         else if (SceneController.IsAtMainScene())
         {
             LoadMainSceneFiles();
-            String invent = "";
-            foreach(string s in PrototypeManager.Inventory.Keys)
+            string invent = string.Empty;
+            foreach (string s in PrototypeManager.Inventory.Keys)
             {
                 invent += s + ", ";
             }
+
             Debug.Log(invent);
-            String gear = "";
+            string gear = string.Empty;
             foreach (string sg in PrototypeManager.Gear.Keys)
             {
                 gear += sg + ", ";
             }
+
             Debug.Log(gear);
-
-
         }
     }
 

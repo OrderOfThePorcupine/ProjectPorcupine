@@ -273,6 +273,11 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         LocalizationDescription = reader_parent.GetAttribute("localizationDesc");
     }
 
+    public virtual void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
+
     private void ImportPrototypeSettings(int defaulMaxStackSize, float defaultBasePrice, string defaultCategory)
     {
         if (PrototypeManager.Inventory.Has(Type))
@@ -313,10 +318,5 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
             this.character = character;
             this.amount = amount;
         }
-    }
-
-    public virtual void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
-    {
-        throw new NotImplementedException();
     }
 }

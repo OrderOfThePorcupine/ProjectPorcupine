@@ -39,6 +39,9 @@ namespace ProjectPorcupine.Entities
         /// What ID we currently are sitting at
         private static int currentID = 0;
 
+        /// the current equipped gear
+        private Gear gear;
+
         /// Current tile the character is standing on.
         private Tile currTile;
 
@@ -255,6 +258,70 @@ namespace ProjectPorcupine.Entities
             }
         }
 
+        /// <summary>
+        /// All Gear will need to be referenced here.
+        /// All properties should be checked against the properties in the set for loop and the removeGear function.
+        /// </summary>
+        #region Gear
+            
+        /// The gear we have equipped.
+        public Gear Gear
+        {
+            get
+            {
+                return gear;
+            }
+
+            set
+            {
+                ///remove add new buffs
+                foreach (KeyValuePair<string, JToken> property in value.Properties)
+                {
+                    switch (property.Key)
+                    {
+                        case "Health":
+                            health.MaxHealth = (float)property.Value;
+                            break;
+                        default:
+                            UnityDebugger.Debugger.Log("Invalid Material Key: " + property.Key);
+                            break;
+                    }
+                }
+
+                gear = value;
+            }
+        }
+
+        /// <summary>
+        /// An example function for removing gear.
+        ///
+        /// Not actually called yet.
+        /// </summary>
+        public Gear RemoveGear()
+        {
+            if (gear != null)
+            {
+                foreach (KeyValuePair<string, JToken> property in Gear.Properties)
+                {
+                    switch (property.Key)
+                    {
+                        case "Health":
+                            health.MaxHealth = 50 + ((float)Stats["Constitution"].Value * 5);
+                            break;
+                        default:
+                            UnityDebugger.Debugger.Log("Invalid Material Key: " + property.Key);
+                            break;
+                    }
+                }
+            }
+
+            Gear oldGear = Gear;
+            Gear = null;
+            return oldGear;
+        }
+
+        #endregion
+        
         public IEnumerable<ContextMenuAction> GetContextMenuActions(ContextMenu contextMenu)
         {
             yield return new ContextMenuAction
@@ -409,6 +476,8 @@ namespace ProjectPorcupine.Entities
             {
                 characterJson.Add("Inventories", new JArray(Inventory.ToJSon()));
             }
+
+            characterJson.Add("Gear", (JObject)Gear.ToJSon());
 
             return characterJson;
         }

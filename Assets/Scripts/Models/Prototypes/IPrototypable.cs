@@ -6,8 +6,8 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using Newtonsoft.Json.Linq;
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 public interface IPrototypable
 {

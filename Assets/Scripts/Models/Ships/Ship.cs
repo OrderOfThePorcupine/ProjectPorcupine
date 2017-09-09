@@ -392,6 +392,11 @@ public class Ship : IPrototypable
         return true;
     }
 
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
+
     // Moves the ship by a fixed 5 tiles per second towards its destination, or to its destination if it is within reach.
     private void Move(float deltaTime)
     {
@@ -511,10 +516,5 @@ public class Ship : IPrototypable
                 furnitureTypes[x, y] = null;
             }
         }
-    }
-
-    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
-    {
-        throw new NotImplementedException();
     }
 }

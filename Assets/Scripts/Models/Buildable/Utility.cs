@@ -685,6 +685,11 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
             Parameters.FromJson(utilityJObject["Parameters"]);
         }
     }
+    
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
 
     private void SeekConnection()
     {
@@ -712,9 +717,5 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             Changed(util);
         }
-    }
-    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
-    {
-        throw new NotImplementedException();
     }
 }

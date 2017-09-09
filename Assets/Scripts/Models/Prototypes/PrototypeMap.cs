@@ -21,8 +21,8 @@ using UnityEngine;
 /// </summary>
 public class PrototypeMap<T> where T : IPrototypable, new()
 {
+    public readonly bool IsJSON;
     private readonly Dictionary<string, T> prototypes;
-    public readonly bool isJSON;
     private string listTag;
     private string elementTag;
 
@@ -32,7 +32,7 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     public PrototypeMap()
     {
         this.prototypes = new Dictionary<string, T>();
-        isJSON = false;
+        IsJSON = false;
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     public PrototypeMap(string listTag, string elementTag)
     {
         this.prototypes = new Dictionary<string, T>();
-        isJSON = false;
+        IsJSON = false;
         this.listTag = listTag;
         this.elementTag = elementTag;
     }
@@ -51,11 +51,12 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     /// <summary>
     /// Initializes a new instance of the <see cref="PrototypeMap`1"/> class.
     /// </summary>
-    /// <param name="isJSON">if the data is to be loaded from a JSON.</param>
+    /// <param name="listTag;">Name used for the XML tag that holds all the prototypes.</param>
+    /// <param name="isJSON">If the data is to be loaded from a JSON.</param>
     public PrototypeMap(string listTag, bool isJSON)
     {
         this.prototypes = new Dictionary<string, T>();
-        this.isJSON = isJSON;
+        this.IsJSON = isJSON;
         this.listTag = listTag;
     }
 
@@ -162,7 +163,7 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     /// <param name="xmlText">Xml text to parse.</param>
     public void LoadPrototypes(string xmlText)
     {
-        if (!isJSON)
+        if (!IsJSON)
         {
             XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
 
@@ -220,6 +221,7 @@ public class PrototypeMap<T> where T : IPrototypable, new()
 
         Set(prototype);
     }
+
     /// <summary>
     /// Loads a single prototype.
     /// </summary>
@@ -236,6 +238,7 @@ public class PrototypeMap<T> where T : IPrototypable, new()
             // Leaving this for Unitys console because UberLogger doesn't show multiline messages correctly.
             UnityDebugger.Debugger.LogError("PrototypeMap", "Error reading '" + elementTag + "' prototype for: " + listTag + Environment.NewLine + "Exception: " + e.Message + Environment.NewLine + "StackTrace: " + e.StackTrace);
         }
+
         Set(prototype);
     }
 }

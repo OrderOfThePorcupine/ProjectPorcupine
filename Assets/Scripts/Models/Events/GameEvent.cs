@@ -6,11 +6,11 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
 using UnityEngine;
-using System;
 
 [MoonSharpUserData]
 public class GameEvent : IPrototypable
@@ -176,6 +176,7 @@ public class GameEvent : IPrototypable
             }
         }
     }
+
     public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
     {
         throw new NotImplementedException();
