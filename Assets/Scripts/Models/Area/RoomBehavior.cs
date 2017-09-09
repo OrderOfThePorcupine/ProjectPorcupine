@@ -97,8 +97,8 @@ namespace ProjectPorcupine.Rooms
                 ControlledFurniture = new Dictionary<string, List<Furniture>>(other.ControlledFurniture);
             }
 
-            LocalizationCode = other.LocalizationCode;
-            UnlocalizedDescription = other.UnlocalizedDescription;
+            LocalizationName = other.LocalizationName;
+            LocalizationDescription = other.LocalizationDescription;
         }
 
         /// <summary>
@@ -158,12 +158,12 @@ namespace ProjectPorcupine.Rooms
         /// <summary>
         /// Gets the code used for Localization of the room behavior.
         /// </summary>
-        public string LocalizationCode { get; private set; }
+        public string LocalizationName { get; private set; }
 
         /// <summary>
         /// Gets the description of the room behavior. This is used by localization.
         /// </summary>
-        public string UnlocalizedDescription { get; private set; }
+        public string LocalizationDescription { get; private set; }
 
         /// <summary>
         /// Gets or sets the parameters that is tied to the room behavior.
@@ -247,11 +247,11 @@ namespace ProjectPorcupine.Rooms
                         break;
                     case "LocalizationCode":
                         reader.Read();
-                        LocalizationCode = reader.ReadContentAsString();
+                        LocalizationName = reader.ReadContentAsString();
                         break;
                     case "UnlocalizedDescription":
                         reader.Read();
-                        UnlocalizedDescription = reader.ReadContentAsString();
+                        LocalizationDescription = reader.ReadContentAsString();
                         break;
                 }
             }
@@ -281,6 +281,36 @@ namespace ProjectPorcupine.Rooms
             // X, Y, and type have already been set, and we should already
             // be assigned to a tile.  So just read extra data.
             Parameters = Parameter.ReadXml(reader);
+        }
+
+        /// <summary>
+        /// Reads the prototype from the specified JObject.
+        /// </summary>
+        /// <param name="jsonProto">The JProperty containing the prototype.</param>
+        public void ReadJsonPrototype(JProperty jsonProto)
+        {
+            Type = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+
+            typeTags = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TypeTags"]));
+            LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
+            LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+
+            EventActions.ReadJson(innerJson["EventActions"]);
+            contextMenuLuaActions = PrototypeReader.ReadContextMenuActions(innerJson["ContextMenuActions"]);
+
+            if (innerJson["Parameters"] != null)
+            {
+                Parameters.FromJson(innerJson["Parameters"]);
+            }
+            /*
+                    case "Requirements":
+                        ReadXmlRequirements(reader);
+            break;
+                    case "Optional":
+                        ReadXmlRequirements(reader, true);
+            break;
+            */
         }
 
         /// <summary>
@@ -317,7 +347,7 @@ namespace ProjectPorcupine.Rooms
         /// <returns>LocalizationCode for the name of the room behavior.</returns>
         public string GetName()
         {
-            return LocalizationCode; // this.Name;
+            return LocalizationName; // this.Name;
         }
 
         /// <summary>
@@ -326,7 +356,7 @@ namespace ProjectPorcupine.Rooms
         /// <returns>Description of the room behavior.</returns>
         public string GetDescription()
         {
-            return UnlocalizedDescription;
+            return LocalizationDescription;
         }
 
         public IEnumerable<string> GetAdditionalInfo()
@@ -352,7 +382,7 @@ namespace ProjectPorcupine.Rooms
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = LocalizationTable.GetLocalization("deconstruct", LocalizationCode),
+                LocalizationKey = LocalizationTable.GetLocalization("deconstruct", LocalizationName),
                 RequireCharacterSelected = false,
                 Action = (contextMenuAction, character) => Deconstruct(this)
             };

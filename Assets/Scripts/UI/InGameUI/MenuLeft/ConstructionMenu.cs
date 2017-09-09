@@ -172,7 +172,7 @@ public class ConstructionMenu : MonoBehaviour
 
             gameObject.name = "Button - Designate " + objectId;
 
-            gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(proto.LocalizationCode) };
+            gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(proto.LocalizationName) };
 
             Button button = gameObject.GetComponent<Button>();
 
@@ -186,7 +186,7 @@ public class ConstructionMenu : MonoBehaviour
             string roomBehavior = roomBehaviorKey;
             LocalizationTable.CBLocalizationFilesChanged += delegate
                 {
-                    gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(PrototypeManager.RoomBehavior.Get(roomBehavior).LocalizationCode) };
+                    gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(PrototypeManager.RoomBehavior.Get(roomBehavior).LocalizationName) };
                 };
 
             Image image = gameObject.transform.GetChild(0).GetComponentsInChildren<Image>().First();

@@ -5,6 +5,7 @@
 // and you are welcome to redistribute it under certain conditions; See
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
 #endregion
 
 using System;
@@ -12,6 +13,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 
 /// <summary>
@@ -166,6 +169,52 @@ public class PrototypeMap<T> where T : IPrototypable, new()
         else
         {
             UnityDebugger.Debugger.LogError("PrototypeMap", "Did not find a '" + listTag + "' element in the prototype definition file.");
+        }
+    }
+
+
+
+    /// <summary>
+    /// Loads all the prototypes from the specified text.
+    /// </summary>
+    /// <param name="xmlText">Xml text to parse.</param>
+    public void LoadJsonPrototypes(JProperty jToken)
+    {
+        //JsonTextReader reader = new JsonTextReader(new StringReader(jsonText));
+        //XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
+
+
+        JsonSerializerSettings settings = new JsonSerializerSettings();
+        settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+        settings.Formatting = Newtonsoft.Json.Formatting.Indented;
+        settings.NullValueHandling = NullValueHandling.Ignore;
+        settings.DefaultValueHandling = DefaultValueHandling.Ignore;
+        //JsonConvert.DeserializeObject(jsonText);
+        //JProperty jsonMap = jToken;
+
+        System.Console.Out.WriteLine("X"+ jToken.Name+ "X");
+        foreach (JToken token in jToken.Value)
+        {
+            if(jToken.Name != "Headline")
+            {
+                JProperty item = (JProperty)token;
+                T prototype = new T();
+
+                prototype.ReadJsonPrototype(item);
+
+                Set(prototype);
+            }
+            else
+            {
+                // HACK: headlines currently need special handling, should be made into not a prototype
+
+                JProperty jproperty = new JProperty((string)token, (string)token);
+                T prototype = new T();
+
+                prototype.ReadJsonPrototype(jproperty);
+
+                Set(prototype);
+            }
         }
     }
 
