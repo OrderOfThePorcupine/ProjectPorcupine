@@ -9,7 +9,7 @@
 using System;
 using NUnit.Framework;
 
-public class ModUtilsTest 
+public class ModUtilsTest
 {
     /*
      * ModUtils.Clamp01
@@ -17,7 +17,7 @@ public class ModUtilsTest
 
     // tests passing in a value between zero and one
     [Test]
-    public void Test_Clamp01_InRange() 
+    public void Test_Clamp01_InRange()
     {
         float value_1 = 0.12345f;
         Assert.AreEqual(value_1, ModUtils.Clamp01(value_1));
@@ -34,7 +34,7 @@ public class ModUtilsTest
 
     // tests passing in values that are out of range
     [Test]
-    public void Test_Clamp01_OutOfRange() 
+    public void Test_Clamp01_OutOfRange()
     {
         float value_1 = 1.0001f;
         float ans_1 = ModUtils.Clamp01(value_1);
@@ -93,10 +93,9 @@ public class ModUtilsTest
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void Test_Round_NegitiveDigits()
     {
         float value_2 = 9.9998f;
-        ModUtils.Round(value_2, -2);
+        Assert.Throws(typeof(ArgumentOutOfRangeException), () => ModUtils.Round(value_2, -2));
     }
 }

@@ -29,17 +29,22 @@ def get_jsonparsed_data(url):
 names=[]
 
 #Main PP repository
-url = 'https://api.github.com/repos/OrderOfThePorcupine/ProjectPorcupine/contributors'
-page=1
-while True:
-	output=get_jsonparsed_data("%s?page=%i"%(url,page))
-	if len(output)==0:
-		break;
+urls=['https://api.github.com/repos/TeamPorcupine/ProjectPorcupine/contributors', 
+'https://api.github.com/repos/OrderOfThePorcupine/Localization/contributors', 
+'https://api.github.com/repos/OrderOfThePorcupine/ProjectPorcupine/contributors']
 
-	for row in output:
-		temp=row["login"]
-		names+=[temp[0].upper()+temp[1:]]
-	page+=1
+for url in urls:
+#url = 'https://api.github.com/repos/TeamPorcupine/ProjectPorcupine/contributors'
+	page=1
+	while True:
+		output=get_jsonparsed_data("%s?page=%i"%(url,page))
+		if len(output)==0:
+			break;
+
+		for row in output:
+			temp=row["login"]
+			names+=[temp[0].upper()+temp[1:]]
+		page+=1
 
 #This is for the localization database. As it isn't in the master branch, we have to do some trickery.
 page=1

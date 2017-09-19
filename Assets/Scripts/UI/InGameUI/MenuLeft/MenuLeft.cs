@@ -29,7 +29,7 @@ public class MenuLeft : MonoBehaviour
 
     public void OpenMenu(string menuName)
     {
-        GameObject menu = parent.FindChild(menuName).gameObject;
+        GameObject menu = parent.Find(menuName).gameObject;
 
         CloseMenu();
 
