@@ -5,10 +5,12 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
 #endregion
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 
 namespace ProjectPorcupine.Entities
 {
@@ -30,7 +32,7 @@ namespace ProjectPorcupine.Entities
         {
             Amount = 0;
             Type = other.Type;
-            LocalizationID = other.LocalizationID;
+            LocalizationName = other.LocalizationName;
             GrowthRate = other.GrowthRate;
             highToLow = other.highToLow;
             RestoreNeedFurn = other.RestoreNeedFurn;
@@ -48,7 +50,7 @@ namespace ProjectPorcupine.Entities
 
         public string Type { get; private set; }
 
-        public string LocalizationID { get; private set; }
+        public string LocalizationName { get; private set; }
 
         public float Amount
         {
@@ -182,7 +184,7 @@ namespace ProjectPorcupine.Entities
                         break;
                     case "Localization":
                         reader.Read();
-                        LocalizationID = reader.ReadContentAsString();
+                        LocalizationName = reader.ReadContentAsString();
                         break;
                     case "Action":
                         XmlReader subtree = reader.ReadSubtree();
@@ -191,6 +193,25 @@ namespace ProjectPorcupine.Entities
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Reads the prototype from the specified JObject.
+        /// </summary>
+        /// <param name="jsonProto">The JProperty containing the prototype.</param>
+        public void ReadJsonPrototype(JProperty jsonProto)
+        {
+            Type = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+            RestoreNeedFurn = PrototypeReader.ReadJson(RestoreNeedFurn, innerJson["RestoreNeedFurn"]);
+            RestoreNeedTime = PrototypeReader.ReadJson(RestoreNeedTime, innerJson["RestoreNeedTime"]);
+            Damage = PrototypeReader.ReadJson(Damage, innerJson["Damage"]);
+            CompleteOnFail = PrototypeReader.ReadJson(CompleteOnFail, innerJson["CompleteOnFail"]);
+            highToLow = PrototypeReader.ReadJson(highToLow, innerJson["HighToLow"]);
+            GrowthRate = PrototypeReader.ReadJson(GrowthRate, innerJson["GrowthRate"]);
+            RestoreNeedAmount = PrototypeReader.ReadJson(RestoreNeedAmount, innerJson["RestoreNeedAmount"]);
+            LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
+            EventActions.ReadJson(innerJson["EventActions"]);
         }
 
         public void CompleteJobNorm(Job job)

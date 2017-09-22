@@ -5,6 +5,7 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
 #endregion
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace ProjectPorcupine.OrderActions
 {
@@ -28,11 +30,20 @@ namespace ProjectPorcupine.OrderActions
 
         public OrderAction(OrderAction other)
         {
+            JobTimeFunction = other.JobTimeFunction;
+            Inventory = other.Inventory;
             Type = other.Type;
+            JobTime = other.JobTime;
         }
 
         [XmlIgnore]
         public string Type { get; set; }
+
+        public float JobTime { get; set; }
+
+        public string JobTimeFunction { get; set; }
+
+        public Dictionary<string, int> Inventory { get; set; }
 
         public static OrderAction Deserialize(XmlReader xmlReader)
         {
@@ -57,6 +68,24 @@ namespace ProjectPorcupine.OrderActions
                 UnityDebugger.Debugger.Log(OrderActionsLogChannel, string.Format("There is no deserializer for OrderAction '{0}'", orderActionType));
                 return null;
             }
+        }
+
+        public static OrderAction FromJson(JProperty orderActionProp)
+        {
+            OrderAction orderAction = new OrderAction();
+            orderAction.Type = orderActionProp.Name;
+            orderAction.JobTime = PrototypeReader.ReadJson(orderAction.JobTime, orderActionProp.Value["JobTime"]);
+            orderAction.JobTimeFunction = PrototypeReader.ReadJson(orderAction.JobTimeFunction, orderActionProp.Value["JobTimeFunction"]);
+
+            if(orderActionProp.Value["Inventory"] != null)
+            {
+                foreach(JProperty inventory in orderActionProp.Value["Inventory"])
+                {
+                    orderAction.Inventory.Add(inventory.Name, (int) inventory.Value);
+                }
+            }
+
+            return orderAction;
         }
 
         public virtual void Initialize(string type)
@@ -106,25 +135,6 @@ namespace ProjectPorcupine.OrderActions
             }
 
             return orderActionTypes;
-        }
-
-        [Serializable]
-        public class JobInformation
-        {
-            [XmlAttribute("time")]
-            public float Time { get; set; }
-
-            [XmlAttribute("fromFunction")]
-            public string FromFunction { get; set; }
-        }
-
-        [Serializable]
-        public class InventoryInfo
-        {
-            [XmlAttribute("type")]
-            public string Type { get; set; }
-            [XmlAttribute("amount")]
-            public int Amount { get; set; }
         }
     }
 }
