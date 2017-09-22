@@ -273,6 +273,22 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         LocalizationDescription = reader_parent.GetAttribute("localizationDesc");
     }
 
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+
+        MaxStackSize = PrototypeReader.ReadJson(50, innerJson["MaxStackSize"]);
+        BasePrice = PrototypeReader.ReadJson(1f, innerJson["BasePrice"]);
+        Category = PrototypeReader.ReadJson(Category, innerJson["Category"]);
+        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+    }
+
     private void ImportPrototypeSettings(int defaulMaxStackSize, float defaultBasePrice, string defaultCategory)
     {
         if (PrototypeManager.Inventory.Has(Type))

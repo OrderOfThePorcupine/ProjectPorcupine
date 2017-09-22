@@ -5,12 +5,15 @@
 // and you are welcome to redistribute it under certain conditions; See
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
+
 #endregion
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.Localization;
@@ -557,6 +560,10 @@ public class Job : ISelectable, IPrototypable
     }
 
     public void ReadXmlPrototype(XmlReader reader)
+    {
+    }
+    // TODO: Why does this implement IPrototypable? It isn't a prototype.
+    public void ReadJsonPrototype(JProperty jsonProto)
     {
     }
 
