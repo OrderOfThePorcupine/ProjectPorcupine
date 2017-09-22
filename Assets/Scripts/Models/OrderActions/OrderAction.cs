@@ -72,20 +72,39 @@ namespace ProjectPorcupine.OrderActions
 
         public static OrderAction FromJson(JProperty orderActionProp)
         {
-            OrderAction orderAction = new OrderAction();
-            orderAction.Type = orderActionProp.Name;
-            orderAction.JobTime = PrototypeReader.ReadJson(orderAction.JobTime, orderActionProp.Value["JobTime"]);
-            orderAction.JobTimeFunction = PrototypeReader.ReadJson(orderAction.JobTimeFunction, orderActionProp.Value["JobTimeFunction"]);
-
-            if(orderActionProp.Value["Inventory"] != null)
+            if (orderActionTypes == null)
             {
-                foreach(JProperty inventory in orderActionProp.Value["Inventory"])
-                {
-                    orderAction.Inventory.Add(inventory.Name, (int) inventory.Value);
-                }
+                orderActionTypes = FindOrderActionsInAssembly();
             }
 
-            return orderAction;
+            string orderActionType = orderActionProp.Name;
+
+            if (orderActionTypes.ContainsKey(orderActionType))
+            {
+                Type t = orderActionTypes[orderActionType];
+
+                OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
+                orderAction.Type = orderActionProp.Name;
+
+                // TODO: Probably don't need to set any of this here, if this workse right... not sure.
+                orderAction.JobTime = PrototypeReader.ReadJson(orderAction.JobTime, orderActionProp.Value["JobTime"]);
+                orderAction.JobTimeFunction = PrototypeReader.ReadJson(orderAction.JobTimeFunction, orderActionProp.Value["JobTimeFunction"]);
+
+                if (orderActionProp.Value["Inventory"] != null)
+                {
+                    foreach (JProperty inventory in orderActionProp.Value["Inventory"])
+                    {
+                        orderAction.Inventory.Add(inventory.Name, (int)inventory.Value);
+                    }
+                }
+
+                return orderAction;
+            }
+            else
+            {
+                UnityDebugger.Debugger.Log(OrderActionsLogChannel, string.Format("There is no deserializer for OrderAction '{0}'", orderActionType));
+                return null;
+            }
         }
 
         public virtual void Initialize(string type)

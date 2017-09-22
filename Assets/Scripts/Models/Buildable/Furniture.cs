@@ -1075,9 +1075,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         Deconstruct deconstructOrder = GetOrderAction<Deconstruct>();
         if (deconstructOrder != null)
         {
-            foreach (OrderAction.InventoryInfo inv in deconstructOrder.Inventory)
+            foreach (KeyValuePair<string, int> inv in deconstructOrder.Inventory)
             {
-                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Type, inv.Amount));
+                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Key, inv.Value));
             }
         }
 
