@@ -69,8 +69,8 @@ public class CursorInfoDisplay
             StringBuilder sb = new StringBuilder();
             foreach (var item in buildOrder.Inventory)
             {
-                string requiredMaterialCount = (item.Amount * validPostionCount).ToString();
-                sb.Append(string.Format("{0}x {1}", requiredMaterialCount, item.Type)); // TODO: LocalizationTable.GetLocalization(item.Type))
+                string requiredMaterialCount = (item.Value * validPostionCount).ToString();
+                sb.Append(string.Format("{0}x {1}", requiredMaterialCount, item.Key)); // TODO: LocalizationTable.GetLocalization(item.Type))
                 if (buildOrder.Inventory.Count > 1)
                 {
                     sb.AppendLine();
