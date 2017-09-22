@@ -5,12 +5,15 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
+
 #endregion
 
 using System;
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public enum BerthDirection
@@ -30,6 +33,8 @@ public class Ship : IPrototypable
     private List<ShipStorage> storages;
     private string[,] tileTypes;
     private string[,] furnitureTypes;
+    private List<ShipObject> tiles;
+    private List<ShipObject> furnitures;
 
     private ShipState state;
     private Vector2 position;
@@ -49,6 +54,8 @@ public class Ship : IPrototypable
         BerthPointY = 0;
         BerthDirection = BerthDirection.NORTH;
         storages = new List<ShipStorage>();
+        tiles = new List<ShipObject>();
+        furnitures = new List<ShipObject>();
         tileTypes = null;
         furnitureTypes = null;
     }
@@ -73,6 +80,18 @@ public class Ship : IPrototypable
         foreach (ShipStorage s in proto.storages)
         {
             this.storages.Add(new ShipStorage(s.X, s.Y));
+        }
+
+        tiles = new List<ShipObject>();
+        foreach (ShipObject s in proto.tiles)
+        {
+            this.tiles.Add(new ShipObject(s.Type, s.X, s.Y));
+        }
+
+        furnitures = new List<ShipObject>();
+        foreach (ShipObject s in proto.furnitures)
+        {
+            this.furnitures.Add(new ShipObject(s.Type, s.X, s.Y));
         }
 
         InstantiateTiles();
@@ -370,6 +389,26 @@ public class Ship : IPrototypable
     }
 
     /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+
+        Width = PrototypeReader.ReadJson(Width, innerJson["Width"]);
+        Height = PrototypeReader.ReadJson(Height, innerJson["Height"]);
+        BerthPointX = PrototypeReader.ReadJson(BerthPointX, innerJson["BerthPointX"]);
+        BerthPointY = PrototypeReader.ReadJson(BerthPointY, innerJson["BerthPointY"]);
+        BerthDirection = PrototypeReader.ReadJson(BerthDirection, innerJson["BerthDirection"]);
+
+        ReadJsonStorages(innerJson["Storages"]);
+        ReadJsonTiles(innerJson["Tiles"]);
+        ReadJsonFurnitures(innerJson["Furnitures"]);
+    }
+
+    /// <summary>
     /// Checks if there is enough room around the given berth for the ship to fit into.
     /// </summary>
     /// <returns><c>true</c>, if all potentially occupied tiles are indeed empty, <c>false</c> otherwise.</returns>
@@ -493,6 +532,47 @@ public class Ship : IPrototypable
                 furnitureTypes[x, y] = reader.GetAttribute("type");
             }
             while (reader.ReadToNextSibling("Furniture"));
+        }
+    }
+
+    /// <summary>
+    /// Reads storage locations from Json and stores them in the prototype.
+    /// </summary>
+    /// <param name="reader">The JToken.</param>
+    private void ReadJsonStorages(JToken storagesToken)
+    {
+        foreach (JToken storageToken in storagesToken)
+        {
+            ShipStorage storage = new ShipStorage((int)storageToken["X"], (int)storageToken["Y"]);
+            storages.Add(storage);
+        }
+    }
+
+    /// <summary>
+    /// Reads Tiles json that defines what tiles the ship occupies when unwrapped 
+    /// and writes them to the tile type array.
+    /// </summary>
+    /// <param name="reader">The JToken.</param>
+    private void ReadJsonTiles(JToken tilesToken)
+    {
+        foreach (JToken tileToken in tilesToken)
+        {
+            ShipObject tile = new ShipObject((string)tileToken["Type"], (int)tileToken["X"], (int)tileToken["Y"]);
+            tiles.Add(tile);
+        }
+    }
+
+    /// <summary>
+    /// Reads furniture types that the ship contains while unwrapped and
+    /// writes them to the furniture type array.
+    /// </summary>
+    /// <param name="reader">The JToken.</param>
+    private void ReadJsonFurnitures(JToken furnituresToken)
+    {
+        foreach (JToken furnitureToken in furnituresToken)
+        {
+            ShipObject furniture = new ShipObject((string)furnitureToken["Type"], (int)furnitureToken["X"], (int)furnitureToken["Y"]);
+            furnitures.Add(furniture);
         }
     }
 
