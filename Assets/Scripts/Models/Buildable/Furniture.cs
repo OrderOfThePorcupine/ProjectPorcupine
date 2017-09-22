@@ -829,7 +829,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         Width = PrototypeReader.ReadJson(Width, innerJson["Width"]);
         Height = PrototypeReader.ReadJson(Height, innerJson["Height"]);
 
-        Health = PrototypeReader.ReadJson(Health, innerJson["Health"]);
+        health = PrototypeReader.ReadJson(health, innerJson["Health"]);
         LinksToNeighbours = PrototypeReader.ReadJson(LinksToNeighbours, innerJson["LinksToNeighbours"]);
         EnclosesRoom = PrototypeReader.ReadJson(EnclosesRoom, innerJson["EnclosesRoom"]);
         CanRotate = PrototypeReader.ReadJson(CanRotate, innerJson["CanRotate"]);
