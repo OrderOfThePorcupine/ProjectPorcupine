@@ -5,6 +5,9 @@
 // and you are welcome to redistribute it under certain conditions; See
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+using Newtonsoft.Json.Linq;
+
+
 #endregion
 using System;
 using System.Collections.Generic;
@@ -83,13 +86,13 @@ public class TileType : IPrototypable, IEquatable<TileType>
     /// Gets the localization code.
     /// </summary>
     /// <value>The localization code.</value>
-    public string LocalizationCode { get; private set; }
+    public string LocalizationName { get; private set; }
 
     /// <summary>
     /// Gets the localized description.
     /// </summary>
     /// <value>The localized description.</value>
-    public string UnlocalizedDescription { get; private set; }
+    public string LocalizationDescription { get; private set; }
 
     /// <summary>
     /// The order action to create tileType.
@@ -204,13 +207,33 @@ public class TileType : IPrototypable, IEquatable<TileType>
                     break;
                 case "LocalizationCode":
                     reader.Read();
-                    LocalizationCode = reader.ReadContentAsString();
+                    LocalizationName = reader.ReadContentAsString();
                     break;
                 case "UnlocalizedDescription":
                     reader.Read();
-                    UnlocalizedDescription = reader.ReadContentAsString();
+                    LocalizationDescription = reader.ReadContentAsString();
                     break;
             }
         }
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+
+        BaseMovementCost = PrototypeReader.ReadJson(BaseMovementCost, innerJson["BaseMovementCost"]);
+        PathfindingModifier = PrototypeReader.ReadJson(PathfindingModifier, innerJson["PathfindingModifier"]);
+        PathfindingWeight = PrototypeReader.ReadJson(PathfindingWeight, innerJson["PathfindingWeight"]);
+        LinksToNeighbours = PrototypeReader.ReadJson(LinksToNeighbours, innerJson["LinksToNeighbours"]);
+        CanBuildHereLua = PrototypeReader.ReadJson(CanBuildHereLua, innerJson["CanBuildHereLua"]);
+        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+        OrderActions = PrototypeReader.ReadOrderActions(innerJson["OrderActions"]);
+
     }
 }

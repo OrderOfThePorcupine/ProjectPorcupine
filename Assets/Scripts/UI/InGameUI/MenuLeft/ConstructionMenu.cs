@@ -221,7 +221,7 @@ public class ConstructionMenu : MonoBehaviour
 
             gameObject.name = "Button - Build " + objectId;
 
-            gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(proto.LocalizationCode) };
+            gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(proto.LocalizationName) };
 
             Button button = gameObject.GetComponent<Button>();
 
@@ -235,7 +235,7 @@ public class ConstructionMenu : MonoBehaviour
             string utility = utilityKey;
             LocalizationTable.CBLocalizationFilesChanged += delegate
                 {
-                    gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(PrototypeManager.Utility.Get(utility).LocalizationCode) };
+                    gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(PrototypeManager.Utility.Get(utility).LocalizationName) };
                 };
 
             Image image = gameObject.transform.GetChild(0).GetComponentsInChildren<Image>().First();
@@ -256,7 +256,7 @@ public class ConstructionMenu : MonoBehaviour
         {
             TileType tileType = item;
 
-            string key = tileType.LocalizationCode;
+            string key = tileType.LocalizationName;
 
             GameObject gameObject = (GameObject)Instantiate(buttonPrefab);
             gameObject.transform.SetParent(contentTransform);
