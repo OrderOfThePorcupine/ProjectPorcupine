@@ -278,6 +278,19 @@ namespace Scheduler
             this.EventType = EventType.Lua;
         }
 
+        /// <summary>
+        /// Reads the prototype from the specified JObject.
+        /// </summary>
+        /// <param name="jsonProto">The JProperty containing the prototype.</param>
+        public void ReadJsonPrototype(JProperty jsonProto)
+        {
+            Name = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+
+            LuaFunctionName = PrototypeReader.ReadJson(LuaFunctionName, innerJson["FunctionName"]);
+            this.EventType = EventType.Lua;
+        }
+
         public JObject ToJson()
         {
             JObject eventJObject = new JObject();
