@@ -5,12 +5,14 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
 #endregion
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 
 namespace DeveloperConsole.Core
 {
@@ -70,9 +72,10 @@ namespace DeveloperConsole.Core
         {
             Title = reader.GetAttribute("Title");
             FunctionName = reader.GetAttribute("FunctionName");
-            DescriptiveText = reader.GetAttribute("Description");
-            DetailedDescriptiveText = reader.GetAttribute("DetailedDescription");
+            Description = reader.GetAttribute("Description");
+            DetailedDescription = reader.GetAttribute("DetailedDescription");
             Parameters = reader.GetAttribute("Parameters");
+            ParseParameterToTypeInfo();
             Tags = reader.GetAttribute("Tags").Split(',').Select(x => x.Trim()).ToArray();
             DefaultValue = reader.GetAttribute("DefaultValue");
 
@@ -86,6 +89,28 @@ namespace DeveloperConsole.Core
             {
                 DefaultValue = string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Reads the prototype from the specified JProperty.
+        /// </summary>
+        /// <param name="jsonProto">The JProperty containing the prototype.</param>
+        public void ReadJsonPrototype(JProperty jsonProto)
+        {
+            Title = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+            FunctionName = (string)innerJson["FunctionName"];
+            Description = (string)innerJson["Description"];
+            DetailedDescription = (string)innerJson["DetailedDescription"];
+            Parameters = (string)innerJson["Parameters"];
+            ParseParameterToTypeInfo();
+            DefaultValue = (string)innerJson["DefaultValue"] ?? string.Empty;
+
+            Tags = ((JArray)innerJson["Tags"]).ToObject<string[]>();
+        }
+
+        private void ParseParameterToTypeInfo() {
+
 
             // If the parameters contains a ';' then it'll exclude the 'using' statement.
             // Just makes the declaration help look nicer.
@@ -158,5 +183,6 @@ namespace DeveloperConsole.Core
             // Assign array
             this.TypeInfo = types;
         }
+
     }
 }
