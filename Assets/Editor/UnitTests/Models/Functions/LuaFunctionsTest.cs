@@ -76,8 +76,8 @@ public class LuaFunctionsTest
     [Test]
     public void Test_LoadScript_BadLua_NoEnd()
     {
-        LogAssert.Expect(LogType.Error, "[testCode2] LUA Parse error: chunk_1:(5,8): 'end' expected near '<eof>'");
         // Try loading bad Lua Code. The Lua Interpreter will send an exception and the script won't be loaded
+        LogAssert.Expect(LogType.Error, "[testCode2] LUA Parse error: chunk_1:(5,8): 'end' expected near '<eof>'");
         bool result = functions.LoadScript(testCode2, "testCode2");
         Assert.AreEqual(false, result);
     }
