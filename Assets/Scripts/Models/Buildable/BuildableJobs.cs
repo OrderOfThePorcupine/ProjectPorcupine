@@ -5,6 +5,9 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+using Newtonsoft.Json.Linq;
+
+
 #endregion
 using System;
 using System.Collections.Generic;
@@ -115,6 +118,8 @@ public class BuildableJobs
         get { return activeJobs[i]; }
     }
 
+
+
     /// <summary>
     /// Reads the job work spot offset from the xml.
     /// </summary>
@@ -140,6 +145,18 @@ public class BuildableJobs
     public void ReadOutputSpotOffset(XmlReader reader)
     {
         OutputSpotOffset = ReadVector(reader);
+    }
+
+    public void ReadOffsets(JToken jobToken)
+    {
+        if(jobToken == null)
+        {
+            return;
+        }
+
+        WorkSpotOffset = ReadVector(jobToken["WorkSpotOffset"]);
+        InputSpotOffset = ReadVector(jobToken["InputSpotOffset"]);
+        OutputSpotOffset = ReadVector(jobToken["OutputSpotOffset"]);
     }
 
     /// <summary>
@@ -283,5 +300,19 @@ public class BuildableJobs
         return new Vector2(
             int.Parse(reader.GetAttribute("X")),
             int.Parse(reader.GetAttribute("Y")));
+    }
+
+    private Vector2 ReadVector(JToken vectorToken)
+    {
+        Vector2 vector = new Vector2();
+
+        if(vectorToken != null)
+        {
+            int x = PrototypeReader.ReadJson(0, vectorToken["X"]);
+            int y = PrototypeReader.ReadJson(0, vectorToken["Y"]);
+            vector.x = x;
+            vector.y = y;
+        }
+        return vector;
     }
 }

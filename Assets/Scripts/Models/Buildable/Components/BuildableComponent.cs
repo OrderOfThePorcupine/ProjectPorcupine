@@ -154,6 +154,32 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
+        // TODO: This may be functionally identical to Deserialize(JToken), needs reviewed to see if uses of FromJson can be replaced by Deserialize(JToken)
+        public static BuildableComponent FromJson(JToken componentToken)
+        {
+            if (componentTypes == null)
+            {
+                componentTypes = FindComponentsInAssembly();
+            }
+            JProperty componentProperty = (JProperty)componentToken;
+            string componentTypeName = componentProperty.Name;
+            if (componentTypes.ContainsKey(componentTypeName))
+            {
+                Type t = componentTypes[componentTypeName];
+                t.GetType(); 
+
+                BuildableComponent component = (BuildableComponent)componentProperty.Value.ToObject(t);
+                //BuildableComponent component = JsonConvert.DeserializeObject<BuildableComponent>(componentToken.Value<JToken>().ToString());// = (BuildableComponent)serializer.Deserialize(xmlReader);
+                //// need to set name explicitly (not part of deserialization as it's passed in)
+                component.Type = componentProperty.Name;
+                return component;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         /// <summary>
         /// Initializes after loading the prototype.
         /// </summary>

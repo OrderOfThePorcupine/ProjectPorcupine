@@ -504,7 +504,7 @@ namespace ProjectPorcupine.Rooms
                 return null;
             }
 
-            if (sourceTile.Furniture != null && sourceTile.Furniture.RoomEnclosure)
+            if (sourceTile.Furniture != null && sourceTile.Furniture.EnclosesRoom)
             {
                 // This tile has a wall/door/whatever in it, so clearly
                 // we can't do a room here.
@@ -554,7 +554,7 @@ namespace ProjectPorcupine.Rooms
                             // We know t2 is not null nor is it an empty tile, so just make sure it
                             // hasn't already been processed and isn't a "wall" type tile.
                             if (
-                                neighborTile.Room != newRoom && (neighborTile.Furniture == null || neighborTile.Furniture.RoomEnclosure == false))
+                                neighborTile.Room != newRoom && (neighborTile.Furniture == null || neighborTile.Furniture.EnclosesRoom == false))
                             {
                                 tilesToCheck.Enqueue(neighborTile);
                             }
