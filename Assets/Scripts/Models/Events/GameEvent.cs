@@ -5,10 +5,12 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
 #endregion
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 [MoonSharpUserData]
@@ -174,5 +176,27 @@ public class GameEvent : IPrototypable
                     break;
             }
         }
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JProperty.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Name = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+        MaxRepeats = (int)innerJson["MaxRepeats"];
+
+        if (innerJson["Preconditions"] != null)
+        {
+            preconditions = ((JArray)innerJson["Preconditions"]).ToObject<List<string>>();
+        }
+
+        if (innerJson["ExecutionActions"] != null)
+        {
+            executionActions = ((JArray)innerJson["ExecutionActions"]).ToObject<List<string>>();
+        }
+
     }
 }
