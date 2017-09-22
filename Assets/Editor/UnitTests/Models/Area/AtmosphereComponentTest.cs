@@ -9,6 +9,7 @@
 
 using System;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 
 public class AtmosphereComponentTest
 {
@@ -61,6 +62,7 @@ public class AtmosphereComponentTest
     [Test]
     public void CreateGas_AmountIsNegative_NoChange()
     {
+        LogAssert.Expect(UnityEngine.LogType.Error, "CreateGas -- Amount or temperature can not be negative: " + -1.0f + ", " + 1.0f);
         empty1.CreateGas("gas", -1.0f, 1.0f);
 
         Assert.AreEqual(0.0f, empty1.TotalGas);
@@ -69,6 +71,7 @@ public class AtmosphereComponentTest
     [Test]
     public void CreateGas_TemperatureIsNegative_NoChange()
     {
+        LogAssert.Expect(UnityEngine.LogType.Error, "CreateGas -- Amount or temperature can not be negative: " + 1.0f + ", " + -1.0f);
         empty1.CreateGas("gas", 1.0f, -1.0f);
 
         Assert.AreEqual(0.0f, empty1.TotalGas);
@@ -105,6 +108,7 @@ public class AtmosphereComponentTest
     [Test]
     public void DestroyGas_AmountIsNegative_NoChange()
     {
+        LogAssert.Expect(UnityEngine.LogType.Error, "DestroyGas -- Amount can not be negative: " + -0.5f);
         notEmpty1.DestroyGas("gas", -0.5f);
 
         Assert.AreEqual(1.0f, notEmpty1.TotalGas);
@@ -134,6 +138,7 @@ public class AtmosphereComponentTest
     [Test]
     public void MoveGasTo_DestinationIsNull_NoChange()
     {
+        LogAssert.Expect(UnityEngine.LogType.Error, "MoveGasTo -- Destination can not be null");
         notEmpty1.MoveGasTo(null, 1.0f);
 
         Assert.AreEqual(1.0f, notEmpty1.TotalGas);
@@ -192,6 +197,7 @@ public class AtmosphereComponentTest
     [Test]
     public void MoveGasTo_NegativeAmount_NoChange()
     {
+        LogAssert.Expect(UnityEngine.LogType.Error, "MoveGasTo -- Amount can not be negative: " + -0.5f);
         notEmpty1.MoveGasTo(empty1, -0.5f);
 
         Assert.AreEqual(1.0f, notEmpty1.TotalGas);

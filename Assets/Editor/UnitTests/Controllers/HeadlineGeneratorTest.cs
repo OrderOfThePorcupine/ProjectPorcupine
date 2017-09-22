@@ -8,6 +8,7 @@
 #endregion
 using System.Xml;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 
 public class HeadlineGeneratorTest
 {
