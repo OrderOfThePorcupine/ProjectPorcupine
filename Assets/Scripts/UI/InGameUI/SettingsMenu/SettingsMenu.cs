@@ -348,9 +348,9 @@ public class SettingsMenu : MonoBehaviour
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.ClassName, true);
+                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.Type, true);
                     element.option = keyValuePair.Value[j];
-                    element.parameterData = keyValuePair.Value[j].classData.ParameterData;
+                    element.parameterData = keyValuePair.Value[j].classData.Parameters;
                     element.InitializeLUA();
                     options[categories[i].Type][keyValuePair.Key][j] = element;
                 }

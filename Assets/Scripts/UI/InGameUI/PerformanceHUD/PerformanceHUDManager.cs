@@ -59,16 +59,16 @@ public class PerformanceHUDManager : MonoBehaviour
 
         List<PerformanceGroup> groups = PrototypeManager.PerformanceHUD.Values;
 
-        allGroups.Add(new PerformanceGroup("None", new List<UIClassData>()), new BasePerformanceHUDComponent[0]);
+        allGroups.Add(new PerformanceGroup("None", new List<UIComponent>()), new BasePerformanceHUDComponent[0]);
         List<BasePerformanceHUDComponent> elements = new List<BasePerformanceHUDComponent>();
 
         // Convert the dictionary of specialised elements to a more generalised format
         for (int i = 0; i < groups.Count; i++)
         {
-            for (int j = 0; j < groups[i].classData.Count; j++)
+            for (int j = 0; j < groups[i].componentData.Count; j++)
             {
-                BasePerformanceHUDComponent element = FunctionsManager.PerformanceHUD.CreateInstance<BasePerformanceHUDComponent>(groups[i].classData[j].ClassName, true);
-                element.parameterData = groups[i].classData[j].ParameterData;
+                BasePerformanceHUDComponent element = FunctionsManager.PerformanceHUD.CreateInstance<BasePerformanceHUDComponent>(groups[i].componentData[j].Type, true);
+                element.parameterData = groups[i].componentData[j].Parameters;
                 element.InitializeLUA();
                 elements.Add(element);
             }

@@ -34,9 +34,7 @@ public class TraderPrototype : IPrototypable
 
     public List<TraderPotentialInventory> PotentialStock { get; set; }
 
-    public SpritenameAnimation AnimationIdle { get; set; }
-
-    public SpritenameAnimation AnimationFlying { get; set; }
+    public Dictionary<string, SpritenameAnimation> Animations { get; set; }
 
     /// <summary>
     /// Value from 0 to 1, higher value represent higher availability of the trade resource.
@@ -224,15 +222,8 @@ public class TraderPrototype : IPrototypable
                     }
                 }
 
-                switch (state)
-                {
-                    case "idle":
-                        AnimationIdle = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
-                        break;
-                    case "flying":
-                        AnimationFlying = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
-                        break;
-                }
+                SpritenameAnimation animation = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
+                Animations.Add(state, animation);
             }
         }
     }

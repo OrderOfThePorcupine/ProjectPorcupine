@@ -118,6 +118,7 @@ namespace Animation
             animations.Add(state, new SpritenameAnimation(state, spriteNames.ToArray(), 1 / fps, looping, false, valueBased));
 
             // set default state to first state entered - most likely "idle"
+            // TODO: Is it really best practice to base the default on first in?
             if (string.IsNullOrEmpty(currentAnimationState))
             {
                 currentAnimationState = state;

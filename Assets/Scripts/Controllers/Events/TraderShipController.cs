@@ -5,6 +5,9 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+using System.Collections.Generic;
+
+
 #endregion
 
 using Animation;
@@ -32,15 +35,16 @@ public class TraderShipController : MonoBehaviour
 
     public SpriteRenderer Renderer { get; private set; }
 
-    public void Init(Vector3 leavingCoords, Vector3 landingCoords, float speed, Trader trader, SpritenameAnimation animationIdle, SpritenameAnimation animationFlying, SpriteRenderer renderer, float destinationReachedThreshold = 0.1f)
+    public void Init(Vector3 leavingCoords, Vector3 landingCoords, float speed, Trader trader,  Dictionary<string, SpritenameAnimation> animations, SpriteRenderer renderer, float destinationReachedThreshold = 0.1f)
     {
         this.LeavingCoordinates = leavingCoords;
         this.LandingCoordinates = landingCoords;
         this.Speed = speed;
         this.DestinationReachedThreshold = destinationReachedThreshold;
         this.Trader = trader;
-        this.AnimationIdle = animationIdle;
-        this.AnimationFlying = animationFlying;
+        // TODO: Do we really need yet copy of the animations? Should probably have access to this directly through Trader.
+        this.AnimationIdle = animations["idle"];
+        this.AnimationFlying = animations["flying"];
         this.Renderer = renderer;
     }
 

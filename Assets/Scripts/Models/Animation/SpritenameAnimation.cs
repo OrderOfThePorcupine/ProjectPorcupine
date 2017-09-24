@@ -5,9 +5,11 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+
 #endregion
 
 using System;
+using Newtonsoft.Json.Linq;
 
 namespace Animation
 {
@@ -40,6 +42,14 @@ namespace Animation
             frameCount = this.frames.Length;
             CurrentFrame = 0;
             CurrentFrameName = this.frames[CurrentFrame];
+        }
+
+        public SpritenameAnimation()
+        {
+            delay = 1;
+            loops = true;
+            FlipX = false;
+            ValueBased = false;
         }
 
         // current frames value
@@ -122,6 +132,19 @@ namespace Animation
             }
 
             // TODO: if we need a callback after finished animation - put it here
+        }
+
+        public void ReadJson(JProperty jsonProto)
+        {
+            State = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+
+            delay = PrototypeReader.ReadJson(delay, innerJson["Delay"]);
+            loops = PrototypeReader.ReadJson(loops, innerJson["Loops"]);
+            FlipX = PrototypeReader.ReadJson(FlipX, innerJson["FlipX"]);
+            ValueBased = PrototypeReader.ReadJson(ValueBased, innerJson["ValueBased"]);
+
+            frames = PrototypeReader.ReadJsonArray<string>(innerJson["Frames"]);
         }
     }
 }

@@ -97,7 +97,7 @@ public class PrototypeReader
         {
             foreach (JProperty animationToken in animationsToken)
             {
-                SpritenameAnimation animation = new Animation();
+                SpritenameAnimation animation = new SpritenameAnimation();
                 animation.ReadJson(animationToken);
                 animations.Add(animation.State, animation);
             }

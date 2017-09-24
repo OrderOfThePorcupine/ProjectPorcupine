@@ -11,6 +11,7 @@ using System.Linq;
 
 public class Trader
 {
+    //TODO: This class and TraderPrototype need brought into line with other prototype classes, and be merged, with a clone function
     public string Name { get; set; }
 
     public Currency Currency { get; set; }
