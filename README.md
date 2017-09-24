@@ -66,7 +66,7 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md) file for contribution instru
 
 For further information, such as Roadmaps, explanations of systems and features, Standards and Conventions, and all your Git needs and troubleshooting see the [Wiki](https://github.com/TeamPorcupine/ProjectPorcupine/wiki)
 
-Make sure that you are using Unity 5.6.2 [Windows](https://store.unity.com/download/thank-you?thank-you=personal&os=win&nid=325) | [Mac](https://store.unity.com/download/thank-you?thank-you=personal&os=osx&nid=325)
+Make sure that you are using Unity 5.6.3 [Windows](https://beta.unity3d.com/download/9c92e827232b/UnityDownloadAssistant-5.6.3p1.exe?_ga=2.245742084.1638547908.1503090342-1637235381.1467115222) | [Mac](http://beta.unity3d.com/download/9c92e827232b/UnityDownloadAssistant-5.6.3p1.dmg?_ga=2.79155604.1638547908.1503090342-1637235381.1467115222)
 
 ## Weeklies
 
