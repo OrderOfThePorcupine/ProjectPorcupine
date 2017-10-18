@@ -36,7 +36,7 @@ namespace ProjectPorcupine.Rooms
         {
             get
             {
-                return World.Current.RoomManager.GetRoomID(this);
+                return GameController.CurrentWorld.RoomManager.GetRoomID(this);
             }
         }
 
@@ -120,7 +120,7 @@ namespace ProjectPorcupine.Rooms
             foreach (Tile tile in tiles)
             {
                 // Assign to outside.
-                tile.Room = World.Current.RoomManager.OutsideRoom;
+                tile.Room = GameController.CurrentWorld.RoomManager.OutsideRoom;
             }
 
             tiles.Clear();
@@ -128,7 +128,7 @@ namespace ProjectPorcupine.Rooms
 
         public bool IsOutsideRoom()
         {
-            return this == World.Current.RoomManager.OutsideRoom;
+            return this == GameController.CurrentWorld.RoomManager.OutsideRoom;
         }
 
         public List<Tile> FindExits()

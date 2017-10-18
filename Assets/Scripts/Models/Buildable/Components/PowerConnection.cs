@@ -255,17 +255,17 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 if (InputCanVary)
                 {
-                    canFunction = World.Current.PowerNetwork.GetEfficiency(this) > 0f;
+                    canFunction = GameController.CurrentWorld.PowerNetwork.GetEfficiency(this) > 0f;
                 }
                 else
                 {
-                    canFunction = World.Current.PowerNetwork.HasPower(this);
+                    canFunction = GameController.CurrentWorld.PowerNetwork.HasPower(this);
                 }
             }
 
             IsRunning = canFunction;
 
-            bool isConnected = World.Current.PowerNetwork.IsConnected(this);
+            bool isConnected = GameController.CurrentWorld.PowerNetwork.IsConnected(this);
             IsConnected = isConnected;
 
             canFunction |= isConnected;
@@ -291,7 +291,7 @@ namespace ProjectPorcupine.Buildable.Components
             // store the actual efficiency for other components to use
             if (IsConsumer && Requires.CanUseVariableEfficiency)
             {
-                Efficiency = World.Current.PowerNetwork.GetEfficiency(this);                
+                Efficiency = GameController.CurrentWorld.PowerNetwork.GetEfficiency(this);                
             }            
         }
         
@@ -375,7 +375,7 @@ namespace ProjectPorcupine.Buildable.Components
         
         private void PowerConnectionRemoved(Furniture obj)
         {
-            World.Current.PowerNetwork.Unplug(this);
+            GameController.CurrentWorld.PowerNetwork.Unplug(this);
             ParentFurniture.Removed -= PowerConnectionRemoved;
         }
 

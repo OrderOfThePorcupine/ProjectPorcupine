@@ -42,11 +42,11 @@ public class CameraController
         keyboardManager.RegisterInputAction("MoveCameraUp", KeyboardMappedInputType.KeyUp, ChangeLayerUp);
         keyboardManager.RegisterInputAction("MoveCameraDown", KeyboardMappedInputType.KeyUp, ChangeLayerDown);
 
-        keyboardManager.RegisterInputAction("ApplyCameraPreset1", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.Instance.CurrentWorld.CameraData.presets[0]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset2", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.Instance.CurrentWorld.CameraData.presets[1]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset3", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.Instance.CurrentWorld.CameraData.presets[2]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset4", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.Instance.CurrentWorld.CameraData.presets[3]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset5", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.Instance.CurrentWorld.CameraData.presets[4]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset1", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[0]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset2", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[1]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset3", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[2]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset4", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[3]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset5", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[4]));
         keyboardManager.RegisterInputAction("AssignCameraPreset1", KeyboardMappedInputType.KeyUp, () => AssignPreset(0));
         keyboardManager.RegisterInputAction("AssignCameraPreset2", KeyboardMappedInputType.KeyUp, () => AssignPreset(1));
         keyboardManager.RegisterInputAction("AssignCameraPreset3", KeyboardMappedInputType.KeyUp, () => AssignPreset(2));
@@ -217,8 +217,8 @@ public class CameraController
 
     private void AssignPreset(int index)
     {
-        GameController.Instance.CurrentWorld.CameraData.presets[index].position = Camera.main.transform.position;
-        GameController.Instance.CurrentWorld.CameraData.presets[index].zoomLevel = Camera.main.orthographicSize;
+        GameController.CurrentWorld.CameraData.presets[index].position = Camera.main.transform.position;
+        GameController.CurrentWorld.CameraData.presets[index].zoomLevel = Camera.main.orthographicSize;
     }
 
     private void SyncCameras()
@@ -234,15 +234,15 @@ public class CameraController
 
     private void CreateLayerCameras()
     {
-        if (GameController.Instance.CurrentWorld == null)
+        if (GameController.CurrentWorld == null)
         {
             return;
         }
 
         // We don't have the right number of cameras for our layers
-        if (layerCameras == null || layerCameras.Length != GameController.Instance.CurrentWorld.Depth)
+        if (layerCameras == null || layerCameras.Length != GameController.CurrentWorld.Depth)
         {
-            int depth = GameController.Instance.CurrentWorld.Depth;
+            int depth = GameController.CurrentWorld.Depth;
             layerCameras = new Camera[depth];
             for (int i = 0; i < depth; i++)
             {

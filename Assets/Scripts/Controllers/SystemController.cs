@@ -13,7 +13,6 @@ using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [MoonSharp.Interpreter.MoonSharpUserData]
 public class SystemController
@@ -146,7 +145,7 @@ public class SystemController
         StreamWriter sw = new StreamWriter(filePath);
         JsonWriter writer = new JsonTextWriter(sw);
 
-        JObject worldJson = World.Current.ToJson();
+        JObject worldJson = GameController.CurrentWorld.ToJson();
 
         // Launch saving operation in a separate thread.
         // This reduces lag while saving by a little bit.
@@ -161,15 +160,17 @@ public class SystemController
         UnityDebugger.Debugger.Log("WorldController", "Empty World");
         ProjectPorcupine.Localization.LocalizationTable.UnregisterDelegates();
 
-        CurrentWorld = new World(width, height, depth, seed, generateAsteroids, generatorFile);
+        CurrentWorld = new World();
+        CurrentWorld.InitializeWorldWithData(width, height, depth, seed, generateAsteroids, generatorFile);
     }
 
-    public void LoadWorld(string fileName)
+    public void LoadWorld(string filePath)
     {
         UnityDebugger.Debugger.Log("WorldController", "CreateWorldFromSaveFile");
         ProjectPorcupine.Localization.LocalizationTable.UnregisterDelegates();
 
-        CurrentWorld = new World(fileName);
+        CurrentWorld = new World();
+        CurrentWorld.InitializeWorldFromJSON(filePath);
     }
 
     public void AssignWorld(World world)

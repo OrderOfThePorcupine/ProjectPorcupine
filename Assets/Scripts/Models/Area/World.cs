@@ -42,35 +42,11 @@ public class World
     private Tile[,,] tiles;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="World"/> class.
+    /// Empty constructor.
+    /// Use this then initialize afterwards.
     /// </summary>
-    /// <param name="width">Width in tiles.</param>
-    /// <param name="height">Height in tiles.</param>
-    /// <param name="depth">Depth in amount.</param>
-    public World(int width, int height, int depth, int seed, bool generateAsteroids, string generatorFile)
+    public World()
     {
-        // Creates an empty world.
-        SetupWorld(width, height, depth);
-        Seed = seed;
-
-        Debug.LogWarning("World Seed: " + Seed);
-        WorldGenerator.Instance.Generate(this, Seed, generateAsteroids, generatorFile);
-        UnityDebugger.Debugger.Log("World", "Generated World");
-
-        tileGraph = new Path_TileGraph(this);
-        roomGraph = new Path_RoomGraph(this);
-
-        // Make one character.
-        CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
-    }
-
-    /// <summary>
-    /// Create from JSON.
-    /// </summary>
-    public World(string filename)
-    {
-        StreamReader reader = File.OpenText(filename);
-        ReadJson((JObject)JToken.ReadFrom(new JsonTextReader(reader)));
     }
 
     /// <summary>
@@ -85,8 +61,6 @@ public class World
     public event Action<Tile> OnTileChanged;
 
     public event Action<Tile> OnTileTypeChanged;
-
-    public static World Current { get; protected set; }
 
     // The tile width of the world.
     public int Width { get; protected set; }
@@ -167,6 +141,40 @@ public class World
     /// </summary>
     /// <value>The camera data.</value>
     public CameraData CameraData { get; private set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="World"/> class.
+    /// </summary>
+    /// <param name="width"> Width in tiles. </param>
+    /// <param name="height"> Height in tiles. </param>
+    /// <param name="depth"> Depth in amount. </param>
+    /// <param name="seed"> The seed for generation. </param>
+    /// <param name="generateAsteroids"> Generate asteroids?. </param>
+    /// <param name="generatorFile"> The generator file name to generate from. </param>
+    public void InitializeWorldWithData(int width, int height, int depth, int seed, bool generateAsteroids, string generatorFile)
+    {
+        // Creates an empty world.
+        SetupWorld(width, height, depth);
+        Seed = seed;
+        WorldGenerator.Instance.Generate(this, Seed, generateAsteroids, generatorFile);
+        UnityDebugger.Debugger.Log("World", "Generated World with seed: " + seed);
+
+        tileGraph = new Path_TileGraph(this);
+        roomGraph = new Path_RoomGraph(this);
+
+        // Make one character.
+        CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
+    }
+
+    /// <summary>
+    /// Create from JSON.
+    /// </summary>
+    /// <param name="filePath"> The file to load. </param>
+    public void InitializeWorldFromJSON(string filePath)
+    {
+        StreamReader reader = File.OpenText(filePath);
+        ReadJson((JObject)JToken.ReadFrom(new JsonTextReader(reader)));
+    }
 
     /// <summary>
     /// Adds the listeners to the required Time Manager events.
@@ -263,7 +271,7 @@ public class World
             tile = furniture.Tile;
         }
 
-        World.Current.GetTileAt(
+        GetTileAt(
             tile.X + (int)furniture.Jobs.WorkSpotOffset.x,
             tile.Y + (int)furniture.Jobs.WorkSpotOffset.y,
             tile.Z)
@@ -450,10 +458,6 @@ public class World
 
     private void SetupWorld(int width, int height, int depth)
     {
-        // Set the current world to be this world.
-        // TODO: Do we need to do any cleanup of the old world?
-        Current = this;
-
         Width = width;
         Height = height;
         Depth = depth;
@@ -472,7 +476,7 @@ public class World
         UtilityManager = new UtilityManager();
         CharacterManager = new CharacterManager();
         InventoryManager = new InventoryManager();
-        jobQueue = new JobQueue();
+        jobQueue = new JobQueue(this);
         GameEventManager = new GameEventManager();
         PowerNetwork = new PowerNetwork();
         FluidNetwork = new FluidNetwork();

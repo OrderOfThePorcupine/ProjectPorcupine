@@ -87,8 +87,8 @@ public class FurnitureManager : IEnumerable<Furniture>
         // Do we need to recalculate our rooms/reachability for other jobs?
         if (doRoomFloodFill && furniture.RoomEnclosure)
         {
-            World.Current.RoomManager.DoRoomFloodFill(furniture.Tile, true);
-            World.Current.jobQueue.ReevaluateReachability();
+            GameController.CurrentWorld.RoomManager.DoRoomFloodFill(furniture.Tile, true);
+            GameController.CurrentWorld.jobQueue.ReevaluateReachability();
         }
 
         if (Created != null)
@@ -108,7 +108,7 @@ public class FurnitureManager : IEnumerable<Furniture>
         Furniture furn = (Furniture)job.buildablePrototype;
 
         // Let our workspot tile know it is no longer reserved for us
-        World.Current.UnreserveTileAsWorkSpot(furn, job.tile);
+        GameController.CurrentWorld.UnreserveTileAsWorkSpot(furn, job.tile);
 
         PlaceFurniture(furn, job.tile);
     }
@@ -144,7 +144,7 @@ public class FurnitureManager : IEnumerable<Furniture>
             return true;
         }
 
-        if (proto.Jobs != null && World.Current.GetTileAt((int)(tile.X + proto.Jobs.WorkSpotOffset.x), (int)(tile.Y + proto.Jobs.WorkSpotOffset.y), (int)tile.Z).Furniture != null)
+        if (proto.Jobs != null && GameController.CurrentWorld.GetTileAt((int)(tile.X + proto.Jobs.WorkSpotOffset.x), (int)(tile.Y + proto.Jobs.WorkSpotOffset.y), (int)tile.Z).Furniture != null)
         {
             return false;
         }
@@ -215,7 +215,7 @@ public class FurnitureManager : IEnumerable<Furniture>
             int z = (int)furnitureToken["Z"];
             string type = (string)furnitureToken["Type"];
             float rotation = (float)furnitureToken["Rotation"];
-            Furniture furniture = PlaceFurniture(type, World.Current.GetTileAt(x, y, z), false, rotation);
+            Furniture furniture = PlaceFurniture(type, GameController.CurrentWorld.GetTileAt(x, y, z), false, rotation);
             furniture.FromJson(furnitureToken);
         }
     }
@@ -231,6 +231,6 @@ public class FurnitureManager : IEnumerable<Furniture>
         TimeManager.Instance.UnregisterSlowUpdate(furniture);
 
         // Movement to jobs might have been opened, let's move jobs back into the queue to be re-evaluated.
-        World.Current.jobQueue.ReevaluateReachability();
+        GameController.CurrentWorld.jobQueue.ReevaluateReachability();
     }
 }

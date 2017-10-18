@@ -25,7 +25,7 @@ public class DialogBoxJobList : DialogBox
         formatValues = new string[0];
         int i = 0;
 
-        foreach (Character character in World.Current.CharacterManager)
+        foreach (Character character in GameController.CurrentWorld.CharacterManager)
         {
             GameObject go = (GameObject)Instantiate(JobListItemPrefab, JobList);
             string jobDescription = LocalizationTable.GetLocalization(character.GetJobDescription(), formatValues);

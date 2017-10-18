@@ -92,7 +92,7 @@ public class MouseController
 
     public Tile GetMouseOverTile()
     {
-        return GameController.Instance.CurrentWorld.GetRoundedTileAt(GetMousePosition());
+        return GameController.CurrentWorld.GetRoundedTileAt(GetMousePosition());
     }
 
     public GameObject GetCursorParent()
@@ -358,7 +358,7 @@ public class MouseController
         {
             for (int y = dragParams.StartY; y <= dragParams.EndY; y++)
             {
-                Tile t = GameController.Instance.CurrentWorld.GetTileAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
+                Tile t = GameController.CurrentWorld.GetTileAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
                 if (t != null)
                 {
                     // Display the building hint on top of this tile position.
@@ -409,7 +409,7 @@ public class MouseController
 
             for (int y = begin; y != stop; y += increment)
             {
-                Tile tile = GameController.Instance.CurrentWorld.GetTileAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
+                Tile tile = GameController.CurrentWorld.GetTileAt(x, y, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
                 if (tile == null)
                 {
                     // Trying to build off the map, bail out of this cycle.
@@ -448,7 +448,7 @@ public class MouseController
         // In devmode, utilities don't build their network, and one of the utilities built needs UpdateGrid called explicitly after all are built.
         if (GameController.Instance.BuildModeController.BuildMode == BuildMode.UTILITY && SettingsKeyHolder.DeveloperMode)
         {
-            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
+            Tile firstTile = GameController.CurrentWorld.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, GameController.Instance.CurrentSystem.CameraController.CurrentLayer);
             Utility utility = firstTile.Utilities[PrototypeManager.Utility.Get(GameController.Instance.BuildModeController.BuildModeType).Type];
             utility.UpdateGrid(utility);
         }
@@ -460,14 +460,14 @@ public class MouseController
     {
         switch (dragType)
         {
-            case "border":
-                return tile.X == dragParams.StartX || tile.X == dragParams.EndX || tile.Y == dragParams.StartY || tile.Y == dragParams.EndY;
-            case "path":
-                bool withinXBounds = dragParams.StartX <= tile.X && tile.X <= dragParams.EndX;
-                bool onPath = tile.Y == dragParams.RawStartY || tile.X == dragParams.RawEndX;
-                return withinXBounds && onPath;
-            default:
-                return true;
+        case "border":
+            return tile.X == dragParams.StartX || tile.X == dragParams.EndX || tile.Y == dragParams.StartY || tile.Y == dragParams.EndY;
+        case "path":
+            bool withinXBounds = dragParams.StartX <= tile.X && tile.X <= dragParams.EndX;
+            bool onPath = tile.Y == dragParams.RawStartY || tile.X == dragParams.RawEndX;
+            return withinXBounds && onPath;
+        default:
+            return true;
         }
     }
 
@@ -554,8 +554,8 @@ public class MouseController
     {
         Vector3 oldPos = Camera.main.transform.position;
 
-        oldPos.x = Mathf.Clamp(oldPos.x, 0, (float)World.Current.Width - 1);
-        oldPos.y = Mathf.Clamp(oldPos.y, 0, (float)World.Current.Height - 1);
+        oldPos.x = Mathf.Clamp(oldPos.x, 0, (float)GameController.CurrentWorld.Width - 1);
+        oldPos.y = Mathf.Clamp(oldPos.y, 0, (float)GameController.CurrentWorld.Height - 1);
 
         Camera.main.transform.position = oldPos;
     }
@@ -570,8 +570,8 @@ public class MouseController
         sr.sortingLayerName = "Jobs";
         sr.sprite = GameController.Instance.FurnitureSpriteController.GetSpriteForFurniture(furnitureType);
 
-        if (World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile, GameController.Instance.BuildModeController.CurrentPreviewRotation) &&
-            World.Current.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
+        if (GameController.CurrentWorld.FurnitureManager.IsPlacementValid(furnitureType, tile, GameController.Instance.BuildModeController.CurrentPreviewRotation) &&
+            GameController.CurrentWorld.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
             GameController.Instance.BuildModeController.DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType, GameController.Instance.BuildModeController.CurrentPreviewRotation) == false)
         {
             sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
@@ -604,8 +604,8 @@ public class MouseController
         sr.sortingLayerName = "Jobs";
         sr.sprite = SpriteManager.GetSprite("UI", "WorkSpotIndicator");
 
-        if (World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile) &&
-            World.Current.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
+        if (GameController.CurrentWorld.FurnitureManager.IsPlacementValid(furnitureType, tile) &&
+            GameController.CurrentWorld.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
             GameController.Instance.BuildModeController.DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType) == false)
         {
             sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
@@ -628,7 +628,7 @@ public class MouseController
         sr.sortingLayerName = "Jobs";
         sr.sprite = GameController.Instance.UtilitySpriteController.GetSpriteForUtility(type);
 
-        if (World.Current.UtilityManager.IsPlacementValid(type, tile) &&
+        if (GameController.CurrentWorld.UtilityManager.IsPlacementValid(type, tile) &&
             GameController.Instance.BuildModeController.DoesSameUtilityTypeAlreadyExist(type, tile) &&
             GameController.Instance.BuildModeController.DoesUtilityBuildJobOverlapExistingBuildJob(type, tile) == false)
         {

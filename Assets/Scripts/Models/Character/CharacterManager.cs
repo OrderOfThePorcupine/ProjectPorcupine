@@ -142,11 +142,11 @@ namespace ProjectPorcupine.Entities
                     Color color = ColorUtilities.ParseColorFromString((string)colorToken["CharacterColor"][0], (string)colorToken["CharacterColor"][1], (string)colorToken["CharacterColor"][2]);
                     Color colorUni = ColorUtilities.ParseColorFromString((string)colorToken["UniformColor"][0], (string)colorToken["UniformColor"][1], (string)colorToken["UniformColor"][2]);
                     Color colorSkin = ColorUtilities.ParseColorFromString((string)colorToken["SkinColor"][0], (string)colorToken["SkinColor"][1], (string)colorToken["SkinColor"][2]);
-                    character = Create(World.Current.GetTileAt(x, y, z), color, colorUni, colorSkin, (string)characterToken["Name"]);
+                    character = Create(GameController.CurrentWorld.GetTileAt(x, y, z), color, colorUni, colorSkin, (string)characterToken["Name"]);
                 }
                 else
                 {
-                    character = Create(World.Current.GetTileAt(x, y, z), (string)characterToken["Name"]);
+                    character = Create(GameController.CurrentWorld.GetTileAt(x, y, z), (string)characterToken["Name"]);
                 }
 
                 if (characterToken["Inventories"] != null)
@@ -155,7 +155,7 @@ namespace ProjectPorcupine.Entities
                     {
                         Inventory inventory = new Inventory();
                         inventory.FromJson(inventoryToken);
-                        World.Current.InventoryManager.PlaceInventory(character, inventory);
+                        GameController.CurrentWorld.InventoryManager.PlaceInventory(character, inventory);
                     }
                 }
 

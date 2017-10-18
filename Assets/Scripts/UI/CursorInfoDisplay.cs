@@ -38,8 +38,8 @@ public class CursorInfoDisplay
 
         for (int i = 0; i < mc.GetDragObjects().Count; i++)
         {
-            Tile t1 = GameController.Instance.CurrentWorld.GetRoundedTileAt(mc.GetDragObjects()[i].transform.position);
-            if (World.Current.FurnitureManager.IsPlacementValid(bmc.BuildModeType, t1) &&
+            Tile t1 = GameController.CurrentWorld.GetRoundedTileAt(mc.GetDragObjects()[i].transform.position);
+            if (GameController.CurrentWorld.FurnitureManager.IsPlacementValid(bmc.BuildModeType, t1) &&
                (t1.PendingBuildJobs == null || (t1.PendingBuildJobs != null && t1.PendingBuildJobs.Count == 0)))
             {
                 validPostionCount++;

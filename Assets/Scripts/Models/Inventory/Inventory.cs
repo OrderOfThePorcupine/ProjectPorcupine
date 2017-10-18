@@ -149,7 +149,7 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         claims.RemoveAll(claim => claim.character == character);
         if (noneAvailable && AvailableInventory > 0)
         {
-            World.Current.jobQueue.ReevaluateWaitingQueue(this);
+            GameController.CurrentWorld.jobQueue.ReevaluateWaitingQueue(this);
         }
     }
 

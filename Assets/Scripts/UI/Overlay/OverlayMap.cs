@@ -307,9 +307,9 @@ public class OverlayMap : MonoBehaviour
                     return 0;
                 }
 
-                Tile tile = GameController.Instance.CurrentWorld.GetTileAt(x, y, z);
+                Tile tile = GameController.CurrentWorld.GetTileAt(x, y, z);
 
-                DynValue result = FunctionsManager.Overlay.Call(descr.LuaFunctionName, new object[] { tile, World.Current });
+                DynValue result = FunctionsManager.Overlay.Call(descr.LuaFunctionName, new object[] { tile, GameController.CurrentWorld });
                 double? value = result.CastToNumber();
                 if (value == null)
                 {
@@ -473,8 +473,8 @@ public class OverlayMap : MonoBehaviour
         Dictionary<int, Color> colorMapLookup = OverlayColorMapLookup[CurrentOverlay];
 
         // Size in pixels of overlay texture and create texture.
-        int textureWidth = GameController.Instance.CurrentWorld.Width;
-        int textureHeight = GameController.Instance.CurrentWorld.Height;
+        int textureWidth = GameController.CurrentWorld.Width;
+        int textureHeight = GameController.CurrentWorld.Height;
         Color[] pixels = new Color[textureHeight * textureWidth];
 
         for (int y = 0; y < textureHeight; y++)
@@ -525,8 +525,8 @@ public class OverlayMap : MonoBehaviour
             meshFilter.mesh = mesh;
         }
 
-        int sizePixelX = GameController.Instance.CurrentWorld.Width + 1;
-        int sizePixelY = GameController.Instance.CurrentWorld.Height + 1;
+        int sizePixelX = GameController.CurrentWorld.Width + 1;
+        int sizePixelY = GameController.CurrentWorld.Height + 1;
 
         newVertices = new Vector3[sizePixelX * sizePixelY];
         newNormals = new Vector3[sizePixelX * sizePixelY];
@@ -539,7 +539,7 @@ public class OverlayMap : MonoBehaviour
             {
                 newVertices[(y * sizePixelX) + x] = new Vector3(x, y, 0) + leftBottomCorner;
                 newNormals[(x * sizePixelY) + y] = Vector3.up;
-                newUV[(y * sizePixelX) + x] = new Vector2((float)x / GameController.Instance.CurrentWorld.Width, (float)y / GameController.Instance.CurrentWorld.Height);
+                newUV[(y * sizePixelX) + x] = new Vector2((float)x / GameController.CurrentWorld.Width, (float)y / GameController.CurrentWorld.Height);
             }
         }
 

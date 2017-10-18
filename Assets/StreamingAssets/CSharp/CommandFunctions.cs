@@ -308,72 +308,102 @@ public static class CommandFunctions
 
     public static void SetRoomGas(int roomID, string gas, float pressure)
     {
-        // Adding gas to room
-        Room room = World.Current.RoomManager[roomID];
-        room.Atmosphere.SetGas(gas, pressure * room.TileCount);
+        World world;
+
+        if (ModUtils.GetCurrentWorld(out world))
+        {
+            // Adding gas to room
+            Room room = world.RoomManager[roomID];
+            room.Atmosphere.SetGas(gas, pressure * room.TileCount);
+        }
     }
 
     public static void SetAllRoomsGas(string gas, float pressure)
     {
-        // Adding gas to all rooms
-        foreach (Room room in World.Current.RoomManager)
+        World world;
+
+        if (ModUtils.GetCurrentWorld(out world))
         {
-            if (room.ID > 0)
+            // Adding gas to all rooms
+            foreach (Room room in world.RoomManager)
             {
-                room.Atmosphere.SetGas(gas, pressure * room.TileCount);
+                if (room.ID > 0)
+                {
+                    room.Atmosphere.SetGas(gas, pressure * room.TileCount);
+                }
             }
         }
     }
 
     public static void FillRoomWithAir(int roomID)
     {
-        // Adding air to room
-        Room room = World.Current.RoomManager[roomID];
-        foreach (string gas in room.Atmosphere.GetGasNames())
-        {
-            room.Atmosphere.SetGas(gas, 0);
-        }
+        World world;
 
-        room.Atmosphere.SetGas("O2", 0.2f * room.TileCount);
-        room.Atmosphere.SetGas("N2", 0.8f * room.TileCount);
-    }
-
-    public static void FillAllRoomsWithAir()
-    {
-        // Adding air to all rooms
-        foreach (Room room in World.Current.RoomManager)
+        if (ModUtils.GetCurrentWorld(out world))
         {
+            // Adding air to room
+            Room room = world.RoomManager[roomID];
             foreach (string gas in room.Atmosphere.GetGasNames())
             {
                 room.Atmosphere.SetGas(gas, 0);
             }
 
-            if (room.ID > 0)
+            room.Atmosphere.SetGas("O2", 0.2f * room.TileCount);
+            room.Atmosphere.SetGas("N2", 0.8f * room.TileCount);
+        }
+    }
+
+    public static void FillAllRoomsWithAir()
+    {
+        World world;
+
+        if (ModUtils.GetCurrentWorld(out world))
+        {
+            // Adding air to all rooms
+            foreach (Room room in world.RoomManager)
             {
-                room.Atmosphere.SetGas("O2", 0.2f * room.TileCount);
-                room.Atmosphere.SetGas("N2", 0.8f * room.TileCount);
+                foreach (string gas in room.Atmosphere.GetGasNames())
+                {
+                    room.Atmosphere.SetGas(gas, 0);
+                }
+
+                if (room.ID > 0)
+                {
+                    room.Atmosphere.SetGas("O2", 0.2f * room.TileCount);
+                    room.Atmosphere.SetGas("N2", 0.8f * room.TileCount);
+                }
             }
         }
     }
 
     public static void EmptyRoom(int roomId)
     {
-        Room room = World.Current.RoomManager[roomId];
-        foreach (string gas in room.Atmosphere.GetGasNames())
+        World world;
+
+        if (ModUtils.GetCurrentWorld(out world))
         {
-            room.Atmosphere.SetGas(gas, 0);
+            Room room = world.RoomManager[roomId];
+            foreach (string gas in room.Atmosphere.GetGasNames())
+            {
+                room.Atmosphere.SetGas(gas, 0);
+            }
         }
     }
 
     public static void EmptyAllRooms()
     {
-        foreach (Room room in World.Current.RoomManager)
+        World world;
+
+        if (ModUtils.GetCurrentWorld(out world))
         {
-            if (room.ID > 0)
+            foreach (Room room in world.RoomManager)
             {
-                foreach (string gas in room.Atmosphere.GetGasNames())
+                if (room.ID > 0)
                 {
-                    room.Atmosphere.SetGas(gas, 0);
+                    foreach (string gas in room.Atmosphere.GetGasNames())
+                    {
+                        room.Atmosphere.SetGas(gas, 0);
+                    }
                 }
             }
         }

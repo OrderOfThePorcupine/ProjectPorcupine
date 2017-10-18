@@ -52,7 +52,7 @@ namespace ProjectPorcupine.Entities.States
                     string[] inventoryTypes = character.Inventory != null ?
                         new string[] { character.Inventory.Type } :
                         Job.RequestedItems.Keys.ToArray();
-                    path = World.Current.InventoryManager.GetPathToClosestInventoryOfType(inventoryTypes, character.CurrTile, Job.canTakeFromStockpile);
+                    path = GameController.CurrentWorld.InventoryManager.GetPathToClosestInventoryOfType(inventoryTypes, character.CurrTile, Job.canTakeFromStockpile);
                     if (path != null && path.Count > 0)
                     {
                         Inventory inv = path.Last().Inventory;
@@ -78,7 +78,7 @@ namespace ProjectPorcupine.Entities.States
                     int amountCarried = character.Inventory != null ? character.Inventory.StackSize : 0;
                     int amount = Mathf.Min(Job.AmountDesiredOfInventoryType(tileInventory.Type) - amountCarried, tileInventory.StackSize);
                     DebugLog(" - Picked up {0} {1}", amount, tileInventory.Type);
-                    World.Current.InventoryManager.PlaceInventory(character, tileInventory, amount);
+                    GameController.CurrentWorld.InventoryManager.PlaceInventory(character, tileInventory, amount);
                     break;
 
                 case HaulAction.DeliverMaterial:
@@ -97,7 +97,7 @@ namespace ProjectPorcupine.Entities.States
 
                 case HaulAction.DropOffmaterial:
                     DebugLog(" - Delivering {0} {1}", character.Inventory.StackSize, character.Inventory.Type);
-                    World.Current.InventoryManager.PlaceInventory(Job, character);
+                    GameController.CurrentWorld.InventoryManager.PlaceInventory(Job, character);
 
                     // Ping the Job system
                     Job.DoWork(0);

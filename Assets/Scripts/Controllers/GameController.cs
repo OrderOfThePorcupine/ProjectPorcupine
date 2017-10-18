@@ -8,21 +8,41 @@
 #endregion
 
 using System;
+using System.IO;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Manages everything required for each game.
+/// Only one should exist from beginning the game to ending.
+/// </summary>
 [MoonSharp.Interpreter.MoonSharpUserData]
 public class GameController : MonoBehaviour
 {
-    // TODO: Should this be also saved with the world data?
-    // If so - beginner task!
+    /// <summary>
+    /// The Game Version.
+    /// </summary>
+    /// TODO: Should this be also saved with the world data?
+    /// If so - beginner task!
     public const string GameVersion = "Someone_will_come_up_with_a_proper_naming_scheme_later";
 
+    /// <summary>
+    /// The main scene that gameplay takes place in.
+    /// </summary>
+    /// TODO: Do we even need this?  Since UI has been decoupled from the _World scene
     public const string MainScene = "_World";
+
+    /// <summary>
+    /// The main menu where new/old games are created/loaded.
+    /// </summary>
     public const string MainMenuScene = "MainMenu";
 
+    /// <summary>
+    /// The circle cursor prefab to use for the cursor.
+    /// </summary>
+    /// TODO: Make it moddable, so users can change it on the fly (preferably in game)
     [SerializeField]
     private GameObject circleCursorPrefab;
 
@@ -44,41 +64,130 @@ public class GameController : MonoBehaviour
 
     #region Instances
 
-    public static GameController Instance { get; private set; }
-
-    public KeyboardManager KeyboardManager { get; private set; }
-
-    public SoundController SoundController { get; private set; }
-
-    public ModsManager ModsManager { get; private set; }
-
-    public DialogBoxManager DialogBoxManager { get; private set; }
-
-    public FurnitureSpriteController FurnitureSpriteController { get; private set; }
-
-    public UtilitySpriteController UtilitySpriteController { get; private set; }
-
-    public TileSpriteController TileSpriteController { get; private set; }
-
-    public CharacterSpriteController CharacterSpriteController { get; private set; }
-
-    public JobSpriteController JobSpriteController { get; private set; }
-
-    public InventorySpriteController InventorySpriteController { get; private set; }
-
-    public ShipSpriteController ShipSpriteController { get; private set; }
-
-    public BuildModeController BuildModeController { get; private set; }
-
-    public SystemController CurrentSystem { get; private set; }
-
     /// <summary>
     /// Equivalent to <see cref="CurrentSystem"/>.CurrentWorld.
     /// </summary>
-    public World CurrentWorld
+    /// <remarks>
+    /// Could be null, should check for nullability.
+    /// Furthermore should only trust if subsidiary of CurrentSystem or CurrentWorld.
+    /// </remarks>
+    public static World CurrentWorld
     {
-        get { return CurrentSystem.CurrentWorld; }
+        get { return Instance.CurrentSystem.CurrentWorld; }
     }
+
+    /// <summary>
+    /// Use this to access child instances.
+    /// </summary>
+    /// <remarks>
+    /// Shouldn't be null.  Especially if your a subsidiary of GameController.
+    /// </remarks>
+    public static GameController Instance { get; private set; }
+
+    /// <summary>
+    /// Manages inputs from keyboard.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public KeyboardManager KeyboardManager { get; private set; }
+
+    /// <summary>
+    /// Manages all sound effects.  Sits ontop of AudioController.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public SoundController SoundController { get; private set; }
+
+    /// <summary>
+    /// Manages loaded/unloaded mods.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public ModsManager ModsManager { get; private set; }
+
+    /// <summary>
+    /// Manages all dialog boxes.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public DialogBoxManager DialogBoxManager { get; private set; }
+
+    /// <summary>
+    /// Manages all furniture sprites.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public FurnitureSpriteController FurnitureSpriteController { get; private set; }
+
+    /// <summary>
+    /// Manages all utility sprites.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public UtilitySpriteController UtilitySpriteController { get; private set; }
+
+    /// <summary>
+    /// Manages all tile sprites.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public TileSpriteController TileSpriteController { get; private set; }
+
+    /// <summary>
+    /// Manages all character sprites.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public CharacterSpriteController CharacterSpriteController { get; private set; }
+
+    /// <summary>
+    /// Manages all job sprites.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public JobSpriteController JobSpriteController { get; private set; }
+
+    /// <summary>
+    /// Manages all inventory sprites.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public InventorySpriteController InventorySpriteController { get; private set; }
+
+    /// <summary>
+    /// Manages all ship sprites.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public ShipSpriteController ShipSpriteController { get; private set; }
+
+    /// <summary>
+    /// Manages what currently is selected to build and where.
+    /// </summary>
+    /// <remarks>
+    /// Won't be null while <see cref="Instance"/> isn't null.
+    /// </remarks>
+    public BuildModeController BuildModeController { get; private set; }
+
+    /// <summary>
+    /// The current system controller which manages the world and instances required for
+    /// each save.
+    /// </summary>
+    /// <remarks>
+    /// Could be null, can only trust isn't null if your a subsidiary of SystemController.
+    /// </remarks>
+    public SystemController CurrentSystem { get; private set; }
 
     #endregion
 
@@ -108,7 +217,9 @@ public class GameController : MonoBehaviour
     /// </summary>
     public bool OpenedWorldScene { get; private set; }
 
-    // Quit the app whether in editor or a build version.
+    /// <summary>
+    /// Quit the game whether in editor or a build version.
+    /// </summary>
     public static void QuitGame()
     {
         // Maybe ask the user if he want to save or is sure they want to quit??
@@ -134,27 +245,61 @@ public class GameController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Goes to the main scene creating a new world before.
+    /// </summary>
+    /// <param name="width"> The width of the world. </param>
+    /// <param name="height"> The height of the world. </param>
+    /// <param name="depth"> The depth of the world. </param>
+    /// <param name="seed"> The seed used for generation. </param>
+    /// <param name="generateAsteroids"> Generate Asteroids?. </param>
+    /// <param name="generatorFile"> The generator file to use. </param>
+    /// <exception cref="ArgumentException"> If <paramref name="width"/> or <paramref name="height"/> or <paramref name="depth"/> is less than or equal to 0. </exception>
+    /// <exception cref="FileNotFoundException"> If <paramref name="generatorFile"/> Doesn't exist. </exception>
     public void ToMainScene(int width, int height, int depth, int seed, bool generateAsteroids, string generatorFile)
     {
+        if (width <= 0 || height <= 0 || depth <= 0)
+        {
+            throw new ArgumentException("Width, Height, or Depth is <= 0");
+        }
+
+        string path = Path.Combine(GeneratorBasePath, generatorFile);
+        if (File.Exists(path) == false)
+        {
+            throw new FileNotFoundException("File doesn't exist at path: " + path);
+        }
+
         // Load Main World
         CreateSystem();
         CurrentSystem.CreateWorld(width, height, depth, seed, generateAsteroids, generatorFile);
         SceneManager.LoadSceneAsync(MainScene);
     }
 
-    public void ToMainScene(string fileName)
+    /// <summary>
+    /// Goes to the main game scene, loading the initial world.
+    /// </summary>
+    /// <param name="filePath"> The world to load. </param>
+    /// <exception cref="FileNotFoundException"> If filePath is invalid. </exception>
+    public void ToMainScene(string filePath)
     {
+        if (File.Exists(filePath) == false)
+        {
+            throw new FileNotFoundException("Couldn't find file at path: " + filePath);
+        }
+
         // Load Main World
         CreateSystem();
-        CurrentSystem.LoadWorld(fileName);
+        CurrentSystem.LoadWorld(filePath);
         SceneManager.LoadSceneAsync(MainScene);
     }
 
+    /// <summary>
+    /// Goes to the main menu scene.
+    /// </summary>
     public void ToMainMenu()
     {
-        // Should unassign all worlds!!
-        // But since this only allows for multi-worlds not enables it
-        // I won't include it
+        // TODO: Should unassign all worlds!!
+        // When multiple worlds are added.
         Destroy(GetComponentInChildren<OverlayMap>().gameObject);
         UnAssignWorld(CurrentWorld);
         CurrentSystem.TearDown();
@@ -162,13 +307,19 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene(MainMenuScene); // We don't care what the old scene was.
     }
 
+    /// <summary>
+    /// Callback occurs when the active scene has changed.
+    /// </summary>
+    /// <param name="oldScene"> The old scene. </param>
+    /// <param name="newScene"> The new scene. </param>
     public void ActiveSceneChanged(Scene oldScene, Scene newScene)
     {
+        // If we are going to our main game scene initialize world
         if (newScene.name == MainScene)
         {
             if (OpenedWorldScene)
             {
-                // This is for people loading up from _World
+                // This is for people loading up from _World rather than from MainMenu
                 CreateSystem();
                 CurrentSystem.CreateWorld(100, 100, 5, UnityEngine.Random.Range(int.MinValue, int.MaxValue), true, "Default.xml");
             }
@@ -181,8 +332,18 @@ public class GameController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Assigns the world to the current system.
+    /// </summary>
+    /// <param name="world"> The world to assign. </param>
+    /// <exception cref="ArgumentNullException"> If <paramref name="world"/> is null. </exception>
     public void AssignWorld(World world)
     {
+        if (world == null)
+        {
+            throw new ArgumentNullException("World is null");
+        }
+
         CharacterSpriteController.AssignWorld(world);
         FurnitureSpriteController.AssignWorld(world);
         InventorySpriteController.AssignWorld(world);
@@ -196,8 +357,18 @@ public class GameController : MonoBehaviour
         CurrentSystem.AssignWorld(world);
     }
 
+    /// <summary>
+    /// Unassigns the world from the current system.
+    /// </summary>
+    /// <param name="world"> The world to unassign. </param>
+    /// <exception cref="ArgumentNullException"> If <paramref name="world"/> is null. </exception>
     public void UnAssignWorld(World world)
     {
+        if (world == null)
+        {
+            throw new ArgumentNullException("World is null");
+        }
+
         CharacterSpriteController.UnAssignWorld(world);
         FurnitureSpriteController.UnAssignWorld(world);
         InventorySpriteController.UnAssignWorld(world);
@@ -211,8 +382,12 @@ public class GameController : MonoBehaviour
         CurrentSystem.UnAssignWorld(world);
     }
 
+    /// <summary>
+    /// Script initialization; handling singleton, and creation subsidiary managers/controllers.
+    /// </summary>
     private void Awake()
     {
+        // Singleton management
         if (Instance == null || Instance == this)
         {
             Instance = this;
@@ -297,6 +472,10 @@ public class GameController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Builds the UI.
+    /// Should be run when the scene initializes.
+    /// </summary>
     private void BuildUI()
     {
         // Initialising controllers.
@@ -350,22 +529,33 @@ public class GameController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates a new system.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"> If CreateSystem was previously called, or CurrentSystem has been assigned. </exception>
+    /// TODO: Allow for multiple systems perhaps.
     private void CreateSystem()
     {
         if (CurrentSystem != null)
         {
             // We already have a system
-            throw new Exception("CurrentSystem is already allocated, so a system has already been created.");
+            throw new InvalidOperationException("CurrentSystem is already allocated, so a system has already been created.");
         }
 
         CurrentSystem = new SystemController();
     }
 
+    /// <summary>
+    /// Run once per frame, TimeManager handles the ticks from here.
+    /// </summary>
     private void Update()
     {
         TimeManager.Instance.Update(Time.deltaTime);
     }
 
+    /// <summary>
+    /// Run when the application quits, this cleans up the audiomanager resources.
+    /// </summary>
     private void OnApplicationQuit()
     {
         // Ensure that the audiomanager's resources get released properly on quit. This may only be a problem in the editor.

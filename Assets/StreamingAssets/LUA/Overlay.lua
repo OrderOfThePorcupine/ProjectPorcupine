@@ -47,7 +47,7 @@ end
 
 -- Return temperature (in K) in current tile
 function temperatureValueAt(tile, world)
-    --if world == nil or world.current == nil or world.current.temperature == nil then
+    --if world == nil or GameController.CurrentWorld == nil or GameController.CurrentWorld.temperature == nil then
     --	return -1
     --end
 

@@ -465,7 +465,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 for (int ypos = y - 1; ypos < y + proto.Height + 1; ypos++)
                 {
-                    Tile tileAt = World.Current.GetTileAt(xpos, ypos, tile.Z);
+                    Tile tileAt = GameController.CurrentWorld.GetTileAt(xpos, ypos, tile.Z);
                     if (tileAt != null && tileAt.Furniture != null && tileAt.Furniture.Changed != null)
                     {
                         tileAt.Furniture.Changed(tileAt.Furniture);
@@ -475,7 +475,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
 
         // Let our workspot tile know it is reserved for us
-        World.Current.ReserveTileAsWorkSpot(furnObj);
+        GameController.CurrentWorld.ReserveTileAsWorkSpot(furnObj);
 
         // Call LUA install scripts
         furnObj.EventActions.Trigger("OnInstall", furnObj);
@@ -879,7 +879,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             Job job = uninstallOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Uninstall();
-            World.Current.jobQueue.Enqueue(job);
+            GameController.CurrentWorld.jobQueue.Enqueue(job);
         }
     }
 
@@ -906,14 +906,14 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         EventActions.Trigger("OnUninstall", this);
 
         // Let our workspot tile know it is no longer reserved for us
-        World.Current.UnreserveTileAsWorkSpot(this);
+        GameController.CurrentWorld.UnreserveTileAsWorkSpot(this);
 
         Tile.UnplaceFurniture();
 
         Deconstruct deconstructOrder = GetOrderAction<Deconstruct>();
         if (deconstructOrder != null)
         {
-            World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(Type, 1));
+            GameController.CurrentWorld.InventoryManager.PlaceInventoryAround(Tile, new Inventory(Type, 1));
         }
 
         if (Removed != null)
@@ -924,14 +924,14 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         // Do we need to recalculate our rooms?
         if (RoomEnclosure)
         {
-            World.Current.RoomManager.DoRoomFloodFill(Tile, false);
+            GameController.CurrentWorld.RoomManager.DoRoomFloodFill(Tile, false);
         }
 
-        ////World.current.InvalidateTileGraph();
+        ////GameController.CurrentWorld.InvalidateTileGraph();
 
-        if (World.Current.tileGraph != null)
+        if (GameController.CurrentWorld.tileGraph != null)
         {
-            World.Current.tileGraph.RegenerateGraphAtTile(Tile);
+            GameController.CurrentWorld.tileGraph.RegenerateGraphAtTile(Tile);
         }
 
         // We should inform our neighbours that they have just lost a
@@ -943,7 +943,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 for (int ypos = y - 1; ypos < y + fheight + 1; ypos++)
                 {
-                    Tile t = World.Current.GetTileAt(xpos, ypos, Tile.Z);
+                    Tile t = GameController.CurrentWorld.GetTileAt(xpos, ypos, Tile.Z);
                     if (t != null && t.Furniture != null && t.Furniture.Changed != null)
                     {
                         t.Furniture.Changed(t.Furniture);
@@ -981,7 +981,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             Job job = deconstructOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Deconstruct();
-            World.Current.jobQueue.Enqueue(job);
+            GameController.CurrentWorld.jobQueue.Enqueue(job);
         }
     }
 
@@ -1008,7 +1008,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         EventActions.Trigger("OnUninstall", this);
 
         // Let our workspot tile know it is no longer reserved for us
-        World.Current.UnreserveTileAsWorkSpot(this);
+        GameController.CurrentWorld.UnreserveTileAsWorkSpot(this);
 
         Tile.UnplaceFurniture();
 
@@ -1017,7 +1017,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             foreach (OrderAction.InventoryInfo inv in deconstructOrder.Inventory)
             {
-                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Type, inv.Amount));
+                GameController.CurrentWorld.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Type, inv.Amount));
             }
         }
 
@@ -1029,14 +1029,14 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         // Do we need to recalculate our rooms?
         if (RoomEnclosure)
         {
-            World.Current.RoomManager.DoRoomFloodFill(Tile, false);
+            GameController.CurrentWorld.RoomManager.DoRoomFloodFill(Tile, false);
         }
 
-        ////World.current.InvalidateTileGraph();
+        ////GameController.CurrentWorld.InvalidateTileGraph();
 
-        if (World.Current.tileGraph != null)
+        if (GameController.CurrentWorld.tileGraph != null)
         {
-            World.Current.tileGraph.RegenerateGraphAtTile(Tile);
+            GameController.CurrentWorld.tileGraph.RegenerateGraphAtTile(Tile);
         }
 
         // We should inform our neighbours that they have just lost a
@@ -1048,7 +1048,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 for (int ypos = y - 1; ypos < y + fheight + 1; ypos++)
                 {
-                    Tile t = World.Current.GetTileAt(xpos, ypos, Tile.Z);
+                    Tile t = GameController.CurrentWorld.GetTileAt(xpos, ypos, Tile.Z);
                     if (t != null && t.Furniture != null && t.Furniture.Changed != null)
                     {
                         t.Furniture.Changed(t.Furniture);
@@ -1306,7 +1306,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             for (int y = 0; y < Height; y++)
             {
-                tiles[x + (y * Width)] = World.Current.GetTileAt(Tile.X + x, Tile.Y + y, Tile.Z);
+                tiles[x + (y * Width)] = GameController.CurrentWorld.GetTileAt(Tile.X + x, Tile.Y + y, Tile.Z);
             }
         }
 
@@ -1342,7 +1342,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             for (int y_off = tile.Y; y_off < tile.Y + Height; y_off++)
             {
-                Tile tile2 = World.Current.GetTileAt(x_off, y_off, tile.Z);
+                Tile tile2 = GameController.CurrentWorld.GetTileAt(x_off, y_off, tile.Z);
 
                 // Check to see if there is furniture which is replaceable
                 bool isReplaceable = false;

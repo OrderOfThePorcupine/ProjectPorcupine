@@ -55,11 +55,11 @@ public static class ModUtils
     }
 
     /// <summary>
-    /// Returns true if World.Current is real.
+    /// Returns true if GameController.CurrentWorld is real.
     /// </summary>
     public static bool GetCurrentWorld(out World world)
     {
-        world = World.Current;
+        world = GameController.CurrentWorld;
 
         return world != null;
     }
