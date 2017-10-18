@@ -32,7 +32,6 @@ install "MacEditorInstaller/Unity-$VERSION.pkg"
 # and at the moment the build should only be done through the cronjob
 if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
     install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
-    install "MacEditorTargetInstaller/UnitySetup-Mac-Support-for-Editor-$VERSION.pkg"
     install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
 fi
 echo 'travis_fold:end:install-unity'
