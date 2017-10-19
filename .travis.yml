@@ -3,9 +3,9 @@
 # Using objective-c since windows build images are not available
 # The chmod-ing may be uneccesary 
 language: objective-c
-osx_image: xcode8.1
+osx_image: xcode6.4
 rvm:
- - 2.2
+ - 2.1.2
 before_install:
  - chmod +x ./Scripts/Install/unity.sh
  - chmod +x ./Scripts/Install/mono.sh
