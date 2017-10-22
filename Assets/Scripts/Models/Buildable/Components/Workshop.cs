@@ -351,7 +351,7 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 if (outPlace.IsEmpty)
                 {
-                    World.Current.InventoryManager.PlaceInventory(outPlace.Tile, new Inventory(outPlace.ObjectType, outPlace.Amount));
+                    GameController.CurrentWorld.InventoryManager.PlaceInventory(outPlace.Tile, new Inventory(outPlace.ObjectType, outPlace.Amount));
                 }
                 else
                 {
@@ -364,7 +364,7 @@ namespace ProjectPorcupine.Buildable.Components
         {
             foreach (KeyValuePair<Tile, int> toConsume in flaggedForTaking)
             {
-                World.Current.InventoryManager.ConsumeInventory(toConsume.Key, toConsume.Value);
+                GameController.CurrentWorld.InventoryManager.ConsumeInventory(toConsume.Key, toConsume.Value);
             }
         }
 
@@ -375,7 +375,7 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 if (heldInventory.StackSize > 0)
                 {
-                    World.Current.InventoryManager.PlaceInventory(job.tile, heldInventory);
+                    GameController.CurrentWorld.InventoryManager.PlaceInventory(job.tile, heldInventory);
                     job.tile.Inventory.Locked = true;
                 }
             }
@@ -389,7 +389,7 @@ namespace ProjectPorcupine.Buildable.Components
                 foreach (Item inputItem in prodChain.Input)
                 {
                     // check input slots for req. item:                        
-                    Tile tile = World.Current.GetTileAt(
+                    Tile tile = GameController.CurrentWorld.GetTileAt(
                         furniture.Tile.X + inputItem.SlotPosX,
                         furniture.Tile.Y + inputItem.SlotPosY,
                         furniture.Tile.Z);
@@ -450,7 +450,7 @@ namespace ProjectPorcupine.Buildable.Components
                 }
                 else
                 {
-                    Tile inTile = World.Current.GetTileAt(
+                    Tile inTile = GameController.CurrentWorld.GetTileAt(
                                       ParentFurniture.Tile.X + reqInputItem.SlotPosX,
                                       ParentFurniture.Tile.Y + reqInputItem.SlotPosY,
                                       ParentFurniture.Tile.Z);
@@ -505,7 +505,7 @@ namespace ProjectPorcupine.Buildable.Components
                 int amount = outObjType.Amount;
 
                 // check ouput slots for products:                        
-                Tile outputTile = World.Current.GetTileAt(
+                Tile outputTile = GameController.CurrentWorld.GetTileAt(
                     ParentFurniture.Tile.X + outObjType.SlotPosX,
                     ParentFurniture.Tile.Y + outObjType.SlotPosY,
                     ParentFurniture.Tile.Z);
@@ -536,7 +536,7 @@ namespace ProjectPorcupine.Buildable.Components
             foreach (Item reqInputItem in prodChain.Input)
             {
                 // check input slots for req. item:                        
-                Tile tile = World.Current.GetTileAt(
+                Tile tile = GameController.CurrentWorld.GetTileAt(
                     ParentFurniture.Tile.X + reqInputItem.SlotPosX,
                     ParentFurniture.Tile.Y + reqInputItem.SlotPosY,
                     ParentFurniture.Tile.Z);

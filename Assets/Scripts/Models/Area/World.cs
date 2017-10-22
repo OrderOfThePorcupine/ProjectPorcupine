@@ -42,34 +42,8 @@ public class World
     private Tile[,,] tiles;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="World"/> class.
-    /// </summary>
-    /// <param name="width">Width in tiles.</param>
-    /// <param name="height">Height in tiles.</param>
-    /// <param name="depth">Depth in amount.</param>
-    public World(int width, int height, int depth)
-    {
-        // Creates an empty world.
-        SetupWorld(width, height, depth);
-        Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-        if (SceneController.NewWorldSize != Vector3.zero)
-        {
-            Seed = SceneController.Seed;
-        }
-
-        Debug.LogWarning("World Seed: " + Seed);
-        WorldGenerator.Instance.Generate(this, Seed);
-        UnityDebugger.Debugger.Log("World", "Generated World");
-
-        tileGraph = new Path_TileGraph(this);
-        roomGraph = new Path_RoomGraph(this);
-
-        // Make one character.
-        CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
-    }
-
-    /// <summary>
-    /// Default constructor, used when loading a world from a file.
+    /// Empty constructor.
+    /// Use this then initialize afterwards.
     /// </summary>
     public World()
     {
@@ -87,8 +61,6 @@ public class World
     public event Action<Tile> OnTileChanged;
 
     public event Action<Tile> OnTileTypeChanged;
-
-    public static World Current { get; protected set; }
 
     // The tile width of the world.
     public int Width { get; protected set; }
@@ -171,6 +143,40 @@ public class World
     public CameraData CameraData { get; private set; }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="World"/> class.
+    /// </summary>
+    /// <param name="width"> Width in tiles. </param>
+    /// <param name="height"> Height in tiles. </param>
+    /// <param name="depth"> Depth in amount. </param>
+    /// <param name="seed"> The seed for generation. </param>
+    /// <param name="generateAsteroids"> Generate asteroids?. </param>
+    /// <param name="generatorFile"> The generator file name to generate from. </param>
+    public void InitializeWorldWithData(int width, int height, int depth, int seed, bool generateAsteroids, string generatorFile)
+    {
+        // Creates an empty world.
+        SetupWorld(width, height, depth);
+        Seed = seed;
+        WorldGenerator.Instance.Generate(this, Seed, generateAsteroids, generatorFile);
+        UnityDebugger.Debugger.Log("World", "Generated World with seed: " + seed);
+
+        tileGraph = new Path_TileGraph(this);
+        roomGraph = new Path_RoomGraph(this);
+
+        // Make one character.
+        CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
+    }
+
+    /// <summary>
+    /// Create from JSON.
+    /// </summary>
+    /// <param name="filePath"> The file to load. </param>
+    public void InitializeWorldFromJSON(string filePath)
+    {
+        StreamReader reader = File.OpenText(filePath);
+        ReadJson((JObject)JToken.ReadFrom(new JsonTextReader(reader)));
+    }
+
+    /// <summary>
     /// Adds the listeners to the required Time Manager events.
     /// </summary>
     public void AddEventListeners()
@@ -180,11 +186,31 @@ public class World
     }
 
     /// <summary>
-    /// Gets the tile data at x and y.
+    /// Gets the tile data.
     /// </summary>
     /// <returns>The <see cref="Tile"/> or null if called with invalid arguments.</returns>
-    /// <param name="x">The x coordinate.</param>
-    /// <param name="y">The y coordinate.</param>
+    /// <param name="position"> The position to round. </param>
+    public Tile GetRoundedTileAt(Vector3 position)
+    {
+        int x = Mathf.RoundToInt(position.x);
+        int y = Mathf.RoundToInt(position.y);
+        int z = Mathf.RoundToInt(position.z);
+
+        if (x >= Width || x < 0 || y >= Height || y < 0 || z >= Depth || z < 0)
+        {
+            return null;
+        }
+
+        return tiles[x, y, z];
+    }
+
+    /// <summary>
+    /// Gets the tile data at x, and y.
+    /// </summary>
+    /// <returns>The <see cref="Tile"/> or null if called with invalid arguments.</returns>
+    /// <param name="x"> The X coord. </param>
+    /// <param name="y"> The Y coord. </param>
+    /// <param name="z"> The Z coord. </param>
     public Tile GetTileAt(int x, int y, int z)
     {
         if (x >= Width || x < 0 || y >= Height || y < 0 || z >= Depth || z < 0)
@@ -245,7 +271,7 @@ public class World
             tile = furniture.Tile;
         }
 
-        World.Current.GetTileAt(
+        GetTileAt(
             tile.X + (int)furniture.Jobs.WorkSpotOffset.x,
             tile.Y + (int)furniture.Jobs.WorkSpotOffset.y,
             tile.Z)
@@ -306,35 +332,6 @@ public class World
         }
     }
 
-    public JObject ToJson()
-    {
-        JObject worldJson = new JObject();
-        worldJson.Add("Seed", Seed);
-        worldJson.Add("RandomState", RandomStateToJson());
-        worldJson.Add("Width", Width.ToString());
-        worldJson.Add("Height", Height.ToString());
-        worldJson.Add("Depth", Depth.ToString());
-        worldJson.Add("Rooms", RoomManager.ToJson());
-        worldJson.Add("Tiles", TilesToJson());
-        worldJson.Add("Inventories", InventoryManager.ToJson());
-        worldJson.Add("Furnitures", FurnitureManager.ToJson());
-        worldJson.Add("Utilities", UtilityManager.ToJson());
-        worldJson.Add("RoomBehaviors", RoomManager.BehaviorsToJson());
-        worldJson.Add("Characters", CharacterManager.ToJson());
-        worldJson.Add("CameraData", CameraData.ToJson());
-        worldJson.Add("Skybox", skybox.name);
-        worldJson.Add("Wallet", Wallet.ToJson());
-        worldJson.Add("Time", TimeManager.Instance.ToJson());
-        worldJson.Add("Scheduler", Scheduler.Scheduler.Current.ToJson());
-        return worldJson;
-    }
-
-    public void ReadJson(string filename)
-    {
-        StreamReader reader = File.OpenText(filename);
-        ReadJson((JObject)JToken.ReadFrom(new JsonTextReader(reader)));
-    }
-
     public void ReadJson(JObject worldJson)
     {
         if (worldJson["Seed"] != null)
@@ -364,6 +361,31 @@ public class World
         Scheduler.Scheduler.Current.FromJson(worldJson["Scheduler"]);
 
         tileGraph = new Path_TileGraph(this);
+    }
+
+    public JObject ToJson()
+    {
+        JObject worldJson = new JObject
+        {
+            { "Seed", Seed },
+            { "RandomState", RandomStateToJson() },
+            { "Width", Width.ToString() },
+            { "Height", Height.ToString() },
+            { "Depth", Depth.ToString() },
+            { "Rooms", RoomManager.ToJson() },
+            { "Tiles", TilesToJson() },
+            { "Inventories", InventoryManager.ToJson() },
+            { "Furnitures", FurnitureManager.ToJson() },
+            { "Utilities", UtilityManager.ToJson() },
+            { "RoomBehaviors", RoomManager.BehaviorsToJson() },
+            { "Characters", CharacterManager.ToJson() },
+            { "CameraData", CameraData.ToJson() },
+            { "Skybox", skybox.name },
+            { "Wallet", Wallet.ToJson() },
+            { "Time", TimeManager.Instance.ToJson() },
+            { "Scheduler", Scheduler.Scheduler.Current.ToJson() }
+        };
+        return worldJson;
     }
 
     public void ResizeWorld(Vector3 worldSize)
@@ -436,10 +458,6 @@ public class World
 
     private void SetupWorld(int width, int height, int depth)
     {
-        // Set the current world to be this world.
-        // TODO: Do we need to do any cleanup of the old world?
-        Current = this;
-
         Width = width;
         Height = height;
         Depth = depth;
@@ -458,7 +476,7 @@ public class World
         UtilityManager = new UtilityManager();
         CharacterManager = new CharacterManager();
         InventoryManager = new InventoryManager();
-        jobQueue = new JobQueue();
+        jobQueue = new JobQueue(this);
         GameEventManager = new GameEventManager();
         PowerNetwork = new PowerNetwork();
         FluidNetwork = new FluidNetwork();

@@ -41,7 +41,7 @@ namespace ProjectPorcupine.Localization
     /// to hard drive using ICSharpCode.SharpZipLib.Zip library. Every GitHub zip download has a folder with
     /// *ProjectName*-*BranchName* so all of it's content needs to be moved to Application.streamingAssetsPath/Localization.
     /// After that the folder get's deleted and new curr.ver file is created containing latest hash.
-    /// GitHub's branch name corresponds to World.current.gameVersion, so that the changes in localization
+    /// GitHub's branch name corresponds to GameController.CurrentWorld.gameVersion, so that the changes in localization
     /// for version 0.2 won't affect users who haven't updated yet from version 0.1.
     /// </summary>
     public static class LocalizationDownloader

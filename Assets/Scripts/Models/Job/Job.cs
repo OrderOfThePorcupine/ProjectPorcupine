@@ -347,13 +347,13 @@ public class Job : ISelectable, IPrototypable
             // If we are a furniture building job, Let our workspot tile know it is no longer reserved for us.
             if (buildablePrototype.GetType() == typeof(Furniture))
             {
-                World.Current.UnreserveTileAsWorkSpot((Furniture)buildablePrototype, tile);
+                GameController.CurrentWorld.UnreserveTileAsWorkSpot((Furniture)buildablePrototype, tile);
             }
         }
 
         // Remove the job out of both job queues.
-        // World.Current.jobWaitingQueue.Remove(this);
-        World.Current.jobQueue.Remove(this);
+        // GameController.CurrentWorld.jobWaitingQueue.Remove(this);
+        GameController.CurrentWorld.jobQueue.Remove(this);
     }
 
     /// <summary>
@@ -421,7 +421,7 @@ public class Job : ISelectable, IPrototypable
     {
         foreach (RequestedItem item in GetInventoryRequirementValues())
         {
-            if (World.Current.InventoryManager.HasInventoryOfType(item.Type, canTakeFromStockpile))
+            if (GameController.CurrentWorld.InventoryManager.HasInventoryOfType(item.Type, canTakeFromStockpile))
             {
                 return item;
             }
@@ -442,7 +442,7 @@ public class Job : ISelectable, IPrototypable
         {
             if (this.acceptsAny == false)
             {
-                if (World.Current.InventoryManager.HasInventoryOfType(item.Type, canTakeFromStockpile) == false)
+                if (GameController.CurrentWorld.InventoryManager.HasInventoryOfType(item.Type, canTakeFromStockpile) == false)
                 {
                     // the job requires ALL inventory requirements to be met, and there is no source of a desired Type
                     return null;
@@ -452,7 +452,7 @@ public class Job : ISelectable, IPrototypable
                     fulfillableInventoryRequirements.Add(item.Type);
                 }
             }
-            else if (World.Current.InventoryManager.HasInventoryOfType(item.Type, canTakeFromStockpile))
+            else if (GameController.CurrentWorld.InventoryManager.HasInventoryOfType(item.Type, canTakeFromStockpile))
             {
                 // there is a source for a desired Type that the job will accept
                 fulfillableInventoryRequirements.Add(item.Type);
@@ -532,7 +532,7 @@ public class Job : ISelectable, IPrototypable
     public bool CanGetToInventory(Character character)
     {
         List<Tile> path = null;
-        path = World.Current.InventoryManager.GetPathToClosestInventoryOfType(RequestedItems.Keys.ToArray(), character.CurrTile, canTakeFromStockpile);
+        path = GameController.CurrentWorld.InventoryManager.GetPathToClosestInventoryOfType(RequestedItems.Keys.ToArray(), character.CurrTile, canTakeFromStockpile);
         if (path != null && path.Count > 0)
         {
             return true;

@@ -34,7 +34,7 @@ public class DialogBoxNewGame : DialogBox
         Seed.text = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
 
         // Get list of files in save location
-        string generatorDirectoryPath = GameController.Instance.GeneratorBasePath();
+        string generatorDirectoryPath = GameController.GeneratorBasePath;
 
         DirectoryInfo generatorDir = new DirectoryInfo(generatorDirectoryPath);
 
@@ -91,7 +91,7 @@ public class DialogBoxNewGame : DialogBox
         DialogBoxManager dialogManager = GameObject.FindObjectOfType<DialogBoxManager>();
         dialogManager.dialogBoxPromptOrInfo.SetPrompt("message_creating_new_world");
         dialogManager.dialogBoxPromptOrInfo.ShowDialog();
-        SceneController.LoadNewWorld(width, height, depth, seed, generatorFile, GenerateAsteroids.isOn);
+        GameController.Instance.ToMainScene(width, height, depth, seed, GenerateAsteroids.isOn, generatorFile);
     }
 
     public void VerifyNumericInput(InputField input)

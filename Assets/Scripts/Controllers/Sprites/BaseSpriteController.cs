@@ -10,16 +10,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseSpriteController<T> 
+public abstract class BaseSpriteController<T>
 {
     protected Dictionary<T, GameObject> objectGameObjectMap;
-    protected World world;
     protected GameObject objectParent;
+    protected string parentName;
 
-    public BaseSpriteController(World world, string parentName)
+    public BaseSpriteController(string parentName)
     {
-        this.world = world;
-        objectParent = new GameObject(parentName);
+        this.parentName = parentName;
         objectGameObjectMap = new Dictionary<T, GameObject>();
     }
 
@@ -28,6 +27,24 @@ public abstract class BaseSpriteController<T>
         objectGameObjectMap.Clear();
         GameObject.Destroy(objectParent);
     }
+
+    /// <summary>
+    /// Register world.
+    /// </summary>
+    /// <param name="world"> World to register. </param>
+    public virtual void AssignWorld(World world)
+    {
+        if (objectParent == null)
+        {
+            objectParent = new GameObject(parentName);
+        }
+    }
+
+    /// <summary>
+    /// Unregister world.
+    /// </summary>
+    /// <param name="world"> World to unregister. </param>
+    public abstract void UnAssignWorld(World world);
 
     protected abstract void OnCreated(T obj);
 

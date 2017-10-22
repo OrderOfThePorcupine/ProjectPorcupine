@@ -18,13 +18,13 @@ public class JobQueue
     private Dictionary<string, List<Job>> jobsWaitingForInventory;
     private Queue<Job> unreachableJobs;
 
-    public JobQueue()
+    public JobQueue(World world)
     {
         jobQueue = new SortedList<Job.JobPriority, Job>(new DuplicateKeyComparer<Job.JobPriority>(true));
         jobsWaitingForInventory = new Dictionary<string, List<Job>>();
         unreachableJobs = new Queue<Job>();
 
-        World.Current.InventoryManager.InventoryCreated += ReevaluateWaitingQueue;
+        world.InventoryManager.InventoryCreated += ReevaluateWaitingQueue;
     }
 
     public event Action<Job> OnJobCreated;
@@ -69,7 +69,7 @@ public class JobQueue
             jobsWaitingForInventory[missing].Add(job);
         }
         else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
-            job.CharsCantReach.Count == World.Current.CharacterManager.Characters.Count)
+            job.CharsCantReach.Count == GameController.CurrentWorld.CharacterManager.Characters.Count)
         {
             // No one can reach the job.
             DebugLog("JobQueue", "- Job can't be reached");

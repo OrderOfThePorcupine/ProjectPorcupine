@@ -60,15 +60,17 @@ public class SpawnInventoryController
 
         if (t.Inventory == null || t.Inventory.Type == InventoryToBuild)
         {
-            World.Current.InventoryManager.PlaceInventory(t, inventoryChange);
+            GameController.CurrentWorld.InventoryManager.PlaceInventory(t, inventoryChange);
         }
     }
 
     private void CreateSpawnUI()
     {
-        spawnUI = new GameObject();
-        spawnUI.name = "Spawn Inventory UI";
-        spawnUI.layer = LayerMask.NameToLayer("UI");
+        spawnUI = new GameObject()
+        {
+            name = "Spawn Inventory UI",
+            layer = LayerMask.NameToLayer("UI")
+        };
 
         Canvas canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         spawnUI.transform.SetParent(canvas.transform, false);
@@ -95,10 +97,11 @@ public class SpawnInventoryController
     {
         foreach (Inventory inventory in PrototypeManager.Inventory.Values.OrderByDescending(inv => inv.Category))
         {
-            GameObject inventorySlot_go = new GameObject();
-            inventorySlot_go.name = "Slot - " + inventory.Type;
-            inventorySlot_go.layer = LayerMask.NameToLayer("UI");
-
+            GameObject inventorySlot_go = new GameObject()
+            {
+                name = "Slot - " + inventory.Type,
+                layer = LayerMask.NameToLayer("UI")
+            };
             inventorySlot_go.transform.SetParent(spawnUI.transform);
 
             HorizontalLayoutGroup hlg = inventorySlot_go.AddComponent<HorizontalLayoutGroup>();
@@ -125,9 +128,11 @@ public class SpawnInventoryController
     {
         foreach (int amount in amounts)
         {
-            GameObject button_go = new GameObject();
-            button_go.name = "Button";
-            button_go.layer = LayerMask.NameToLayer("UI");
+            GameObject button_go = new GameObject()
+            {
+                name = "Button",
+                layer = LayerMask.NameToLayer("UI")
+            };
 
             button_go.AddComponent<Image>();
 
@@ -150,9 +155,11 @@ public class SpawnInventoryController
 
     private GameObject CreateTextComponent(GameObject go, string invName, TextAnchor textAnchor)
     {
-        GameObject text_go = new GameObject();
-        text_go.name = "Text";
-        text_go.layer = LayerMask.NameToLayer("UI");
+        GameObject text_go = new GameObject()
+        {
+            name = "Text",
+            layer = LayerMask.NameToLayer("UI")
+        };
 
         RectTransform rectTransform = text_go.AddComponent<RectTransform>();
         rectTransform.SetParent(go.transform);
@@ -178,6 +185,6 @@ public class SpawnInventoryController
     {
         InventoryToBuild = invName;
         AmountToCreate = amount;
-        WorldController.Instance.MouseController.StartSpawnMode();
+        GameController.Instance.CurrentSystem.MouseController.StartSpawnMode();
     }
 }

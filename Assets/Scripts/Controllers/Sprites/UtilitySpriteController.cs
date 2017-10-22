@@ -6,36 +6,46 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class UtilitySpriteController : BaseSpriteController<Utility>
 {
     // Use this for initialization
-    public UtilitySpriteController(World world) : base(world, "Utility")
+    public UtilitySpriteController() : base("Utility")
     {
-        // Register our callback so that our GameObject gets updated whenever
-        // the tile's type changes.
-        world.UtilityManager.Created += OnCreated;
+    }
 
-        // Go through any EXISTING utility (i.e. from a save that was loaded OnEnable) and call the OnCreated event manually.
-        foreach (Utility utility in world.UtilityManager)
+    public override void AssignWorld(World world)
+    {
+        base.AssignWorld(world);
+        if (world != null)
         {
-            OnCreated(utility);
+            // Register our callback so that our GameObject gets updated whenever
+            // the tile's type changes.
+            world.UtilityManager.Created += OnCreated;
+
+            // Go through any EXISTING utility (i.e. from a save that was loaded OnEnable) and call the OnCreated event manually.
+            foreach (Utility utility in world.UtilityManager)
+            {
+                OnCreated(utility);
+            }
         }
     }
 
-    public override void RemoveAll()
+    public override void UnAssignWorld(World world)
     {
-        world.UtilityManager.Created -= OnCreated;
-
-        foreach (Utility utility in world.UtilityManager)
+        if (world != null)
         {
-            utility.Changed -= OnChanged;
-            utility.Removed -= OnRemoved;
-        }
+            world.UtilityManager.Created -= OnCreated;
 
-        base.RemoveAll();
+            foreach (Utility utility in world.UtilityManager)
+            {
+                utility.Changed -= OnChanged;
+                utility.Removed -= OnRemoved;
+            }
+        }
     }
 
     public Sprite GetSpriteForUtility(string objectType)
@@ -46,11 +56,11 @@ public class UtilitySpriteController : BaseSpriteController<Utility>
         return sprite;
     }
 
-    public Sprite GetSpriteForUtility(Utility util)
+    public Sprite GetSpriteForUtility(Utility utility)
     {
-        string spriteName = util.GetSpriteName();
+        string spriteName = utility.GetSpriteName();
 
-        if (util.LinksToNeighbour == false)
+        if (utility.LinksToNeighbour == false)
         {
             return SpriteManager.GetSprite("Utility", spriteName);
         }
@@ -59,14 +69,14 @@ public class UtilitySpriteController : BaseSpriteController<Utility>
         spriteName += "_";
 
         // Check for neighbours North, East, South, West, Northeast, Southeast, Southwest, Northwest
-        int x = util.Tile.X;
-        int y = util.Tile.Y;
         string suffix = string.Empty;
 
-        suffix += GetSuffixForNeighbour(util, x, y + 1, util.Tile.Z, "N");
-        suffix += GetSuffixForNeighbour(util, x + 1, y, util.Tile.Z, "E");
-        suffix += GetSuffixForNeighbour(util, x, y - 1, util.Tile.Z, "S");
-        suffix += GetSuffixForNeighbour(util, x - 1, y, util.Tile.Z, "W");
+        Tile[] neighbours = utility.Tile.GetNeighbours(false, false, false);
+
+        suffix += GetSuffixForNeighbour(utility, neighbours[0], "N");
+        suffix += GetSuffixForNeighbour(utility, neighbours[1], "E");
+        suffix += GetSuffixForNeighbour(utility, neighbours[2], "S");
+        suffix += GetSuffixForNeighbour(utility, neighbours[3], "W");
 
         // For example, if this object has all eight neighbours of
         // the same type, then the string will look like:
@@ -110,7 +120,7 @@ public class UtilitySpriteController : BaseSpriteController<Utility>
         util_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForUtility(util);
         util_go.GetComponent<SpriteRenderer>().color = util.Tint;
     }
-        
+
     protected override void OnRemoved(Utility util)
     {
         if (objectGameObjectMap.ContainsKey(util) == false)
@@ -126,13 +136,12 @@ public class UtilitySpriteController : BaseSpriteController<Utility>
         GameObject.Destroy(util_go);
     }
 
-    private string GetSuffixForNeighbour(Utility util, int x, int y, int z, string suffix)
+    private string GetSuffixForNeighbour(Utility util, Tile tile, string suffix)
     {
-        Tile tile = world.GetTileAt(x, y, z);
         if (tile != null && tile.Utilities != null && tile.Utilities.ContainsKey(util.Type))
-         {
-             return suffix;
-         }
+        {
+            return suffix;
+        }
 
         return string.Empty;
     }

@@ -351,7 +351,7 @@ namespace ProjectPorcupine.Entities
                 }
                 else
                 {
-                    Job job = World.Current.jobQueue.GetJob(this);
+                    Job job = GameController.CurrentWorld.jobQueue.GetJob(this);
                     if (job != null)
                     {
                         SetState(new States.JobState(this, job));

@@ -10,7 +10,7 @@ function InitDevMode( object )
 end
 
 function DevModeSettingChanger()
-	if (WorldController.Instance ~= nil and WorldController.Instance.spawnInventoryController ~= nil) then
-		WorldController.Instance.spawnInventoryController.SetUIVisibility(Settings.GetSetting("developer_general_developerMode") == "True");
+	if (GameController.Instance.CurrentSystem ~= nil and GameController.Instance.CurrentSystem.SpawnInventoryController ~= nil) then
+		GameController.Instance.CurrentSystem.SpawnInventoryController.SetUIVisibility(Settings.GetSetting("developer_general_developerMode") == "True");
 	end
 end

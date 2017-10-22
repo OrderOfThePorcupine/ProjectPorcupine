@@ -26,7 +26,6 @@ public class DialogBox : MonoBehaviour
         openedWhileModal = GameController.Instance.IsModal ? true : false;
 
         GameController.Instance.IsModal = true;
-
         GameController.Instance.SoundController.OnButtonSFX();
 
         gameObject.transform.SetAsLastSibling();
@@ -36,8 +35,8 @@ public class DialogBox : MonoBehaviour
     public virtual void CloseDialog()
     {
         InvokeClosed();
-        
-        Closed = null;        
+
+        Closed = null;
 
         UnityDebugger.Debugger.Log("ModDialogBox", "openedWhileModal=" + openedWhileModal.ToString());
         if (!openedWhileModal)
@@ -46,13 +45,13 @@ public class DialogBox : MonoBehaviour
         }
 
         GameController.Instance.SoundController.OnButtonSFX();
-        
+
         gameObject.SetActive(false);
     }
 
     public void SetClosedAction(string funcName)
     {
-        Closed = () => FunctionsManager.Get("ModDialogBox").Call(funcName, Result); 
+        Closed = () => FunctionsManager.Get("ModDialogBox").Call(funcName, Result);
     }
 
     private void InvokeClosed()

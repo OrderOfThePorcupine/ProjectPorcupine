@@ -81,7 +81,7 @@ public class Path_RoomGraph
     private void GenerateEdgesOutside()
     {   
         List<Path_Edge<Room>> outsideEdges = new List<Path_Edge<Room>>();
-        Room outsideRoom = World.Current.RoomManager.OutsideRoom;
+        Room outsideRoom = GameController.CurrentWorld.RoomManager.OutsideRoom;
         foreach (Room room in nodes.Keys)
         {
             if (room.IsOutsideRoom())

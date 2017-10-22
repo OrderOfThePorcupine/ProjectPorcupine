@@ -237,10 +237,13 @@ namespace ProjectPorcupine.Rooms
                     // Save a list of all the rooms to be removed for later calls
                     // TODO: find a way of not doing this, because at the time of the
                     // later calls, this is stale data.
-                    HashSet<Room> oldRooms = new HashSet<Room>();
+                    // FIXME: Currently not needed?
+                    HashSet<Room> oldRooms = new HashSet<Room>
+                    {
+                        // You need to delete the surrounding rooms so a new room can be created
+                        oldRoom
+                    };
 
-                    // You need to delete the surrounding rooms so a new room can be created
-                    oldRooms.Add(oldRoom);
                     Remove(oldRoom);
 
                     if (sourceTile != null && sourceTile.Room != null)

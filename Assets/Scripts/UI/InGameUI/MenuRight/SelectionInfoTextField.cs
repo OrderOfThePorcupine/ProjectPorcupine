@@ -23,7 +23,7 @@ public class SelectionInfoTextField : MonoBehaviour
     // Use this for initialization.
     private void Start()
     {
-        mc = WorldController.Instance.MouseController;
+        mc = GameController.Instance.CurrentSystem.MouseController;
         txt = GetComponent<Text>();
     }
 

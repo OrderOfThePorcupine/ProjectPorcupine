@@ -172,7 +172,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
 
         if (doRoomFloodFill)
         {
-            World.Current.RoomManager.DoRoomFloodFill(this, splitting, true);
+            GameController.CurrentWorld.RoomManager.DoRoomFloodFill(this, splitting, true);
         }
 
         OnTileClean();
@@ -196,7 +196,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         {
             for (int y_off = Y; y_off < Y + furniture.Height; y_off++)
             {
-                Tile tile = World.Current.GetTileAt(x_off, y_off, Z);
+                Tile tile = GameController.CurrentWorld.GetTileAt(x_off, y_off, Z);
                 tile.Furniture = null;
             }
         }
@@ -221,7 +221,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         {
             for (int y_off = Y; y_off < Y + objInstance.Height; y_off++)
             {
-                Tile t = World.Current.GetTileAt(x_off, y_off, Z);
+                Tile t = GameController.CurrentWorld.GetTileAt(x_off, y_off, Z);
                 t.Furniture = objInstance;
             }
         }
@@ -306,7 +306,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     #region Manage Gas
     public void EqualiseGas(float leakFactor)
     {
-        World.Current.RoomManager.EqualiseGasByTile(this, leakFactor);
+        GameController.CurrentWorld.RoomManager.EqualiseGasByTile(this, leakFactor);
     }
 
     public float GetGasPressure(string gas)
@@ -368,17 +368,17 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public Tile[] GetNeighbours(bool diagOkay = false, bool vertOkay = false, bool nullOkay = false)
     {
         Tile[] tiles = new Tile[10];
-        tiles[0] = World.Current.GetTileAt(X, Y + 1, Z);
-        tiles[1] = World.Current.GetTileAt(X + 1, Y, Z);
-        tiles[2] = World.Current.GetTileAt(X, Y - 1, Z);
-        tiles[3] = World.Current.GetTileAt(X - 1, Y, Z);
+        tiles[0] = GameController.CurrentWorld.GetTileAt(X, Y + 1, Z);
+        tiles[1] = GameController.CurrentWorld.GetTileAt(X + 1, Y, Z);
+        tiles[2] = GameController.CurrentWorld.GetTileAt(X, Y - 1, Z);
+        tiles[3] = GameController.CurrentWorld.GetTileAt(X - 1, Y, Z);
 
         if (diagOkay == true)
         {
-            tiles[4] = World.Current.GetTileAt(X + 1, Y + 1, Z);
-            tiles[5] = World.Current.GetTileAt(X + 1, Y - 1, Z);
-            tiles[6] = World.Current.GetTileAt(X - 1, Y - 1, Z);
-            tiles[7] = World.Current.GetTileAt(X - 1, Y + 1, Z);
+            tiles[4] = GameController.CurrentWorld.GetTileAt(X + 1, Y + 1, Z);
+            tiles[5] = GameController.CurrentWorld.GetTileAt(X + 1, Y - 1, Z);
+            tiles[6] = GameController.CurrentWorld.GetTileAt(X - 1, Y - 1, Z);
+            tiles[7] = GameController.CurrentWorld.GetTileAt(X - 1, Y + 1, Z);
         }
 
         // FIXME: This is a bit of a dirty hack, but it works for preventing characters from phasing through the floor for now.
@@ -402,15 +402,15 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public Tile[] GetVerticalNeighbors(bool nullOkay = false)
     {
         Tile[] tiles = new Tile[2];
-        Tile tileup = World.Current.GetTileAt(X, Y, Z - 1);
+        Tile tileup = GameController.CurrentWorld.GetTileAt(X, Y, Z - 1);
         if (tileup != null && tileup.Type == TileType.Empty)
         {
-            tiles[0] = World.Current.GetTileAt(X, Y, Z - 1);
+            tiles[0] = GameController.CurrentWorld.GetTileAt(X, Y, Z - 1);
         }
 
         if (Type == TileType.Empty)
         {
-            tiles[1] = World.Current.GetTileAt(X, Y, Z + 1);
+            tiles[1] = GameController.CurrentWorld.GetTileAt(X, Y, Z + 1);
         }
 
         if (!nullOkay)
@@ -452,13 +452,13 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         if (Mathf.Abs(dX) + Mathf.Abs(dY) == 2)
         {
             // We are diagonal
-            if (World.Current.GetTileAt(X - dX, Y, Z).PathfindingCost.AreEqual(0f))
+            if (GameController.CurrentWorld.GetTileAt(X - dX, Y, Z).PathfindingCost.AreEqual(0f))
             {
                 // East or West is unwalkable, therefore this would be a clipped movement.
                 return true;
             }
 
-            if (World.Current.GetTileAt(X, Y - dY, Z).PathfindingCost.AreEqual(0f))
+            if (GameController.CurrentWorld.GetTileAt(X, Y - dY, Z).PathfindingCost.AreEqual(0f))
             {
                 // North or South is unwalkable, therefore this would be a clipped movement.
                 return true;
@@ -490,32 +490,32 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
 
     public Tile North()
     {
-        return World.Current.GetTileAt(X, Y + 1, Z);
+        return GameController.CurrentWorld.GetTileAt(X, Y + 1, Z);
     }
 
     public Tile South()
     {
-        return World.Current.GetTileAt(X, Y - 1, Z);
+        return GameController.CurrentWorld.GetTileAt(X, Y - 1, Z);
     }
 
     public Tile East()
     {
-        return World.Current.GetTileAt(X + 1, Y, Z);
+        return GameController.CurrentWorld.GetTileAt(X + 1, Y, Z);
     }
 
     public Tile West()
     {
-        return World.Current.GetTileAt(X - 1, Y, Z);
+        return GameController.CurrentWorld.GetTileAt(X - 1, Y, Z);
     }
 
     public Tile Up()
     {
-        return World.Current.GetTileAt(X, Y, Z - 1);
+        return GameController.CurrentWorld.GetTileAt(X, Y, Z - 1);
     }
 
     public Tile Down()
     {
-        return World.Current.GetTileAt(X, Y, Z + 1);
+        return GameController.CurrentWorld.GetTileAt(X, Y, Z + 1);
     }
 
     /// <summary>
@@ -584,7 +584,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
 
     public void FromJson(JToken tileToken)
     {
-        Room = World.Current.RoomManager[(int)tileToken["RoomID"]];
+        Room = GameController.CurrentWorld.RoomManager[(int)tileToken["RoomID"]];
         if (Room != null)
         {
             Room.AssignTile(this);

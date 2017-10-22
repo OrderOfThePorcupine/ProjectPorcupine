@@ -36,7 +36,6 @@ public class MemoryPerformanceComponent : BasePerformanceHUDComponent
     }
 }
 
-
 /// <summary>
 /// Currently not used but may be used in future is just network.
 /// </summary>
@@ -84,7 +83,6 @@ public class FPSPerformanceComponent : BasePerformanceHUDComponent
     private int currentFps = 0;
 
     private Text UITextElement;
-
 
     // The shown FPS will be 0 for the first second until it ticks over correctly
     public override void Update()
@@ -144,7 +142,6 @@ public class FPSPerformanceComponent : BasePerformanceHUDComponent
         return "FPSPerformanceComponent";
     }
 }
-
 
 /// <summary>
 /// Just measures the max and min range for FPS.

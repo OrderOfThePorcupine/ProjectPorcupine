@@ -54,13 +54,13 @@ public class DialogBoxSaveGame : DialogBoxLoadSaveGame
         // Right now fileName is just what was in the dialog box.  We need to pad this out to the full
         // path, plus an extension!
         // In the end, we're looking for something that's going to be similar to this (depending on OS)
-        //    C:\Users\Quill18\ApplicationData\MyCompanyName\MyGameName\Saves\SaveGameName123.sav
+        //    C:\Users\<UserName>\ApplicationData\<CompanyName>\<GameName>\Saves\SaveGameName123.sav
 
         // Application.persistentDataPath == C:\Users\<username>\ApplicationData\MyCompanyName\MyGameName\
-        string filePath = System.IO.Path.Combine(GameController.Instance.FileSaveBasePath(), fileName + ".sav");
+        string filePath = System.IO.Path.Combine(GameController.FileSaveBasePath, fileName + ".sav");
 
         // At this point, filePath should look very much like
-        ////     C:\Users\Quill18\ApplicationData\MyCompanyName\MyGameName\Saves\SaveGameName123.sav
+        ////     C:\Users\<UserName>\ApplicationData\<CompanyName>\<GameName>\Saves\SaveGameName123.sav
 
         if (File.Exists(filePath) == true)
         {
@@ -96,7 +96,7 @@ public class DialogBoxSaveGame : DialogBoxLoadSaveGame
             // Skip a frame so that user will see pop-up
             yield return null;
 
-            Thread t = WorldController.Instance.SaveWorld(filePath);
+            Thread t = GameController.Instance.CurrentSystem.SaveWorld(filePath);
 
             // Wait for data to be saved to HDD.
             while (t.IsAlive)

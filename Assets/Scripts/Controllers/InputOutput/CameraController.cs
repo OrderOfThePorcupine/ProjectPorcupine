@@ -27,14 +27,10 @@ public class CameraController
     private Vector3 positionTarget;
     private Vector3 prevPositionTarget;
 
-    private CameraData cameraData;
-
     public CameraController()
     {
         // Main camera handles UI only
         Camera.main.farClipPlane = 9;
-
-        cameraData = World.Current.CameraData;
 
         KeyboardManager keyboardManager = KeyboardManager.Instance;
         keyboardManager.RegisterInputAction("MoveCameraEast", KeyboardMappedInputType.Key, () => { frameMoveHorizontal++; });
@@ -46,11 +42,11 @@ public class CameraController
         keyboardManager.RegisterInputAction("MoveCameraUp", KeyboardMappedInputType.KeyUp, ChangeLayerUp);
         keyboardManager.RegisterInputAction("MoveCameraDown", KeyboardMappedInputType.KeyUp, ChangeLayerDown);
 
-        keyboardManager.RegisterInputAction("ApplyCameraPreset1", KeyboardMappedInputType.KeyUp, () => ApplyPreset(cameraData.presets[0]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset2", KeyboardMappedInputType.KeyUp, () => ApplyPreset(cameraData.presets[1]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset3", KeyboardMappedInputType.KeyUp, () => ApplyPreset(cameraData.presets[2]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset4", KeyboardMappedInputType.KeyUp, () => ApplyPreset(cameraData.presets[3]));
-        keyboardManager.RegisterInputAction("ApplyCameraPreset5", KeyboardMappedInputType.KeyUp, () => ApplyPreset(cameraData.presets[4]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset1", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[0]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset2", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[1]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset3", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[2]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset4", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[3]));
+        keyboardManager.RegisterInputAction("ApplyCameraPreset5", KeyboardMappedInputType.KeyUp, () => ApplyPreset(GameController.CurrentWorld.CameraData.presets[4]));
         keyboardManager.RegisterInputAction("AssignCameraPreset1", KeyboardMappedInputType.KeyUp, () => AssignPreset(0));
         keyboardManager.RegisterInputAction("AssignCameraPreset2", KeyboardMappedInputType.KeyUp, () => AssignPreset(1));
         keyboardManager.RegisterInputAction("AssignCameraPreset3", KeyboardMappedInputType.KeyUp, () => AssignPreset(2));
@@ -125,7 +121,7 @@ public class CameraController
 
         prevPositionTarget = positionTarget;
 
-        WorldController.Instance.SoundController.SetListenerPosition(Camera.main.transform.position.x, Camera.main.transform.position.y, (float)CurrentLayer);
+        GameController.Instance.SoundController.SetListenerPosition(Camera.main.transform.position.x, Camera.main.transform.position.y, (float)CurrentLayer);
     }
 
     public void ChangeZoom(float amount)
@@ -169,32 +165,32 @@ public class CameraController
     /// Presets will be null if loading an empty world and its values are then taken from the current camera values;
     /// if loading from a file, preset values are fed to the camera.
     /// </summary>
-    public void Initialize()
+    public void Initialize(World world)
     {
-        if (cameraData.presets == null)
+        if (world.CameraData.presets == null)
         {
-            cameraData.presets = new Preset[5];
+            world.CameraData.presets = new Preset[5];
 
-            cameraData.position = Camera.main.transform.position;
-            cameraData.zoomLevel = zoomTarget;
-            cameraData.zLevel = currentLayer;
+            world.CameraData.position = Camera.main.transform.position;
+            world.CameraData.zoomLevel = zoomTarget;
+            world.CameraData.zLevel = currentLayer;
 
-            for (int i = 0; i < cameraData.presets.Length; i++)
+            for (int i = 0; i < world.CameraData.presets.Length; i++)
             {
-                cameraData.presets[i].position = Camera.main.transform.position;
-                cameraData.presets[i].zoomLevel = Camera.main.orthographicSize;
-                cameraData.presets[i].zLevel = currentLayer;
+                world.CameraData.presets[i].position = Camera.main.transform.position;
+                world.CameraData.presets[i].zoomLevel = Camera.main.orthographicSize;
+                world.CameraData.presets[i].zLevel = currentLayer;
             }
         }
         else
         {
-            positionTarget = cameraData.position;
+            positionTarget = world.CameraData.position;
             Camera.main.transform.position = positionTarget;
 
-            zoomTarget = cameraData.zoomLevel;
+            zoomTarget = world.CameraData.zoomLevel;
             Camera.main.orthographicSize = zoomTarget;
 
-            ChangeLayer(cameraData.zLevel);
+            ChangeLayer(world.CameraData.zLevel);
         }
     }
 
@@ -221,8 +217,8 @@ public class CameraController
 
     private void AssignPreset(int index)
     {
-        cameraData.presets[index].position = Camera.main.transform.position;
-        cameraData.presets[index].zoomLevel = Camera.main.orthographicSize;
+        GameController.CurrentWorld.CameraData.presets[index].position = Camera.main.transform.position;
+        GameController.CurrentWorld.CameraData.presets[index].zoomLevel = Camera.main.orthographicSize;
     }
 
     private void SyncCameras()
@@ -238,21 +234,20 @@ public class CameraController
 
     private void CreateLayerCameras()
     {
-        if (WorldController.Instance.World == null)
+        if (GameController.CurrentWorld == null)
         {
             return;
         }
 
         // We don't have the right number of cameras for our layers
-        if (layerCameras == null || layerCameras.Length != WorldController.Instance.World.Depth)
+        if (layerCameras == null || layerCameras.Length != GameController.CurrentWorld.Depth)
         {
-            int depth = WorldController.Instance.World.Depth;
+            int depth = GameController.CurrentWorld.Depth;
             layerCameras = new Camera[depth];
             for (int i = 0; i < depth; i++)
             {
                 // This creates a new GameObject and adds it to our scene.
                 GameObject camera_go = new GameObject();
-
                 camera_go.name = "Layer Camera (" + i + ")";
                 camera_go.transform.position = new Vector3(0, 0, 9);
                 camera_go.transform.SetParent(Camera.main.transform, false);

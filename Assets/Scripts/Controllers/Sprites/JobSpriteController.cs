@@ -6,59 +6,60 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using ProjectPorcupine.Entities;
 using UnityEngine;
 
 public class JobSpriteController : BaseSpriteController<Job>
 {
-    // This bare-bones controller is mostly just going to piggyback
-    // on FurnitureSpriteController because we don't yet fully know
-    // what our job system is going to look like in the end.
-    private FurnitureSpriteController fsc;
-    private UtilitySpriteController usc;
-
     // Use this for initialization
-    public JobSpriteController(World world, FurnitureSpriteController furnitureSpriteController, UtilitySpriteController utilitySpriteController)
-        : base(world, "Jobs")
+    public JobSpriteController() : base("Jobs")
     {
-        fsc = furnitureSpriteController;
-        usc = utilitySpriteController;
-        world.jobQueue.OnJobCreated += OnCreated;
+    }
 
-        foreach (Job job in world.jobQueue.PeekAllJobs())
+    public override void AssignWorld(World world)
+    {
+        base.AssignWorld(world);
+        if (world != null)
         {
-            OnCreated(job);
-        }
+            world.jobQueue.OnJobCreated += OnCreated;
 
-        foreach (Character character in world.CharacterManager)
-        {
-            if (character.MyJob != null)
+            foreach (Job job in world.jobQueue.PeekAllJobs())
             {
-                OnCreated(character.MyJob);
+                OnCreated(job);
+            }
+
+            foreach (Character character in world.CharacterManager)
+            {
+                if (character.MyJob != null)
+                {
+                    OnCreated(character.MyJob);
+                }
             }
         }
     }
 
-    public override void RemoveAll()
+    public override void UnAssignWorld(World world)
     {
-        world.jobQueue.OnJobCreated -= OnCreated;
-
-        foreach (Job job in world.jobQueue.PeekAllJobs())
+        if (world != null)
         {
-            job.OnJobCompleted -= OnRemoved;
-            job.OnJobStopped -= OnRemoved;
-        }
+            world.jobQueue.OnJobCreated -= OnCreated;
 
-        foreach (Character character in world.CharacterManager)
-        {
-            if (character.MyJob != null)
+            foreach (Job job in world.jobQueue.PeekAllJobs())
             {
-                character.MyJob.OnJobCompleted -= OnRemoved;
-                character.MyJob.OnJobStopped -= OnRemoved;
+                job.OnJobCompleted -= OnRemoved;
+                job.OnJobStopped -= OnRemoved;
+            }
+
+            foreach (Character character in world.CharacterManager)
+            {
+                if (character.MyJob != null)
+                {
+                    character.MyJob.OnJobCompleted -= OnRemoved;
+                    character.MyJob.OnJobStopped -= OnRemoved;
+                }
             }
         }
-
-        base.RemoveAll();
     }
 
     protected override void OnCreated(Job job)
@@ -116,13 +117,13 @@ public class JobSpriteController : BaseSpriteController<Job>
             if (job.buildablePrototype.GetType().ToString() == "Furniture")
             {
                 Furniture furnitureToBuild = (Furniture)job.buildablePrototype;
-                sr.sprite = fsc.GetSpriteForFurniture(job.Type);
+                sr.sprite = GameController.Instance.FurnitureSpriteController.GetSpriteForFurniture(job.Type);
                 job_go.transform.position = job.tile.Vector3 + ImageUtils.SpritePivotOffset(sr.sprite, furnitureToBuild.Rotation);
                 job_go.transform.Rotate(0, 0, furnitureToBuild.Rotation);
             }
             else if (job.buildablePrototype.GetType().ToString() == "Utility")
             {
-                sr.sprite = usc.GetSpriteForUtility(job.Type);
+                sr.sprite = GameController.Instance.UtilitySpriteController.GetSpriteForUtility(job.Type);
                 job_go.transform.position = job.tile.Vector3 + ImageUtils.SpritePivotOffset(sr.sprite);
             }
 
@@ -132,13 +133,14 @@ public class JobSpriteController : BaseSpriteController<Job>
         sr.sortingLayerName = "Jobs";
 
         // FIXME: This hardcoding is not ideal!  <== Understatement
+        // Certain furniture should have a special property to turn it to face properly
         if (job.Type == "Door")
         {
             // By default, the door graphic is meant for walls to the east & west
             // Check to see if we actually have a wall north/south, and if so
             // then rotate this GO by 90 degrees
-            Tile northTile = world.GetTileAt(job.tile.X, job.tile.Y + 1, job.tile.Z);
-            Tile southTile = world.GetTileAt(job.tile.X, job.tile.Y - 1, job.tile.Z);
+            Tile northTile = job.tile.North();
+            Tile southTile = job.tile.South();
 
             if (northTile != null && southTile != null && northTile.Furniture != null && southTile.Furniture != null &&
                 northTile.Furniture.HasTypeTag("Wall") && southTile.Furniture.HasTypeTag("Wall"))

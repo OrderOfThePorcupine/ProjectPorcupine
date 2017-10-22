@@ -53,14 +53,14 @@ public class InventoryManager
             for (offsetX = -offset; offsetX <= offset; offsetX++)
             {
                 offsetY = offset;
-                tile = World.Current.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
+                tile = GameController.CurrentWorld.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
                 if (CanPlaceInventoryAt(tile, inv))
                 {
                     return tile;
                 }
 
                 offsetY = -offset;
-                tile = World.Current.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
+                tile = GameController.CurrentWorld.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
                 if (CanPlaceInventoryAt(tile, inv))
                 {
                     return tile;
@@ -71,14 +71,14 @@ public class InventoryManager
             for (offsetY = -offset; offsetY <= offset; offsetY++)
             {
                 offsetX = offset;
-                tile = World.Current.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
+                tile = GameController.CurrentWorld.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
                 if (CanPlaceInventoryAt(tile, inv))
                 {
                     return tile;
                 }
 
                 offsetX = -offset;
-                tile = World.Current.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
+                tile = GameController.CurrentWorld.GetTileAt(inTile.X + offsetX, inTile.Y + offsetY, inTile.Z);
                 if (CanPlaceInventoryAt(tile, inv))
                 {
                     return tile;
@@ -337,7 +337,7 @@ public class InventoryManager
 
             Inventory inventory = new Inventory();
             inventory.FromJson(inventoryToken);
-            PlaceInventory(World.Current.GetTileAt(x, y, z), inventory);
+            PlaceInventory(GameController.CurrentWorld.GetTileAt(x, y, z), inventory);
         }
     }
 
@@ -378,7 +378,7 @@ public class InventoryManager
             handler(inventory);
 
             // Let the JobQueue know there is new inventory available.
-            World.Current.jobQueue.ReevaluateReachability();
+            GameController.CurrentWorld.jobQueue.ReevaluateReachability();
         }
     }
 

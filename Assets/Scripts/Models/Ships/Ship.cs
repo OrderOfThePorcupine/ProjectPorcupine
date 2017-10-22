@@ -292,7 +292,7 @@ public class Ship : IPrototypable
         {
             for (int y = 0; y < Height; y++)
             {
-                Tile tile = GetTile(World.Current, Berth, x, y, 0);
+                Tile tile = GetTile(GameController.CurrentWorld, Berth, x, y, 0);
 
                 // Change tile to defined contents
                 if (tile.Type.Equals(TileType.Empty) == false || tile.Furniture != null)
@@ -303,7 +303,7 @@ public class Ship : IPrototypable
                 tile.SetTileType(PrototypeManager.TileType.Get(tileTypes[x, y]));
                 if (furnitureTypes[x, y] != null)
                 {
-                    World.Current.FurnitureManager.PlaceFurniture(furnitureTypes[x, y], tile, false);
+                    GameController.CurrentWorld.FurnitureManager.PlaceFurniture(furnitureTypes[x, y], tile, false);
                 }
             }
         }
@@ -319,7 +319,7 @@ public class Ship : IPrototypable
         {
             for (int y = 0; y < Height; y++)
             {
-                Tile tile = GetTile(World.Current, Berth, x, y, 0);
+                Tile tile = GetTile(GameController.CurrentWorld, Berth, x, y, 0);
 
                 // Change tile to empty
                 // Order reversed in case furniture on an empty tile leads to problems
@@ -380,7 +380,7 @@ public class Ship : IPrototypable
         {
             for (int y = 0; y < Height; y++)
             {
-                Tile tile = GetTile(World.Current, berth, x, y, 0);
+                Tile tile = GetTile(GameController.CurrentWorld, berth, x, y, 0);
 
                 if (tile.Type.Equals(TileType.Empty) == false)
                 {

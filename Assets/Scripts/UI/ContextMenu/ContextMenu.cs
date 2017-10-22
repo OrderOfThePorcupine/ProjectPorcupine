@@ -23,11 +23,8 @@ public class ContextMenu : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        List<IContextActionProvider> providers = GetContextualActionProviderOnTile(tile);
-        List<ContextMenuAction> contextActions = GetContextualMenuActionFromProviders(providers);
-
         ClearInterface();
-        BuildInterface(contextActions);
+        BuildInterface(GetContextualActionProviders(tile));
     }
 
     /// <summary>
@@ -54,16 +51,14 @@ public class ContextMenu : MonoBehaviour
     /// Builds the interface.
     /// </summary>
     /// <param name="contextualActions">Contextual actions.</param>
-    private void BuildInterface(List<ContextMenuAction> contextualActions)
+    private void BuildInterface(IEnumerable<IContextActionProvider> contextualActions)
     {
         gameObject.transform.position = Input.mousePosition + new Vector3(10, -10, 0);
+        bool characterSelected = GameController.Instance.CurrentSystem.MouseController.IsCharacterSelected();
 
-        bool characterSelected = WorldController.Instance.MouseController.IsCharacterSelected();
-
-        foreach (ContextMenuAction contextMenuAction in contextualActions)
+        foreach (ContextMenuAction contextMenuAction in contextualActions.SelectMany(x => x.GetContextMenuActions(this)))
         {
-            if ((contextMenuAction.RequireCharacterSelected && characterSelected) ||
-                !contextMenuAction.RequireCharacterSelected)
+            if (!contextMenuAction.RequireCharacterSelected || characterSelected)
             {
                 GameObject go = (GameObject)Instantiate(ContextualMenuItemPrefab);
                 go.transform.SetParent(gameObject.transform);
@@ -81,22 +76,20 @@ public class ContextMenu : MonoBehaviour
     /// </summary>
     /// <returns>The contextual action provider for the specified tile.</returns>
     /// <param name="tile">Tile to get a contextual action provider for.</param>
-    private List<IContextActionProvider> GetContextualActionProviderOnTile(Tile tile)
+    private IEnumerable<IContextActionProvider> GetContextualActionProviders(Tile tile)
     {
-        List<IContextActionProvider> providers = new List<IContextActionProvider>();
-
-        providers.Add(tile);
+        yield return tile;
 
         if (tile.Furniture != null)
         {
-            providers.Add(tile.Furniture);
+            yield return tile.Furniture;
         }
 
         if (tile.Utilities != null)
         {
             foreach (Utility utility in tile.Utilities.Values)
             {
-                providers.Add(utility);
+                yield return utility;
             }
         }
 
@@ -104,31 +97,13 @@ public class ContextMenu : MonoBehaviour
         {
             foreach (Character character in tile.Characters)
             {
-                providers.Add(character);
+                yield return character;
             }
         }
 
         if (tile.Inventory != null)
         {
-            providers.Add(tile.Inventory);
+            yield return tile.Inventory;
         }
-
-        return providers;
-    }
-
-    /// <summary>
-    /// Gets the contextual menu action from a list of providers.
-    /// </summary>
-    /// <returns>The contextual menu action from a list of providers.</returns>
-    /// <param name="providers">Providers.</param>
-    private List<ContextMenuAction> GetContextualMenuActionFromProviders(List<IContextActionProvider> providers)
-    {
-        List<ContextMenuAction> contextualActions = new List<ContextMenuAction>();
-        foreach (IContextActionProvider contextualActionProvider in providers)
-        {
-            contextualActions.AddRange(contextualActionProvider.GetContextMenuActions(this));
-        }
-
-        return contextualActions;
     }
 }

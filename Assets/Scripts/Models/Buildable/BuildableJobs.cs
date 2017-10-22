@@ -182,7 +182,7 @@ public class BuildableJobs
         job.buildable = buildable;
         activeJobs.Add(job);
         job.OnJobStopped += OnJobStopped;
-        World.Current.jobQueue.Enqueue(job);
+        GameController.CurrentWorld.jobQueue.Enqueue(job);
     }
 
     /// <summary>
@@ -270,7 +270,7 @@ public class BuildableJobs
     /// <param name="offset">A an offset from the buildable Tile.</param>
     private Tile GetTileAtOffset(Vector2 offset)
     {
-        return World.Current.GetTileAt(buildable.Tile.X + (int)offset.x, buildable.Tile.Y + (int)offset.y, buildable.Tile.Z);
+        return GameController.CurrentWorld.GetTileAt(buildable.Tile.X + (int)offset.x, buildable.Tile.Y + (int)offset.y, buildable.Tile.Z);
     }
 
     /// <summary>

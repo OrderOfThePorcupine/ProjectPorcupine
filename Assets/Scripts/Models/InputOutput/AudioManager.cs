@@ -10,49 +10,65 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using FMOD;
 
 /// <summary>
 /// The Manager that handles the loading and storing of audio from streamingAssets.
 /// </summary>
-public class AudioManager
+public static class AudioManager
 {
-    public static FMOD.System SoundSystem;
-
-    // Channel Groups
-    public static Dictionary<string, ChannelGroup> channelGroups;
-
-    public static ChannelGroup master;
-
+    public static readonly FMOD.System SoundSystem;
     private static Dictionary<string, SoundClip> audioClips;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AudioManager"/> class.
-    /// </summary>
-    public AudioManager()
+    static AudioManager()
     {
-        channelGroups = new Dictionary<string, ChannelGroup>();
         Factory.System_Create(out SoundSystem);
         SoundSystem.setDSPBufferSize(1024, 10);
         SoundSystem.init(32, INITFLAGS.NORMAL, (IntPtr)0);
+
+        ChannelGroups = new Dictionary<string, ChannelGroup>();
+        ChannelGroup master;
         SoundSystem.getMasterChannelGroup(out master);
-        DSPConnection throwaway;
-        channelGroups.Add("UI", null);
-        channelGroups.Add("gameSounds", null);
-        channelGroups.Add("alerts", null);
-        channelGroups.Add("music", null);
-        foreach (string key in channelGroups.Keys.ToArray())
+        Master = master;
+
+        DSPConnection connection;
+        ChannelGroups.Add("UI", null);
+        ChannelGroups.Add("gameSounds", null);
+        ChannelGroups.Add("alerts", null);
+        ChannelGroups.Add("music", null);
+        foreach (string key in ChannelGroups.Keys.ToArray())
         {
             ChannelGroup chanGroup;
             SoundSystem.createChannelGroup(key, out chanGroup);
-            master.addGroup(chanGroup, true, out throwaway);
-            channelGroups[key] = chanGroup;
+            Master.addGroup(chanGroup, true, out connection);
+            ChannelGroups[key] = chanGroup;
         }
 
-        channelGroups.Add("master", master);
+        ChannelGroups.Add("master", Master);
 
         SoundSystem.set3DSettings(1f, 1f, .25f);
         audioClips = new Dictionary<string, SoundClip>();
+    }
+
+    public static Dictionary<string, ChannelGroup> ChannelGroups { get; private set; }
+
+    public static ChannelGroup Master { get; private set; }
+
+    /// <summary>
+    /// Loads all the audio files from the specified directory.
+    /// </summary>
+    /// <param name="directoryPath">The path of the directory you want to load the audio files from.</param>
+    public static void LoadAudioFiles(string directoryPath)
+    {
+        string[] subDirectories = Directory.GetDirectories(directoryPath);
+        foreach (string subDirectory in subDirectories)
+        {
+            LoadAudioFiles(subDirectory);
+        }
+
+        string[] filesInDir = Directory.GetFiles(directoryPath);
+        LoadAudioFile(filesInDir, directoryPath);
     }
 
     /// <summary>
@@ -104,34 +120,20 @@ public class AudioManager
     }
 
     /// <summary>
-    /// Loads all the audio files from the specified directory.
+    /// Should only be called when the game is actually ending!.
     /// </summary>
-    /// <param name="directoryPath">The path of the directory you want to load the audio files from.</param>
-    public static void LoadAudioFiles(string directoryPath)
-    {
-        string[] subDirectories = Directory.GetDirectories(directoryPath);
-        foreach (string subDirectory in subDirectories)
-        {
-            LoadAudioFiles(subDirectory);
-        }
-
-        string[] filesInDir = Directory.GetFiles(directoryPath);
-        LoadAudioFile(filesInDir, directoryPath);
-    }
-
     public static void Destroy()
     {
         SoundSystem.close();
 
         // This will also release master, so we don't have to call master.release();
-        foreach (string key in channelGroups.Keys)
+        foreach (string key in ChannelGroups.Keys)
         {
-            channelGroups[key].release();
+            ChannelGroups[key].release();
         }
 
         SoundSystem.release();
-
-        SoundSystem = null;
+        SoundSystem.close();
         audioClips = null;
     }
 
@@ -168,6 +170,35 @@ public class AudioManager
             {
                 audioClips[filename] = new SoundClip(clip);
             }
+        }
+    }
+
+    public struct DriverInfo
+    {
+        public DriverInfo(int id)
+        {
+            this.ID = id;
+            StringBuilder name = new StringBuilder(64);
+            Guid guid;
+            int systemRate;
+            SPEAKERMODE speakerMode;
+            int speakerModeChannels;
+
+            SoundSystem.getDriverInfo(id, name, 64, out guid, out systemRate, out speakerMode, out speakerModeChannels);
+
+            this.Guid = guid;
+            this.Name = name.ToString();
+        }
+
+        public int ID { get; private set; }
+
+        public string Name { get; private set; }
+
+        public Guid Guid { get; private set; }
+
+        public override string ToString()
+        {
+            return ID.ToString() + ", " + Name;
         }
     }
 }

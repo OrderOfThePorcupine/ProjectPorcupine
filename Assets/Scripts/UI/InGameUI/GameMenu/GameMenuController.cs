@@ -20,7 +20,7 @@ public class GameMenuController : MonoBehaviour
     public void DeactivateAll()
     {
         menuLeft.CloseMenu();
-        WorldController.Instance.MouseController.ClearMouseMode(true);
+        GameController.Instance.CurrentSystem.MouseController.ClearMouseMode(true);
     }
 
     // Toggles whether menu is active.
@@ -43,6 +43,11 @@ public class GameMenuController : MonoBehaviour
 
     private void CreateGameMenu()
     {
+        foreach (Transform transform in this.gameObject.transform)
+        {
+            Destroy(transform.gameObject);
+        }
+
         foreach (GameMenuItem gameMenuItem in GameMenuManager.Instance)
         {
             CreateButton(gameMenuItem);
@@ -62,7 +67,7 @@ public class GameMenuController : MonoBehaviour
         gameObject.transform.GetComponentInChildren<TextLocalizer>().formatValues = new string[] { LocalizationTable.GetLocalization(gameMenuItem.Key) };
 
         Button button = gameObject.GetComponent<Button>();
-        button.onClick.AddListener(delegate
+        button.onClick.AddListener((UnityEngine.Events.UnityAction)delegate
             {
                 if (!GameController.Instance.IsModal)
                 {

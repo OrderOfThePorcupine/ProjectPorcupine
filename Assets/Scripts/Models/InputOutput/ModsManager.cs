@@ -19,16 +19,7 @@ public class ModsManager
     {
         mods = GetModsFiles();
 
-        LoadSharedFiles();
-
-        if (SceneController.IsAtIntroScene())
-        {
-            LoadIntroFiles();
-        }
-        else if (SceneController.IsAtMainScene())
-        {
-            LoadMainSceneFiles();
-        }
+        LoadFiles();
     }
 
     /// <summary>
@@ -66,8 +57,11 @@ public class ModsManager
         return Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Mods");
     }
 
-    private void LoadMainSceneFiles()
+    private void LoadFiles()
     {
+        LoadDirectoryAssets("Images", SpriteManager.LoadSpriteFiles);
+        LoadDirectoryAssets("Audio", AudioManager.LoadAudioFiles);
+
         LoadFunctions("Furniture.lua", "Furniture");
         LoadFunctions("Utility.lua", "Utility");
         LoadFunctions("RoomBehavior.lua", "RoomBehavior");
@@ -77,9 +71,15 @@ public class ModsManager
         LoadFunctions("Quest.lua", "Quest");
         LoadFunctions("ScheduledEvent.lua", "ScheduledEvent");
         LoadFunctions("Overlay.lua", "Overlay");
+        LoadFunctions("ConsoleCommands.lua", "DevConsole");
+        LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
+        LoadFunctions("PerformanceHUDCommands.lua", "PerformanceHUD");
 
         LoadFunctions("FurnitureFunctions.cs", "Furniture");
         LoadFunctions("OverlayFunctions.cs", "Overlay");
+        LoadFunctions("CommandFunctions.cs", "DevConsole");
+        LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
+        LoadFunctions("PerformanceHUDFunctions.cs", "PerformanceHUD");
 
         LoadPrototypes("Tiles.xml", PrototypeManager.TileType.LoadPrototypes);
         LoadPrototypes("Furniture.xml", PrototypeManager.Furniture.LoadPrototypes);
@@ -96,36 +96,11 @@ public class ModsManager
         LoadPrototypes("Headlines.xml", PrototypeManager.Headline.LoadPrototypes);
         LoadPrototypes("Overlay.xml", PrototypeManager.Overlay.LoadPrototypes);
         LoadPrototypes("Ships.xml", PrototypeManager.Ship.LoadPrototypes);
-
-        LoadCharacterNames("CharacterNames.txt");
-
-        LoadDirectoryAssets("Images", SpriteManager.LoadSpriteFiles);
-        LoadDirectoryAssets("Audio", AudioManager.LoadAudioFiles);
-    }
-
-    private void LoadIntroFiles()
-    {
-        LoadDirectoryAssets("MainMenu/Images", SpriteManager.LoadSpriteFiles);
-        LoadDirectoryAssets("MainMenu/Audio", AudioManager.LoadAudioFiles);
-    }
-
-    private void LoadSharedFiles()
-    {
-        LoadDirectoryAssets("Shared/Images", SpriteManager.LoadSpriteFiles);
-        LoadDirectoryAssets("Shared/Audio", AudioManager.LoadAudioFiles);
-
-        LoadFunctions("CommandFunctions.cs", "DevConsole");
-        LoadFunctions("ConsoleCommands.lua", "DevConsole");
-
         LoadPrototypes("ConsoleCommands.xml", PrototypeManager.DevConsole.LoadPrototypes);
         LoadPrototypes("SettingsTemplate.xml", PrototypeManager.SettingsCategories.LoadPrototypes);
         LoadPrototypes("PerformanceHUDComponentGroups.xml", PrototypeManager.PerformanceHUD.LoadPrototypes);
 
-        LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
-        LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
-
-        LoadFunctions("PerformanceHUDFunctions.cs", "PerformanceHUD");
-        LoadFunctions("PerformanceHUDCommands.lua", "PerformanceHUD");
+        LoadCharacterNames("CharacterNames.txt");
     }
 
     /// <summary>

@@ -203,7 +203,7 @@ namespace ProjectPorcupine.Buildable.Components
             bool hasPower = true;
             if (IsConsumer)
             {
-                hasPower = World.Current.FluidNetwork.HasPower(this);
+                hasPower = GameController.CurrentWorld.FluidNetwork.HasPower(this);
             }
 
             return hasPower;
@@ -289,14 +289,14 @@ namespace ProjectPorcupine.Buildable.Components
 
         private void FluidConnectionRemoved(Furniture obj)
         {
-            World.Current.FluidNetwork.Unplug(this);
+            GameController.CurrentWorld.FluidNetwork.Unplug(this);
             ParentFurniture.Removed -= FluidConnectionRemoved;
         }
 
         private void OnReconnecting()
         {
             // TODO: Make this not a Universal Connection
-            World.Current.FluidNetwork.PlugIn(this);
+            GameController.CurrentWorld.FluidNetwork.PlugIn(this);
         }
         
         [Serializable]

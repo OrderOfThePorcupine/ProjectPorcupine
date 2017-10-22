@@ -13,30 +13,38 @@ using UnityEngine;
 
 public class TileSpriteController : BaseSpriteController<Tile>
 {
-    // Use this for initialization
-    public TileSpriteController(World world) : base(world, "Tiles")
+    public TileSpriteController() : base("Tiles")
     {
-        world.OnTileChanged += OnChanged;
-        world.OnTileTypeChanged += OnChanged;
+    }
 
-        for (int x = 0; x < world.Width; x++)
+    public override void AssignWorld(World world)
+    {
+        base.AssignWorld(world);
+        if (world != null)
         {
-            for (int y = 0; y < world.Height; y++)
+            world.OnTileChanged += OnChanged;
+            world.OnTileTypeChanged += OnChanged;
+
+            for (int x = 0; x < world.Width; x++)
             {
-                for (int z = 0; z < world.Depth; z++)
+                for (int y = 0; y < world.Height; y++)
                 {
-                    Tile tile = world.GetTileAt(x, y, z);
-                    OnCreated(tile);
+                    for (int z = 0; z < world.Depth; z++)
+                    {
+                        OnCreated(world.GetTileAt(x, y, z));
+                    }
                 }
             }
         }
     }
 
-    public override void RemoveAll()
+    public override void UnAssignWorld(World world)
     {
-        world.OnTileChanged -= OnChanged;
-
-        base.RemoveAll();
+        if (world != null)
+        {
+            world.OnTileChanged -= OnChanged;
+            world.OnTileTypeChanged -= OnChanged;
+        }
     }
 
     protected override void OnCreated(Tile tile)

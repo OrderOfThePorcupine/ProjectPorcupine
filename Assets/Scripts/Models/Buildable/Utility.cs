@@ -261,7 +261,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             // If we're skipping the update, we need a temporary grid for furniture in the same tile to connect to.
             obj.Grid = new Grid();
-            World.Current.PowerNetwork.RegisterGrid(obj.Grid);
+            GameController.CurrentWorld.PowerNetwork.RegisterGrid(obj.Grid);
             obj.SeekConnection();
         }
 
@@ -395,7 +395,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             Job job = deconstructOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Deconstruct();
-            World.Current.jobQueue.Enqueue(job);
+            GameController.CurrentWorld.jobQueue.Enqueue(job);
         }
     }
 
@@ -410,7 +410,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         }
 
         // Just unregister our grid, it will get reregistered if there are any other utilities on this grid
-        World.Current.PowerNetwork.RemoveGrid(Grid);
+        GameController.CurrentWorld.PowerNetwork.RemoveGrid(Grid);
 
         // We call lua to decostruct
         EventActions.Trigger("OnUninstall", this);
@@ -426,7 +426,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             foreach (OrderAction.InventoryInfo inv in deconstructOrder.Inventory)
             {
-                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Type, inv.Amount));
+                GameController.CurrentWorld.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Type, inv.Amount));
             }
         }
 
@@ -606,7 +606,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         TimeManager.Instance.RunNextFrame(() => gridUpdatedThisFrame = false);
         Grid oldGrid = utilityToUpdate.Grid;
 
-        World.Current.PowerNetwork.RemoveGrid(utilityToUpdate.Grid);
+        GameController.CurrentWorld.PowerNetwork.RemoveGrid(utilityToUpdate.Grid);
 
         if (newGrid == null)
         {
@@ -635,7 +635,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
         if (utilityToUpdate.Grid != oldGrid)
         {
-            World.Current.PowerNetwork.UnregisterGrid(oldGrid);
+            GameController.CurrentWorld.PowerNetwork.UnregisterGrid(oldGrid);
         }
 
         if (oldGrid != null && newGrid != null)
@@ -643,7 +643,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
             newGrid.Merge(oldGrid);
         }
 
-        World.Current.PowerNetwork.RegisterGrid(utilityToUpdate.Grid);
+        GameController.CurrentWorld.PowerNetwork.RegisterGrid(utilityToUpdate.Grid);
 
         foreach (Tile neighborTile in utilityToUpdate.Tile.GetNeighbours())
         {

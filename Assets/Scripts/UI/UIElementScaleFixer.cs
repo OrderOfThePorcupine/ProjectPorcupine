@@ -11,9 +11,9 @@ using UnityEngine;
 
 // HACK: This is a needed workaround for any most any UI ELeemnt that is instantiated after start.
 // If this script isn't attached it may cause errors at different scalings.
-public class UIElementScaleFixer : MonoBehaviour 
+public class UIElementScaleFixer : MonoBehaviour
 {
-    public void Start() 
+    public void Start()
     {
         transform.localScale = Vector3.one;
     }

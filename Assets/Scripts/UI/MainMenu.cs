@@ -27,7 +27,7 @@ public class MainMenu : MonoBehaviour
         {
             if (!GameController.Instance.IsModal)
             {
-                SceneController.ConfigureNewWorld();
+                GameController.Instance.DialogBoxManager.dialogBoxNewGame.ShowDialog();
             }
         });
 
@@ -36,7 +36,7 @@ public class MainMenu : MonoBehaviour
         {
             if (!GameController.Instance.IsModal)
             {
-                MainMenuController.Instance.DialogBoxManager.dialogBoxLoadGame.ShowDialog();
+                GameController.Instance.DialogBoxManager.dialogBoxLoadGame.ShowDialog();
             }
         });
 
@@ -54,7 +54,7 @@ public class MainMenu : MonoBehaviour
         {
             if (!GameController.Instance.IsModal)
             {
-                SceneController.QuitGame();
+                GameController.QuitGame();
             }
         });
     }

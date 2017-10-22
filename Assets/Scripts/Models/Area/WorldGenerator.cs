@@ -12,6 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class WorldGenerator
@@ -43,7 +45,7 @@ public class WorldGenerator
         }
     }
 
-    public void Generate(World world, int seed)
+    public void Generate(World world, int seed, bool generateAsteroids, string generatorFile)
     {
         asteroidFloorType = TileType.Empty;
 
@@ -51,14 +53,14 @@ public class WorldGenerator
         int height = world.Height;
         int depth = world.Depth;
 
-        ReadXML(world);
+        ReadXML(world, generatorFile);
         world.ResizeWorld(width, height, depth);
 
         Random.InitState(seed);
 
         sumOfAllWeightedChances = asteroidInfo.Resources.Select(x => x.WeightedChance).Sum();
 
-        if (SceneController.GenerateAsteroids)
+        if (generateAsteroids)
         {
             // To clarify this is the formula for an ellipsoid, taking the lesser of asteroid radius and world size in that dimension
             float averageAsteroidVolume = (4 / 3) * Mathf.PI * Mathf.Min(asteroidInfo.AsteroidSize, world.Height) * Mathf.Min(asteroidInfo.AsteroidSize, world.Width) * Mathf.Min(asteroidInfo.AsteroidSize, world.Depth);
@@ -207,13 +209,10 @@ public class WorldGenerator
         }
     }
 
-    private void ReadXML(World world)
+    private void ReadXML(World world, string generatorFile)
     {
         // Setup XML Reader
-        // Optimally, this would use GameController.Instance.GeneratorBasePath(), but that apparently may not exist at this point.
-        // TODO: Investigate either a way to ensure GameController exists at this time or another place to reliably store the base path, that is accessible
-        // both in _World and MainMenu scenes
-        string filePath = System.IO.Path.Combine(System.IO.Path.Combine(Application.streamingAssetsPath, "WorldGen"), SceneController.GeneratorFile);
+        string filePath = System.IO.Path.Combine(GameController.GeneratorBasePath, generatorFile);
         string furnitureXmlText = System.IO.File.ReadAllText(filePath);
 
         XmlTextReader reader = new XmlTextReader(new StringReader(furnitureXmlText));
@@ -285,7 +284,8 @@ public class WorldGenerator
 
     private void ReadStartArea(string startAreaFilePath, World world)
     {
-        world.ReadJson(startAreaFilePath);
+        StreamReader reader = File.OpenText(startAreaFilePath);
+        world.ReadJson((JObject)JToken.ReadFrom(new JsonTextReader(reader)));
     }
 
     [System.Serializable]

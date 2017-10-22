@@ -30,7 +30,7 @@ public class CurrencyDisplay : MonoBehaviour
             return;
         }
 
-        currencies = World.Current.Wallet.GetCurrencyNames();
+        currencies = GameController.CurrentWorld.Wallet.GetCurrencyNames();
     }
 
     // Update is called once per frame
@@ -42,7 +42,7 @@ public class CurrencyDisplay : MonoBehaviour
         foreach (string currency in currencies)
         {
             content.Append(currency + ":");
-            content.Append(World.Current.Wallet[currency].Balance);
+            content.Append(GameController.CurrentWorld.Wallet[currency].Balance);
             content.AppendLine();
         }
 

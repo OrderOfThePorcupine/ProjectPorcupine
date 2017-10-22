@@ -146,7 +146,7 @@ public class BuildModeController
         {
             string roomBehaviorType = BuildModeType;
 
-            if (tile.Room != null && WorldController.Instance.World.IsRoomBehaviorValidForRoom(roomBehaviorType, tile.Room))
+            if (tile.Room != null && GameController.CurrentWorld.IsRoomBehaviorValidForRoom(roomBehaviorType, tile.Room))
             {
                 RoomBehavior proto = PrototypeManager.RoomBehavior.Get(roomBehaviorType);
                 tile.Room.DesignateRoomBehavior(proto.Clone());
@@ -160,8 +160,8 @@ public class BuildModeController
             string furnitureType = BuildModeType;
 
             if (
-                World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile, CurrentPreviewRotation) &&
-                World.Current.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
+                GameController.CurrentWorld.FurnitureManager.IsPlacementValid(furnitureType, tile, CurrentPreviewRotation) &&
+                GameController.CurrentWorld.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
                 DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType, CurrentPreviewRotation) == false)
             {
                 // This tile position is valid for this furniture
@@ -189,12 +189,12 @@ public class BuildModeController
                     }
 
                     // this is here so OrderAction can be used for utility as well as furniture
-                    job.OnJobCompleted += (theJob) => World.Current.FurnitureManager.ConstructJobCompleted(theJob);
+                    job.OnJobCompleted += (theJob) => GameController.CurrentWorld.FurnitureManager.ConstructJobCompleted(theJob);
                 }
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + furnitureType + "'");
-                    job = new Job(tile, furnitureType, World.Current.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
+                    job = new Job(tile, furnitureType, GameController.CurrentWorld.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
                     job.adjacent = true;
                     job.Description = "job_build_" + furnitureType + "_desc";
                 }
@@ -206,7 +206,7 @@ public class BuildModeController
                 // Add the job to the queue or build immediately if in Dev mode
                 if (SettingsKeyHolder.DeveloperMode)
                 {
-                    World.Current.FurnitureManager.PlaceFurniture(furnitureToBuild, job.tile);
+                    GameController.CurrentWorld.FurnitureManager.PlaceFurniture(furnitureToBuild, job.tile);
                 }
                 else
                 {
@@ -216,8 +216,8 @@ public class BuildModeController
                         {
                             // FIXME: I don't like having to manually and explicitly set
                             // flags that prevent conflicts. It's too easy to forget to set/clear them!
-                            Tile offsetTile = World.Current.GetTileAt(x_off, y_off, tile.Z);
-                            HashSet<Job> pendingBuildJobs = WorldController.Instance.World.GetTileAt(x_off, y_off, tile.Z).PendingBuildJobs;
+                            Tile offsetTile = GameController.CurrentWorld.GetTileAt(x_off, y_off, tile.Z);
+                            HashSet<Job> pendingBuildJobs = GameController.CurrentWorld.GetTileAt(x_off, y_off, tile.Z).PendingBuildJobs;
                             if (pendingBuildJobs != null)
                             {
                                 // if the existing buildJobs furniture is replaceable by the current furnitureType,
@@ -236,10 +236,10 @@ public class BuildModeController
                         }
                     }
 
-                    World.Current.jobQueue.Enqueue(job);
+                    GameController.CurrentWorld.jobQueue.Enqueue(job);
 
                     // Let our workspot tile know it is reserved for us
-                    World.Current.ReserveTileAsWorkSpot((Furniture)job.buildablePrototype, job.tile);
+                    GameController.CurrentWorld.ReserveTileAsWorkSpot((Furniture)job.buildablePrototype, job.tile);
                 }
             }
         }
@@ -250,7 +250,7 @@ public class BuildModeController
             // Run the ValidPlacement function!
             string utilityType = BuildModeType;
             if (
-                World.Current.UtilityManager.IsPlacementValid(utilityType, tile) &&
+                GameController.CurrentWorld.UtilityManager.IsPlacementValid(utilityType, tile) &&
                 DoesSameUtilityTypeAlreadyExist(utilityType, tile) == false &&
                 DoesUtilityBuildJobOverlapExistingBuildJob(utilityType, tile) == false)
             {
@@ -266,12 +266,12 @@ public class BuildModeController
                     job = orderAction.CreateJob(tile, utilityType);
 
                     // this is here so OrderAction can be used for utility as well as furniture
-                    job.OnJobCompleted += (theJob) => World.Current.UtilityManager.ConstructJobCompleted(theJob);
+                    job.OnJobCompleted += (theJob) => GameController.CurrentWorld.UtilityManager.ConstructJobCompleted(theJob);
                 }
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + utilityType + "'");
-                    job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
+                    job = new Job(tile, utilityType, GameController.CurrentWorld.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
                     job.Description = "job_build_" + utilityType + "_desc";
                 }
 
@@ -280,17 +280,17 @@ public class BuildModeController
                 // Add the job to the queue or build immediately if in dev mode
                 if (SettingsKeyHolder.DeveloperMode)
                 {
-                    World.Current.UtilityManager.PlaceUtility(job.Type, job.tile, true);
+                    GameController.CurrentWorld.UtilityManager.PlaceUtility(job.Type, job.tile, true);
                 }
                 else
                 {
                     // FIXME: I don't like having to manually and explicitly set
                     // flags that preven conflicts. It's too easy to forget to set/clear them!
-                    Tile offsetTile = World.Current.GetTileAt(tile.X, tile.Y, tile.Z);
+                    Tile offsetTile = GameController.CurrentWorld.GetTileAt(tile.X, tile.Y, tile.Z);
                     offsetTile.PendingBuildJobs.Add(job);
                     job.OnJobStopped += (theJob) => offsetTile.PendingBuildJobs.Remove(job);
 
-                    World.Current.jobQueue.Enqueue(job);
+                    GameController.CurrentWorld.jobQueue.Enqueue(job);
                 }
             }
         }
@@ -320,7 +320,7 @@ public class BuildModeController
                     else
                     {
                         buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
-                        WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                        GameController.CurrentWorld.jobQueue.Enqueue(buildingJob);
                     }
                 }
                 else
@@ -399,7 +399,7 @@ public class BuildModeController
         {
             for (int y_off = t.Y; y_off < (t.Y + furnitureToBuild.Height); y_off++)
             {
-                HashSet<Job> pendingBuildJobs = WorldController.Instance.World.GetTileAt(x_off, y_off, t.Z).PendingBuildJobs;
+                HashSet<Job> pendingBuildJobs = GameController.CurrentWorld.GetTileAt(x_off, y_off, t.Z).PendingBuildJobs;
                 if (pendingBuildJobs != null)
                 {
                     // if the existing buildJobs furniture is replaceable by the current furnitureType,

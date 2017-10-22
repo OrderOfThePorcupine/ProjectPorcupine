@@ -47,7 +47,7 @@ public class MouseCursor
 
         style.font = Resources.Load<Font>("Fonts/Arial/Arial") as Font;
         style.fontSize = 15;
-        
+
         LoadCursorTexture();
         BuildCursor();
 
@@ -64,12 +64,12 @@ public class MouseCursor
         }
 
         UpdateCursor();
-        DisplayCursorInfo();        
+        DisplayCursorInfo();
     }
 
     private void LoadCursorTexture()
     {
-        cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");        
+        cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
     }
 
     private void BuildCursor()
@@ -95,38 +95,38 @@ public class MouseCursor
         rt1.sizeDelta = new Vector2(64, 64);
         cursorSR = cursorGO.AddComponent<SpriteRenderer>();
         cursorSR.sortingLayerName = "TileUI";
-       
+
         Cursor.SetCursor(cursorTexture, new Vector2(0, 0), CursorMode.Auto);
-        
+
         upperLeft = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, upperLeftPostion, cursorTextBoxSize);
         upperRight = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, upperRightPostion, cursorTextBoxSize);
         lowerLeft = new CursorTextBox(cursorGO, TextAnchor.MiddleRight, style, lowerLeftPostion, cursorTextBoxSize);
-        lowerRight = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, lowerRightPostion, cursorTextBoxSize);        
+        lowerRight = new CursorTextBox(cursorGO, TextAnchor.MiddleLeft, style, lowerRightPostion, cursorTextBoxSize);
     }
 
     private void UpdateCursor()
     {
-        cursorGO.transform.position = Input.mousePosition;       
+        cursorGO.transform.position = Input.mousePosition;
     }
 
     private void ShowCursor()
     {
         if (EventSystem.current.IsPointerOverGameObject() || cursorOverride == true)
-        {            
+        {
             cursorGO.SetActive(false);
         }
         else
-        {            
+        {
             cursorGO.SetActive(true);
         }
     }
 
     private void DisplayCursorInfo()
-    {        
-        lowerLeft.text.text = upperLeft.text.text = lowerRight.text.text = upperRight.text.text = string.Empty;        
+    {
+        lowerLeft.text.text = upperLeft.text.text = lowerRight.text.text = upperRight.text.text = string.Empty;
 
-        Tile t = WorldController.Instance.GetTileAtWorldCoord(mc.GetMousePosition());        
-        
+        Tile t = mc.GetMouseOverTile();
+
         if (mc.GetCurrentMode() == MouseController.MouseMode.BUILD)
         {
             // Placing furniture object.
@@ -156,13 +156,13 @@ public class MouseCursor
                 {
                     upperLeft.text.text = mc.GetDragObjects().Count.ToString();
                     lowerLeft.text.text = bmc.GetFloorTile();
-                }                
+                }
             }
         }
         else
         {
-            lowerRight.text.text = cid.MousePosition(t);            
-        }        
+            lowerRight.text.text = cid.MousePosition(t);
+        }
     }
 
     public class CursorTextBox

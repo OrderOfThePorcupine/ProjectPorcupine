@@ -64,7 +64,7 @@ namespace ProjectPorcupine.Entities.States
                 else
                 {
                     // Add character to the list of characters unable to reach the job.
-                    if (!World.Current.jobQueue.CharacterCantReachHelper(Job, character))
+                    if (!GameController.CurrentWorld.jobQueue.CharacterCantReachHelper(Job, character))
                     {
                         Job.CharsCantReach.Add(character);
                     }
@@ -115,7 +115,7 @@ namespace ProjectPorcupine.Entities.States
             }
 
             // If the job gets abandoned because of pathing issues or something else, just return it to the queue
-            World.Current.jobQueue.Enqueue(Job);
+            GameController.CurrentWorld.jobQueue.Enqueue(Job);
 
             // Tell the player that we need a new task.
             character.SetState(null);

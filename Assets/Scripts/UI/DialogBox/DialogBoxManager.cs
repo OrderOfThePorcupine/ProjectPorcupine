@@ -29,13 +29,18 @@ public class DialogBoxManager : MonoBehaviour
     public DialogBoxNewGame dialogBoxNewGame;
 
     // This dictionary will hold the DialogBoxes to be called by name.
-    public Dictionary<string, DialogBox> DialogBoxes;
+    public Dictionary<string, DialogBox> DialogBoxes = new Dictionary<string, DialogBox>();
     public GameObject DialogBoxGO;
 
-    public void Awake()
+    public void CreateUI()
     {
         DialogBoxes = new Dictionary<string, DialogBox>();
         DialogBoxGO = GameObject.Find("Dialog Boxes");
+
+        foreach (Transform child in DialogBoxGO.transform)
+        {
+            Destroy(child.gameObject);
+        }
 
         GameObject tempGoObj;
 
@@ -51,31 +56,34 @@ public class DialogBoxManager : MonoBehaviour
         dialogBoxNewGame = tempGoObj.GetComponent<DialogBoxNewGame>();
         DialogBoxes["New Game"] = dialogBoxNewGame;
 
-        if (SceneController.IsAtMainScene())
-        {
-            tempGoObj = CreateDialogGO("DB_SaveFile", "Save File");
-            dialogBoxSaveGame = tempGoObj.GetComponent<DialogBoxSaveGame>();
-            DialogBoxes["Save File"] = dialogBoxSaveGame;
+        tempGoObj = CreateDialogGO("DB_SaveFile", "Save File");
+        dialogBoxSaveGame = tempGoObj.GetComponent<DialogBoxSaveGame>();
+        DialogBoxes["Save File"] = dialogBoxSaveGame;
 
-            tempGoObj = CreateDialogGO("DB_Options", "Options");
-            dialogBoxOptions = tempGoObj.GetComponent<DialogBoxOptions>();
-            DialogBoxes["Options"] = dialogBoxOptions;
+        tempGoObj = CreateDialogGO("DB_Options", "Options");
+        dialogBoxOptions = tempGoObj.GetComponent<DialogBoxOptions>();
+        DialogBoxes["Options"] = dialogBoxOptions;
+    }
 
-            tempGoObj = CreateDialogGO("DB_Trade", "Trade");
-            dialogBoxTrade = tempGoObj.GetComponent<DialogBoxTrade>();
-            DialogBoxes["Trade"] = dialogBoxTrade;
+    public void CreateSystemUI()
+    {
+        GameObject tempGoObj;
 
-            tempGoObj = CreateDialogGO("DB_JobList", "Job List");
-            dialogBoxJobList = tempGoObj.GetComponent<DialogBoxJobList>();
-            DialogBoxes["Job List"] = dialogBoxJobList;
+        tempGoObj = CreateDialogGO("DB_Trade", "Trade");
+        dialogBoxTrade = tempGoObj.GetComponent<DialogBoxTrade>();
+        DialogBoxes["Trade"] = dialogBoxTrade;
 
-            tempGoObj = CreateDialogGO("DB_Quests", "Quests");
-            dialogBoxQuests = tempGoObj.GetComponent<DialogBoxQuests>();
-            DialogBoxes["Quests"] = dialogBoxQuests;
-            AddQuestList();
-            LoadModdedDialogBoxes();
-            AddMainMenuItems();
-        }
+        tempGoObj = CreateDialogGO("DB_JobList", "Job List");
+        dialogBoxJobList = tempGoObj.GetComponent<DialogBoxJobList>();
+        DialogBoxes["Job List"] = dialogBoxJobList;
+
+        tempGoObj = CreateDialogGO("DB_Quests", "Quests");
+        dialogBoxQuests = tempGoObj.GetComponent<DialogBoxQuests>();
+        DialogBoxes["Quests"] = dialogBoxQuests;
+        LoadModdedDialogBoxes();
+
+        AddQuestList();
+        AddMainMenuItems();
     }
 
     /// <summary>
@@ -180,7 +188,7 @@ public class DialogBoxManager : MonoBehaviour
                     break;
                 case ".lua":
                     UnityDebugger.Debugger.Log("ModDialogBox", "Found lua element:" + fileInfo.Name);
-                    WorldController.Instance.ModsManager.LoadFunctionsInFile(fileInfo, "ModDialogBox");
+                    GameController.Instance.ModsManager.LoadFunctionsInFile(fileInfo, "ModDialogBox");
                     break;
             }
         }

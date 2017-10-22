@@ -51,7 +51,7 @@ public class TradeController
         Trader trader = prototype.CreateTrader();
 
         GameObject go = new GameObject(trader.Name);
-        go.transform.parent = WorldController.Instance.transform;
+        go.transform.parent = GameController.Instance.transform;
         TraderShipController controller = go.AddComponent<TraderShipController>();
         TradeShips.Add(controller);
         go.transform.position = new Vector3(-10, 50, 0);
@@ -59,7 +59,7 @@ public class TradeController
         SpriteRenderer spriteRenderer = go.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = SpriteManager.GetSprite("Trader", prototype.AnimationIdle.CurrentFrameName);
         spriteRenderer.sortingLayerName = "TradeShip";
-        
+
         // TODO: Look into passing more of the work of calling a tradeship off to the controller
         controller.Init(leavingCoords: new Vector3(100, 50, 0), landingCoords: new Vector3(landingPad.Tile.X + 1, landingPad.Tile.Y + 1, 0), speed: 5f, trader: trader, animationIdle: prototype.AnimationIdle.Clone(), animationFlying: prototype.AnimationFlying.Clone(), renderer: spriteRenderer);
     }
@@ -72,7 +72,7 @@ public class TradeController
     {
         DialogBoxManager dbm = GameObject.Find("Dialog Boxes").GetComponent<DialogBoxManager>();
 
-        Trader playerTrader = Trader.FromPlayer(World.Current.Wallet[tradeShip.Trader.Currency.Name]);
+        Trader playerTrader = Trader.FromPlayer(GameController.CurrentWorld.Wallet[tradeShip.Trader.Currency.Name]);
         Trade trade = new Trade(playerTrader, tradeShip.Trader);
         dbm.dialogBoxTrade.SetupTrade(trade);
         dbm.dialogBoxTrade.TradeCancelled = () =>
@@ -102,13 +102,13 @@ public class TradeController
         {
             if (tradeItem.TradeAmount > 0)
             {
-                Tile tile = World.Current.GetTileAt((int)tradingCoordinates.x, (int)tradingCoordinates.y, (int)tradingCoordinates.z);
+                Tile tile = GameController.CurrentWorld.GetTileAt((int)tradingCoordinates.x, (int)tradingCoordinates.y, (int)tradingCoordinates.z);
                 Inventory inv = new Inventory(tradeItem.Type, tradeItem.TradeAmount, tradeItem.TradeAmount);
-                World.Current.InventoryManager.PlaceInventoryAround(tile, inv, 6);
+                GameController.CurrentWorld.InventoryManager.PlaceInventoryAround(tile, inv, 6);
             }
             else if (tradeItem.TradeAmount < 0)
             {
-                World.Current.InventoryManager.RemoveInventoryOfType(tradeItem.Type, -tradeItem.TradeAmount, true);
+                GameController.CurrentWorld.InventoryManager.RemoveInventoryOfType(tradeItem.Type, -tradeItem.TradeAmount, true);
             }
         }
     }
@@ -135,7 +135,7 @@ public class TradeController
     /// <returns></returns>
     private Furniture FindRandomLandingPadWithouTrader()
     {
-        List<Furniture> landingPads = World.Current.FurnitureManager.Find(f => f.HasTypeTag("LandingPad"));
+        List<Furniture> landingPads = GameController.CurrentWorld.FurnitureManager.Find(f => f.HasTypeTag("LandingPad"));
 
         if (landingPads.Any())
         {

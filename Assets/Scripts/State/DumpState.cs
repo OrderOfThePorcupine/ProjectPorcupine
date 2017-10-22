@@ -27,7 +27,7 @@ namespace ProjectPorcupine.Entities.States
             if (tileInventory == null)
             {
                 DebugLog(" - Dumping");
-                World.Current.InventoryManager.PlaceInventory(character.CurrTile, character.Inventory);
+                GameController.CurrentWorld.InventoryManager.PlaceInventory(character.CurrTile, character.Inventory);
                 Finished();
                 return;
             }
@@ -36,7 +36,7 @@ namespace ProjectPorcupine.Entities.States
             if (tileInventory.Type == character.Inventory.Type && (tileInventory.StackSize + character.Inventory.StackSize) <= tileInventory.MaxStackSize)
             {
                 DebugLog(" - Dumping");
-                World.Current.InventoryManager.PlaceInventory(character.CurrTile, character.Inventory);
+                GameController.CurrentWorld.InventoryManager.PlaceInventory(character.CurrTile, character.Inventory);
                 Finished();
                 return;
             }

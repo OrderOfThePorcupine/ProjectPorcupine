@@ -11,35 +11,6 @@ using System.Linq;
 using FMOD;
 using UnityEngine;
 
-public struct DriverInfo
-{
-    public DriverInfo(int id)
-    {
-        this.ID = id;
-        this.Name = new System.Text.StringBuilder(64);
-
-        System.Guid guid;
-        int systemRate;
-        SPEAKERMODE speakerMode;
-        int speakerModeChannels;
-
-        AudioManager.SoundSystem.getDriverInfo(id, this.Name, 64, out guid, out systemRate, out speakerMode, out speakerModeChannels);
-
-        this.Guid = guid;
-    }
-
-    public int ID { get; private set; }
-
-    public System.Text.StringBuilder Name { get; private set; }
-
-    public System.Guid Guid { get; private set; }
-
-    public override string ToString()
-    {
-        return ID.ToString() + ", " + Name.ToString();
-    }
-}
-
 public class SoundController
 {
     private Dictionary<SoundClip, float> cooldowns;
@@ -48,15 +19,8 @@ public class SoundController
     private VECTOR zero;
     private VECTOR ignore;
 
-    // Use this for initialization
-    public SoundController(World world = null)
+    public SoundController()
     {
-        if (world != null)
-        {
-            world.FurnitureManager.Created += OnFurnitureCreated;
-            world.OnTileTypeChanged += OnTileTypeChanged;
-        }
-
         TimeManager.Instance.EveryFrame += Update;
         zero = GetVectorFrom(Vector3.zero);
         forward = GetVectorFrom(Vector3.forward);
@@ -67,6 +31,24 @@ public class SoundController
     public enum AudioChannel
     {
         master, UI, gameSounds, alerts, music
+    }
+
+    public void AssignWorld(World world)
+    {
+        if (world != null)
+        {
+            world.FurnitureManager.Created += OnFurnitureCreated;
+            world.OnTileTypeChanged += OnTileTypeChanged;
+        }
+    }
+
+    public void UnAssignWorld(World world)
+    {
+        if (world != null)
+        {
+            world.FurnitureManager.Created -= OnFurnitureCreated;
+            world.OnTileTypeChanged -= OnTileTypeChanged;
+        }
     }
 
     // Update is called once per frame
@@ -142,12 +124,12 @@ public class SoundController
     /// <param name="volRange">Volume range in decibels.</param>
     public void PlaySoundAt(Sound clip, Tile tile, string chanGroup = "master", float freqRange = 0f, float volRange = 0f)
     {
-        if (!AudioManager.channelGroups.ContainsKey(chanGroup))
+        if (!AudioManager.ChannelGroups.ContainsKey(chanGroup))
         {
             chanGroup = "master";
         }
 
-        ChannelGroup channelGroup = AudioManager.channelGroups[chanGroup];
+        ChannelGroup channelGroup = AudioManager.ChannelGroups[chanGroup];
 
         FMOD.System soundSystem = AudioManager.SoundSystem;
         Channel channel;
@@ -228,7 +210,7 @@ public class SoundController
     /// Returns information on the current driver.
     /// </summary>
     /// <returns> Information covering index, name, GUID, and other information <see cref="DriverInfo"/>. </returns>
-    public DriverInfo GetCurrentAudioDriverInfo()
+    public AudioManager.DriverInfo GetCurrentAudioDriverInfo()
     {
         int audioDriver;
         AudioManager.SoundSystem.getDriver(out audioDriver);
@@ -240,9 +222,9 @@ public class SoundController
     /// </summary>
     /// <param name="id"> The index in question. </param>
     /// <returns> Information covering index, name, GUID, and other information <see cref="DriverInfo"/>. </returns>
-    public DriverInfo GetDriverInfo(int id)
+    public AudioManager.DriverInfo GetDriverInfo(int id)
     {
-        return new DriverInfo(id);
+        return new AudioManager.DriverInfo(id);
     }
 
     /// <summary>
@@ -288,9 +270,9 @@ public class SoundController
 
     public void SetVolume(string channel, float volume)
     {
-        if (AudioManager.channelGroups.ContainsKey(channel))
+        if (AudioManager.ChannelGroups.ContainsKey(channel))
         {
-            AudioManager.channelGroups[channel].setVolume(volume);
+            AudioManager.ChannelGroups[channel].setVolume(volume);
         }
         else
         {
@@ -305,10 +287,10 @@ public class SoundController
 
     public float GetVolume(string channel)
     {
-        if (AudioManager.channelGroups.ContainsKey(channel))
+        if (AudioManager.ChannelGroups.ContainsKey(channel))
         {
             float volume = 0;
-            AudioManager.channelGroups[channel].getVolume(out volume);
+            AudioManager.ChannelGroups[channel].getVolume(out volume);
             return volume;
         }
         else
