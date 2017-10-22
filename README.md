@@ -76,7 +76,7 @@ However, these are merely 'snapshots', a preview of the current development buil
 
 ## Community
 
-* [Offical Discord Channel ](https://discord.gg/68hkpSA)<discord.projectporcupine.com>
+* [Offical Discord Channel ](https://discord.gg/68hkpSA)
 * [Unoffical Subreddit](https://reddit.com/r/ProjectPorcupine)
 
 ## Contact
