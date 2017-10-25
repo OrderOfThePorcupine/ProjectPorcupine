@@ -177,11 +177,8 @@ public static class Settings
 
             foreach (string keyName in jsonDictionary.Keys)
             {
-
-
                 settingsDict[keyName] = jsonDictionary[keyName];
             }
-
         }
         else
         {
