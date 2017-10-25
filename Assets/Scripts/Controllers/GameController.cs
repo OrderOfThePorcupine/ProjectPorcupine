@@ -69,9 +69,6 @@ public class GameController : MonoBehaviour
     // Only on first time a scene is loaded.
     private void Start()
     {
-        // Load settings.
-        Settings.LoadSettings();
-
         // Add a gameobject that Localization
         this.gameObject.AddComponent<LocalizationLoader>();
     }
@@ -84,14 +81,14 @@ public class GameController : MonoBehaviour
     // Game Controller will persist between scenes. 
     private void EnableDontDestroyOnLoad()
     {
-        if (Instance == null)
+        if (Instance == null || Instance == this)
         {
             Instance = this;
         }
         else
         {
+            UnityDebugger.Debugger.LogError("Two 'MainMenuController' exist, deleting the new version rather than the old.");
             Destroy(this.gameObject);
-            Destroy(this);
         }
 
         DontDestroyOnLoad(this);

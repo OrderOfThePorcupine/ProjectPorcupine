@@ -18,21 +18,30 @@ public class MainMenuController : MonoBehaviour
 
     public DialogBoxManager DialogBoxManager { get; private set; }
 
-    // Use this for initialization.
-    public void OnEnable()
+    public void Awake()
     {
+        if (Instance == null || Instance == this)
+        {
+            Instance = this;
+        }
+        else
+        {
+            UnityDebugger.Debugger.LogError("Two 'MainMenuController' exist, deleting the new version rather than the old.");
+            Destroy(this.gameObject);
+        }
+
         new PrototypeManager();
         new FunctionsManager();
+        new SpriteManager();
+        new AudioManager();
+
+        // Load Mods and Settings on awake rather than on Starts
+        ModsManager = new ModsManager();
+        Settings.LoadSettings();
     }
 
     public void Start()
     {
-        Instance = this;
-
-        new SpriteManager();
-        new AudioManager();
-        ModsManager = new ModsManager();
-
         TimeManager.Instance.IsPaused = true;
 
         // Create a Background.

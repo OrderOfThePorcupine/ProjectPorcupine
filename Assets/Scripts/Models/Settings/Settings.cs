@@ -25,11 +25,6 @@ public static class Settings
     private static string userSettingsFilePath = System.IO.Path.Combine(
         Application.persistentDataPath, "Settings.json");
 
-    static Settings()
-    {
-        LoadSettings();
-    }
-
     public static string GetSettingWithOverwrite(string key, string defaultValue)
     {
         if (settingsDict == null)
@@ -158,8 +153,7 @@ public static class Settings
 
         // Load the settings Json file.
         // First try the user's private settings file in userSettingsFilePath.
-        // If that doesn't work fall back to defaultSettingsFilePath.
-        // If that doesn't work fall back to the hard coded FallbackSettingJson above.
+        // If that doesn't work fall back to the settingsTemplate above.
         if (System.IO.File.Exists(userSettingsFilePath) == false)
         {
             UnityDebugger.Debugger.Log("Settings", "User settings file could not be found at '" + userSettingsFilePath);
@@ -183,8 +177,16 @@ public static class Settings
 
             foreach (string keyName in jsonDictionary.Keys)
             {
+
+
                 settingsDict[keyName] = jsonDictionary[keyName];
             }
+
+        }
+        else
+        {
+            UnityDebugger.Debugger.LogError("No User Settings; Saving Defaults to User Data");
+            SaveSettings(); // Save Defaults
         }
     }
 
@@ -196,7 +198,7 @@ public static class Settings
         // It just gets the dictionary values, then the next values, then since its a jagged array it then simplifies it
         SettingsOption[] settingsOptions = PrototypeManager.SettingsCategories.Values
                                                                          .SelectMany(x => x.headings.Values)
-                                                                         .SelectMany(x => x)
+                                                                         .SelectMany(x => x)                 // Collapse
                                                                          .ToArray();
 
         settingsDict = new Dictionary<string, string>();
