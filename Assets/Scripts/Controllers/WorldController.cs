@@ -77,12 +77,14 @@ public class WorldController : MonoBehaviour
 
     public void OnEnable()
     {
-        if (Instance != null)
+        if (Instance == null || Instance == this)
+        {
+            Instance = this;
+        }
+        else
         {
             UnityDebugger.Debugger.LogError("WorldController", "There should never be two world controllers.");
         }
-
-        Instance = this;
 
         new FunctionsManager();
         new PrototypeManager();
@@ -97,6 +99,9 @@ public class WorldController : MonoBehaviour
                 (evt) => UnityDebugger.Debugger.LogFormat("Scheduler", "Event {0} fired", evt.Name)));
 
         ModsManager = new ModsManager();
+
+        // Reload incase any mods have changed settings
+        Settings.LoadSettings();
 
         if (SceneController.LoadWorldFromFileName != null)
         {

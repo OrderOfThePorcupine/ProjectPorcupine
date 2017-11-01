@@ -65,7 +65,7 @@ endTestsFold=0 #stores whether the travis_fold:end:tests has been echoed yet
 
 travecho 'travis_fold:start:compile'
 echo "Attempting Unit Tests"
-"$unityPath" -batchmode -runEditorTests -nographics -EditorTestResultFile "$(pwd)"/EditorTestResults.xml -projectPath "$(pwd)" -logFile unity.log
+"$unityPath" -batchmode -runEditorTests -nographics -editorTestsResultFile "$(pwd)"/EditorTestResults.xml -projectPath "$(pwd)" -logFile unity.log
 logFile="$(pwd)"/unity.log
 travecho "$(cat "$logFile")"
 travecho 'travis_fold:end:compile'
@@ -102,27 +102,28 @@ fi
 
 
 #TERRIBLE error check logic - Please fix ASAP
-errorCount=$(grep "failures" EditorTestResults.xml | awk -F"\"" '{print $8}') #find line with 'failures' and returns characters between quotation mark 8 and 9
+errorCount=$(grep -m 1 "failed" EditorTestResults.xml | head -1 | awk -F"\"" '{print $26}') #find line with 'failed' and returns characters in quote mark delimited "field" 26
 
 if [ "$errorCount" != "0" ]; then
     echo "$errorCount" ' unit tests failed!'
 
      #show the exact unit test failure
     printf '\nThe following unit tests failed:'
-    echo | grep 'success="False"' EditorTestResults.xml | grep 'test-case'
+    echo | grep 'result="Failed"' EditorTestResults.xml | grep 'test-case'
 
     exitStatus=1
 fi
 
-errorCount=$(grep "failures" EditorTestResults.xml | awk -F"\"" '{print $6}') #now for errors
+# Unity unit test report no longer reports errors, if this returns, this functionality should be readded
+#errorCount=$(grep -m 1 "failed" EditorTestResults.xml | head -1 | awk -F"\"" '{print $6}') #now for errors
+#
+#if [ "$errorCount" != "0" ]; then
+#    echo "$errorCount" ' unit tests threw errors!'
+#
+#    exitStatus=1
+#fi
 
-if [ "$errorCount" != "0" ]; then
-    echo "$errorCount" ' unit tests threw errors!'
-
-    exitStatus=1
-fi
-
-errorCount=$(grep "failures" EditorTestResults.xml | awk -F"\"" '{print $12}') #inconlusive tests
+errorCount=$(grep -m 1 "failed" EditorTestResults.xml | head -1 | awk -F"\"" '{print $28}') #inconlusive tests
 
 if [ "$errorCount" != "0" ]; then
     echo "$errorCount" ' unit tests were inconlusive!'
@@ -130,14 +131,14 @@ if [ "$errorCount" != "0" ]; then
     exitStatus=1
 fi
 
-
-errorCount=$(grep "failures" EditorTestResults.xml | awk -F"\"" '{print $18}') #finally for invalid tests
-
-if [ "$errorCount" != "0" ]; then
-    echo "$errorCount" ' unit tests were invalid!'
-
-    exitStatus=1
-fi
+# Unity unit test report no longer reports invalid tests, if this returns, this functionality should be readded
+#errorCount=$(grep "failures" EditorTestResults.xml | awk -F"\"" '{print $18}') #finally for invalid tests
+#
+#if [ "$errorCount" != "0" ]; then
+#    echo "$errorCount" ' unit tests were invalid!'
+#
+#    exitStatus=1
+#fi
 #end of unit test checks. at this point the test have suceeded or set exitStatus to 1.
 rm "$(pwd)"/EditorTestResults.xml
 exit $exitStatus

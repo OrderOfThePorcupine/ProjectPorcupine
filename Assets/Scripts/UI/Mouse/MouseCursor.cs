@@ -119,10 +119,10 @@ namespace ProjectPorcupine.Mouse
         /// <summary>
         /// Update the cursor should be called by the parent class.
         /// </summary>
-        public void UpdateCursor()
+        public void UpdateCursor(bool modeEnabled)
         {
             // If we should show cursor and we aren't over a ui element (unless we are UI mode) then show cursor.
-            CursorGameObject.SetActive(shouldShowCursor && (UIMode || EventSystem.current.IsPointerOverGameObject() == false));
+            CursorGameObject.SetActive(modeEnabled && shouldShowCursor && (UIMode || EventSystem.current.IsPointerOverGameObject() == false));
             cachedTransform.position = Input.mousePosition;
         }
 
@@ -189,39 +189,39 @@ namespace ProjectPorcupine.Mouse
                 Vector3 localPosition;
                 switch (location)
                 {
-                    case TextAnchor.UpperLeft:
-                        localPosition = new Vector3(-64f, 32f, 0f);
-                        break;
-                    case TextAnchor.UpperCenter:
-                        localPosition = new Vector3(0f, 32f, 0f);
-                        break;
-                    case TextAnchor.UpperRight:
-                        localPosition = new Vector3(120f, 32f, 0f);
-                        break;
+                case TextAnchor.UpperLeft:
+                    localPosition = new Vector3(-64f, 32f, 0f);
+                    break;
+                case TextAnchor.UpperCenter:
+                    localPosition = new Vector3(0f, 32f, 0f);
+                    break;
+                case TextAnchor.UpperRight:
+                    localPosition = new Vector3(120f, 32f, 0f);
+                    break;
 
-                    case TextAnchor.MiddleLeft:
-                        localPosition = new Vector3(-64f, 0f, 0f);
-                        break;
-                    case TextAnchor.MiddleCenter:
-                        localPosition = new Vector3(0f, 0f, 0f);
-                        break;
-                    case TextAnchor.MiddleRight:
-                        localPosition = new Vector3(120f, 0f, 0f);
-                        break;
+                case TextAnchor.MiddleLeft:
+                    localPosition = new Vector3(-64f, 0f, 0f);
+                    break;
+                case TextAnchor.MiddleCenter:
+                    localPosition = new Vector3(0f, 0f, 0f);
+                    break;
+                case TextAnchor.MiddleRight:
+                    localPosition = new Vector3(120f, 0f, 0f);
+                    break;
 
-                    case TextAnchor.LowerLeft:
-                        localPosition = new Vector3(-64f, -32f, 0f);
-                        break;
-                    case TextAnchor.LowerCenter:
-                        localPosition = new Vector3(0f, -32f, 0f);
-                        break;
-                    case TextAnchor.LowerRight:
-                        localPosition = new Vector3(120f, -32f, 0f);
-                        break;
+                case TextAnchor.LowerLeft:
+                    localPosition = new Vector3(-64f, -32f, 0f);
+                    break;
+                case TextAnchor.LowerCenter:
+                    localPosition = new Vector3(0f, -32f, 0f);
+                    break;
+                case TextAnchor.LowerRight:
+                    localPosition = new Vector3(120f, -32f, 0f);
+                    break;
 
-                    default:
-                        localPosition = Vector3.zero;
-                        break;
+                default:
+                    localPosition = Vector3.zero;
+                    break;
                 }
 
                 GameObject rootMaster = new GameObject("Root: " + location);
@@ -259,6 +259,7 @@ namespace ProjectPorcupine.Mouse
                 textComponent.font = style.font;
                 textComponent.fontSize = style.fontSize;
                 textComponent.verticalOverflow = VerticalWrapMode.Overflow;
+                textObject.transform.localScale = Vector3.one;
 
                 outline = textObject.AddComponent<Outline>();
                 outline.effectColor = MouseCursor.TextOutlineColor;

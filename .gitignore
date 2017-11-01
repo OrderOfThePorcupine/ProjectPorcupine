@@ -1,4 +1,3 @@
-/.vs/
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -25,6 +24,10 @@ ExportedObj/
 *.pidb
 *.booproj
 *.svd
+*.userosscache
+*.sln.docstates
+*.userprefs
+/.vs/
 
 # Unity3D generated meta files
 *.pidb.meta
