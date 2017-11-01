@@ -22,13 +22,12 @@ namespace ProjectPorcupine.Mouse
     public enum MouseMode
     {
         /// <summary>
-        /// Default mode is for selecting objects.
-        /// Will present information like coords.
-        /// TooltipInfo:
+        /// Coordinate mode is for coordinates.
+        /// Tooltip:
         ///     Small information that is around 5-10 characters.
         /// </summary>
         [Description("Coordinates")]
-        DEFAULT,
+        COORDINATES,
 
         /// <summary>
         /// When build mode is activated.
@@ -127,7 +126,7 @@ namespace ProjectPorcupine.Mouse
         /// The current mouse mode set using <see cref="ChangeMouseMode(MouseMode, string)"/>.
         /// Acts as a ptr to <see cref="mouseHandlers"/> via cast to int.
         /// </summary>
-        private MouseMode currentMode = MouseMode.DEFAULT;
+        private MouseMode currentMode = MouseMode.COORDINATES;
 
         /// <summary>
         /// Where the panning started.
@@ -147,12 +146,13 @@ namespace ProjectPorcupine.Mouse
 
             mouseCursor = new MouseCursor();
 
-            RegisterModeHandler(MouseMode.DEFAULT, new MultiMouseHandler(MouseMode.DEFAULT));
+            RegisterModeHandler(MouseMode.COORDINATES, new MultiMouseHandler(MouseMode.COORDINATES));
             RegisterModeHandler(MouseMode.LIGHT_UI, new MultiMouseHandler(MouseMode.LIGHT_UI));
             RegisterModeHandler(MouseMode.HEAVY_UI, new MultiMouseHandler(MouseMode.HEAVY_UI));
 
             TimeManager.Instance.EveryFrame += (time) => Update();
             RefreshSettings();
+            KeyboardManager.Instance.RegisterInputAction("ToggleCoords", KeyboardMappedInputType.KeyUp, () => { statusOfModes[(int)MouseMode.COORDINATES] = !statusOfModes[(int)MouseMode.COORDINATES]; });
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace ProjectPorcupine.Mouse
         {
             this.uiTooltip = null;
             mouseCursor.UIMode = false;
-            currentMode = BuildModeController.Instance.Building ? MouseMode.BUILD : MouseMode.DEFAULT;
+            currentMode = BuildModeController.Instance.Building ? MouseMode.BUILD : MouseMode.COORDINATES;
 
             if (stopDragging)
             {
@@ -277,13 +277,13 @@ namespace ProjectPorcupine.Mouse
             IsDragging = false;
             Selection = null;
 
-            if (currentMode == MouseMode.BUILD || currentMode == MouseMode.INVENTORY || currentMode == MouseMode.DEFAULT)
+            if (currentMode == MouseMode.BUILD || currentMode == MouseMode.INVENTORY || currentMode == MouseMode.COORDINATES)
             {
                 // If it is Build or Default then set to default
                 // Else if it is inventory and panning == false then set to default
                 if (currentMode != MouseMode.INVENTORY || IsPanning == false)
                 {
-                    currentMode = MouseMode.DEFAULT;
+                    currentMode = MouseMode.COORDINATES;
                 }
             }
         }
@@ -650,7 +650,7 @@ namespace ProjectPorcupine.Mouse
             /// <param name="mode"></param>
             public MultiMouseHandler(MouseMode mode)
             {
-                if (mode == MouseMode.HEAVY_UI || mode == MouseMode.DEFAULT || mode == MouseMode.LIGHT_UI)
+                if (mode == MouseMode.HEAVY_UI || mode == MouseMode.COORDINATES || mode == MouseMode.LIGHT_UI)
                 {
                     this.modeToHandle = mode;
                 }
@@ -663,7 +663,7 @@ namespace ProjectPorcupine.Mouse
             /// <summary>
             /// What callbacks are enabled for this mousemode.
             /// If the <see cref="modeToHandle"/> is <see cref="MouseMode.HEAVY_UI"/> or <see cref="MouseMode.LIGHT_UI"/> then it handles only tooltip.
-            /// Else if its <see cref="MouseMode.DEFAULT"/> then it handles tooltip and clicking.
+            /// Else if its <see cref="MouseMode.COORDINATES"/> then it handles tooltip and clicking.
             /// </summary>
             public MouseHandlerCallbacks CallbacksEnabled
             {
@@ -673,7 +673,7 @@ namespace ProjectPorcupine.Mouse
                     {
                         return MouseHandlerCallbacks.HANDLE_TOOLTIP;
                     }
-                    else if (modeToHandle == MouseMode.DEFAULT)
+                    else if (modeToHandle == MouseMode.COORDINATES)
                     {
                         return MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_CLICK;
                     }
@@ -705,7 +705,7 @@ namespace ProjectPorcupine.Mouse
 
                 switch (modeToHandle)
                 {
-                case MouseMode.DEFAULT:
+                case MouseMode.COORDINATES:
                     cursor.Reset();
                     Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
                     if (t != null)
@@ -743,7 +743,7 @@ namespace ProjectPorcupine.Mouse
             /// </summary>
             public void HandleClick(Vector2 position, int mouseKey)
             {
-                if (modeToHandle == MouseMode.DEFAULT)
+                if (modeToHandle == MouseMode.COORDINATES)
                 {
                     // These ifs are separate since we want to error out if the handle != MouseMode.DEFAULT, but we don't want to error out if mouseKey != 0
                     if (mouseKey == 0)

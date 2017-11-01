@@ -107,6 +107,7 @@ public class KeyboardManager
         RegisterInputMapping("DevConsole", KeyboardInputModifier.Control, KeyCode.BackQuote);
 
         RegisterInputMapping("Escape", KeyboardInputModifier.None, KeyCode.Escape);
+        RegisterInputMapping("ToggleCoords", KeyboardInputModifier.Control, KeyCode.M);
     }
 
     /// <summary>

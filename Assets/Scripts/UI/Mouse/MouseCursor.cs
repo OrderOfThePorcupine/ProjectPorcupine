@@ -66,7 +66,6 @@ namespace ProjectPorcupine.Mouse
             }
 
             cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
-            KeyboardManager.Instance.RegisterInputAction("ToggleCursorTextBox", KeyboardMappedInputType.KeyUp, () => { shouldShowCursor = !shouldShowCursor; });
 
             BuildCursor();
         }
