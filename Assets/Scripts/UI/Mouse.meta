@@ -1,14 +1,6 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/StreamingAssets/MainMenu/Audio.meta
-guid: 151b325d7581dd64e815fab1496f34ee
-folderAsset: yes
-timeCreated: 1508894245
-=======
 guid: 375303736567456499ab8422848845eb
 folderAsset: yes
-timeCreated: 1502694562
->>>>>>> 7f8acde62614591e6fa7a6dd1f2ad727d395c0b9:Assets/Scripts/UI/Mouse.meta
-licenseType: Free
 DefaultImporter:
   userData: 
   assetBundleName: 
