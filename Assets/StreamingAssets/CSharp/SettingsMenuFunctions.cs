@@ -102,33 +102,33 @@ public class GenericInputField : BaseSettingsElement
 
         switch (verification)
         {
-            case "PositiveInteger":
-                fieldElement.onValidateInput += ValidateInputForPositiveNumber;
-                break;
-            case "Integer":
-                fieldElement.contentType = InputField.ContentType.IntegerNumber;
-                break;
-            case "Alphanumeric":
-                fieldElement.contentType = InputField.ContentType.Alphanumeric;
-                break;
-            case "Decimal":
-                fieldElement.contentType = InputField.ContentType.DecimalNumber;
-                break;
-            case "Pin":
-                fieldElement.contentType = InputField.ContentType.Pin;
-                break;
-            case "Password":
-                fieldElement.contentType = InputField.ContentType.Password;
-                break;
-            case "Name":
-                fieldElement.contentType = InputField.ContentType.Name;
-                break;
-            case "EmailAddress":
-                fieldElement.contentType = InputField.ContentType.EmailAddress;
-                break;
-            case "Autocorrected":
-                fieldElement.contentType = InputField.ContentType.Autocorrected;
-                break;
+        case "PositiveInteger":
+            fieldElement.onValidateInput += ValidateInputForPositiveNumber;
+            break;
+        case "Integer":
+            fieldElement.contentType = InputField.ContentType.IntegerNumber;
+            break;
+        case "Alphanumeric":
+            fieldElement.contentType = InputField.ContentType.Alphanumeric;
+            break;
+        case "Decimal":
+            fieldElement.contentType = InputField.ContentType.DecimalNumber;
+            break;
+        case "Pin":
+            fieldElement.contentType = InputField.ContentType.Pin;
+            break;
+        case "Password":
+            fieldElement.contentType = InputField.ContentType.Password;
+            break;
+        case "Name":
+            fieldElement.contentType = InputField.ContentType.Name;
+            break;
+        case "EmailAddress":
+            fieldElement.contentType = InputField.ContentType.EmailAddress;
+            break;
+        case "Autocorrected":
+            fieldElement.contentType = InputField.ContentType.Autocorrected;
+            break;
         }
 
         return element;
@@ -652,15 +652,15 @@ public class AnisotropicFilteringComboBox : GenericComboBox
     {
         switch (value)
         {
-            case 0:
-                QualitySettings.anisotropicFiltering = AnisotropicFiltering.Disable;
-                break;
-            case 1:
-                QualitySettings.anisotropicFiltering = AnisotropicFiltering.Enable;
-                break;
-            case 2:
-                QualitySettings.anisotropicFiltering = AnisotropicFiltering.ForceEnable;
-                break;
+        case 0:
+            QualitySettings.anisotropicFiltering = AnisotropicFiltering.Disable;
+            break;
+        case 1:
+            QualitySettings.anisotropicFiltering = AnisotropicFiltering.Enable;
+            break;
+        case 2:
+            QualitySettings.anisotropicFiltering = AnisotropicFiltering.ForceEnable;
+            break;
         }
     }
 
@@ -702,18 +702,18 @@ public class AAComboBox : GenericComboBox
     {
         switch (value)
         {
-            case 0:
-                QualitySettings.antiAliasing = 0;
-                break;
-            case 1:
-                QualitySettings.antiAliasing = 2;
-                break;
-            case 2:
-                QualitySettings.antiAliasing = 4;
-                break;
-            case 3:
-                QualitySettings.antiAliasing = 8;
-                break;
+        case 0:
+            QualitySettings.antiAliasing = 0;
+            break;
+        case 1:
+            QualitySettings.antiAliasing = 2;
+            break;
+        case 2:
+            QualitySettings.antiAliasing = 4;
+            break;
+        case 3:
+            QualitySettings.antiAliasing = 8;
+            break;
         }
     }
 
@@ -755,21 +755,21 @@ public class ShadowComboBox : GenericComboBox
     {
         switch (value)
         {
-            case 0:
-                QualitySettings.shadowResolution = ShadowResolution.VeryHigh;
-                break;
-            case 1:
-                QualitySettings.shadowResolution = ShadowResolution.High;
-                break;
-            case 2:
-                QualitySettings.shadowResolution = ShadowResolution.Medium;
-                break;
-            case 3:
-                QualitySettings.shadowResolution = ShadowResolution.Low;
-                break;
-            case 4:
-                QualitySettings.shadowResolution = ShadowResolution.Low;
-                break;
+        case 0:
+            QualitySettings.shadowResolution = ShadowResolution.VeryHigh;
+            break;
+        case 1:
+            QualitySettings.shadowResolution = ShadowResolution.High;
+            break;
+        case 2:
+            QualitySettings.shadowResolution = ShadowResolution.Medium;
+            break;
+        case 3:
+            QualitySettings.shadowResolution = ShadowResolution.Low;
+            break;
+        case 4:
+            QualitySettings.shadowResolution = ShadowResolution.Low;
+            break;
         }
     }
 
@@ -1057,30 +1057,38 @@ public class DeveloperConsoleSlider : GenericSlider
 
 public class UIScaleSlider : GenericSlider
 {
-    private UIRescaler rescaler;
+    private UIRescaler[] rescalers;
 
     public override GameObject InitializeElement()
     {
         GameObject go = base.InitializeElement();
-        rescaler = GameObject.Find("Canvas").GetComponent<UIRescaler>();
+        rescalers = new UIRescaler[2];
+        rescalers[0] = GameObject.Find("Canvas").GetComponent<UIRescaler>();
+        rescalers[1] = GameObject.Find("Cursor_Canvas").GetComponent<UIRescaler>();
         return go;
     }
 
     public override void ApplySetting()
     {
         base.ApplySetting();
-        if (rescaler != null)
+        for (int i = 0; i < rescalers.Length; i++)
         {
-            rescaler.AdjustScale();
+            if (rescalers[i] != null)
+            {
+                rescalers[i].AdjustScale();
+            }
         }
     }
 
     public override void CancelSetting()
     {
         base.CancelSetting();
-        if (rescaler != null)
+        for (int i = 0; i < rescalers.Length; i++)
         {
-            rescaler.AdjustScale();
+            if (rescalers[i] != null)
+            {
+                rescalers[i].AdjustScale();
+            }
         }
     }
 }

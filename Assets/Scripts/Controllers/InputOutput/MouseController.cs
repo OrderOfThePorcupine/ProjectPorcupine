@@ -293,58 +293,53 @@ namespace ProjectPorcupine.Mouse
         /// </summary>
         private void Update()
         {
-            // The mode is disabled
-            if (statusOfModes[(int)currentMode] == false)
-            {
-                return;
-            }
-
-            // This prevents having to reobtain these, since the call is expensive enough to warrant this
+            IMouseHandler handler = mouseHandlers[(int)currentMode];
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             bool mouseButton0Up = Input.GetMouseButtonUp(0);
             bool mouseButton1Up = Input.GetMouseButtonUp(1);
             bool mouseButton2Up = Input.GetMouseButtonUp(2);
-
-            IMouseHandler handler = mouseHandlers[(int)currentMode];
-
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            bool performDragThisFrame = false;
             CurrentFramePosition = new Vector3(mousePos.x, mousePos.y, WorldController.Instance.CameraController.CurrentLayer);
 
-            if ((handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_PLACING_POSITION) == MouseHandlerCallbacks.HANDLE_PLACING_POSITION)
+            // The mode is enabled
+            if (statusOfModes[(int)currentMode])
             {
-                CurrentPlacingPosition = handler.HandlePlacingPosition(CurrentFramePosition); // CalculatePlacingPosition(); // REPLACED BY PositionHandlers
-            }
-            else
-            {
-                CurrentPlacingPosition = CurrentFramePosition;
-            }
-
-            bool performDragThisFrame = false;
-            if ((mouseButton0Up || mouseButton1Up) && IsDragging)
-            {
-                if (IsPanning == false)
+                if ((handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_PLACING_POSITION) == MouseHandlerCallbacks.HANDLE_PLACING_POSITION)
                 {
-                    uiTooltip = null;
-                    mouseCursor.UIMode = false;
+                    CurrentPlacingPosition = handler.HandlePlacingPosition(CurrentFramePosition);
+                }
+                else
+                {
+                    CurrentPlacingPosition = CurrentFramePosition;
                 }
 
-                IsDragging = false;
-                Selection = null;
-
-                if (mouseButton0Up)
+                if ((mouseButton0Up || mouseButton1Up) && IsDragging)
                 {
-                    // If we are over a UI element then don't perform the drag this frame
-                    // Also only perform the drag if we are actually ending the drag with left click
-                    // else its a cancel drag action
-                    performDragThisFrame = !EventSystem.current.IsPointerOverGameObject();
+                    if (IsPanning == false)
+                    {
+                        uiTooltip = null;
+                        mouseCursor.UIMode = false;
+                    }
+
+                    IsDragging = false;
+                    Selection = null;
+
+                    if (mouseButton0Up)
+                    {
+                        // If we are over a UI element then don't perform the drag this frame
+                        // Also only perform the drag if we are actually ending the drag with left click
+                        // else its a cancel drag action
+                        performDragThisFrame = !EventSystem.current.IsPointerOverGameObject();
+                    }
+                }
+                else if (IsDragging == false && Input.GetMouseButtonDown(0))
+                {
+                    IsDragging = true;
+                    dragStartPosition = CurrentPlacingPosition;
                 }
             }
-            else if (IsDragging == false && Input.GetMouseButtonDown(0))
-            {
-                IsDragging = true;
-                dragStartPosition = CurrentPlacingPosition;
-            }
 
-            mouseCursor.UpdateCursor();
+            mouseCursor.UpdateCursor(statusOfModes[(int)currentMode]);
 
             // HANDLE DRAG
             // Clear all the drag objects
@@ -355,53 +350,59 @@ namespace ProjectPorcupine.Mouse
 
             DragPreviewGameObjects.Clear();
 
-            // If callback for handling drag is enabled then handle the drag
-            bool dragEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_FINISHED) == MouseHandlerCallbacks.HANDLE_DRAG_FINISHED;
-            bool dragVisualEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_VISUAL) == MouseHandlerCallbacks.HANDLE_DRAG_VISUAL;
-
-            if (dragEnabled || dragVisualEnabled)
+            if (statusOfModes[(int)currentMode])
             {
-                DragParameters dragParams = handler.DisableDragging || (IsDragging == false && performDragThisFrame == false) ? new DragParameters(CurrentPlacingPosition) : new DragParameters(dragStartPosition, CurrentPlacingPosition);
+                // If callback for handling drag is enabled then handle the drag
+                bool dragEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_FINISHED) == MouseHandlerCallbacks.HANDLE_DRAG_FINISHED;
+                bool dragVisualEnabled = (handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_DRAG_VISUAL) == MouseHandlerCallbacks.HANDLE_DRAG_VISUAL;
 
-                if (dragVisualEnabled)
+                if (dragEnabled || dragVisualEnabled)
                 {
-                    // HANDLE VISUAL
-                    DragPreviewGameObjects = handler.HandleDragVisual(dragParams, mouseCursor.CursorCanvasGameObject.transform);
-                }
+                    DragParameters dragParams = handler.DisableDragging || (IsDragging == false && performDragThisFrame == false) ? new DragParameters(CurrentPlacingPosition) : new DragParameters(dragStartPosition, CurrentPlacingPosition);
 
-                // If we have dragEnabled and we are to perform it on our next frame (which is this frame) perform it
-                if (dragEnabled && performDragThisFrame)
-                {
-                    // HANDLE DRAG
-                    handler.HandleDragFinished(dragParams);
+                    if (dragVisualEnabled)
+                    {
+                        // HANDLE VISUAL
+                        DragPreviewGameObjects = handler.HandleDragVisual(dragParams, mouseCursor.CursorCanvasGameObject.transform);
+                    }
+
+                    // If we have dragEnabled and we are to perform it on our next frame (which is this frame) perform it
+                    if (dragEnabled && performDragThisFrame)
+                    {
+                        // HANDLE DRAG
+                        handler.HandleDragFinished(dragParams);
+                    }
                 }
             }
 
             UpdateCameraMovement();
 
-            // Tooltip handling
-            if ((handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_TOOLTIP) == MouseHandlerCallbacks.HANDLE_TOOLTIP)
+            if (statusOfModes[(int)currentMode])
             {
-                handler.HandleTooltip(CurrentFramePosition, mouseCursor, IsDragging);
-            }
-
-            // Could include drag clicks
-            // Should handle any 'building' that requires dragging in the HandleDrag callback
-            if ((handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_CLICK) == MouseHandlerCallbacks.HANDLE_CLICK && EventSystem.current.IsPointerOverGameObject() == false)
-            {
-                if (mouseButton0Up)
+                // Tooltip handling
+                if ((handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_TOOLTIP) == MouseHandlerCallbacks.HANDLE_TOOLTIP)
                 {
-                    handler.HandleClick(CurrentFramePosition, 0);
+                    handler.HandleTooltip(CurrentFramePosition, mouseCursor, IsDragging);
                 }
 
-                if (mouseButton1Up)
+                // Could include drag clicks
+                // Should handle any 'building' that requires dragging in the HandleDrag callback
+                if ((handler.CallbacksEnabled & MouseHandlerCallbacks.HANDLE_CLICK) == MouseHandlerCallbacks.HANDLE_CLICK && EventSystem.current.IsPointerOverGameObject() == false)
                 {
-                    handler.HandleClick(CurrentFramePosition, 1);
-                }
+                    if (mouseButton0Up)
+                    {
+                        handler.HandleClick(CurrentFramePosition, 0);
+                    }
 
-                if (mouseButton2Up)
-                {
-                    handler.HandleClick(CurrentFramePosition, 2);
+                    if (mouseButton1Up)
+                    {
+                        handler.HandleClick(CurrentFramePosition, 1);
+                    }
+
+                    if (mouseButton2Up)
+                    {
+                        handler.HandleClick(CurrentFramePosition, 2);
+                    }
                 }
             }
 
@@ -704,36 +705,36 @@ namespace ProjectPorcupine.Mouse
 
                 switch (modeToHandle)
                 {
-                    case MouseMode.DEFAULT:
-                        cursor.Reset();
-                        Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
-                        if (t != null)
-                        {
-                            cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.TextColor, false);
-                        }
+                case MouseMode.DEFAULT:
+                    cursor.Reset();
+                    Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
+                    if (t != null)
+                    {
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.TextColor, false);
+                    }
 
-                        break;
-                    case MouseMode.LIGHT_UI:
-                        cursor.Reset();
+                    break;
+                case MouseMode.LIGHT_UI:
+                    cursor.Reset();
 
-                        if (string.IsNullOrEmpty(tooltip) == false)
-                        {
-                            cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, false);
-                        }
+                    if (string.IsNullOrEmpty(tooltip) == false)
+                    {
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, false);
+                    }
 
-                        break;
-                    case MouseMode.HEAVY_UI:
-                        cursor.Reset();
+                    break;
+                case MouseMode.HEAVY_UI:
+                    cursor.Reset();
 
-                        if (string.IsNullOrEmpty(tooltip) == false)
-                        {
-                            cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, true);
-                        }
+                    if (string.IsNullOrEmpty(tooltip) == false)
+                    {
+                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, true);
+                    }
 
-                        break;
-                    default:
-                        // Only supports the above variants.
-                        throw new InvalidOperationException("Only supports DEFAULT, HEAVY_UI, LIGHT_UI");
+                    break;
+                default:
+                    // Only supports the above variants.
+                    throw new InvalidOperationException("Only supports DEFAULT, HEAVY_UI, LIGHT_UI");
                 }
             }
 

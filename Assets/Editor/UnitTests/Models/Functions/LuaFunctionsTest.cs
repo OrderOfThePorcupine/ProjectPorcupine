@@ -7,9 +7,11 @@
 // ====================================================
 #endregion
 using System;
+using System.Text.RegularExpressions;
 using MoonSharp.Interpreter;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 [MoonSharpUserData]
 public class LuaFunctionsTest
@@ -75,6 +77,7 @@ public class LuaFunctionsTest
     public void Test_LoadScript_BadLua_NoEnd()
     {
         // Try loading bad Lua Code. The Lua Interpreter will send an exception and the script won't be loaded
+        LogAssert.Expect(LogType.Error, "[testCode2] LUA Parse error: chunk_1:(5,8): 'end' expected near '<eof>'");
         bool result = functions.LoadScript(testCode2, "testCode2");
         Assert.AreEqual(false, result);
     }
