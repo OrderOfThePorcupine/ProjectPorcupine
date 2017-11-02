@@ -192,7 +192,6 @@ public class PrototypeMap<T> where T : IPrototypable, new()
         //JsonConvert.DeserializeObject(jsonText);
         //JProperty jsonMap = jToken;
 
-        System.Console.Out.WriteLine("X"+ jToken.Name+ "X");
         foreach (JToken token in jToken.Value)
         {
             if(jToken.Name != "Headline")
