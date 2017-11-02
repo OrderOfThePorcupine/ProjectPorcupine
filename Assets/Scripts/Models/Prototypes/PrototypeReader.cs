@@ -105,4 +105,15 @@ public class PrototypeReader
         return animations;
     }
 
+    /// <summary>
+    /// Reads the furniture animations. A shorthand for instantiating a new FurnitureAnimation from a
+    /// Jtoken containing animations.
+    /// </summary>
+    /// <returns>The furniture animations.</returns>
+    /// <param name="animationsToken">Animations token.</param>
+    public static FurnitureAnimation ReadFurnitureAnimations(JToken animationsToken)
+    {
+        return new FurnitureAnimation(ReadAnimations(animationsToken));
+    }
+
 }

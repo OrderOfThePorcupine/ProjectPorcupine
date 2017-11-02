@@ -33,6 +33,11 @@ namespace Animation
             animations = new Dictionary<string, SpritenameAnimation>();
         }
 
+        public FurnitureAnimation(Dictionary<string, SpritenameAnimation> incomingAnimations)
+        {            
+            animations = incomingAnimations;
+        }
+
         public SpriteRenderer Renderer { get; set; }
 
         public FurnitureAnimation Clone()

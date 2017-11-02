@@ -851,7 +851,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         orderActions = PrototypeReader.ReadOrderActions(innerJson["OrderActions"]);
         contextMenuLuaActions = PrototypeReader.ReadContextMenuActions(innerJson["ContextMenuActions"]);
 
-        Animations = PrototypeReader.ReadAnimations(innerJson["Animations"]);
+        Animations = PrototypeReader.ReadFurnitureAnimations(innerJson["Animations"]);
 
         EventActions.ReadJson(innerJson["EventActions"]);
 
