@@ -39,19 +39,11 @@ public class OrderActionTest
     {
         Build buildOrder = new Build();
 
-        buildOrder.JobInfo = new OrderAction.JobInformation() { Time = 1 };
-        buildOrder.Inventory = new List<OrderAction.InventoryInfo>()
+        buildOrder.JobTime = 1;
+        buildOrder.Inventory = new Dictionary<string, int>()
         {
-            new OrderAction.InventoryInfo()
-            {
-                Type = "Steel Plate",
-                Amount = 5
-            },
-            new OrderAction.InventoryInfo()
-            {
-                Type = "Copper Plate",
-                Amount = 2
-            }
+            {"Steel Plate", 5},
+            {"Copper Plate", 2}
         };
 
         // serialize
@@ -69,7 +61,7 @@ public class OrderActionTest
         Build deserializedBuildOrder = (Build)serializer.Deserialize(sr);
 
         Assert.NotNull(deserializedBuildOrder);
-        Assert.AreEqual("Steel Plate", deserializedBuildOrder.Inventory[0].Type);
+        Assert.IsTrue(deserializedBuildOrder.Inventory.ContainsKey("Steel Plate"));
     }
 
     [Test]
@@ -77,19 +69,11 @@ public class OrderActionTest
     {
         Deconstruct deconstructOrder = new Deconstruct();
 
-        deconstructOrder.JobInfo = new OrderAction.JobInformation() { Time = 1 };
-        deconstructOrder.Inventory = new List<OrderAction.InventoryInfo>()
+        deconstructOrder.JobTime = 1;
+        deconstructOrder.Inventory = new Dictionary<string, int>()
         {
-            new OrderAction.InventoryInfo()
-            {
-                Type = "Steel Plate",
-                Amount = 5
-            },
-            new OrderAction.InventoryInfo()
-            {
-                Type = "Copper Plate",
-                Amount = 2
-            }
+            {"Steel Plate", 5},
+            {"Copper Plate", 2}
         };
 
         // serialize
@@ -107,6 +91,6 @@ public class OrderActionTest
         Deconstruct deserializedDeconstructOrder = (Deconstruct)serializer.Deserialize(sr);
 
         Assert.NotNull(deserializedDeconstructOrder);
-        Assert.AreEqual("Copper Plate", deserializedDeconstructOrder.Inventory[1].Type);
+        Assert.IsTrue(deserializedDeconstructOrder.Inventory.ContainsKey("Copper Plate"));
     }
 }
