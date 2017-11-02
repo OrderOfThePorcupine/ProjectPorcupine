@@ -81,21 +81,21 @@ public class ModsManager
         LoadFunctions("FurnitureFunctions.cs", "Furniture");
         LoadFunctions("OverlayFunctions.cs", "Overlay");
 
-        LoadPrototypes("Tiles.xml", PrototypeManager.TileType.LoadPrototypes);
-        LoadPrototypes("Furniture.xml", PrototypeManager.Furniture.LoadPrototypes);
-        LoadPrototypes("Utility.xml", PrototypeManager.Utility.LoadPrototypes);
-        LoadPrototypes("RoomBehavior.xml", (text) => PrototypeManager.RoomBehavior.LoadPrototypes(text));
-        LoadPrototypes("Inventory.xml", PrototypeManager.Inventory.LoadPrototypes);
-        LoadPrototypes("Need.xml", PrototypeManager.Need.LoadPrototypes);
-        LoadPrototypes("Trader.xml", PrototypeManager.Trader.LoadPrototypes);
-        LoadPrototypes("Currency.xml", PrototypeManager.Currency.LoadPrototypes);
-        LoadPrototypes("GameEvents.xml", PrototypeManager.GameEvent.LoadPrototypes);
-        LoadPrototypes("ScheduledEvents.xml", PrototypeManager.ScheduledEvent.LoadPrototypes);
-        LoadPrototypes("Stats.xml", PrototypeManager.Stat.LoadPrototypes);
-        LoadPrototypes("Quest.xml", PrototypeManager.Quest.LoadPrototypes);
-        LoadPrototypes("Headlines.xml", PrototypeManager.Headline.LoadPrototypes);
-        LoadPrototypes("Overlay.xml", PrototypeManager.Overlay.LoadPrototypes);
-        LoadPrototypes("Ships.xml", PrototypeManager.Ship.LoadPrototypes);
+//        LoadPrototypes("Tiles.xml", PrototypeManager.TileType.LoadPrototypes);
+//        LoadPrototypes("Furniture.xml", PrototypeManager.Furniture.LoadPrototypes);
+//        LoadPrototypes("Utility.xml", PrototypeManager.Utility.LoadPrototypes);
+//        LoadPrototypes("RoomBehavior.xml", (text) => PrototypeManager.RoomBehavior.LoadPrototypes(text));
+//        LoadPrototypes("Inventory.xml", PrototypeManager.Inventory.LoadPrototypes);
+//        LoadPrototypes("Need.xml", PrototypeManager.Need.LoadPrototypes);
+//        LoadPrototypes("Trader.xml", PrototypeManager.Trader.LoadPrototypes);
+//        LoadPrototypes("Currency.xml", PrototypeManager.Currency.LoadPrototypes);
+//        LoadPrototypes("GameEvents.xml", PrototypeManager.GameEvent.LoadPrototypes);
+//        LoadPrototypes("ScheduledEvents.xml", PrototypeManager.ScheduledEvent.LoadPrototypes);
+//        LoadPrototypes("Stats.xml", PrototypeManager.Stat.LoadPrototypes);
+//        LoadPrototypes("Quest.xml", PrototypeManager.Quest.LoadPrototypes);
+//        LoadPrototypes("Headlines.xml", PrototypeManager.Headline.LoadPrototypes);
+//        LoadPrototypes("Overlay.xml", PrototypeManager.Overlay.LoadPrototypes);
+//        LoadPrototypes("Ships.xml", PrototypeManager.Ship.LoadPrototypes);
 
         LoadCharacterNames("CharacterNames.txt");
 
