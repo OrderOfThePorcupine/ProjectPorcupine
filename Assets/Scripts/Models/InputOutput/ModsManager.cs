@@ -5,6 +5,12 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+
+
 #endregion
 using System;
 using System.IO;
@@ -29,6 +35,8 @@ public class ModsManager
         {
             LoadMainSceneFiles();
         }
+
+        LoadPrototypes();
     }
 
     /// <summary>
@@ -68,6 +76,7 @@ public class ModsManager
 
     private void LoadMainSceneFiles()
     {
+        
         LoadFunctions("Furniture.lua", "Furniture");
         LoadFunctions("Utility.lua", "Utility");
         LoadFunctions("RoomBehavior.lua", "RoomBehavior");
@@ -80,6 +89,22 @@ public class ModsManager
 
         LoadFunctions("FurnitureFunctions.cs", "Furniture");
         LoadFunctions("OverlayFunctions.cs", "Overlay");
+
+        HandlePrototypes("Tile", PrototypeManager.TileType.LoadJsonPrototypes);
+        HandlePrototypes("Furniture", PrototypeManager.Furniture.LoadJsonPrototypes);
+        HandlePrototypes("Utility", PrototypeManager.Utility.LoadJsonPrototypes);
+        HandlePrototypes("RoomBehavior", PrototypeManager.RoomBehavior.LoadJsonPrototypes);
+        HandlePrototypes("Inventory", PrototypeManager.Inventory.LoadJsonPrototypes);
+        HandlePrototypes("Need", PrototypeManager.Need.LoadJsonPrototypes);
+        HandlePrototypes("Trader", PrototypeManager.Trader.LoadJsonPrototypes);
+        HandlePrototypes("Currency", PrototypeManager.Currency.LoadJsonPrototypes);
+        HandlePrototypes("GameEvent", PrototypeManager.GameEvent.LoadJsonPrototypes);
+        HandlePrototypes("ScheduledEvent", PrototypeManager.ScheduledEvent.LoadJsonPrototypes);
+        HandlePrototypes("Stat", PrototypeManager.Stat.LoadJsonPrototypes);
+        HandlePrototypes("Quest", PrototypeManager.Quest.LoadJsonPrototypes);
+        HandlePrototypes("Headline", PrototypeManager.Headline.LoadJsonPrototypes);
+        HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
+        HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
 
 //        LoadPrototypes("Tiles.xml", PrototypeManager.TileType.LoadPrototypes);
 //        LoadPrototypes("Furniture.xml", PrototypeManager.Furniture.LoadPrototypes);
@@ -117,9 +142,14 @@ public class ModsManager
         LoadFunctions("CommandFunctions.cs", "DevConsole");
         LoadFunctions("ConsoleCommands.lua", "DevConsole");
 
-        LoadPrototypes("ConsoleCommands.xml", PrototypeManager.DevConsole.LoadPrototypes);
-        LoadPrototypes("SettingsTemplate.xml", PrototypeManager.SettingsCategories.LoadPrototypes);
-        LoadPrototypes("PerformanceHUDComponentGroups.xml", PrototypeManager.PerformanceHUD.LoadPrototypes);
+
+        HandlePrototypes("ConsoleCommand", PrototypeManager.DevConsole.LoadJsonPrototypes);
+        HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
+        HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
+
+//        LoadPrototypes("ConsoleCommands.xml", PrototypeManager.DevConsole.LoadPrototypes);
+//        LoadPrototypes("SettingsTemplate.xml", PrototypeManager.SettingsCategories.LoadPrototypes);
+//        LoadPrototypes("PerformanceHUDComponentGroups.xml", PrototypeManager.PerformanceHUD.LoadPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
@@ -160,6 +190,40 @@ public class ModsManager
                     UnityDebugger.Debugger.LogError(folder == "CSharp" ? "CSharp" : "LUA", "file " + filePath + " not found");
                 }
             });
+    }
+
+
+    private Dictionary<string, Action<JProperty>> prototypeHandlers = new Dictionary<string, Action<JProperty>>();
+    /// <summary>
+    /// Subscribes to the prototypeLoader to handle all prototypes with the given key.
+    /// </summary>
+    /// <param name="prototypeKey">Key for the prototypes to handle.</param>
+    /// <param name="prototypesLoader">Called to handle the prototypes loading.</param>
+    private void HandlePrototypes(string prototypeKey, Action<JProperty> prototypesLoader)
+    {
+        prototypeHandlers.Add(prototypeKey, prototypesLoader);
+    }
+
+    private void LoadPrototypes()
+    {
+        // Get list of files in save location
+        string prototypesDirectoryPath = Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Prototypes");
+
+        //EnsureDirectoryExists(saveDirectoryPath);
+
+        DirectoryInfo prototypeDir = new DirectoryInfo(prototypesDirectoryPath);
+
+        FileInfo[] prototypeFiles = prototypeDir.GetFiles("*.json").ToArray();
+
+        for (int i = 0; i < prototypeFiles.Length; i++)
+        {
+            FileInfo file = prototypeFiles[i];
+//            string fileName = Path.GetF(file.FullName);
+            StreamReader reader = File.OpenText(file.FullName);
+            JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+            string tagName = ((JProperty)protoJson.First).Name;
+            prototypeHandlers[tagName]((JProperty)protoJson.First);
+        }
     }
 
     /// <summary>
