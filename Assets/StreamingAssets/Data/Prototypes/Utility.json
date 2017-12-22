@@ -1,0 +1,56 @@
+{
+  "Utility": {
+    "power_cable": {
+      "LocalizationName": "util_power_cable",
+      "LocalizationDescription": "util_power_cable_desc",
+      "TypeTags": [
+        "Power"
+      ],
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "UtilityContextTest1",
+          "LocalizationKey": "Test Context 1"
+        },
+        {
+          "LuaFunction": "UtilityContextTest2",
+          "LocalizationKey": "Test Context 2"
+        }
+      ],
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "copper_wire": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "copper_wire": 1
+          }
+        }
+      }
+    },
+    "fluid_pipe": {
+      "LocalizationName": "util_fluid_pipe",
+      "LocalizationDescription": "util_fluid_pipe_desc",
+      "TypeTags": [
+        "Fluid"
+      ],
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        }
+      }
+    }
+  }
+}

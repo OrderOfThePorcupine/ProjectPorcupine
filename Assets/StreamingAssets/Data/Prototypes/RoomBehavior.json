@@ -1,0 +1,22 @@
+{
+  "RoomBehavior": {
+    "airlock": {
+      "EventActions": {
+        "OnControl": [
+          "OnControl_Airlock"
+        ],
+        "PumpOut": [
+          "PumpOut_Airlock"
+        ],
+        "PumpIn": [
+          "PumpIn_Airlock"
+        ],
+        "PumpOff": [
+          "PumpOff_Airlock"
+        ]
+      },
+      "LocalizationName": "roombehavior_airlock",
+      "LocalizationDescription": "roombehavior_airlock_desc"
+    }
+  }
+}

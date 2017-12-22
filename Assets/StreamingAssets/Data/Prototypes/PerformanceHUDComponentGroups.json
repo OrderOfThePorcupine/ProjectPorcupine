@@ -1,0 +1,50 @@
+{
+  "ComponentGroup": {
+    "Basic": {
+      "Components": [
+        {
+          "Type": "FPSPerformanceComponent"
+        }
+      ]
+    },
+    "Extended": {
+      "Components": [
+        {
+          "Type": "FPSPerformanceComponent"
+        },
+        {
+          "Type": "FPSRangePerformanceComponent"
+        },
+        {
+          "Type": "FPSPerformanceComponent",
+          "Parameters": {
+            "MeasurePeriod": "5",
+            "DisplayText": "AVG: ",
+            "DisplayColor": "false"
+          }
+        }
+      ]
+    },
+    "Verbose": {
+      "Components": [
+        {
+          "Type": "FPSPerformanceComponent"
+        },
+        {
+          "Type": "FPSRangePerformanceComponent"
+        },
+        {
+          "Type": "FPSPerformanceComponent",
+          "Parameters": {
+            "MeasurePeriod": "5",
+            "DisplayText": "AVG: ",
+            "DisplayColor": "false"
+          }
+        },
+        {
+          "Type": "MemoryPerformanceComponent"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "Tile": {
+    "empty": {
+      "BaseMovementCost": 1.0,
+      "PathfindingWeight": 1.0,
+      "LocalizationName": "tile_empty",
+      "LocalizationDescription": "tile_empty_desc",
+      "OrderActions": {
+        "ChangeTileType": {
+          "Inventory": {}
+        }
+      }
+    },
+    "floor": {
+      "BaseMovementCost": 1.0,
+      "PathfindingWeight": 1.0,
+      "LocalizationName": "tile_floor",
+      "LocalizationDescription": "tile_floor_desc",
+      "OrderActions": {
+        "ChangeTileType": {
+          "JobTime": 0.1,
+          "Inventory": {}
+        }
+      }
+    },
+    "ladder": {
+      "BaseMovementCost": 1.5,
+      "PathfindingWeight": 1.0,
+      "CanBuildHereLua": "CanBuildHere_Ladder",
+      "LocalizationName": "tile_ladder",
+      "LocalizationDescription": "tile_ladder_desc",
+      "OrderActions": {
+        "ChangeTileType": {
+          "JobTime": 0.5,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        }
+      }
+    }
+  }
+}
