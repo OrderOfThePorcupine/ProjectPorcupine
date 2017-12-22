@@ -4,7 +4,7 @@
       "TypeTags": [
         "Wall"
       ],
-      "MovementCost": 1.0,
+      "MovementCost": 0,
       "PathfindingWeight": 1.0,
       "Width": 1,
       "Height": 1,
