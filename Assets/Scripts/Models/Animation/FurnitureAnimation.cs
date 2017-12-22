@@ -8,6 +8,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Animation
@@ -36,6 +37,12 @@ namespace Animation
         public FurnitureAnimation(Dictionary<string, SpritenameAnimation> incomingAnimations)
         {            
             animations = incomingAnimations;
+            if (string.IsNullOrEmpty(currentAnimationState))
+            {
+                currentAnimationState = animations.Keys.First();
+                currentAnimation = animations[currentAnimationState];
+                prevFrameIndex = 0;
+            }
         }
 
         public SpriteRenderer Renderer { get; set; }

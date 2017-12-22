@@ -339,15 +339,18 @@ public class SettingsMenu : MonoBehaviour
             ColorButton button = Instantiate(categoryPrefab).GetComponent<ColorButton>();
             button.transform.SetParent(categoryRoot.transform);
             button.name = categories[i].Type;
+            Debug.LogWarning(categories[i].Type);
             button.SetText(LocalizationTable.GetLocalization(categories[i].Type));
             options.Add(categories[i].Type, new Dictionary<string, BaseSettingsElement[]>());
 
             foreach (KeyValuePair<string, List<SettingsOption>> keyValuePair in categories[i].headings)
             {
                 options[categories[i].Type].Add(keyValuePair.Key, new BaseSettingsElement[keyValuePair.Value.Count]);
+                Debug.LogWarning(keyValuePair.Key);
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
+//                    Debug.LogWarning(keyValuePair.Key[j] + ": " + keyValuePair.Value[j]);
                     BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.Type, true);
                     element.option = keyValuePair.Value[j];
                     element.parameterData = keyValuePair.Value[j].classData.Parameters;

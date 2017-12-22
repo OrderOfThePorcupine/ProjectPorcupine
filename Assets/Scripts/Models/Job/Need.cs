@@ -203,7 +203,12 @@ namespace ProjectPorcupine.Entities
         {
             Type = jsonProto.Name;
             JToken innerJson = jsonProto.Value;
-            RestoreNeedFurn = PrototypeReader.ReadJson(RestoreNeedFurn, innerJson["RestoreNeedFurn"]);
+            string furniture = PrototypeReader.ReadJson(string.Empty, innerJson["RestoreNeedFurn"]);
+            if (furniture != string.Empty)
+            {
+                RestoreNeedFurn = PrototypeManager.Furniture.Get(furniture);
+            }
+
             RestoreNeedTime = PrototypeReader.ReadJson(RestoreNeedTime, innerJson["RestoreNeedTime"]);
             Damage = PrototypeReader.ReadJson(Damage, innerJson["Damage"]);
             CompleteOnFail = PrototypeReader.ReadJson(CompleteOnFail, innerJson["CompleteOnFail"]);

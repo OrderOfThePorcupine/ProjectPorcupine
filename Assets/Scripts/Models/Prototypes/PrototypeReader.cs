@@ -113,6 +113,12 @@ public class PrototypeReader
     /// <param name="animationsToken">Animations token.</param>
     public static FurnitureAnimation ReadFurnitureAnimations(JToken animationsToken)
     {
+        if(animationsToken == null)
+        {
+            // Current system is based on a nonexistent FurnitureAnimation being null, rather than a FurnitureAnimation based on a null json token
+            return null;
+        }
+
         return new FurnitureAnimation(ReadAnimations(animationsToken));
     }
 

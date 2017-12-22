@@ -102,15 +102,21 @@ namespace DeveloperConsole.Core
             FunctionName = (string)innerJson["FunctionName"];
             Description = (string)innerJson["Description"];
             DetailedDescription = (string)innerJson["DetailedDescription"];
-            Parameters = (string)innerJson["Parameters"];
+            Parameters = PrototypeReader.ReadJson(Parameters, innerJson["Parameters"]);
             ParseParameterToTypeInfo();
             DefaultValue = (string)innerJson["DefaultValue"] ?? string.Empty;
 
             Tags = ((JArray)innerJson["Tags"]).ToObject<string[]>();
         }
 
-        private void ParseParameterToTypeInfo() {
-
+        private void ParseParameterToTypeInfo() 
+        {
+            if(Parameters == null)
+            {
+                // Json can return a null Parameters rather than empty string, if that's the case set it to empty and return.
+                Parameters = string.Empty;
+                return;
+            }
 
             // If the parameters contains a ';' then it'll exclude the 'using' statement.
             // Just makes the declaration help look nicer.

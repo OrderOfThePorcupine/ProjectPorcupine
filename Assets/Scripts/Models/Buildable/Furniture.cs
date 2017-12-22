@@ -829,7 +829,15 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         Width = PrototypeReader.ReadJson(Width, innerJson["Width"]);
         Height = PrototypeReader.ReadJson(Height, innerJson["Height"]);
 
-        health = PrototypeReader.ReadJson(health, innerJson["Health"]);
+        /* TODO: This may need altered, for now it is built to match the functionality of the xml reader
+        in that if no value is set it is invincible, and the furniture's health system will make it invincible if access while null.
+        It may be preferable to have the HealthSystem constructor detect an "invalid" health amount such as -1, and autoset to invincible as appropriate */
+        float healthValue = PrototypeReader.ReadJson(-1f, innerJson["Health"]);
+        if (Mathf.Abs(healthValue - -1) > Mathf.Epsilon)
+        {
+            health = new HealthSystem(healthValue, false, true, false, false);
+        }
+
         LinksToNeighbours = PrototypeReader.ReadJson(LinksToNeighbours, innerJson["LinksToNeighbours"]);
         EnclosesRoom = PrototypeReader.ReadJson(EnclosesRoom, innerJson["EnclosesRoom"]);
         CanRotate = PrototypeReader.ReadJson(CanRotate, innerJson["CanRotate"]);
@@ -847,7 +855,6 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
 
         tileTypeBuildPermissions = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TileTypeBuildPermissions"]));
-
         orderActions = PrototypeReader.ReadOrderActions(innerJson["OrderActions"]);
         contextMenuLuaActions = PrototypeReader.ReadContextMenuActions(innerJson["ContextMenuActions"]);
 

@@ -61,7 +61,7 @@ public class UIComponent
 
     public void ReadJson(JToken jToken)
     {
-        Type = (string)jToken["Type"];
+        Type = (string)jToken["ClassName"];
         if (jToken["Parameters"] != null)
         {
             Parameters.FromJson(jToken["Parameters"]);
