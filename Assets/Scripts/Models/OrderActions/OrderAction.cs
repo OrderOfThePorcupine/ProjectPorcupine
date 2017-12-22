@@ -101,7 +101,7 @@ namespace ProjectPorcupine.OrderActions
 //                        orderAction.Inventory.Add(inventory.Name, (int)inventory.Value);
 //                    }
 //                }
-//
+
                 return orderAction;
             }
             else

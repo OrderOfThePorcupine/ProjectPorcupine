@@ -303,6 +303,7 @@ namespace ProjectPorcupine.Rooms
             {
                 Parameters.FromJson(innerJson["Parameters"]);
             }
+            // TODO: really should get requirements and optionals working...
             /*
                     case "Requirements":
                         ReadXmlRequirements(reader);

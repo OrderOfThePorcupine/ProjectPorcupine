@@ -5,9 +5,8 @@
 // and you are welcome to redistribute it under certain conditions; See
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
-
-
 #endregion
+
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
@@ -109,9 +108,9 @@ public class Quest : IPrototypable
 
         Description = PrototypeReader.ReadJson(Description, innerJson["Description"]);
 
-        if(innerJson["RequiredQuests"] != null)
+        if (innerJson["RequiredQuests"] != null)
         {
-            foreach(JToken token in innerJson["RequiredQuests"])
+            foreach (JToken token in innerJson["RequiredQuests"])
             {
                 RequiredQuests.Add((string)token);
             }

@@ -42,8 +42,8 @@ public class OrderActionTest
         buildOrder.JobTime = 1;
         buildOrder.Inventory = new Dictionary<string, int>()
         {
-            {"Steel Plate", 5},
-            {"Copper Plate", 2}
+            { "Steel Plate", 5 },
+            { "Copper Plate", 2 }
         };
 
         // serialize
@@ -72,8 +72,8 @@ public class OrderActionTest
         deconstructOrder.JobTime = 1;
         deconstructOrder.Inventory = new Dictionary<string, int>()
         {
-            {"Steel Plate", 5},
-            {"Copper Plate", 2}
+            { "Steel Plate", 5 },
+            { "Copper Plate", 2 }
         };
 
         // serialize

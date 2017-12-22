@@ -5,11 +5,9 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
-using System.Collections.Generic;
-
-
 #endregion
 
+using System.Collections.Generic;
 using Animation;
 using UnityEngine;
 
@@ -42,6 +40,7 @@ public class TraderShipController : MonoBehaviour
         this.Speed = speed;
         this.DestinationReachedThreshold = destinationReachedThreshold;
         this.Trader = trader;
+
         // TODO: Do we really need yet copy of the animations? Should probably have access to this directly through Trader.
         this.AnimationIdle = animations["idle"];
         this.AnimationFlying = animations["flying"];

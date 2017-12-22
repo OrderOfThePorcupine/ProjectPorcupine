@@ -161,6 +161,7 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 componentTypes = FindComponentsInAssembly();
             }
+
             JProperty componentProperty = (JProperty)componentToken;
             string componentTypeName = componentProperty.Name;
             if (componentTypes.ContainsKey(componentTypeName))
@@ -169,6 +170,7 @@ namespace ProjectPorcupine.Buildable.Components
                 t.GetType(); 
 
                 BuildableComponent component = (BuildableComponent)componentProperty.Value.ToObject(t);
+
                 //BuildableComponent component = JsonConvert.DeserializeObject<BuildableComponent>(componentToken.Value<JToken>().ToString());// = (BuildableComponent)serializer.Deserialize(xmlReader);
                 //// need to set name explicitly (not part of deserialization as it's passed in)
                 component.Type = componentProperty.Name;

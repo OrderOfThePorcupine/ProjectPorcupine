@@ -10,7 +10,6 @@
 using System.Xml;
 using Newtonsoft.Json.Linq;
 
-
 /// <summary>
 /// Represents data for a code UI class.
 /// </summary>
@@ -40,7 +39,9 @@ public class UIComponent
     /// <summary>
     /// Parameters for the class.
     /// </summary>
-    public Parameter Parameters { get; private set; }public void ReadXml(XmlReader reader)
+    public Parameter Parameters { get; private set; }
+
+    public void ReadXml(XmlReader reader)
     {
         string className = reader.GetAttribute("ClassName");
         XmlReader subReader = reader.ReadSubtree();
@@ -59,12 +60,12 @@ public class UIComponent
         }
     }
 
-    public void ReadJson(JToken jToken)
+    public void ReadJson(JToken componentToken)
     {
-        Type = (string)jToken["ClassName"];
-        if (jToken["Parameters"] != null)
+        Type = (string)componentToken["ClassName"];
+        if (componentToken["Parameters"] != null)
         {
-            Parameters.FromJson(jToken["Parameters"]);
+            Parameters.FromJson(componentToken["Parameters"]);
         }
     }
 }

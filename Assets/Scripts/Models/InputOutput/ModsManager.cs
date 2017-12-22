@@ -5,15 +5,14 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
-
-
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
 using UnityEngine;
 
@@ -76,7 +75,6 @@ public class ModsManager
 
     private void LoadMainSceneFiles()
     {
-        
         LoadFunctions("Furniture.lua", "Furniture");
         LoadFunctions("Utility.lua", "Utility");
         LoadFunctions("RoomBehavior.lua", "RoomBehavior");
@@ -142,7 +140,6 @@ public class ModsManager
         LoadFunctions("CommandFunctions.cs", "DevConsole");
         LoadFunctions("ConsoleCommands.lua", "DevConsole");
 
-
         HandlePrototypes("ConsoleCommand", PrototypeManager.DevConsole.LoadJsonPrototypes);
         HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
         HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
@@ -192,8 +189,9 @@ public class ModsManager
             });
     }
 
-
+    //TODO: Don't leave this here
     private Dictionary<string, Action<JProperty>> prototypeHandlers = new Dictionary<string, Action<JProperty>>();
+
     /// <summary>
     /// Subscribes to the prototypeLoader to handle all prototypes with the given key.
     /// </summary>
@@ -201,6 +199,7 @@ public class ModsManager
     /// <param name="prototypesLoader">Called to handle the prototypes loading.</param>
     private void HandlePrototypes(string prototypeKey, Action<JProperty> prototypesLoader)
     {
+        // The way these work suggest it should be in a separate class, either a new class (PrototypeLoader?) or in one of the prototype related classes
         prototypeHandlers.Add(prototypeKey, prototypesLoader);
     }
 
@@ -222,6 +221,9 @@ public class ModsManager
             StreamReader reader = File.OpenText(file.FullName);
             JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
             string tagName = ((JProperty)protoJson.First).Name;
+            // TODO: This only takes the first prototype section, right now they're formatted so that that works, however, there's no reason there can't
+            // be multiple, we should cycle through all of them. additionally, the handlers at present only allow one handler per tag, there's no reason
+            // it shouldn't be a list and allow multiple handlers per tag. However, handling multiple tag sets per file is priority.
             prototypeHandlers[tagName]((JProperty)protoJson.First);
         }
     }

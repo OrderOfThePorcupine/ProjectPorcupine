@@ -13,8 +13,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -172,17 +172,14 @@ public class PrototypeMap<T> where T : IPrototypable, new()
         }
     }
 
-
-
     /// <summary>
     /// Loads all the prototypes from the specified text.
     /// </summary>
     /// <param name="xmlText">Xml text to parse.</param>
-    public void LoadJsonPrototypes(JProperty jToken)
+    public void LoadJsonPrototypes(JProperty protoToken)
     {
         //JsonTextReader reader = new JsonTextReader(new StringReader(jsonText));
         //XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
-
 
         JsonSerializerSettings settings = new JsonSerializerSettings();
         settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
@@ -192,9 +189,9 @@ public class PrototypeMap<T> where T : IPrototypable, new()
         //JsonConvert.DeserializeObject(jsonText);
         //JProperty jsonMap = jToken;
 
-        foreach (JToken token in jToken.Value)
+        foreach (JToken token in protoToken.Value)
         {
-            if(jToken.Name != "Headline")
+            if (protoToken.Name != "Headline")
             {
                 JProperty item = (JProperty)token;
                 T prototype = new T();

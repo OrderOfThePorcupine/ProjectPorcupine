@@ -71,13 +71,13 @@ public class EventActions
     /// <param name="eventActionsToken">JToken pointing to an Action tag.</param>
     public void ReadJson(JToken eventActionsToken)
     {
-        if(eventActionsToken == null)
+        if (eventActionsToken == null)
         {
             return;
         }
+
         foreach (JProperty eventAction in eventActionsToken)
         {
-
             string name = eventAction.Name;
 
             // TODO: this could possibly be converted over to use tools from PrototpeReader

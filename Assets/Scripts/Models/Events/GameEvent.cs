@@ -197,6 +197,5 @@ public class GameEvent : IPrototypable
         {
             executionActions = ((JArray)innerJson["ExecutionActions"]).ToObject<List<string>>();
         }
-
     }
 }

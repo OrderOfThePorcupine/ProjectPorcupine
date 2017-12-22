@@ -111,7 +111,7 @@ namespace DeveloperConsole.Core
 
         private void ParseParameterToTypeInfo() 
         {
-            if(Parameters == null)
+            if (Parameters == null)
             {
                 // Json can return a null Parameters rather than empty string, if that's the case set it to empty and return.
                 Parameters = string.Empty;
@@ -189,6 +189,5 @@ namespace DeveloperConsole.Core
             // Assign array
             this.TypeInfo = types;
         }
-
     }
 }

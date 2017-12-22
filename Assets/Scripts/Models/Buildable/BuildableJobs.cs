@@ -5,15 +5,14 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
-using Newtonsoft.Json.Linq;
-
-
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 [MoonSharpUserData]
@@ -149,7 +148,7 @@ public class BuildableJobs
 
     public void ReadOffsets(JToken jobToken)
     {
-        if(jobToken == null)
+        if (jobToken == null)
         {
             return;
         }
@@ -306,13 +305,14 @@ public class BuildableJobs
     {
         Vector2 vector = new Vector2();
 
-        if(vectorToken != null)
+        if (vectorToken != null)
         {
             int x = PrototypeReader.ReadJson(0, vectorToken["X"]);
             int y = PrototypeReader.ReadJson(0, vectorToken["Y"]);
             vector.x = x;
             vector.y = y;
         }
+
         return vector;
     }
 }

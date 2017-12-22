@@ -5,14 +5,13 @@
 // and you are welcome to redistribute it under certain conditions; See
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
-using Newtonsoft.Json.Linq;
-
-
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.OrderActions;
 
@@ -234,6 +233,5 @@ public class TileType : IPrototypable, IEquatable<TileType>
         LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
         LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
         OrderActions = PrototypeReader.ReadOrderActions(innerJson["OrderActions"]);
-
     }
 }

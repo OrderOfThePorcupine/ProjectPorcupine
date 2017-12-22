@@ -80,6 +80,6 @@ public class Currency : IPrototypable
     {
         Name = jsonProto.Name;
         JToken innerJson = jsonProto.Value;
-        ShortName = (string) innerJson["ShortName"];
+        ShortName = (string)innerJson["ShortName"];
     }
 }

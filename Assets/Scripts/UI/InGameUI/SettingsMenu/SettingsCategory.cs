@@ -5,9 +5,8 @@
 // and you are welcome to redistribute it under certain conditions; See 
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
-
-
 #endregion
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -78,7 +77,7 @@ public class SettingsCategory : IPrototypable
     {
         Type = jsonProto.Name;
         JToken innerJson = jsonProto.Value["Headings"];
-        foreach(JProperty heading in innerJson)
+        foreach (JProperty heading in innerJson)
         {
             string headingName = heading.Name;
             List<SettingsOption> options = new List<SettingsOption>();

@@ -1,8 +1,17 @@
-﻿using System;
+﻿#region License
+// ====================================================
+// Project Porcupine Copyright(C) 2016 Team Porcupine
+// This program comes with ABSOLUTELY NO WARRANTY; This is free software,
+// and you are welcome to redistribute it under certain conditions; See
+// file LICENSE, which is part of this source code package, for details.
+// ====================================================
+#endregion
+
+using System;
 using System.Collections.Generic;
+using Animation;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.OrderActions;
-using Animation;
 
 public class PrototypeReader
 {
@@ -33,7 +42,6 @@ public class PrototypeReader
         return itemList.ToArray();
     }
 
-
     public static Dictionary<string, OrderAction> ReadOrderActions(JToken orderActionsToken)
     {
         Dictionary<string, OrderAction> orderActions = new Dictionary<string, OrderAction>();
@@ -44,6 +52,7 @@ public class PrototypeReader
                 orderActions.Add(orderAction.Name, OrderAction.FromJson(orderAction));
             }
         }
+
         return orderActions;
     }
 
@@ -102,6 +111,7 @@ public class PrototypeReader
                 animations.Add(animation.State, animation);
             }
         }
+
         return animations;
     }
 
@@ -113,7 +123,7 @@ public class PrototypeReader
     /// <param name="animationsToken">Animations token.</param>
     public static FurnitureAnimation ReadFurnitureAnimations(JToken animationsToken)
     {
-        if(animationsToken == null)
+        if (animationsToken == null)
         {
             // Current system is based on a nonexistent FurnitureAnimation being null, rather than a FurnitureAnimation based on a null json token
             return null;
@@ -121,5 +131,4 @@ public class PrototypeReader
 
         return new FurnitureAnimation(ReadAnimations(animationsToken));
     }
-
 }

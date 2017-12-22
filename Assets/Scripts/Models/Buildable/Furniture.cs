@@ -868,7 +868,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
         if (innerJson["Components"] != null)
         {
-            JToken componentsJArray = (innerJson["Components"]);
+            JToken componentsJArray = innerJson["Components"];
             foreach (JToken componentJson in componentsJArray)
             {
                 BuildableComponent component = BuildableComponent.FromJson(componentJson);

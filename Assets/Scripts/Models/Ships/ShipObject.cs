@@ -17,6 +17,7 @@ public class ShipObject
         X = x;
         Y = y;
     }
+
     public string Type { get; set; }
 
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
