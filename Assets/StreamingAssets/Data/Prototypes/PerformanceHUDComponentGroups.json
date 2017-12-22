@@ -3,20 +3,20 @@
     "Basic": {
       "Components": [
         {
-          "Type": "FPSPerformanceComponent"
+          "ClassName": "FPSPerformanceComponent"
         }
       ]
     },
     "Extended": {
       "Components": [
         {
-          "Type": "FPSPerformanceComponent"
+          "ClassName": "FPSPerformanceComponent"
         },
         {
-          "Type": "FPSRangePerformanceComponent"
+          "ClassName": "FPSRangePerformanceComponent"
         },
         {
-          "Type": "FPSPerformanceComponent",
+          "ClassName": "FPSPerformanceComponent",
           "Parameters": {
             "MeasurePeriod": "5",
             "DisplayText": "AVG: ",
@@ -28,13 +28,13 @@
     "Verbose": {
       "Components": [
         {
-          "Type": "FPSPerformanceComponent"
+          "ClassName": "FPSPerformanceComponent"
         },
         {
-          "Type": "FPSRangePerformanceComponent"
+          "ClassName": "FPSRangePerformanceComponent"
         },
         {
-          "Type": "FPSPerformanceComponent",
+          "ClassName": "FPSPerformanceComponent",
           "Parameters": {
             "MeasurePeriod": "5",
             "DisplayText": "AVG: ",
@@ -42,7 +42,7 @@
           }
         },
         {
-          "Type": "MemoryPerformanceComponent"
+          "ClassName": "MemoryPerformanceComponent"
         }
       ]
     }
