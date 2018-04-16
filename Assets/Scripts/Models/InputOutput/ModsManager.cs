@@ -224,7 +224,10 @@ public class ModsManager
             // TODO: This only takes the first prototype section, right now they're formatted so that that works, however, there's no reason there can't
             // be multiple, we should cycle through all of them. additionally, the handlers at present only allow one handler per tag, there's no reason
             // it shouldn't be a list and allow multiple handlers per tag. However, handling multiple tag sets per file is priority.
-            prototypeHandlers[tagName]((JProperty)protoJson.First);
+            foreach (var prototypeGroup in protoJson)
+            {
+                prototypeHandlers[tagName]((JProperty)prototypeGroup);
+            }
         }
     }
 
