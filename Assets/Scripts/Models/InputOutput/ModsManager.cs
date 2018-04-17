@@ -19,6 +19,7 @@ using UnityEngine;
 public class ModsManager
 {
     private DirectoryInfo[] mods;
+    private Dictionary<string, List<Action<JProperty>>> prototypeHandlers = new Dictionary<string, List<Action<JProperty>>>();
 
     public ModsManager()
     {
@@ -189,9 +190,6 @@ public class ModsManager
             });
     }
 
-    //TODO: Don't leave this here
-    private Dictionary<string, Action<JProperty>> prototypeHandlers = new Dictionary<string, Action<JProperty>>();
-
     /// <summary>
     /// Subscribes to the prototypeLoader to handle all prototypes with the given key.
     /// </summary>
@@ -199,8 +197,13 @@ public class ModsManager
     /// <param name="prototypesLoader">Called to handle the prototypes loading.</param>
     private void HandlePrototypes(string prototypeKey, Action<JProperty> prototypesLoader)
     {
+        if(!prototypeHandlers.ContainsKey(prototypeKey))
+        {
+            prototypeHandlers.Add(prototypeKey, new List<Action<JProperty>>());
+        }
+
         // The way these work suggest it should be in a separate class, either a new class (PrototypeLoader?) or in one of the prototype related classes
-        prototypeHandlers.Add(prototypeKey, prototypesLoader);
+        prototypeHandlers[prototypeKey].Add(prototypesLoader);
     }
 
     private void LoadPrototypes()
@@ -221,12 +224,15 @@ public class ModsManager
             StreamReader reader = File.OpenText(file.FullName);
             JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
             string tagName = ((JProperty)protoJson.First).Name;
-            // TODO: This only takes the first prototype section, right now they're formatted so that that works, however, there's no reason there can't
-            // be multiple, we should cycle through all of them. additionally, the handlers at present only allow one handler per tag, there's no reason
-            // it shouldn't be a list and allow multiple handlers per tag. However, handling multiple tag sets per file is priority.
-            foreach (var prototypeGroup in protoJson)
+
+            // This *should* handle tags spread across multiple files, multiple tags in a single file, and multiple handlers per type.
+            foreach (JToken prototypeGroup in protoJson)
             {
-                prototypeHandlers[tagName]((JProperty)prototypeGroup);
+                foreach (Action<JProperty> handler in prototypeHandlers[tagName])
+                {
+                    handler((JProperty)prototypeGroup);
+                }
+
             }
         }
     }
