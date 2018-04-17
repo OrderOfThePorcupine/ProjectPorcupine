@@ -874,7 +874,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
                 BuildableComponent component = BuildableComponent.FromJson(componentJson);
                 if (component != null)
                 {
-                    //component.InitializePrototype(this);
+                    component.InitializePrototype(this);
                     components.Add(component);
                 }
             }
