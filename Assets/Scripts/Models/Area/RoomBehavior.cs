@@ -303,15 +303,16 @@ namespace ProjectPorcupine.Rooms
             {
                 Parameters.FromJson(innerJson["Parameters"]);
             }
-            // TODO: really should get requirements and optionals working...
-            /*
-                    case "Requirements":
-                        ReadXmlRequirements(reader);
-            break;
-                    case "Optional":
-                        ReadXmlRequirements(reader, true);
-            break;
-            */
+
+            if (innerJson["Requirements"] != null)
+            {
+                ReadJsonRequirements((JArray)innerJson["Requirements"]);
+            }
+
+            if (innerJson["Optional"] != null)
+            {
+                ReadJsonRequirements((JArray)innerJson["Optional"], true);
+            }
         }
 
         /// <summary>
@@ -481,6 +482,30 @@ namespace ProjectPorcupine.Rooms
             if (Changed != null)
             {
                 Changed(util);
+            }
+        }
+
+        private void ReadJsonRequirements(JArray requirementsArray, bool isOptional = false) 
+        {
+            foreach (var requirementToken in requirementsArray)
+            {
+                if(requirementToken["Furniture"] != null)
+                {
+                    // Furniture must have either Type or TypeTag, try both, check for null later
+                    string type = (string)requirementToken["Furniture"]["Type"];
+                    string typeTag = (string)requirementToken["Furniture"]["TypeTag"];
+                    int count = 0;
+                    if(!isOptional) 
+                    {
+                        count = PrototypeReader.ReadJson(count, requirementToken["Furniture"]["Count"]);
+                    }
+
+                    requiredFurniture.Add(new FurnitureRequirement(type, typeTag, count));
+                }
+                else if(requirementToken["Size"] != null && !isOptional)
+                {
+                    requiredSize = PrototypeReader.ReadJson(requiredSize, requirementToken["Size"]);
+                }
             }
         }
 

@@ -1,6 +1,19 @@
 {
   "RoomBehavior": {
     "airlock": {
+	  "Requirements": [
+	    {
+		  "Type": "air_pump",
+		  "Count": 1
+		},
+		{
+		  "TypeTag": "Pressure Door",
+		  "Count": 2
+		},
+		{
+		  "Size": 3
+		}
+	  ],
       "EventActions": {
         "OnControl": [
           "OnControl_Airlock"

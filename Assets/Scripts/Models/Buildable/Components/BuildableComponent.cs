@@ -143,7 +143,7 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 Type t = componentTypes[componentTypeName];
                 BuildableComponent component = (BuildableComponent)jtoken["Component"].ToObject(t);
-                //// need to set name explicitly (not part of deserialization as it's passed in)
+                // need to set name explicitly (not part of deserialization as it's passed in)
                 component.Type = componentTypeName;
                 return component;
             }
