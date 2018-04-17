@@ -3,12 +3,16 @@
     "airlock": {
 	  "Requirements": [
 	    {
-		  "Type": "air_pump",
-		  "Count": 1
+		  "Furniture":{ 
+			"Type": "pump_air",
+			"Count": 1
+		  }
 		},
 		{
-		  "TypeTag": "Pressure Door",
-		  "Count": 2
+		  "Furniture":{ 
+			"TypeTag": "Pressure Door",
+			"Count": 2
+		  }
 		},
 		{
 		  "Size": 3
