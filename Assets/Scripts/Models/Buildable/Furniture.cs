@@ -1379,6 +1379,11 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         return true;
     }
 
+    public void ReadJSONPrototype(JProperty property)
+    {
+        throw new NotImplementedException();
+    }
+
     #region Private Context Menu
     private void InvokeContextMenuLuaAction(ContextMenuAction action, Character character)
     {

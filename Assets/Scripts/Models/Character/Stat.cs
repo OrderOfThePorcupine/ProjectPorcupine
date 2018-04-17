@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Xml;
 
 namespace ProjectPorcupine.Entities
@@ -42,6 +43,11 @@ namespace ProjectPorcupine.Entities
         public override string ToString()
         {
             return string.Format("{0}: {1}", Type, Value);
+        }
+
+        public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+        {
+            throw new NotImplementedException();
         }
     }
 }

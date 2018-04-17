@@ -80,4 +80,9 @@ public class OverlayDescriptor : IPrototypable
         xmlReader.Read();
         LuaFunctionName = xmlReader.ReadContentAsString();
     }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
 }

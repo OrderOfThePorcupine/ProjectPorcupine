@@ -568,4 +568,9 @@ public class Job : ISelectable, IPrototypable
             UnityDebugger.Debugger.Log("FSM", string.Format("   - {0}, min: {1}, max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested));
         }
     }
+
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new NotImplementedException();
+    }
 }

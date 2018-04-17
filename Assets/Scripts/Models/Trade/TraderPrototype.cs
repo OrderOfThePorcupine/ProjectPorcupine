@@ -174,6 +174,11 @@ public class TraderPrototype : IPrototypable
         return t;
     }
 
+    public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+    {
+        throw new System.NotImplementedException();
+    }
+
     /// <summary>
     /// Reads and creates Animations from the prototype xml. 
     /// For now, this requires an idle animation and a flying animation state.

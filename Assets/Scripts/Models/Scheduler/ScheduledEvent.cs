@@ -289,5 +289,10 @@ namespace Scheduler
 
             return eventJObject;
         }
+
+        public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

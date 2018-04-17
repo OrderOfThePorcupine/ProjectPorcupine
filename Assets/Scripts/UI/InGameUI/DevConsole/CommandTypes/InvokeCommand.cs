@@ -158,5 +158,10 @@ namespace DeveloperConsole.Core
             // Assign array
             this.TypeInfo = types;
         }
+
+        public void ReadJSONPrototype(Newtonsoft.Json.Linq.JProperty property)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

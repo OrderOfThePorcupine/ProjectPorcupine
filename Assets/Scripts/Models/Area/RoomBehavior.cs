@@ -412,6 +412,11 @@ namespace ProjectPorcupine.Rooms
             return behaviorJson;
         }
 
+        public void ReadJSONPrototype(JProperty property)
+        {
+            throw new NotImplementedException();
+        }
+
         [MoonSharpVisible(true)]
         private void CallEventAction(string actionName, params object[] parameters)
         {

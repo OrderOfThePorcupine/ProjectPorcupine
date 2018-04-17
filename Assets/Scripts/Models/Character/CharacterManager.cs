@@ -180,6 +180,16 @@ namespace ProjectPorcupine.Entities
                         }
                     }
                 }
+
+                if (characterToken["Gear"] != null)
+                {
+                    foreach (JToken inventoryToken in characterToken["Gear"])
+                    {
+                        Gear gear = new Gear();
+                        gear.FromJson(characterToken["Gear"]);
+                        character.Gear = gear;
+                    }
+                }
             }
         }
     }

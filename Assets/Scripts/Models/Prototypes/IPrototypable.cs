@@ -7,6 +7,7 @@
 // ====================================================
 #endregion
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 public interface IPrototypable
 {
@@ -20,4 +21,10 @@ public interface IPrototypable
     /// </summary>
     /// <param name="readerParent">The XML reader to read from.</param>
     void ReadXmlPrototype(XmlReader reader);
+
+    /// <summary>
+    /// Reads the prototype from the specified JSON.
+    /// </summary>
+    /// <param name="property">The JSON reader to read from.</param>
+    void ReadJSONPrototype(JProperty property);
 }
