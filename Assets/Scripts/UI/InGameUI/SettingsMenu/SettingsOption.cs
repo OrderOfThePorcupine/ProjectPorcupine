@@ -69,7 +69,6 @@ public struct SettingsOption
     public SettingsOption(JToken innerJson)
     {
         name = PrototypeReader.ReadJson("name", innerJson["Name"]);
-        //JToken innerJson = jsonProto.Value;
         key = PrototypeReader.ReadJson("key", innerJson["Key"]);
         defaultValue = PrototypeReader.ReadJson("defaultValue", innerJson["DefaultValue"]);
         classData = new UIComponent();

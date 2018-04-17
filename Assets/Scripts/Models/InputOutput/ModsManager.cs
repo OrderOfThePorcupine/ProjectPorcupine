@@ -105,22 +105,6 @@ public class ModsManager
         HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
         HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
 
-//        LoadPrototypes("Tiles.xml", PrototypeManager.TileType.LoadPrototypes);
-//        LoadPrototypes("Furniture.xml", PrototypeManager.Furniture.LoadPrototypes);
-//        LoadPrototypes("Utility.xml", PrototypeManager.Utility.LoadPrototypes);
-//        LoadPrototypes("RoomBehavior.xml", (text) => PrototypeManager.RoomBehavior.LoadPrototypes(text));
-//        LoadPrototypes("Inventory.xml", PrototypeManager.Inventory.LoadPrototypes);
-//        LoadPrototypes("Need.xml", PrototypeManager.Need.LoadPrototypes);
-//        LoadPrototypes("Trader.xml", PrototypeManager.Trader.LoadPrototypes);
-//        LoadPrototypes("Currency.xml", PrototypeManager.Currency.LoadPrototypes);
-//        LoadPrototypes("GameEvents.xml", PrototypeManager.GameEvent.LoadPrototypes);
-//        LoadPrototypes("ScheduledEvents.xml", PrototypeManager.ScheduledEvent.LoadPrototypes);
-//        LoadPrototypes("Stats.xml", PrototypeManager.Stat.LoadPrototypes);
-//        LoadPrototypes("Quest.xml", PrototypeManager.Quest.LoadPrototypes);
-//        LoadPrototypes("Headlines.xml", PrototypeManager.Headline.LoadPrototypes);
-//        LoadPrototypes("Overlay.xml", PrototypeManager.Overlay.LoadPrototypes);
-//        LoadPrototypes("Ships.xml", PrototypeManager.Ship.LoadPrototypes);
-
         LoadCharacterNames("CharacterNames.txt");
 
         LoadDirectoryAssets("Images", SpriteManager.LoadSpriteFiles);
@@ -144,10 +128,6 @@ public class ModsManager
         HandlePrototypes("ConsoleCommand", PrototypeManager.DevConsole.LoadJsonPrototypes);
         HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
         HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
-
-//        LoadPrototypes("ConsoleCommands.xml", PrototypeManager.DevConsole.LoadPrototypes);
-//        LoadPrototypes("SettingsTemplate.xml", PrototypeManager.SettingsCategories.LoadPrototypes);
-//        LoadPrototypes("PerformanceHUDComponentGroups.xml", PrototypeManager.PerformanceHUD.LoadPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
@@ -197,7 +177,7 @@ public class ModsManager
     /// <param name="prototypesLoader">Called to handle the prototypes loading.</param>
     private void HandlePrototypes(string prototypeKey, Action<JProperty> prototypesLoader)
     {
-        if(!prototypeHandlers.ContainsKey(prototypeKey))
+        if (!prototypeHandlers.ContainsKey(prototypeKey))
         {
             prototypeHandlers.Add(prototypeKey, new List<Action<JProperty>>());
         }
@@ -208,10 +188,8 @@ public class ModsManager
 
     private void LoadPrototypes()
     {
-        // Get list of files in save location
+        // Get list of files in Prototype directory
         string prototypesDirectoryPath = Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Prototypes");
-
-        //EnsureDirectoryExists(saveDirectoryPath);
 
         DirectoryInfo prototypeDir = new DirectoryInfo(prototypesDirectoryPath);
 
@@ -220,7 +198,6 @@ public class ModsManager
         for (int i = 0; i < prototypeFiles.Length; i++)
         {
             FileInfo file = prototypeFiles[i];
-//            string fileName = Path.GetF(file.FullName);
             StreamReader reader = File.OpenText(file.FullName);
             JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
             string tagName = ((JProperty)protoJson.First).Name;
@@ -232,7 +209,6 @@ public class ModsManager
                 {
                     handler((JProperty)prototypeGroup);
                 }
-
             }
         }
     }

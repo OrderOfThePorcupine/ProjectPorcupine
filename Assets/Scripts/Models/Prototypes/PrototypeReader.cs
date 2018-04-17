@@ -20,7 +20,6 @@ public class PrototypeReader
         if (jtoken != null)
         {
             return (T)Convert.ChangeType(jtoken, typeof(T));
-            //value = (T)jtoken;
         }
         else
         {

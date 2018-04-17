@@ -173,21 +173,16 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     }
 
     /// <summary>
-    /// Loads all the prototypes from the specified text.
+    /// Loads all the prototypes from the specified JProperty.
     /// </summary>
-    /// <param name="xmlText">Xml text to parse.</param>
+    /// <param name="protoToken">JProperty to parse.</param>
     public void LoadJsonPrototypes(JProperty protoToken)
     {
-        //JsonTextReader reader = new JsonTextReader(new StringReader(jsonText));
-        //XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
-
         JsonSerializerSettings settings = new JsonSerializerSettings();
         settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
         settings.Formatting = Newtonsoft.Json.Formatting.Indented;
         settings.NullValueHandling = NullValueHandling.Ignore;
         settings.DefaultValueHandling = DefaultValueHandling.Ignore;
-        //JsonConvert.DeserializeObject(jsonText);
-        //JProperty jsonMap = jToken;
 
         foreach (JToken token in protoToken.Value)
         {
@@ -203,7 +198,6 @@ public class PrototypeMap<T> where T : IPrototypable, new()
             else
             {
                 // HACK: headlines currently need special handling, should be made into not a prototype
-
                 JProperty jproperty = new JProperty((string)token, (string)token);
                 T prototype = new T();
 

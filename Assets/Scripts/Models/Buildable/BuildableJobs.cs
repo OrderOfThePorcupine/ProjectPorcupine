@@ -117,8 +117,6 @@ public class BuildableJobs
         get { return activeJobs[i]; }
     }
 
-
-
     /// <summary>
     /// Reads the job work spot offset from the xml.
     /// </summary>

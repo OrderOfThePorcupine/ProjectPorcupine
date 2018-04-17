@@ -489,20 +489,20 @@ namespace ProjectPorcupine.Rooms
         {
             foreach (var requirementToken in requirementsArray)
             {
-                if(requirementToken["Furniture"] != null)
+                if (requirementToken["Furniture"] != null)
                 {
                     // Furniture must have either Type or TypeTag, try both, check for null later
                     string type = (string)requirementToken["Furniture"]["Type"];
                     string typeTag = (string)requirementToken["Furniture"]["TypeTag"];
                     int count = 0;
-                    if(!isOptional) 
+                    if (!isOptional) 
                     {
                         count = PrototypeReader.ReadJson(count, requirementToken["Furniture"]["Count"]);
                     }
 
                     requiredFurniture.Add(new FurnitureRequirement(type, typeTag, count));
                 }
-                else if(requirementToken["Size"] != null && !isOptional)
+                else if (requirementToken["Size"] != null && !isOptional)
                 {
                     requiredSize = PrototypeReader.ReadJson(requiredSize, requirementToken["Size"]);
                 }

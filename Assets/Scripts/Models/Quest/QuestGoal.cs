@@ -44,7 +44,6 @@ public class QuestGoal
     {
         if (token != null)
         {
-            //System.Console.WriteLine(((JProperty)token).Name);
             Description = PrototypeReader.ReadJson(Description, token["Description"]);
             IsCompletedLuaFunction = PrototypeReader.ReadJson(IsCompletedLuaFunction, token["IsCompletedLuaFunction"]);
 
