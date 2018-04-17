@@ -1,5 +1,9 @@
 # ProjectPorcupine [![Build Status](https://travis-ci.org/OrderOfThePorcupine/ProjectPorcupine.svg?branch=master)](https://travis-ci.org/OrderOfThePorcupine/ProjectPorcupine)
 
+#### Development Stopping
+
+Sadly Project Porcupine for a while has had a decline in engagement, this has led to development times stalling and now effectively stopping, thus while the project isn't 'dead' dead I doubt any future development will occur, however if any individual wishes to implement changes I know for certain that we will review and merge them in :), however I don't forsee me (Braedon) or koosemose doing much more work other than finishing off our current PRs.
+
 ### Project Porcupine: A Base-Building Game...in Space!
 
 ![Preview Thumbnail](https://cloud.githubusercontent.com/assets/22880786/19826387/7ad0f0d2-9dd4-11e6-92f3-eb47b395ac63.png)
