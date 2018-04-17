@@ -481,7 +481,6 @@ public class Job : ISelectable, IPrototypable
 
     public void DropPriority()
     {
-        // TODO: This casting to and from enums are a bit weird. We should decide on ONE priority system.
         this.Priority = (Job.JobPriority)Mathf.Min((int)Job.JobPriority.Low, (int)Priority + 1);
     }
 

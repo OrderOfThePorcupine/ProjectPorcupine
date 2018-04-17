@@ -85,23 +85,6 @@ namespace ProjectPorcupine.OrderActions
 
                 OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
                 orderAction.Type = orderActionProp.Name;
-
-                // TODO: Probably don't need to set any of this here, if this workse right... not sure.
-                // TODO: It seems we in fact don't need any of this, remove if loading works fine.
-//                UnityDebugger.Debugger.LogWarning(orderAction.JobTime + " - " + orderAction.JobTimeFunction);
-//                orderAction.JobTime = PrototypeReader.ReadJson(orderAction.JobTime, orderActionProp.Value["JobTime"]);
-//                orderAction.JobTimeFunction = PrototypeReader.ReadJson(orderAction.JobTimeFunction, orderActionProp.Value["JobTimeFunction"]);
-
-//                if (orderActionProp.Value["Inventory"] != null)
-//                {
-//                    UnityDebugger.Debugger.LogWarning(orderActionType);
-//                    foreach (JProperty inventory in orderActionProp.Value["Inventory"])
-//                    {
-//                        UnityDebugger.Debugger.LogWarning(inventory.Name);
-//                        orderAction.Inventory.Add(inventory.Name, (int)inventory.Value);
-//                    }
-//                }
-
                 return orderAction;
             }
             else
