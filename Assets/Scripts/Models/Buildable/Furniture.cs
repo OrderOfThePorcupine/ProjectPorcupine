@@ -84,7 +84,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         CanRotate = false;
         Rotation = 0f;
         DragType = "single";
-        LinksToNeighbour = string.Empty;
+        LinksToNeighbours = string.Empty;
         components = new HashSet<BuildableComponent>();
         orderActions = new Dictionary<string, OrderAction>();
     }
@@ -100,13 +100,13 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         MovementCost = other.MovementCost;
         PathfindingModifier = other.PathfindingModifier;
         PathfindingWeight = other.PathfindingWeight;
-        RoomEnclosure = other.RoomEnclosure;
+        EnclosesRoom = other.EnclosesRoom;
         Width = other.Width;
         Height = other.Height;
         CanRotate = other.CanRotate;
         Rotation = other.Rotation;
         Tint = other.Tint;
-        LinksToNeighbour = other.LinksToNeighbour;
+        LinksToNeighbours = other.LinksToNeighbours;
         health = other.health;
 
         Parameters = new Parameter(other.Parameters);
@@ -126,9 +126,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             orderActions.Add(orderAction.Key, orderAction.Value.Clone());
         }
 
-        if (other.Animation != null)
+        if (other.Animations != null)
         {
-            Animation = other.Animation.Clone();
+            Animations = other.Animations.Clone();
         }
 
         if (other.EventActions != null)
@@ -156,8 +156,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
         RequiresFastUpdate = EventActions.HasEvent("OnFastUpdate") || components.Any(c => c.RequiresFastUpdate);
 
-        LocalizationCode = other.LocalizationCode;
-        UnlocalizedDescription = other.UnlocalizedDescription;
+        LocalizationName = other.LocalizationName;
+        LocalizationDescription = other.LocalizationDescription;
 
         // force true as default, to trigger OnIsOperatingChange (to sync the furniture icons after initialization)
         IsOperating = true;
@@ -301,7 +301,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// <summary>
     /// Gets a value indicating whether the furniture can close a room (e.g. act as a wall).
     /// </summary>
-    public bool RoomEnclosure { get; private set; }
+    public bool EnclosesRoom { get; private set; }
 
     /// <summary>
     /// Gets the width of the furniture.
@@ -326,18 +326,18 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// <summary>
     /// Gets the code used for Localization of the furniture.
     /// </summary>
-    public string LocalizationCode { get; private set; }
+    public string LocalizationName { get; private set; }
 
     /// <summary>
     /// Gets the description of the furniture. This is used by localization.
     /// </summary>
-    public string UnlocalizedDescription { get; private set; }
+    public string LocalizationDescription { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether this furniture is next to any furniture of the same type.
     /// This is used to check what sprite to use if furniture is next to each other.
     /// </summary>
-    public string LinksToNeighbour { get; private set; }
+    public string LinksToNeighbours { get; private set; }
 
     /// <summary>
     /// Gets the type of dragging that is used to build multiples of this furniture.
@@ -363,7 +363,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// <summary>
     /// Gets or sets the furniture animation.
     /// </summary>
-    public FurnitureAnimation Animation { get; set; }
+    public FurnitureAnimation Animations { get; set; }
 
     /// <summary>
     /// Gets or sets the parameters that is tied to the furniture.
@@ -453,7 +453,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             component.Initialize(furnObj);
         }
 
-        if (furnObj.LinksToNeighbour != string.Empty)
+        if (furnObj.LinksToNeighbours != string.Empty)
         {
             // This type of furniture links itself to its neighbours,
             // so we should inform our neighbours that they have a new
@@ -558,9 +558,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             component.FixedFrequencyUpdate(deltaTime);
         }
 
-        if (Animation != null)
+        if (Animations != null)
         {
-            Animation.Update(deltaTime);
+            Animations.Update(deltaTime);
         }
     }
 
@@ -569,12 +569,12 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// </summary>
     public void SetAnimationState(string stateName)
     {
-        if (Animation == null)
+        if (Animations == null)
         {
             return;
         }
 
-        Animation.SetState(stateName);
+        Animations.SetState(stateName);
     }
 
     /// <summary>
@@ -582,7 +582,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// </summary>
     public void SetAnimationProgressValue(float currentValue, float maxValue)
     {
-        if (Animation == null)
+        if (Animations == null)
         {
             return;
         }
@@ -593,7 +593,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
 
         float percent = Mathf.Clamp01(currentValue / maxValue);
-        Animation.SetProgressValue(percent);
+        Animations.SetProgressValue(percent);
     }
     #endregion
 
@@ -604,7 +604,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// <returns>True if furniture is an exit.</returns>
     public bool IsExit()
     {
-        if (RoomEnclosure && MovementCost > 0f)
+        if (EnclosesRoom && MovementCost > 0f)
         {
             return true;
         }
@@ -653,9 +653,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
 
         // Try to get spritename from animation
-        if (Animation != null)
+        if (Animations != null)
         {
-            return Animation.GetSpriteName();
+            return Animations.GetSpriteName();
         }
 
         // Else return default Type string
@@ -714,11 +714,11 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
                     break;
                 case "LinksToNeighbours":
                     reader.Read();
-                    LinksToNeighbour = reader.ReadContentAsString();
+                    LinksToNeighbours = reader.ReadContentAsString();
                     break;
                 case "EnclosesRooms":
                     reader.Read();
-                    RoomEnclosure = reader.ReadContentAsBoolean();
+                    EnclosesRoom = reader.ReadContentAsBoolean();
                     break;
                 case "CanReplaceFurniture":
                     replaceableFurniture.Add(reader.GetAttribute("typeTag").ToString());
@@ -772,11 +772,11 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
                     break;
                 case "LocalizationCode":
                     reader.Read();
-                    LocalizationCode = reader.ReadContentAsString();
+                    LocalizationName = reader.ReadContentAsString();
                     break;
                 case "UnlocalizedDescription":
                     reader.Read();
-                    UnlocalizedDescription = reader.ReadContentAsString();
+                    LocalizationDescription = reader.ReadContentAsString();
                     break;
                 case "Component":
                     BuildableComponent component = BuildableComponent.Deserialize(reader);
@@ -800,7 +800,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
         if (orderActions.ContainsKey("Uninstall"))
         {
-            Inventory asInventory = Inventory.CreatePrototype(Type, 1, 0f, "crated_furniture", LocalizationCode, UnlocalizedDescription);
+            Inventory asInventory = Inventory.CreatePrototype(Type, 1, 0f, "crated_furniture", LocalizationName, LocalizationDescription);
             PrototypeManager.Inventory.Add(asInventory);
         }
     }
@@ -812,6 +812,79 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     public void ReadXmlParams(XmlReader reader)
     {
         Parameters = Parameter.ReadXml(reader);
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+        MovementCost = PrototypeReader.ReadJson(MovementCost, innerJson["MovementCost"]);
+        PathfindingModifier = PrototypeReader.ReadJson(PathfindingModifier, innerJson["PathfindingModifier"]);
+        PathfindingWeight = PrototypeReader.ReadJson(PathfindingWeight, innerJson["PathfindingWeight"]);
+
+        Width = PrototypeReader.ReadJson(Width, innerJson["Width"]);
+        Height = PrototypeReader.ReadJson(Height, innerJson["Height"]);
+
+        /* TODO: This may need altered, for now it is built to match the functionality of the xml reader
+        in that if no value is set it is invincible, and the furniture's health system will make it invincible if access while null.
+        It may be preferable to have the HealthSystem constructor detect an "invalid" health amount such as -1, and autoset to invincible as appropriate */
+        float healthValue = PrototypeReader.ReadJson(-1f, innerJson["Health"]);
+        if (Mathf.Abs(healthValue - -1) > Mathf.Epsilon)
+        {
+            health = new HealthSystem(healthValue, false, true, false, false);
+        }
+
+        LinksToNeighbours = PrototypeReader.ReadJson(LinksToNeighbours, innerJson["LinksToNeighbours"]);
+        EnclosesRoom = PrototypeReader.ReadJson(EnclosesRoom, innerJson["EnclosesRoom"]);
+        CanRotate = PrototypeReader.ReadJson(CanRotate, innerJson["CanRotate"]);
+        DragType = PrototypeReader.ReadJson(DragType, innerJson["DragType"]);
+        isEnterableAction = PrototypeReader.ReadJson(isEnterableAction, innerJson["IsEnterableAction"]);
+        getProgressInfoNameAction = PrototypeReader.ReadJson(getProgressInfoNameAction, innerJson["GetProgressInfoNameAction"]);
+        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+
+        typeTags = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TypeTags"]));
+
+        if (innerJson["CanReplaceFurniture"] != null)
+        {
+            replaceableFurniture = ((JArray)innerJson["CanReplaceFurniture"]).ToObject<List<string>>();
+        }
+
+        tileTypeBuildPermissions = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TileTypeBuildPermissions"]));
+        orderActions = PrototypeReader.ReadOrderActions(innerJson["OrderActions"]);
+        contextMenuLuaActions = PrototypeReader.ReadContextMenuActions(innerJson["ContextMenuActions"]);
+
+        Animations = PrototypeReader.ReadFurnitureAnimations(innerJson["Animations"]);
+
+        EventActions.ReadJson(innerJson["EventActions"]);
+
+        Jobs.ReadOffsets(innerJson["Jobs"]);
+
+        Parameters.FromJson(innerJson["Parameters"]);
+
+        if (innerJson["Components"] != null)
+        {
+            JToken componentsJArray = innerJson["Components"];
+            foreach (JToken componentJson in componentsJArray)
+            {
+                BuildableComponent component = BuildableComponent.FromJson(componentJson);
+                if (component != null)
+                {
+                    component.InitializePrototype(this);
+                    components.Add(component);
+                }
+            }
+        }
+
+        if (orderActions.ContainsKey("Uninstall"))
+        {
+            Inventory asInventory = Inventory.CreatePrototype(Type, 1, 0f, "crated_furniture", LocalizationName, LocalizationDescription);
+            PrototypeManager.Inventory.Add(asInventory);
+        }
     }
     #endregion
 
@@ -898,7 +971,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             Furniture furniture = Tile.Furniture;
             fwidth = furniture.Width;
             fheight = furniture.Height;
-            linksToNeighbour = furniture.LinksToNeighbour;
+            linksToNeighbour = furniture.LinksToNeighbours;
             furniture.Jobs.CancelAll();
         }
 
@@ -922,7 +995,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
 
         // Do we need to recalculate our rooms?
-        if (RoomEnclosure)
+        if (EnclosesRoom)
         {
             World.Current.RoomManager.DoRoomFloodFill(Tile, false);
         }
@@ -1000,7 +1073,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             Furniture furniture = Tile.Furniture;
             fwidth = furniture.Width;
             fheight = furniture.Height;
-            linksToNeighbour = furniture.LinksToNeighbour;
+            linksToNeighbour = furniture.LinksToNeighbours;
             furniture.Jobs.CancelAll();
         }
 
@@ -1015,9 +1088,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         Deconstruct deconstructOrder = GetOrderAction<Deconstruct>();
         if (deconstructOrder != null)
         {
-            foreach (OrderAction.InventoryInfo inv in deconstructOrder.Inventory)
+            foreach (KeyValuePair<string, int> inv in deconstructOrder.Inventory)
             {
-                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Type, inv.Amount));
+                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Key, inv.Value));
             }
         }
 
@@ -1027,7 +1100,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
 
         // Do we need to recalculate our rooms?
-        if (RoomEnclosure)
+        if (EnclosesRoom)
         {
             World.Current.RoomManager.DoRoomFloodFill(Tile, false);
         }
@@ -1088,7 +1161,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// <returns>LocalizationCode for the name of the furniture.</returns>
     public string GetName()
     {
-        return LocalizationCode; // this.Name;
+        return LocalizationName; // this.Name;
     }
 
     /// <summary>
@@ -1097,7 +1170,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// <returns>Description of the furniture.</returns>
     public string GetDescription()
     {
-        return UnlocalizedDescription;
+        return LocalizationDescription;
     }
 
     /// <summary>
@@ -1223,7 +1296,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = LocalizationTable.GetLocalization("deconstruct_furniture", LocalizationCode),
+                LocalizationKey = LocalizationTable.GetLocalization("deconstruct_furniture", LocalizationName),
                 RequireCharacterSelected = false,
                 Action = (ca, c) => SetDeconstructJob()
             };
@@ -1233,7 +1306,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = LocalizationTable.GetLocalization("uninstall_furniture", LocalizationCode),
+                LocalizationKey = LocalizationTable.GetLocalization("uninstall_furniture", LocalizationName),
                 RequireCharacterSelected = false,
                 Action = (ca, c) => SetUninstallJob()
             };
@@ -1245,7 +1318,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 yield return new ContextMenuAction
                 {
-                    LocalizationKey = LocalizationTable.GetLocalization("prioritize_furniture", LocalizationCode),
+                    LocalizationKey = LocalizationTable.GetLocalization("prioritize_furniture", LocalizationName),
                     RequireCharacterSelected = true,
                     Action = (ca, c) => c.PrioritizeJob(Jobs[0])
                 };
@@ -1417,7 +1490,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     /// </summary>
     private void ReadAnimationXml(XmlReader animationReader)
     {
-        Animation = new FurnitureAnimation();
+        Animations = new FurnitureAnimation();
         while (animationReader.Read())
         {
             if (animationReader.Name == "Animation")
@@ -1441,7 +1514,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
                     }
                 }
 
-                Animation.AddAnimation(state, framesSpriteNames, fps, looping, valueBased);
+                Animations.AddAnimation(state, framesSpriteNames, fps, looping, valueBased);
             }
         }
     }

@@ -1,0 +1,60 @@
+{
+  "Inventory": {
+    "raw_iron": {
+      "MaxStackSize": 50,
+      "BasePrice": 0.8,
+      "Category": "inv_cat_raw",
+      "LocalizationName": "inv_raw_iron",
+      "LocalizationDescription": "inv_raw_iron_desc"
+    },
+    "ice": {
+      "MaxStackSize": 10,
+      "BasePrice": 1.2,
+      "Category": "inv_cat_raw",
+      "LocalizationName": "inv_ice",
+      "LocalizationDescription": "inv_ice_desc"
+    },
+    "raw_copper": {
+      "MaxStackSize": 50,
+      "BasePrice": 0.8,
+      "Category": "inv_cat_raw",
+      "LocalizationName": "inv_raw_copper",
+      "LocalizationDescription": "inv_raw_copper_desc"
+    },
+    "raw_uranium": {
+      "MaxStackSize": 20,
+      "BasePrice": 3.0,
+      "Category": "inv_cat_raw",
+      "LocalizationName": "inv_raw_uranium",
+      "LocalizationDescription": "inv_raw_uranium_desc"
+    },
+    "steel_plate": {
+      "MaxStackSize": 50,
+      "BasePrice": 1.5,
+      "Category": "inv_cat_refined",
+      "LocalizationName": "inv_steel_plate",
+      "LocalizationDescription": "inv_steel_plate_desc"
+    },
+    "power_cell": {
+      "MaxStackSize": 5,
+      "BasePrice": 5.0,
+      "Category": "inv_cat_crafted",
+      "LocalizationName": "inv_power_cell",
+      "LocalizationDescription": "inv_power_cell_desc"
+    },
+    "copper_plate": {
+      "MaxStackSize": 50,
+      "BasePrice": 1.5,
+      "Category": "inv_cat_refined",
+      "LocalizationName": "inv_copper_plate",
+      "LocalizationDescription": "inv_copper_plate_desc"
+    },
+    "copper_wire": {
+      "MaxStackSize": 50,
+      "BasePrice": 2.0,
+      "Category": "inv_cat_crafted",
+      "LocalizationName": "inv_copper_wire",
+      "LocalizationDescription": "inv_copper_wire_desc"
+    }
+  }
+}

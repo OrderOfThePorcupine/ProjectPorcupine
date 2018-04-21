@@ -6,7 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 public class Currency : IPrototypable
 {
@@ -68,5 +70,16 @@ public class Currency : IPrototypable
     {
         Name = reader.GetAttribute("Name");
         ShortName = reader.GetAttribute("ShortName");
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JProperty.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Name = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+        ShortName = (string)innerJson["ShortName"];
     }
 }

@@ -85,7 +85,7 @@ public class FurnitureManager : IEnumerable<Furniture>
         }
 
         // Do we need to recalculate our rooms/reachability for other jobs?
-        if (doRoomFloodFill && furniture.RoomEnclosure)
+        if (doRoomFloodFill && furniture.EnclosesRoom)
         {
             World.Current.RoomManager.DoRoomFloodFill(furniture.Tile, true);
             World.Current.jobQueue.ReevaluateReachability();

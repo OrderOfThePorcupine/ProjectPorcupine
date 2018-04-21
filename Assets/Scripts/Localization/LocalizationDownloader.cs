@@ -46,10 +46,8 @@ namespace ProjectPorcupine.Localization
     /// </summary>
     public static class LocalizationDownloader
     {
-        // TODO: Change this to the official repo before PR.
         private static readonly string LocalizationRepositoryZipLocation = "https://github.com/OrderOfThePorcupine/Localization/archive/" + GameController.GameVersion + ".zip";
 
-        // TODO: Change this to the official repo before PR.
         private static readonly string LastCommitGithubApiLocation = "https://api.github.com/repos/OrderOfThePorcupine/Localization/commits/" + GameController.GameVersion;
 
         private static readonly string LocalizationFolderPath = Path.Combine(Application.streamingAssetsPath, "Localization");

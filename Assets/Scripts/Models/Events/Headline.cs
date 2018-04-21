@@ -6,7 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// A class that holds each Headline.
@@ -52,5 +54,15 @@ public class Headline : IPrototypable
     {
         reader.Read();
         Text = reader.ReadContentAsString();
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Text = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
     }
 }

@@ -6,11 +6,13 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 
 namespace DeveloperConsole.Core
 {
@@ -70,9 +72,10 @@ namespace DeveloperConsole.Core
         {
             Title = reader.GetAttribute("Title");
             FunctionName = reader.GetAttribute("FunctionName");
-            DescriptiveText = reader.GetAttribute("Description");
-            DetailedDescriptiveText = reader.GetAttribute("DetailedDescription");
+            Description = reader.GetAttribute("Description");
+            DetailedDescription = reader.GetAttribute("DetailedDescription");
             Parameters = reader.GetAttribute("Parameters");
+            ParseParameterToTypeInfo();
             Tags = reader.GetAttribute("Tags").Split(',').Select(x => x.Trim()).ToArray();
             DefaultValue = reader.GetAttribute("DefaultValue");
 
@@ -85,6 +88,34 @@ namespace DeveloperConsole.Core
             if (DefaultValue == null)
             {
                 DefaultValue = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Reads the prototype from the specified JProperty.
+        /// </summary>
+        /// <param name="jsonProto">The JProperty containing the prototype.</param>
+        public void ReadJsonPrototype(JProperty jsonProto)
+        {
+            Title = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+            FunctionName = (string)innerJson["FunctionName"];
+            Description = (string)innerJson["Description"];
+            DetailedDescription = (string)innerJson["DetailedDescription"];
+            Parameters = PrototypeReader.ReadJson(Parameters, innerJson["Parameters"]);
+            ParseParameterToTypeInfo();
+            DefaultValue = (string)innerJson["DefaultValue"] ?? string.Empty;
+
+            Tags = ((JArray)innerJson["Tags"]).ToObject<string[]>();
+        }
+
+        private void ParseParameterToTypeInfo() 
+        {
+            if (Parameters == null)
+            {
+                // Json can return a null Parameters rather than empty string, if that's the case set it to empty and return.
+                Parameters = string.Empty;
+                return;
             }
 
             // If the parameters contains a ';' then it'll exclude the 'using' statement.

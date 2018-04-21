@@ -25,25 +25,6 @@ namespace ProjectPorcupine.OrderActions
 
         private ChangeTileType(ChangeTileType other) : base(other)
         {
-            JobInfo = other.JobInfo;
-            Inventory = other.Inventory;
-        }
-
-        [XmlElement("Job")]
-        public JobInformation JobInfo { get; set; }
-
-        [XmlElement("Inventory")]
-        public List<InventoryInfo> Inventory { get; set; }
-
-        public override void Initialize(string type)
-        {
-            base.Initialize(type);
-
-            // if there is no JobInfo defined, use defaults (time=0, ...)
-            if (JobInfo == null)
-            {
-                JobInfo = new JobInformation();
-            }
         }
 
         public override OrderAction Clone()
@@ -53,7 +34,7 @@ namespace ProjectPorcupine.OrderActions
 
         public override Job CreateJob(Tile tile, string type)
         {
-            Job job = CheckJobFromFunction(JobInfo.FromFunction, tile.Furniture);
+            Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
             TileType tileType = PrototypeManager.TileType.Get(type);
 
             if (job == null)
@@ -62,8 +43,8 @@ namespace ProjectPorcupine.OrderActions
                 tile,
                 tileType,
                 Tile.ChangeTileTypeJobComplete,
-                JobInfo.Time,
-                Inventory.Select(it => new RequestedItem(it.Type, it.Amount)).ToArray(),
+                JobTime,
+                Inventory.Select(it => new RequestedItem(it.Key, it.Value)).ToArray(),
                 Job.JobPriority.High,
                 jobRepeats: false,
                 adjacent: true);

@@ -55,7 +55,7 @@ namespace ProjectPorcupine.Buildable.Components
         {
             get
             {
-                return Initialized && (UsedAnimations != null && ParentFurniture.Animation != null && UsedAnimations.Count > 0);
+                return Initialized && (UsedAnimations != null && ParentFurniture.Animations != null && UsedAnimations.Count > 0);
             }
         }
 
@@ -69,17 +69,17 @@ namespace ProjectPorcupine.Buildable.Components
 
         public override void FixedFrequencyUpdate(float deltaTime)
         {
-            if (UsedAnimations != null && ParentFurniture.Animation != null && UsedAnimations.Count > 0)
+            if (UsedAnimations != null && ParentFurniture.Animations != null && UsedAnimations.Count > 0)
             {
                 foreach (var anim in UsedAnimations)
                 {
                     if (!string.IsNullOrEmpty(anim.ValueBasedParamerName))
                     {
                         // is value based animation
-                        if (ParentFurniture.Animation != null)
+                        if (ParentFurniture.Animations != null)
                         {
                             int frmIdx = FurnitureParams[anim.ValueBasedParamerName].ToInt();
-                            ParentFurniture.Animation.SetFrameIndex(frmIdx);
+                            ParentFurniture.Animations.SetFrameIndex(frmIdx);
                         }
                     }
                     else if (anim.RunConditions.ParamConditions != null)
@@ -102,9 +102,9 @@ namespace ProjectPorcupine.Buildable.Components
 
         protected override void Initialize()
         {
-            if (UsedAnimations != null && ParentFurniture.Animation != null && UsedAnimations.Count > 0)
+            if (UsedAnimations != null && ParentFurniture.Animations != null && UsedAnimations.Count > 0)
             {
-                ParentFurniture.Animation.SetState(UsedAnimations[0].Name);
+                ParentFurniture.Animations.SetState(UsedAnimations[0].Name);
                 DefaultAnimationName = CurrentAnimationName = UsedAnimations[0].Name;
             }
             
@@ -123,9 +123,9 @@ namespace ProjectPorcupine.Buildable.Components
 
         private void ChangeAnimation(string newAnimation)
         {
-            if (newAnimation != CurrentAnimationName && ParentFurniture.Animation != null)
+            if (newAnimation != CurrentAnimationName && ParentFurniture.Animations != null)
             {
-                ParentFurniture.Animation.SetState(newAnimation);
+                ParentFurniture.Animations.SetState(newAnimation);
                 CurrentAnimationName = newAnimation;
             }
         }

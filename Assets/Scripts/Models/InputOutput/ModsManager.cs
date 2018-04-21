@@ -6,14 +6,20 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
 using UnityEngine;
 
 public class ModsManager
 {
     private DirectoryInfo[] mods;
+    private Dictionary<string, List<Action<JProperty>>> prototypeHandlers = new Dictionary<string, List<Action<JProperty>>>();
 
     public ModsManager()
     {
@@ -29,6 +35,8 @@ public class ModsManager
         {
             LoadMainSceneFiles();
         }
+
+        LoadPrototypes();
     }
 
     /// <summary>
@@ -81,21 +89,21 @@ public class ModsManager
         LoadFunctions("FurnitureFunctions.cs", "Furniture");
         LoadFunctions("OverlayFunctions.cs", "Overlay");
 
-        LoadPrototypes("Tiles.xml", PrototypeManager.TileType.LoadPrototypes);
-        LoadPrototypes("Furniture.xml", PrototypeManager.Furniture.LoadPrototypes);
-        LoadPrototypes("Utility.xml", PrototypeManager.Utility.LoadPrototypes);
-        LoadPrototypes("RoomBehavior.xml", (text) => PrototypeManager.RoomBehavior.LoadPrototypes(text));
-        LoadPrototypes("Inventory.xml", PrototypeManager.Inventory.LoadPrototypes);
-        LoadPrototypes("Need.xml", PrototypeManager.Need.LoadPrototypes);
-        LoadPrototypes("Trader.xml", PrototypeManager.Trader.LoadPrototypes);
-        LoadPrototypes("Currency.xml", PrototypeManager.Currency.LoadPrototypes);
-        LoadPrototypes("GameEvents.xml", PrototypeManager.GameEvent.LoadPrototypes);
-        LoadPrototypes("ScheduledEvents.xml", PrototypeManager.ScheduledEvent.LoadPrototypes);
-        LoadPrototypes("Stats.xml", PrototypeManager.Stat.LoadPrototypes);
-        LoadPrototypes("Quest.xml", PrototypeManager.Quest.LoadPrototypes);
-        LoadPrototypes("Headlines.xml", PrototypeManager.Headline.LoadPrototypes);
-        LoadPrototypes("Overlay.xml", PrototypeManager.Overlay.LoadPrototypes);
-        LoadPrototypes("Ships.xml", PrototypeManager.Ship.LoadPrototypes);
+        HandlePrototypes("Tile", PrototypeManager.TileType.LoadJsonPrototypes);
+        HandlePrototypes("Furniture", PrototypeManager.Furniture.LoadJsonPrototypes);
+        HandlePrototypes("Utility", PrototypeManager.Utility.LoadJsonPrototypes);
+        HandlePrototypes("RoomBehavior", PrototypeManager.RoomBehavior.LoadJsonPrototypes);
+        HandlePrototypes("Inventory", PrototypeManager.Inventory.LoadJsonPrototypes);
+        HandlePrototypes("Need", PrototypeManager.Need.LoadJsonPrototypes);
+        HandlePrototypes("Trader", PrototypeManager.Trader.LoadJsonPrototypes);
+        HandlePrototypes("Currency", PrototypeManager.Currency.LoadJsonPrototypes);
+        HandlePrototypes("GameEvent", PrototypeManager.GameEvent.LoadJsonPrototypes);
+        HandlePrototypes("ScheduledEvent", PrototypeManager.ScheduledEvent.LoadJsonPrototypes);
+        HandlePrototypes("Stat", PrototypeManager.Stat.LoadJsonPrototypes);
+        HandlePrototypes("Quest", PrototypeManager.Quest.LoadJsonPrototypes);
+        HandlePrototypes("Headline", PrototypeManager.Headline.LoadJsonPrototypes);
+        HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
+        HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
 
         LoadCharacterNames("CharacterNames.txt");
 
@@ -117,9 +125,9 @@ public class ModsManager
         LoadFunctions("CommandFunctions.cs", "DevConsole");
         LoadFunctions("ConsoleCommands.lua", "DevConsole");
 
-        LoadPrototypes("ConsoleCommands.xml", PrototypeManager.DevConsole.LoadPrototypes);
-        LoadPrototypes("SettingsTemplate.xml", PrototypeManager.SettingsCategories.LoadPrototypes);
-        LoadPrototypes("PerformanceHUDComponentGroups.xml", PrototypeManager.PerformanceHUD.LoadPrototypes);
+        HandlePrototypes("ConsoleCommand", PrototypeManager.DevConsole.LoadJsonPrototypes);
+        HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
+        HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
@@ -160,6 +168,49 @@ public class ModsManager
                     UnityDebugger.Debugger.LogError(folder == "CSharp" ? "CSharp" : "LUA", "file " + filePath + " not found");
                 }
             });
+    }
+
+    /// <summary>
+    /// Subscribes to the prototypeLoader to handle all prototypes with the given key.
+    /// </summary>
+    /// <param name="prototypeKey">Key for the prototypes to handle.</param>
+    /// <param name="prototypesLoader">Called to handle the prototypes loading.</param>
+    private void HandlePrototypes(string prototypeKey, Action<JProperty> prototypesLoader)
+    {
+        if (!prototypeHandlers.ContainsKey(prototypeKey))
+        {
+            prototypeHandlers.Add(prototypeKey, new List<Action<JProperty>>());
+        }
+
+        // The way these work suggest it should be in a separate class, either a new class (PrototypeLoader?) or in one of the prototype related classes
+        prototypeHandlers[prototypeKey].Add(prototypesLoader);
+    }
+
+    private void LoadPrototypes()
+    {
+        // Get list of files in Prototype directory
+        string prototypesDirectoryPath = Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Prototypes");
+
+        DirectoryInfo prototypeDir = new DirectoryInfo(prototypesDirectoryPath);
+
+        FileInfo[] prototypeFiles = prototypeDir.GetFiles("*.json").ToArray();
+
+        for (int i = 0; i < prototypeFiles.Length; i++)
+        {
+            FileInfo file = prototypeFiles[i];
+            StreamReader reader = File.OpenText(file.FullName);
+            JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+            string tagName = ((JProperty)protoJson.First).Name;
+
+            // This *should* handle tags spread across multiple files, multiple tags in a single file, and multiple handlers per type.
+            foreach (JToken prototypeGroup in protoJson)
+            {
+                foreach (Action<JProperty> handler in prototypeHandlers[tagName])
+                {
+                    handler((JProperty)prototypeGroup);
+                }
+            }
+        }
     }
 
     /// <summary>

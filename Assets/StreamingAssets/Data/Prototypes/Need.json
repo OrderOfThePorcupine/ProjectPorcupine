@@ -1,0 +1,26 @@
+{
+  "Need": {
+    "oxygen": {
+      "LocalizationName": "need_oxygen",
+      "GrowthRate": 0.3,
+      "Damage": 20.0,
+      "HighToLow": true,
+      "RestoreNeedAmount": 100.0,
+      "RestoreNeedFurn": "oxygen_generator",
+      "RestoreNeedTime": 10.0,
+      "EventActions": {
+        "OnUpdate": [
+          "OnUpdate_Oxygen"
+        ]
+      }
+    },
+    "sleep": {
+      "LocalizationName": "need_sleep",
+      "GrowthRate": 0.15,
+      "HighToLow": true,
+      "RestoreNeedAmount": 100.0,
+      "RestoreNeedFurn": "simple_bed",
+      "RestoreNeedTime": 30.0
+    }
+  }
+}

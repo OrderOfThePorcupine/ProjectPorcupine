@@ -6,7 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// A struct representing data of a settings option.
@@ -31,7 +33,7 @@ public struct SettingsOption
     /// <summary>
     /// Class data associated with this option.
     /// </summary>
-    public UIClassData classData;
+    public UIComponent classData;
 
     /// <summary>
     /// Construct a settings option from parameters.
@@ -40,7 +42,7 @@ public struct SettingsOption
     /// <param name="key"> The key to save. </param>
     /// <param name="defaultValue"> The default value. </param>
     /// <param name="classData"> Any class data associated with the option. </param>
-    public SettingsOption(string name, string key, string defaultValue, UIClassData classData)
+    public SettingsOption(string name, string key, string defaultValue, UIComponent classData)
     {
         this.name = name;
         this.key = key;
@@ -57,7 +59,20 @@ public struct SettingsOption
         name = reader.GetAttribute("Name");
         key = reader.GetAttribute("Key");
         defaultValue = reader.GetAttribute("DefaultValue");
-        classData = new UIClassData(reader.GetAttribute("ClassName"), (reader != null && subReader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter());
+        classData = new UIComponent(reader.GetAttribute("ClassName"), (reader != null && subReader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter());
         subReader.Close();
+    }
+
+    /// <summary>
+    /// A nice little helper (pass it a reader class that is up to the subtree).
+    /// </summary>
+    public SettingsOption(JToken innerJson)
+    {
+        name = PrototypeReader.ReadJson("name", innerJson["Name"]);
+        key = PrototypeReader.ReadJson("key", innerJson["Key"]);
+        defaultValue = PrototypeReader.ReadJson("defaultValue", innerJson["DefaultValue"]);
+        classData = new UIComponent();
+
+        classData.ReadJson(innerJson);
     }
 }
