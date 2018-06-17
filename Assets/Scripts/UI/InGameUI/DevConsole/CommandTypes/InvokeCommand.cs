@@ -167,6 +167,7 @@ namespace DeveloperConsole.Core
                 else
                 {
                     string[] parameterSections = parameterTypes[i].Split(';');
+
                     // This is just to have a safety, that may trigger in some cases??  Better than nothing I guess
                     // Could try to remove, but in most cases won't be part of DevConsole, till you open, or it starts.
                     try
@@ -180,9 +181,12 @@ namespace DeveloperConsole.Core
                         // with a more efficient algo.
                         // Slight hack fix later @ TODO
                         // Try with UnityEngine.X, UnityEngine.Core
-                        try {
+                        try
+                        {
                             types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ", UnityEngine.CoreModule", true, true);
-                        } catch (Exception inner) {
+                        }
+                        catch (Exception inner)
+                        {
                             // This means invalid type, so we set it to object.
                             // This in most cases is fine, just means that when you call it, 
                             // it won't work (unless the type is object)

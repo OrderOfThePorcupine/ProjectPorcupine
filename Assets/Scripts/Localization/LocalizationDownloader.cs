@@ -10,10 +10,11 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Xml;
+
 using ICSharpCode.SharpZipLib.Zip;
-using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace ProjectPorcupine.Localization
 {

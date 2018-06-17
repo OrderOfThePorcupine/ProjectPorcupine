@@ -135,7 +135,8 @@ namespace ProjectPorcupine.Mouse
             Canvas cursorCanvas = CursorCanvasGameObject.AddComponent<Canvas>();
             cursorCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             cursorCanvas.worldCamera = Camera.main;
-            // TOOD: do we want this
+
+            // TOOD: do we want this to be so damn high
             cursorCanvas.sortingOrder = 32767; // This is the maximum sorting layer value one can have
             cursorCanvas.referencePixelsPerUnit = 100f;
             cursorCanvas.pixelPerfect = true;
