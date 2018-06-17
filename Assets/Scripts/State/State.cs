@@ -13,7 +13,7 @@ namespace ProjectPorcupine.Entities.States
     public abstract class State
     {
         protected Character character;
-        private bool exstensiveLog = false;
+        private bool extensiveLog = false;
 
         public State(string name, Character character, State nextState)
         {
@@ -64,7 +64,7 @@ namespace ProjectPorcupine.Entities.States
 
         protected void DebugLog(string message, params object[] par)
         {
-            if (!exstensiveLog)
+            if (!extensiveLog)
             {
                 return;
             }
