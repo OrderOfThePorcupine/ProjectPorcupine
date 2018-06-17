@@ -8,6 +8,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Animation
@@ -31,6 +32,17 @@ namespace Animation
         public FurnitureAnimation()
         {            
             animations = new Dictionary<string, SpritenameAnimation>();
+        }
+
+        public FurnitureAnimation(Dictionary<string, SpritenameAnimation> incomingAnimations)
+        {            
+            animations = incomingAnimations;
+            if (string.IsNullOrEmpty(currentAnimationState))
+            {
+                currentAnimationState = animations.Keys.First();
+                currentAnimation = animations[currentAnimationState];
+                prevFrameIndex = 0;
+            }
         }
 
         public SpriteRenderer Renderer { get; set; }
@@ -118,6 +130,7 @@ namespace Animation
             animations.Add(state, new SpritenameAnimation(state, spriteNames.ToArray(), 1 / fps, looping, false, valueBased));
 
             // set default state to first state entered - most likely "idle"
+            // TODO: Is it really best practice to base the default on first in?
             if (string.IsNullOrEmpty(currentAnimationState))
             {
                 currentAnimationState = state;

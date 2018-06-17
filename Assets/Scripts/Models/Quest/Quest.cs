@@ -6,9 +6,11 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 
 [MoonSharpUserData]
 public class Quest : IPrototypable
@@ -30,14 +32,14 @@ public class Quest : IPrototypable
 
     public List<QuestReward> Rewards { get; set; }
 
-    public List<string> PreRequiredCompletedQuest { get; set; }
+    public List<string> RequiredQuests { get; set; }
 
     public void ReadXmlPrototype(XmlReader reader_parent)
     {
         Name = reader_parent.GetAttribute("Name");
         Goals = new List<QuestGoal>();
         Rewards = new List<QuestReward>();   
-        PreRequiredCompletedQuest = new List<string>();
+        RequiredQuests = new List<string>();
 
         XmlReader reader = reader_parent.ReadSubtree();
 
@@ -56,7 +58,7 @@ public class Quest : IPrototypable
                     {
                         if (subReader.Name == "PreRequiredCompletedQuest")
                         {
-                            PreRequiredCompletedQuest.Add(subReader.GetAttribute("Name"));
+                            RequiredQuests.Add(subReader.GetAttribute("Name"));
                         }
                     }
 
@@ -87,6 +89,50 @@ public class Quest : IPrototypable
                     }
 
                     break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Name = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+
+        Goals = new List<QuestGoal>();
+        Rewards = new List<QuestReward>();
+        RequiredQuests = new List<string>();
+
+        Description = PrototypeReader.ReadJson(Description, innerJson["Description"]);
+
+        if (innerJson["RequiredQuests"] != null)
+        {
+            foreach (JToken token in innerJson["RequiredQuests"])
+            {
+                RequiredQuests.Add((string)token);
+            }
+        }
+
+        if (innerJson["Goals"] != null)
+        {
+            foreach (JToken token in innerJson["Goals"])
+            {
+                QuestGoal goal = new QuestGoal();
+                goal.ReadJsonPrototype(token);
+                Goals.Add(goal);
+            }
+        }
+
+        if (innerJson["Rewards"] != null)
+        {
+            foreach (JToken token in innerJson["Rewards"])
+            {
+                QuestReward reward = new QuestReward();
+                reward.ReadJsonPrototype(token);
+                Rewards.Add(reward);
             }
         }
     }

@@ -431,7 +431,7 @@ namespace ProjectPorcupine.Entities
 
             foreach (Need n in Needs)
             {
-                yield return LocalizationTable.GetLocalization(n.LocalizationID, n.DisplayAmount);
+                yield return LocalizationTable.GetLocalization(n.LocalizationName, n.DisplayAmount);
             }
 
             foreach (string stat in Stats.Keys)

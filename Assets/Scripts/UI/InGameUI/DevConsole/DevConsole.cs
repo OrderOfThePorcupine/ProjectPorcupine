@@ -369,13 +369,13 @@ namespace DeveloperConsole
         /// </summary>
         public static void ShowHelpMethod(CommandBase help)
         {
-            if (string.IsNullOrEmpty(help.DetailedDescriptiveText) && string.IsNullOrEmpty(help.DescriptiveText))
+            if (string.IsNullOrEmpty(help.DetailedDescription) && string.IsNullOrEmpty(help.Description))
             {
                 DevConsole.Log("<color=yellow>Command Info:</color> <color=red>There's no help for this command</color>");
                 return;
             }
 
-            Log("<color=yellow>Command Info:</color> " + (string.IsNullOrEmpty(help.DetailedDescriptiveText) ? help.DescriptiveText : help.DetailedDescriptiveText));
+            Log("<color=yellow>Command Info:</color> " + (string.IsNullOrEmpty(help.DetailedDescription) ? help.Description : help.DetailedDescription));
             Log("<color=yellow>Call it like </color><color=orange> " + help.Title + GetParameters(help) + "</color>");
         }
 

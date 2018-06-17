@@ -516,9 +516,9 @@ public class BuildModeController : IMouseHandler
                 if (buildOrder != null)
                 {
                     StringBuilder sb = new StringBuilder();
-                    foreach (OrderAction.InventoryInfo item in buildOrder.Inventory)
+                    foreach (KeyValuePair<string, int> item in buildOrder.Inventory)
                     {
-                        sb.Append(string.Format("{0}x {1}", item.Amount * validPostionCount, LocalizationTable.GetLocalization(item.Type)));
+                        sb.Append(string.Format("{0}x {1}", item.Value * validPostionCount, LocalizationTable.GetLocalization(item.Key)));
                         if (buildOrder.Inventory.Count > 1)
                         {
                             sb.AppendLine();

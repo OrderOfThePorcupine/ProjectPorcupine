@@ -111,7 +111,7 @@ namespace ProjectPorcupine.Mouse
         private Vector3 lastFramePosition;
 
         /// <summary>
-        /// The starting position of the drag.
+        /// The starting position of the `.
         /// If <see cref="IMouseHandler.DisableDragging"/> is enabled then this will equal PlacingPosition,
         /// resulting in a singular 'tile' drag.
         /// </summary>
@@ -198,7 +198,6 @@ namespace ProjectPorcupine.Mouse
         /// </summary>
         /// <param name="newMode"> The new mode to change to. </param>
         /// <param name="tooltip"> Tooltip if any. </param>
-        /// <param name="forceShow"> If enabled will show mouse in UI mode. </param>
         public void ChangeMouseMode(MouseMode newMode, string tooltip = null)
         {
             this.uiTooltip = tooltip;
@@ -710,7 +709,7 @@ namespace ProjectPorcupine.Mouse
                     Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
                     if (t != null)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.TextColor, false);
+                        cursor.DisplayCursorInfo(TextAnchor.UpperRight, string.Format("X:{0} Y:{1} Z:{2}", t.X.ToString(), t.Y.ToString(), t.Z.ToString()), MouseCursor.TextColor, false);
                     }
 
                     break;
@@ -719,7 +718,7 @@ namespace ProjectPorcupine.Mouse
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, false);
+                        cursor.DisplayCursorInfo(TextAnchor.UpperRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, false);
                     }
 
                     break;
@@ -728,7 +727,7 @@ namespace ProjectPorcupine.Mouse
 
                     if (string.IsNullOrEmpty(tooltip) == false)
                     {
-                        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, true);
+                        cursor.DisplayCursorInfo(TextAnchor.UpperRight, LocalizationTable.GetLocalization(tooltip), MouseCursor.TextColor, true);
                     }
 
                     break;

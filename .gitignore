@@ -30,6 +30,7 @@ ExportedObj/
 /.vs/
 /.vscode/
 Packages/
+StyleCopViolations.xml
 
 # Unity3D generated meta files
 *.pidb.meta

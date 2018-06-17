@@ -23,7 +23,7 @@ namespace DeveloperConsole.Core
         /// <summary>
         /// Text describing the command.
         /// </summary>
-        public string DescriptiveText
+        public string Description
         {
             get; protected set;
         }
@@ -47,7 +47,7 @@ namespace DeveloperConsole.Core
         /// <summary>
         /// The detailed help description.
         /// </summary>
-        public string DetailedDescriptiveText
+        public string DetailedDescription
         {
             get; protected set;
         }

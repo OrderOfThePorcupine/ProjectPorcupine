@@ -62,17 +62,6 @@ public class SettingsMenu : MonoBehaviour
         {
             DisplayCategory("No Settings Loaded");
         }
-
-        RectTransform rectTransform = instance.mainRoot.GetComponent<RectTransform>();
-        if (rectTransform.sizeDelta.x > Screen.width * 0.8f)
-        {
-            rectTransform.sizeDelta = new Vector2(Screen.width * 0.8f, rectTransform.sizeDelta.y);
-        }
-
-        if (rectTransform.sizeDelta.y > Screen.height * 0.8f)
-        {
-            rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, Screen.height * 0.8f);
-        }
     }
 
     public static void DisplayCategory(string category)
@@ -352,9 +341,9 @@ public class SettingsMenu : MonoBehaviour
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.ClassName, true);
+                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.Type, true);
                     element.option = keyValuePair.Value[j];
-                    element.parameterData = keyValuePair.Value[j].classData.ParameterData;
+                    element.parameterData = keyValuePair.Value[j].classData.Parameters;
                     element.InitializeLUA();
                     options[categories[i].Type][keyValuePair.Key][j] = element;
                 }

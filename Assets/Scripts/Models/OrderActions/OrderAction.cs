@@ -6,12 +6,14 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace ProjectPorcupine.OrderActions
 {
@@ -28,11 +30,20 @@ namespace ProjectPorcupine.OrderActions
 
         public OrderAction(OrderAction other)
         {
+            JobTimeFunction = other.JobTimeFunction;
+            Inventory = other.Inventory;
             Type = other.Type;
+            JobTime = other.JobTime;
         }
 
         [XmlIgnore]
         public string Type { get; set; }
+
+        public float JobTime { get; set; }
+
+        public string JobTimeFunction { get; set; }
+
+        public Dictionary<string, int> Inventory { get; set; }
 
         public static OrderAction Deserialize(XmlReader xmlReader)
         {
@@ -50,6 +61,30 @@ namespace ProjectPorcupine.OrderActions
                 OrderAction orderAction = (OrderAction)serializer.Deserialize(xmlReader);
                 //// need to set name explicitly (not part of deserialization as it's passed in)
                 orderAction.Initialize(orderActionType);
+                return orderAction;
+            }
+            else
+            {
+                UnityDebugger.Debugger.Log(OrderActionsLogChannel, string.Format("There is no deserializer for OrderAction '{0}'", orderActionType));
+                return null;
+            }
+        }
+
+        public static OrderAction FromJson(JProperty orderActionProp)
+        {
+            if (orderActionTypes == null)
+            {
+                orderActionTypes = FindOrderActionsInAssembly();
+            }
+
+            string orderActionType = orderActionProp.Name;
+
+            if (orderActionTypes.ContainsKey(orderActionType))
+            {
+                Type t = orderActionTypes[orderActionType];
+
+                OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
+                orderAction.Type = orderActionProp.Name;
                 return orderAction;
             }
             else
@@ -106,25 +141,6 @@ namespace ProjectPorcupine.OrderActions
             }
 
             return orderActionTypes;
-        }
-
-        [Serializable]
-        public class JobInformation
-        {
-            [XmlAttribute("time")]
-            public float Time { get; set; }
-
-            [XmlAttribute("fromFunction")]
-            public string FromFunction { get; set; }
-        }
-
-        [Serializable]
-        public class InventoryInfo
-        {
-            [XmlAttribute("type")]
-            public string Type { get; set; }
-            [XmlAttribute("amount")]
-            public int Amount { get; set; }
         }
     }
 }

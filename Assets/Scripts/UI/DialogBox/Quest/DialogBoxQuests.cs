@@ -53,12 +53,12 @@ public class DialogBoxQuests : DialogBox
             return false;
         }
 
-        if (quest.PreRequiredCompletedQuest.Count == 0)
+        if (quest.RequiredQuests.Count == 0)
         {
             return true;
         }
 
-        List<Quest> preQuests = PrototypeManager.Quest.Values.Where(q => quest.PreRequiredCompletedQuest.Contains(q.Name)).ToList();
+        List<Quest> preQuests = PrototypeManager.Quest.Values.Where(q => quest.RequiredQuests.Contains(q.Name)).ToList();
 
         return preQuests.All(q => q.IsCompleted);
     }

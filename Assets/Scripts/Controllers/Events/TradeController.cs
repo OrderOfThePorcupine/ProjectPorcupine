@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Animation;
 using MoonSharp.Interpreter;
 using Scheduler;
 using UnityEngine;
@@ -57,11 +58,12 @@ public class TradeController
         go.transform.position = new Vector3(-10, 50, 0);
         go.transform.localScale = new Vector3(1, 1, 1);
         SpriteRenderer spriteRenderer = go.AddComponent<SpriteRenderer>();
-        spriteRenderer.sprite = SpriteManager.GetSprite("Trader", prototype.AnimationIdle.CurrentFrameName);
+        spriteRenderer.sprite = SpriteManager.GetSprite("Trader", prototype.Animations["idle"].CurrentFrameName);
         spriteRenderer.sortingLayerName = "TradeShip";
         
         // TODO: Look into passing more of the work of calling a tradeship off to the controller
-        controller.Init(leavingCoords: new Vector3(100, 50, 0), landingCoords: new Vector3(landingPad.Tile.X + 1, landingPad.Tile.Y + 1, 0), speed: 5f, trader: trader, animationIdle: prototype.AnimationIdle.Clone(), animationFlying: prototype.AnimationFlying.Clone(), renderer: spriteRenderer);
+        // TODO: This is a very ugly way to do this, and should instead have use a clone function, after TraderPrototype and Trader are merged
+        controller.Init(leavingCoords: new Vector3(100, 50, 0), landingCoords: new Vector3(landingPad.Tile.X + 1, landingPad.Tile.Y + 1, 0), speed: 5f, trader: trader, animations: new Dictionary<string, SpritenameAnimation>(prototype.Animations), renderer: spriteRenderer);
     }
 
     /// <summary>

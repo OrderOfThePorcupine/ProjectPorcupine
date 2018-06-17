@@ -135,6 +135,7 @@ namespace ProjectPorcupine.Mouse
             Canvas cursorCanvas = CursorCanvasGameObject.AddComponent<Canvas>();
             cursorCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             cursorCanvas.worldCamera = Camera.main;
+            // TOOD: do we want this
             cursorCanvas.sortingOrder = 32767; // This is the maximum sorting layer value one can have
             cursorCanvas.referencePixelsPerUnit = 100f;
             cursorCanvas.pixelPerfect = true;
@@ -161,17 +162,17 @@ namespace ProjectPorcupine.Mouse
 
             textBoxes = new CursorTextBox[]
             {
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.UpperLeft),      // UpperLeft
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.UpperCenter),   // UpperCenter
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.UpperRight),      // UpperRight
+            new CursorTextBox(CursorGameObject, TextAnchor.LowerRight, style, TextAnchor.UpperLeft),      // UpperLeft
+            new CursorTextBox(CursorGameObject, TextAnchor.LowerCenter, style, TextAnchor.UpperCenter),   // UpperCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.LowerLeft, style, TextAnchor.UpperRight),      // UpperRight
 
             new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style, TextAnchor.MiddleLeft),     // MiddleLeft,
             new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.MiddleCenter),  // MiddleCenter
             new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style, TextAnchor.MiddleRight),     // MiddleRight
 
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleRight, style,  TextAnchor.LowerLeft),     // LowerLeft
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleCenter, style, TextAnchor.LowerCenter),   // LowerCenter
-            new CursorTextBox(CursorGameObject, TextAnchor.MiddleLeft, style,  TextAnchor.LowerRight),     // LowerRight
+            new CursorTextBox(CursorGameObject, TextAnchor.UpperRight, style,  TextAnchor.LowerLeft),     // LowerLeft
+            new CursorTextBox(CursorGameObject, TextAnchor.UpperCenter, style, TextAnchor.LowerCenter),   // LowerCenter
+            new CursorTextBox(CursorGameObject, TextAnchor.UpperLeft, style,  TextAnchor.LowerRight),     // LowerRight
             };
         }
 
@@ -189,33 +190,33 @@ namespace ProjectPorcupine.Mouse
                 switch (location)
                 {
                 case TextAnchor.UpperLeft:
-                    localPosition = new Vector3(-64f, 32f, 0f);
+                    localPosition = new Vector3(-32f, 16f, 0f);
                     break;
                 case TextAnchor.UpperCenter:
                     localPosition = new Vector3(0f, 32f, 0f);
                     break;
                 case TextAnchor.UpperRight:
-                    localPosition = new Vector3(120f, 32f, 0f);
+                    localPosition = new Vector3(64f, 16f, 0f);
                     break;
 
                 case TextAnchor.MiddleLeft:
-                    localPosition = new Vector3(-64f, 0f, 0f);
+                    localPosition = new Vector3(-32f, 0f, 0f);
                     break;
                 case TextAnchor.MiddleCenter:
                     localPosition = new Vector3(0f, 0f, 0f);
                     break;
                 case TextAnchor.MiddleRight:
-                    localPosition = new Vector3(120f, 0f, 0f);
+                    localPosition = new Vector3(64, 0f, 0f);
                     break;
 
                 case TextAnchor.LowerLeft:
-                    localPosition = new Vector3(-64f, -32f, 0f);
+                    localPosition = new Vector3(-40f, -32f, 0f);
                     break;
                 case TextAnchor.LowerCenter:
                     localPosition = new Vector3(0f, -32f, 0f);
                     break;
                 case TextAnchor.LowerRight:
-                    localPosition = new Vector3(120f, -32f, 0f);
+                    localPosition = new Vector3(80, -32f, 0f);
                     break;
 
                 default:
@@ -230,9 +231,9 @@ namespace ProjectPorcupine.Mouse
                 HorizontalLayoutGroup horizontalLayout = rootMaster.AddComponent<HorizontalLayoutGroup>();
                 horizontalLayout.childForceExpandHeight = false;
                 horizontalLayout.childForceExpandWidth = false;
+                horizontalLayout.childAlignment = textAlignment;
                 rootMaster.transform.SetParent(parentObject.transform);
                 rootMaster.transform.localPosition = localPosition;
-                rootMaster.GetComponent<RectTransform>().sizeDelta = new Vector2(170f, 0f);
 
                 background = new GameObject("Background: " + location).AddComponent<Image>();
                 background.color = MouseCursor.BackgroundColor;

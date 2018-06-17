@@ -6,11 +6,13 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 
 namespace DeveloperConsole.Core
 {
@@ -70,9 +72,10 @@ namespace DeveloperConsole.Core
         {
             Title = reader.GetAttribute("Title");
             FunctionName = reader.GetAttribute("FunctionName");
-            DescriptiveText = reader.GetAttribute("Description");
-            DetailedDescriptiveText = reader.GetAttribute("DetailedDescription");
+            Description = reader.GetAttribute("Description");
+            DetailedDescription = reader.GetAttribute("DetailedDescription");
             Parameters = reader.GetAttribute("Parameters");
+            ParseParameterToTypeInfo();
             Tags = reader.GetAttribute("Tags").Split(',').Select(x => x.Trim()).ToArray();
             DefaultValue = reader.GetAttribute("DefaultValue");
 
@@ -85,6 +88,34 @@ namespace DeveloperConsole.Core
             if (DefaultValue == null)
             {
                 DefaultValue = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Reads the prototype from the specified JProperty.
+        /// </summary>
+        /// <param name="jsonProto">The JProperty containing the prototype.</param>
+        public void ReadJsonPrototype(JProperty jsonProto)
+        {
+            Title = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+            FunctionName = (string)innerJson["FunctionName"];
+            Description = (string)innerJson["Description"];
+            DetailedDescription = (string)innerJson["DetailedDescription"];
+            Parameters = PrototypeReader.ReadJson(Parameters, innerJson["Parameters"]);
+            ParseParameterToTypeInfo();
+            DefaultValue = (string)innerJson["DefaultValue"] ?? string.Empty;
+
+            Tags = ((JArray)innerJson["Tags"]).ToObject<string[]>();
+        }
+
+        private void ParseParameterToTypeInfo() 
+        {
+            if (Parameters == null)
+            {
+                // Json can return a null Parameters rather than empty string, if that's the case set it to empty and return.
+                Parameters = string.Empty;
+                return;
             }
 
             // If the parameters contains a ';' then it'll exclude the 'using' statement.
@@ -135,22 +166,30 @@ namespace DeveloperConsole.Core
                 }
                 else
                 {
+                    string[] parameterSections = parameterTypes[i].Split(';');
                     // This is just to have a safety, that may trigger in some cases??  Better than nothing I guess
                     // Could try to remove, but in most cases won't be part of DevConsole, till you open, or it starts.
                     try
                     {
                         // We just split, since its a decently appropriate solution.
-                        string[] parameterSections = parameterTypes[i].Split(';');
-
                         types[i] = System.Type.GetType((parameterSections[1].Contains('.') ? parameterSections[1] : "System." + parameterSections[1]) + parameterSections[0], true, true);
                     }
                     catch (Exception e)
                     {
-                        // This means invalid type, so we set it to object.
-                        // This in most cases is fine, just means that when you call it, 
-                        // it won't work (unless the type is object)
-                        types[i] = typeof(object);
-                        UnityDebugger.Debugger.LogError("DevConsole", e.Message);
+                        // Also replace the string splitting and containing
+                        // with a more efficient algo.
+                        // Slight hack fix later @ TODO
+                        // Try with UnityEngine.X, UnityEngine.Core
+                        try {
+                            types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ", UnityEngine.CoreModule", true, true);
+                        } catch (Exception inner) {
+                            // This means invalid type, so we set it to object.
+                            // This in most cases is fine, just means that when you call it, 
+                            // it won't work (unless the type is object)
+                            types[i] = typeof(object);
+                            UnityDebugger.Debugger.LogError("DevConsole", typeof(UnityEngine.Vector3).Assembly.FullName + "; " + typeof(UnityEngine.Vector3).AssemblyQualifiedName);
+                            UnityDebugger.Debugger.LogError("DevConsole", e.Message + "\n" + inner.Message);
+                        }
                     }
                 }
             }

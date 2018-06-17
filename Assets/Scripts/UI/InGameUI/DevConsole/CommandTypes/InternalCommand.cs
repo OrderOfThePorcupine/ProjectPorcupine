@@ -32,9 +32,9 @@ namespace DeveloperConsole.Core
         {
             this.Title = title;
             this.Method = method;
-            this.DescriptiveText = descriptiveText;
+            this.Description = descriptiveText;
             this.Parameters = parameters;
-            this.DetailedDescriptiveText = string.IsNullOrEmpty(detailedDescriptiveText) ? descriptiveText : detailedDescriptiveText;
+            this.DetailedDescription = string.IsNullOrEmpty(detailedDescriptiveText) ? descriptiveText : detailedDescriptiveText;
             this.Tags = tags == null ? new string[0] : tags;
             this.TypeInfo = typeInfo == null ? new Type[0] : typeInfo;
         }

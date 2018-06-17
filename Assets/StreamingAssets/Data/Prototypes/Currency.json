@@ -1,0 +1,10 @@
+{
+  "Currency": {
+    "Quill Corp Bucks": {
+      "ShortName": "QCB"
+    },
+    "Inter-Galactic Credits": {
+      "ShortName": "ICB"
+    }
+  }
+}
