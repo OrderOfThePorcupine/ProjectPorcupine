@@ -2,7 +2,7 @@
 
 #### Development Delayed
 
-Sadly Project Porcupine for a while has had a decline in engagement, this has led to development times stalling, thus while the project isn't 'dead' dead future development will be minimal and slow, however if any individual wishes to implement changes I know for certain that we will review and merge them in :), however I don't forsee me (Braedon) doing much more work other than finishing off our current PRs. I (koosemose) will continue to make occasional changes. If there is enough renewed interest, I will gladly continue working on it.
+Sadly Project Porcupine for a while has had a decline in engagement, this has led to development times stalling, thus while the project isn't 'dead' dead future development will be minimal and slow, however if any individual wishes to implement changes I know for certain that we will review and merge them in :), however I don't forsee me (Braedon) doing much more work other than finishing off our current PRs. I (koosemose) will continue to make occasional changes. If there is enough renewed interest, we will both gladly continue working on it.
 
 ### Project Porcupine: A Base-Building Game...in Space!
 
