@@ -6,10 +6,15 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using ProjectPorcupine.Localization;
+using ProjectPorcupine.Mouse;
 using ProjectPorcupine.OrderActions;
 using ProjectPorcupine.Rooms;
+using UnityEngine;
 
 public enum BuildMode
 {
@@ -21,9 +26,10 @@ public enum BuildMode
     MINE
 }
 
-public class BuildModeController
+public class BuildModeController : IMouseHandler
 {
     private MouseController mouseController;
+    private GameObject furnitureParent;
     private TileType buildModeTile = TileType.Floor;
 
     private bool useCratedObject;
@@ -34,6 +40,7 @@ public class BuildModeController
         CurrentPreviewRotation = 0f;
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureLeft", KeyboardMappedInputType.KeyUp, RotateFurnitireLeft);
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureRight", KeyboardMappedInputType.KeyUp, RotateFurnitireRight);
+        furnitureParent = new GameObject("Furniture Preview Sprites");
     }
 
     public static BuildModeController Instance { get; protected set; }
@@ -44,7 +51,24 @@ public class BuildModeController
 
     public string BuildModeType { get; private set; }
 
-    // Use this for initialization
+    public bool Building { get; set; }
+
+    public MouseHandlerCallbacks CallbacksEnabled
+    {
+        get
+        {
+            return MouseHandlerCallbacks.HANDLE_DRAG_FINISHED | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION;
+        }
+    }
+
+    public bool DisableDragging
+    {
+        get
+        {
+            return IsObjectDraggable() == false;
+        }
+    }
+
     public void SetMouseController(MouseController currentMouseController)
     {
         mouseController = currentMouseController;
@@ -76,6 +100,7 @@ public class BuildModeController
 
     public void SetBuildMode(BuildMode newMode, string type = null, bool useCratedObject = false, bool startBuildMode = true)
     {
+        Building = true;
         BuildMode = newMode;
         BuildModeType = type;
 
@@ -91,53 +116,58 @@ public class BuildModeController
 
         if (startBuildMode)
         {
-            mouseController.StartBuildMode();
+            mouseController.ChangeMouseMode(MouseMode.BUILD);
         }
     }
 
     public void SetModeBuildTile(TileType type)
     {
+        Building = true;
         BuildMode = BuildMode.FLOOR;
         buildModeTile = type;
-
-        mouseController.StartBuildMode();
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_DesignateRoomBehavior(string type)
     {
+        Building = true;
         BuildMode = BuildMode.ROOMBEHAVIOR;
         BuildModeType = type;
-        mouseController.StartBuildMode();
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_BuildFurniture(string type, bool useCratedObject = false)
     {
         // Wall is not a Tile!  Wall is an "Furniture" that exists on TOP of a tile.
+        Building = true;
         BuildMode = BuildMode.FURNITURE;
         BuildModeType = type;
         this.useCratedObject = useCratedObject;
         CurrentPreviewRotation = 0f;
-        mouseController.StartBuildMode();
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_BuildUtility(string type)
     {
         // Wall is not a Tile!  Wall is an "Furniture" that exists on TOP of a tile.
+        Building = true;
         BuildMode = BuildMode.UTILITY;
         BuildModeType = type;
-        mouseController.StartBuildMode();
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_Deconstruct()
     {
+        Building = true;
         BuildMode = BuildMode.DECONSTRUCT;
-        mouseController.StartBuildMode();
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void SetMode_Mine()
     {
+        Building = true;
         BuildMode = BuildMode.MINE;
-        mouseController.StartBuildMode();
+        mouseController.ChangeMouseMode(MouseMode.BUILD);
     }
 
     public void DoBuild(Tile tile)
@@ -194,9 +224,11 @@ public class BuildModeController
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + furnitureType + "'");
-                    job = new Job(tile, furnitureType, World.Current.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
-                    job.adjacent = true;
-                    job.Description = "job_build_" + furnitureType + "_desc";
+                    job = new Job(tile, furnitureType, World.Current.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High)
+                    {
+                        adjacent = true,
+                        Description = "job_build_" + furnitureType + "_desc"
+                    };
                 }
 
                 Furniture furnitureToBuild = PrototypeManager.Furniture.Get(furnitureType).Clone();
@@ -271,8 +303,10 @@ public class BuildModeController
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + utilityType + "'");
-                    job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High);
-                    job.Description = "job_build_" + utilityType + "_desc";
+                    job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High)
+                    {
+                        Description = "job_build_" + utilityType + "_desc"
+                    };
                 }
 
                 job.buildablePrototype = PrototypeManager.Utility.Get(utilityType);
@@ -445,6 +479,315 @@ public class BuildModeController
         return tile.Utilities.ContainsKey(proto.Type);
     }
 
+    public void HandleTooltip(Vector2 position, MouseCursor cursor, bool isDragging)
+    {
+        cursor.Reset();
+        Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
+
+        int validPostionCount = 0;
+        int invalidPositionCount = 0;
+        List<GameObject> dragPreviewGameObjects = WorldController.Instance.MouseController.DragPreviewGameObjects;
+
+        // Placing furniture object.
+        if (BuildMode == BuildMode.FURNITURE)
+        {
+            cursor.DisplayCursorInfo(TextAnchor.LowerRight, LocalizationTable.GetLocalization(PrototypeManager.Furniture.Get(BuildModeType).GetName()), MouseCursor.TextColor, false);
+
+            // Dragging and placing multiple furniture.
+            if (t != null && isDragging == true && dragPreviewGameObjects.Count > 1)
+            {
+                for (int i = 0; i < dragPreviewGameObjects.Count; i++)
+                {
+                    Tile t1 = WorldController.Instance.GetTileAtWorldCoord(dragPreviewGameObjects[i].transform.position);
+                    if (World.Current.FurnitureManager.IsPlacementValid(BuildModeType, t1) &&
+                       (t1.PendingBuildJobs == null || t1.PendingBuildJobs.Count == 0))
+                    {
+                        validPostionCount++;
+                    }
+                    else
+                    {
+                        invalidPositionCount++;
+                    }
+                }
+
+                string currentBuildRequirements = string.Empty;
+
+                Build buildOrder = PrototypeManager.Furniture.Get(BuildModeType).GetOrderAction<Build>();
+                if (buildOrder != null)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (KeyValuePair<string, int> item in buildOrder.Inventory)
+                    {
+                        sb.Append(string.Format("{0}x {1}", item.Value * validPostionCount, LocalizationTable.GetLocalization(item.Key)));
+                        if (buildOrder.Inventory.Count > 1)
+                        {
+                            sb.AppendLine();
+                        }
+                    }
+
+                    currentBuildRequirements = sb.ToString();
+                }
+                else
+                {
+                    UnityDebugger.Debugger.LogError("BuildOrder is null");
+                }
+
+                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, validPostionCount.ToString(), Color.green, false);
+                cursor.DisplayCursorInfo(TextAnchor.UpperRight, invalidPositionCount.ToString(), Color.red, false);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, currentBuildRequirements, MouseCursor.TextColor, false);
+            }
+        }
+        else if (BuildMode == BuildMode.FLOOR)
+        {
+            // Placing tiles and dragging.
+            if (t != null && isDragging == true && dragPreviewGameObjects.Count >= 1)
+            {
+                cursor.DisplayCursorInfo(TextAnchor.UpperLeft, dragPreviewGameObjects.Count.ToString(), MouseCursor.TextColor, false);
+                cursor.DisplayCursorInfo(TextAnchor.LowerLeft, LocalizationTable.GetLocalization(GetFloorTile()), MouseCursor.TextColor, false);
+            }
+        }
+    }
+
+    public void HandleDragFinished(MouseController.DragParameters dragParams)
+    {
+        for (int x = dragParams.StartX; x <= dragParams.EndX; x++)
+        {
+            // Variables for the for-loop over the y-coordinates.
+            // These are used to determine whether the loop should run from highest to lowest values or vice-versa.
+            // The tiles are thus added in a snake or zig-zag pattern, which makes building more efficient.
+            int begin = (x - dragParams.StartX) % 2 == 0 ? dragParams.StartY : dragParams.EndY;
+            int stop = (x - dragParams.StartX) % 2 == 0 ? dragParams.EndY + 1 : dragParams.StartY - 1;
+            int increment = (x - dragParams.StartX) % 2 == 0 ? 1 : -1;
+
+            for (int y = begin; y != stop; y += increment)
+            {
+                Tile tile = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.CameraController.CurrentLayer);
+                if (tile == null)
+                {
+                    // Trying to build off the map, bail out of this cycle.
+                    continue;
+                }
+
+                if (BuildMode == BuildMode.FURNITURE)
+                {
+                    // Check for furniture dragType.
+                    Furniture proto = PrototypeManager.Furniture.Get(BuildModeType);
+
+                    if (IsTilePartOfDrag(tile, dragParams, proto.DragType))
+                    {
+                        // Call BuildModeController::DoBuild().
+                        DoBuild(tile);
+                    }
+                }
+                else if (BuildMode == BuildMode.UTILITY)
+                {
+                    // Check for furniture dragType.
+                    Utility proto = PrototypeManager.Utility.Get(BuildModeType);
+
+                    if (IsTilePartOfDrag(tile, dragParams, proto.DragType))
+                    {
+                        // Call BuildModeController::DoBuild().
+                        DoBuild(tile);
+                    }
+                }
+                else
+                {
+                    DoBuild(tile);
+                }
+            }
+        }
+
+        // In devmode, utilities don't build their network, and one of the utilities built needs UpdateGrid called explicitly after all are built.
+        if (BuildMode == BuildMode.UTILITY && SettingsKeyHolder.DeveloperMode)
+        {
+            Tile firstTile = World.Current.GetTileAt(dragParams.RawStartX, dragParams.RawStartY, WorldController.Instance.CameraController.CurrentLayer);
+            Utility utility = firstTile.Utilities[PrototypeManager.Utility.Get(BuildModeType).Type];
+            utility.UpdateGrid(utility);
+        }
+    }
+
+    public List<GameObject> HandleDragVisual(MouseController.DragParameters dragParams, Transform parent)
+    {
+        List<GameObject> objects = new List<GameObject>();
+
+        for (int x = dragParams.StartX; x <= dragParams.EndX; x++)
+        {
+            for (int y = dragParams.StartY; y <= dragParams.EndY; y++)
+            {
+                Tile t = WorldController.Instance.World.GetTileAt(x, y, WorldController.Instance.CameraController.CurrentLayer);
+                if (t != null)
+                {
+                    // Display the building hint on top of this tile position.
+                    if (BuildMode == BuildMode.FURNITURE)
+                    {
+                        Furniture proto = PrototypeManager.Furniture.Get(BuildModeType);
+                        if (IsTilePartOfDrag(t, dragParams, proto.DragType))
+                        {
+                            objects.Add(ShowFurnitureSpriteAtTile(BuildModeType, t));
+                            GameObject go = ShowWorkSpotSpriteAtTile(BuildModeType, t);
+                            if (go != null)
+                            {
+                                objects.Add(go);
+                            }
+                        }
+                    }
+                    else if (BuildMode == BuildMode.UTILITY)
+                    {
+                        Utility proto = PrototypeManager.Utility.Get(BuildModeType);
+                        if (IsTilePartOfDrag(t, dragParams, proto.DragType))
+                        {
+                            objects.Add(ShowUtilitySpriteAtTile(BuildModeType, t));
+                        }
+                    }
+                    else
+                    {
+                        // Show generic visuals
+                        GameObject go = SimplePool.Spawn(WorldController.Instance.CircleCursorPrefab, new Vector3(x, y, WorldController.Instance.CameraController.CurrentLayer), Quaternion.identity);
+                        go.transform.SetParent(parent, true);
+                        go.GetComponent<SpriteRenderer>().sprite = SpriteManager.GetSprite("UI", "CursorCircle");
+                        objects.Add(go);
+                    }
+                }
+            }
+        }
+
+        return objects;
+    }
+
+    public Vector3 HandlePlacingPosition(Vector3 position)
+    {
+        if (BuildMode == BuildMode.FURNITURE
+            && PrototypeManager.Furniture.Has(BuildModeType)
+            && (PrototypeManager.Furniture.Get(BuildModeType).Width > 1
+            || PrototypeManager.Furniture.Get(BuildModeType).Height > 1))
+        {
+            Furniture furnitureToBuild = PrototypeManager.Furniture.Get(BuildModeType).Clone(); // Get a copy
+            furnitureToBuild.SetRotation(CurrentPreviewRotation);
+            Sprite sprite = WorldController.Instance.FurnitureSpriteController.GetSpriteForFurniture(furnitureToBuild.Type);
+
+            // Use the center of the Furniture.
+            return position - ImageUtils.SpritePivotOffset(sprite, CurrentPreviewRotation);
+        }
+        else
+        {
+            return position;
+        }
+    }
+
+    /// <summary>
+    /// BuildModeController doesn't handle clicks, and will throw an error on call.
+    /// </summary>
+    public void HandleClick(Vector2 position, int mouseKey)
+    {
+        throw new InvalidOperationException("Not supported by this class");
+    }
+
+    #region HelperFunctions
+
+    /// <summary>
+    /// Checks whether a tile is valid for the drag type, given the drag parameters
+    /// Returns true if tile should be included, false otherwise.
+    /// </summary>
+    private bool IsTilePartOfDrag(Tile tile, MouseController.DragParameters dragParams, string dragType)
+    {
+        switch (dragType)
+        {
+            case "border":
+                return tile.X == dragParams.StartX || tile.X == dragParams.EndX || tile.Y == dragParams.StartY || tile.Y == dragParams.EndY;
+            case "path":
+                bool withinXBounds = dragParams.StartX <= tile.X && tile.X <= dragParams.EndX;
+                bool onPath = tile.Y == dragParams.RawStartY || tile.X == dragParams.RawEndX;
+                return withinXBounds && onPath;
+            default:
+                return true;
+        }
+    }
+
+    private GameObject ShowFurnitureSpriteAtTile(string furnitureType, Tile tile)
+    {
+        GameObject go = new GameObject();
+        go.transform.SetParent(furnitureParent.transform, true);
+
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sortingLayerName = "Jobs";
+        sr.sprite = WorldController.Instance.FurnitureSpriteController.GetSpriteForFurniture(furnitureType);
+
+        if (World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile, CurrentPreviewRotation) &&
+            World.Current.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
+            DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType, CurrentPreviewRotation) == false)
+        {
+            sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
+        }
+        else
+        {
+            sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
+        }
+
+        go.name = furnitureType + "_p_" + tile.X + "_" + tile.Y + "_" + tile.Z;
+        go.transform.position = tile.Vector3 + ImageUtils.SpritePivotOffset(sr.sprite, CurrentPreviewRotation);
+        go.transform.Rotate(0, 0, CurrentPreviewRotation);
+
+        return go;
+    }
+
+    private GameObject ShowWorkSpotSpriteAtTile(string furnitureType, Tile tile)
+    {
+        Furniture proto = PrototypeManager.Furniture.Get(furnitureType);
+
+        // if the workspot is inside the furniture, there's no reason to show it separately
+        if (proto.Jobs.WorkSpotOffset.x >= 0 && proto.Jobs.WorkSpotOffset.x < proto.Width && proto.Jobs.WorkSpotOffset.y >= 0 && proto.Jobs.WorkSpotOffset.y < proto.Height)
+        {
+            return null;
+        }
+
+        GameObject go = new GameObject();
+        go.transform.SetParent(furnitureParent.transform, true);
+
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sortingLayerName = "Jobs";
+        sr.sprite = SpriteManager.GetSprite("UI", "WorkSpotIndicator");
+
+        if (World.Current.FurnitureManager.IsPlacementValid(furnitureType, tile) &&
+            World.Current.FurnitureManager.IsWorkSpotClear(furnitureType, tile) &&
+            DoesFurnitureBuildJobOverlapExistingBuildJob(tile, furnitureType) == false)
+        {
+            sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
+        }
+        else
+        {
+            sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
+        }
+
+        go.transform.position = new Vector3(tile.X + proto.Jobs.WorkSpotOffset.x, tile.Y + proto.Jobs.WorkSpotOffset.y, WorldController.Instance.CameraController.CurrentLayer);
+
+        return go;
+    }
+
+    private GameObject ShowUtilitySpriteAtTile(string type, Tile tile)
+    {
+        GameObject go = new GameObject();
+        go.transform.SetParent(furnitureParent.transform, true);
+
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sortingLayerName = "Jobs";
+        sr.sprite = WorldController.Instance.UtilitySpriteController.GetSpriteForUtility(type);
+
+        if (World.Current.UtilityManager.IsPlacementValid(type, tile) &&
+            DoesSameUtilityTypeAlreadyExist(type, tile) &&
+            DoesUtilityBuildJobOverlapExistingBuildJob(type, tile) == false)
+        {
+            sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
+        }
+        else
+        {
+            sr.color = new Color(1f, 0.5f, 0.5f, 0.25f);
+        }
+
+        go.transform.position = new Vector3(tile.X, tile.Y, WorldController.Instance.CameraController.CurrentLayer);
+
+        return go;
+    }
+
     private bool IsTilePartOfPressuredRoom(Tile tile)
     {
         // check if this is a WALL neighbouring a pressured and pressureless environment, and if so, bail
@@ -477,6 +820,8 @@ public class BuildModeController
 
         return false;
     }
+
+    #endregion
 
     // Rotate the preview furniture to the left.
     private void RotateFurnitireLeft()

@@ -26,10 +26,8 @@ public class LanguageDropdownUpdater : MonoBehaviour
     private void UpdateLanguageDropdown()
     {
         Dropdown dropdown = GetComponentInChildren<Dropdown>();
-
         string[] languages = LocalizationTable.GetLanguages();
-
-        dropdown.options.RemoveRange(0, dropdown.options.Count);
+        dropdown.ClearOptions();
 
         foreach (string lang in languages)
         {
@@ -40,9 +38,8 @@ public class LanguageDropdownUpdater : MonoBehaviour
         {
             if (languages[i] == LocalizationTable.currentLanguage)
             {
-                // This tbh quite stupid looking code is necessary due to a Unity (optimization?, bug(?)).
-                dropdown.value = i + 1;
                 dropdown.value = i;
+                break;
             }
         }
 

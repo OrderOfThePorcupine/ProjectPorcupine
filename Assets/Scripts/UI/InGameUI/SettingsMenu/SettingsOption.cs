@@ -21,6 +21,11 @@ public struct SettingsOption
     public string name;
 
     /// <summary>
+    /// Tool tip to display in UI Mode.
+    /// </summary>
+    public string tooltip;
+
+    /// <summary>
     /// The key to save for this option.
     /// </summary>
     public string key;
@@ -41,13 +46,15 @@ public struct SettingsOption
     /// <param name="name"> The name of the option (unlocalized). </param>
     /// <param name="key"> The key to save. </param>
     /// <param name="defaultValue"> The default value. </param>
+    /// <param name="tooltip"> Tooltip to show. </param>
     /// <param name="classData"> Any class data associated with the option. </param>
-    public SettingsOption(string name, string key, string defaultValue, UIComponent classData)
+    public SettingsOption(string name, string key, string defaultValue, string tooltip, UIComponent classData)
     {
         this.name = name;
         this.key = key;
         this.defaultValue = defaultValue;
         this.classData = classData;
+        this.tooltip = tooltip;
     }
 
     /// <summary>
@@ -59,6 +66,7 @@ public struct SettingsOption
         name = reader.GetAttribute("Name");
         key = reader.GetAttribute("Key");
         defaultValue = reader.GetAttribute("DefaultValue");
+        tooltip = reader.GetAttribute("Tooltip");
         classData = new UIComponent(reader.GetAttribute("ClassName"), (reader != null && subReader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter());
         subReader.Close();
     }
@@ -71,6 +79,7 @@ public struct SettingsOption
         name = PrototypeReader.ReadJson("name", innerJson["Name"]);
         key = PrototypeReader.ReadJson("key", innerJson["Key"]);
         defaultValue = PrototypeReader.ReadJson("defaultValue", innerJson["DefaultValue"]);
+        tooltip = PrototypeReader.ReadJson("tooltip", innerJson["Tooltip"]);
         classData = new UIComponent();
 
         classData.ReadJson(innerJson);

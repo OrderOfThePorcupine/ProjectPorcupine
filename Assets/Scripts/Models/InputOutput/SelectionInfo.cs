@@ -22,11 +22,20 @@ public class SelectionInfo
         SelectFirstStuff();
     }
 
-    public Tile Tile
+    /// <summary>
+    /// Returns true if the <see cref="Tile.Type"/> isn't empty or if there is stuff other than just the empty tile.
+    /// </summary>
+    public bool StuffInTile
     {
-        get;
-        protected set;
+        get
+        {
+            // If we have more than just one (since Tile will always exist in the list and more than one refers to having a character/whatever also in there) then return true
+            // Else only return true if TileType isn't empty since otherwise its just a vacuum space tile thingy
+            return stuffInTile.Count > 1 || Tile.Type != TileType.Empty;
+        }
     }
+
+    public Tile Tile { get; protected set; }
 
     public void BuildStuffInTile()
     {
@@ -40,8 +49,16 @@ public class SelectionInfo
         }
 
         // Now assign references to the other three sub-selections available.
-        stuffInTile.Add(Tile.Furniture);
-        stuffInTile.Add(Tile.Inventory);
+        if (Tile.Furniture != null)
+        {
+            stuffInTile.Add(Tile.Furniture);
+        }
+
+        if (Tile.Inventory != null)
+        {
+            stuffInTile.Add(Tile.Inventory);
+        }
+
         foreach (Job pendingBuildJob in Tile.PendingBuildJobs)
         {
             stuffInTile.Add(pendingBuildJob);

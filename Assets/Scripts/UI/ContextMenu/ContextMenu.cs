@@ -15,6 +15,14 @@ public class ContextMenu : MonoBehaviour
 {
     public GameObject ContextualMenuItemPrefab;
 
+    public bool Opened
+    {
+        get
+        {
+            return gameObject.activeInHierarchy;
+        }
+    }
+
     /// <summary>
     /// Open the context menu at the specified tile.
     /// </summary>
@@ -57,8 +65,7 @@ public class ContextMenu : MonoBehaviour
     private void BuildInterface(List<ContextMenuAction> contextualActions)
     {
         gameObject.transform.position = Input.mousePosition + new Vector3(10, -10, 0);
-
-        bool characterSelected = WorldController.Instance.MouseController.IsCharacterSelected();
+        bool characterSelected = WorldController.Instance.MouseController.Selection != null && WorldController.Instance.MouseController.Selection.IsCharacterSelected();
 
         foreach (ContextMenuAction contextMenuAction in contextualActions)
         {
@@ -84,7 +91,6 @@ public class ContextMenu : MonoBehaviour
     private List<IContextActionProvider> GetContextualActionProviderOnTile(Tile tile)
     {
         List<IContextActionProvider> providers = new List<IContextActionProvider>();
-
         providers.Add(tile);
 
         if (tile.Furniture != null)

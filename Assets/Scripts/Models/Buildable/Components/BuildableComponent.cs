@@ -72,28 +72,28 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        public bool Initialized 
-        { 
-            get 
-            { 
-                return initialized; 
-            } 
+        public bool Initialized
+        {
+            get
+            {
+                return initialized;
+            }
         }
 
-        public virtual bool RequiresSlowUpdate 
-        { 
-            get 
-            { 
-                return false; 
-            } 
+        public virtual bool RequiresSlowUpdate
+        {
+            get
+            {
+                return false;
+            }
         }
 
-        public virtual bool RequiresFastUpdate 
-        { 
-            get 
-            { 
-                return false; 
-            } 
+        public virtual bool RequiresFastUpdate
+        {
+            get
+            {
+                return false;
+            }
         }
 
         [XmlIgnore]
@@ -364,7 +364,7 @@ namespace ProjectPorcupine.Buildable.Components
 
             public Conditions RunConditions { get; set; }
         }
-        
+
         [Serializable]
         [JsonObject(MemberSerialization.OptOut)]
         public class ParameterCondition
@@ -425,7 +425,7 @@ namespace ProjectPorcupine.Buildable.Components
             public int CapacityThresholds { get; set; }
 
             [XmlAttribute("canUseVariableEffiency")]
-            public bool CanUseVariableEfficiency { get; set; }            
+            public bool CanUseVariableEfficiency { get; set; }
         }
 
         [Serializable]

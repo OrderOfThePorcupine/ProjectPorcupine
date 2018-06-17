@@ -14,13 +14,13 @@ namespace ProjectPorcupine.PowerNetwork
 {
     public class PowerNetwork
     {
-        private readonly HashSet<Grid> powerGrids;
+        private readonly HashSet<UtilityGrid> powerGrids;
         private readonly float secondsToTick = 1.0f;
         private float secondsPassed;
 
         public PowerNetwork()
         {
-            powerGrids = new HashSet<Grid>();
+            powerGrids = new HashSet<UtilityGrid>();
         }
 
         public bool IsEmpty
@@ -47,14 +47,14 @@ namespace ProjectPorcupine.PowerNetwork
 
             if (IsEmpty)
             {
-                powerGrids.Add(new Grid());
+                powerGrids.Add(new UtilityGrid());
             }
 
-            Grid powerGrid = powerGrids.First(grid => grid.CanPlugIn(connection));
+            UtilityGrid powerGrid = powerGrids.First(grid => grid.CanPlugIn(connection));
             return PlugIn(connection, powerGrid);
         }
 
-        public bool PlugIn(IPluggable connection, Grid grid)
+        public bool PlugIn(IPluggable connection, UtilityGrid grid)
         {
             if (connection == null)
             {
@@ -69,7 +69,7 @@ namespace ProjectPorcupine.PowerNetwork
             return grid != null && grid.PlugIn(connection);
         }
 
-        public bool IsPluggedIn(IPluggable connection, out Grid grid)
+        public bool IsPluggedIn(IPluggable connection, out UtilityGrid grid)
         {
             if (connection == null)
             {
@@ -93,7 +93,7 @@ namespace ProjectPorcupine.PowerNetwork
                 throw new ArgumentNullException("connection");
             }
 
-            Grid grid;
+            UtilityGrid grid;
             IsPluggedIn(connection, out grid);
             if (grid == null)
             {
@@ -103,7 +103,7 @@ namespace ProjectPorcupine.PowerNetwork
             Unplug(connection, grid);
         }
 
-        public void RegisterGrid(Grid grid)
+        public void RegisterGrid(UtilityGrid grid)
         {
             if (powerGrids.Contains(grid))
             {
@@ -113,7 +113,7 @@ namespace ProjectPorcupine.PowerNetwork
             powerGrids.Add(grid);
         }
 
-        public void UnregisterGrid(Grid grid)
+        public void UnregisterGrid(UtilityGrid grid)
         {
             if (!powerGrids.Contains(grid))
             {
@@ -123,12 +123,12 @@ namespace ProjectPorcupine.PowerNetwork
             powerGrids.Remove(grid);
         }
 
-        public int FindId(Grid grid)
+        public int FindId(UtilityGrid grid)
         {
             return powerGrids.ToList().IndexOf(grid);
         }
 
-        public void Unplug(IPluggable connection, Grid grid)
+        public void Unplug(IPluggable connection, UtilityGrid grid)
         {
             if (connection == null)
             {
@@ -145,14 +145,14 @@ namespace ProjectPorcupine.PowerNetwork
 
         public bool IsConnected(IPluggable connection)
         {
-            Grid grid;
+            UtilityGrid grid;
             IsPluggedIn(connection, out grid);
             return grid != null && grid.HasAnyProducer();
         }
 
         public bool HasPower(IPluggable connection)
         {
-            Grid grid;
+            UtilityGrid grid;
             IsPluggedIn(connection, out grid);
             return grid != null && grid.IsOperating;
         }
@@ -160,7 +160,7 @@ namespace ProjectPorcupine.PowerNetwork
         public float GetEfficiency(IPluggable connection)
         {
             float efficiency = 0f;
-            Grid grid;
+            UtilityGrid grid;
             IsPluggedIn(connection, out grid);
             if (grid != null)
             {
@@ -182,7 +182,7 @@ namespace ProjectPorcupine.PowerNetwork
             Tick();
         }
 
-        public void RemoveGrid(Grid grid)
+        public void RemoveGrid(UtilityGrid grid)
         {
             powerGrids.Remove(grid);
         }
@@ -194,7 +194,7 @@ namespace ProjectPorcupine.PowerNetwork
                 return;
             }
 
-            foreach (Grid powerGrid in powerGrids)
+            foreach (UtilityGrid powerGrid in powerGrids)
             {
                 powerGrid.Tick();
             }

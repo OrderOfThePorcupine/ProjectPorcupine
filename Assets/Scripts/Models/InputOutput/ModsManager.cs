@@ -119,9 +119,9 @@ public class ModsManager
 
     private void LoadSharedFiles()
     {
-        LoadDirectoryAssets("Shared/Images", SpriteManager.LoadSpriteFiles);
-        LoadDirectoryAssets("Shared/Audio", AudioManager.LoadAudioFiles);
-
+        // Not currently used
+        // LoadDirectoryAssets("Shared/Images", SpriteManager.LoadSpriteFiles);
+        // LoadDirectoryAssets("Shared/Audio", AudioManager.LoadAudioFiles);
         LoadFunctions("CommandFunctions.cs", "DevConsole");
         LoadFunctions("ConsoleCommands.lua", "DevConsole");
 

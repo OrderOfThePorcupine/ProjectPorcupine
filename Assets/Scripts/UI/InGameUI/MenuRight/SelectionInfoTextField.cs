@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Localization;
+using ProjectPorcupine.Mouse;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,7 +31,7 @@ public class SelectionInfoTextField : MonoBehaviour
     // Update is called once per frame.
     private void Update()
     {
-        if (mc.mySelection == null)
+        if (mc.Selection == null || mc.Selection.StuffInTile == false)
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
@@ -42,7 +43,7 @@ public class SelectionInfoTextField : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
 
-        ISelectable actualSelection = mc.mySelection.GetSelectedStuff();
+        ISelectable actualSelection = mc.Selection.GetSelectedStuff();
 
         string additionalInfoText = string.Join(Environment.NewLine, actualSelection.GetAdditionalInfo().ToArray());
 
