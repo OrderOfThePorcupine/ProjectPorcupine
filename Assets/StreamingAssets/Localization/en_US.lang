@@ -163,8 +163,8 @@ selection_hp={0}/{1}
 build=Build {0}
 
 ##########Power##########
-power_grid_status_online=Power Grid: <color={0}>Online</color>
-power_grid_status_offline=Power Grid: <color={0}>Offline</color>
+power_grid_status_online=Power UtilityGrid: <color={0}>Online</color>
+power_grid_status_offline=Power UtilityGrid: <color={0}>Offline</color>
 power_input_status=Power Input: <color={0}>{1}</color>
 power_output_status=Power Output: <color={0}>{1}</color>
 power_accumulated_fraction=Power Accumulated: {0} / {1}

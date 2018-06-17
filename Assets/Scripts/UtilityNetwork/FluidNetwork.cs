@@ -14,13 +14,13 @@ namespace ProjectPorcupine.PowerNetwork
 {
     public class FluidNetwork
     {
-        private readonly HashSet<Grid> fluidGrids;
+        private readonly HashSet<UtilityGrid> fluidGrids;
         private readonly float secondsToTick = 1.0f;
         private float secondsPassed;
 
         public FluidNetwork()
         {
-            fluidGrids = new HashSet<Grid>();
+            fluidGrids = new HashSet<UtilityGrid>();
         }
 
         public bool IsEmpty
@@ -47,17 +47,17 @@ namespace ProjectPorcupine.PowerNetwork
 
             if (IsEmpty || !fluidGrids.Any(grid => grid.CanPlugIn(connection)))
             {
-                fluidGrids.Add(new Grid());
-                UnityDebugger.Debugger.LogWarning("FluidNetwork", "Adding new Fluid Grid");
+                fluidGrids.Add(new UtilityGrid());
+                UnityDebugger.Debugger.LogWarning("FluidNetwork", "Adding new Fluid UtilityGrid");
             }
 
             // TODO: Currently, this will create a "Universal" Fluid system... that is not ideal.
             // In theory at this point there should either be a grid that can be plugged in, or there should be new grid added... that can be plugged in.
-            Grid fluidGrid = fluidGrids.FirstOrDefault(grid => grid.CanPlugIn(connection));
+            UtilityGrid fluidGrid = fluidGrids.FirstOrDefault(grid => grid.CanPlugIn(connection));
             return PlugIn(connection, fluidGrid);
         }
 
-        public bool PlugIn(IPluggable connection, Grid grid)
+        public bool PlugIn(IPluggable connection, UtilityGrid grid)
         {
             if (connection == null)
             {
@@ -72,7 +72,7 @@ namespace ProjectPorcupine.PowerNetwork
             return grid != null && grid.PlugIn(connection);
         }
 
-        public bool IsPluggedIn(IPluggable connection, out Grid grid)
+        public bool IsPluggedIn(IPluggable connection, out UtilityGrid grid)
         {
             if (connection == null)
             {
@@ -96,7 +96,7 @@ namespace ProjectPorcupine.PowerNetwork
                 throw new ArgumentNullException("connection");
             }
 
-            Grid grid;
+            UtilityGrid grid;
             IsPluggedIn(connection, out grid);
             if (grid == null)
             {
@@ -106,7 +106,7 @@ namespace ProjectPorcupine.PowerNetwork
             Unplug(connection, grid);
         }
 
-        public void RegisterGrid(Grid grid)
+        public void RegisterGrid(UtilityGrid grid)
         {
             if (fluidGrids.Contains(grid))
             {
@@ -116,7 +116,7 @@ namespace ProjectPorcupine.PowerNetwork
             fluidGrids.Add(grid);
         }
 
-        public void UnregisterGrid(Grid grid)
+        public void UnregisterGrid(UtilityGrid grid)
         {
             if (!fluidGrids.Contains(grid))
             {
@@ -126,12 +126,12 @@ namespace ProjectPorcupine.PowerNetwork
             fluidGrids.Remove(grid);
         }
 
-        public int FindId(Grid grid)
+        public int FindId(UtilityGrid grid)
         {
             return fluidGrids.ToList().IndexOf(grid);
         }
 
-        public void Unplug(IPluggable connection, Grid grid)
+        public void Unplug(IPluggable connection, UtilityGrid grid)
         {
             if (connection == null)
             {
@@ -148,7 +148,7 @@ namespace ProjectPorcupine.PowerNetwork
 
         public bool HasPower(IPluggable connection)
         {
-            Grid grid;
+            UtilityGrid grid;
             IsPluggedIn(connection, out grid);
             return grid != null && grid.IsOperating;
         }
@@ -165,7 +165,7 @@ namespace ProjectPorcupine.PowerNetwork
             Tick();
         }
 
-        public void RemoveGrid(Grid grid)
+        public void RemoveGrid(UtilityGrid grid)
         {
             fluidGrids.Remove(grid);
         }
@@ -177,7 +177,7 @@ namespace ProjectPorcupine.PowerNetwork
                 return;
             }
 
-            foreach (Grid fluidGrid in fluidGrids)
+            foreach (UtilityGrid fluidGrid in fluidGrids)
             {
                 fluidGrid.Tick();
             }

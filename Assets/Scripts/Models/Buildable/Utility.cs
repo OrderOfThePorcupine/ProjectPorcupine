@@ -206,7 +206,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     /// Gets or sets the grid used by this utility.
     /// </summary>
     /// <value>The grid used by this utility.</value>
-    public Grid Grid { get; set; }
+    public UtilityGrid Grid { get; set; }
 
     /// <summary>
     /// Used to place utility in a certain position.
@@ -260,7 +260,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         else
         {
             // If we're skipping the update, we need a temporary grid for furniture in the same tile to connect to.
-            obj.Grid = new Grid();
+            obj.Grid = new UtilityGrid();
             World.Current.PowerNetwork.RegisterGrid(obj.Grid);
             obj.SeekConnection();
         }
@@ -444,7 +444,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
                 if (neighborUtility.Grid == this.Grid)
                 {
-                    neighborUtility.Grid = new Grid();
+                    neighborUtility.Grid = new UtilityGrid();
                 }
 
                 neighborUtility.UpdateGrid(neighborUtility);
@@ -594,8 +594,8 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     /// Updates the grids of this utility sharing the grids along the network of connected utilities.
     /// </summary>
     /// <param name="utilityToUpdate">Utility to update.</param>
-    /// <param name="newGrid">If not null this will force neighboring utilities to use the specified Instance of Grid.</param>
-    public void UpdateGrid(Utility utilityToUpdate, Grid newGrid = null)
+    /// <param name="newGrid">If not null this will force neighboring utilities to use the specified Instance of UtilityGrid.</param>
+    public void UpdateGrid(Utility utilityToUpdate, UtilityGrid newGrid = null)
     {
         if (gridUpdatedThisFrame)
         {
@@ -604,7 +604,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
         gridUpdatedThisFrame = true;
         TimeManager.Instance.RunNextFrame(() => gridUpdatedThisFrame = false);
-        Grid oldGrid = utilityToUpdate.Grid;
+        UtilityGrid oldGrid = utilityToUpdate.Grid;
 
         World.Current.PowerNetwork.RemoveGrid(utilityToUpdate.Grid);
 
@@ -625,7 +625,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
             if (utilityToUpdate.Grid == null)
             {
-                utilityToUpdate.Grid = new Grid();
+                utilityToUpdate.Grid = new UtilityGrid();
             }
         }
         else
