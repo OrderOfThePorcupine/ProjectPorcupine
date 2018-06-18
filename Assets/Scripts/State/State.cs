@@ -13,6 +13,7 @@ namespace ProjectPorcupine.Entities.States
     public abstract class State
     {
         protected Character character;
+        private bool extensiveLog = false;
 
         public State(string name, Character character, State nextState)
         {
@@ -63,6 +64,11 @@ namespace ProjectPorcupine.Entities.States
 
         protected void DebugLog(string message, params object[] par)
         {
+            if (!extensiveLog)
+            {
+                return;
+            }
+
             string prefixedMessage = string.Format("{0}, {1} {2}: {3}", character.GetName(), character.ID, StateStack(), message);
             UnityDebugger.Debugger.LogFormat("Character", prefixedMessage, par);
         }

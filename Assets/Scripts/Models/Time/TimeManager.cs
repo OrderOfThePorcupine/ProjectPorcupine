@@ -259,7 +259,6 @@ public class TimeManager
         {
             TimeScalePosition = newTimeScalePosition;
             TimeScale = possibleTimeScales[newTimeScalePosition];
-            UnityDebugger.Debugger.Log("Game speed", "Game speed set to " + TimeScale + "x");
         }
     }
 
