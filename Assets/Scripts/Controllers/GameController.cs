@@ -18,8 +18,6 @@ public class GameController : MonoBehaviour
 
     public static GameController Instance { get; protected set; }
 
-    public KeyboardManager KeyboardManager { get; private set; }
-
     public SoundController SoundController { get; private set; }
 
     // If true, a modal dialog box is open, so normal inputs should be ignored.
@@ -57,13 +55,10 @@ public class GameController : MonoBehaviour
 
         SoundController = new SoundController();
 
-        // Load Keyboard Mapping.
-        KeyboardManager = KeyboardManager.Instance;
-
         IsModal = false;
         IsPaused = false;
 
-        KeyboardManager.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });
+        KeyboardManager.Instance.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });
     }
 
     // Only on first time a scene is loaded.
