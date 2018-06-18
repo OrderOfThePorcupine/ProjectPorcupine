@@ -19,7 +19,7 @@ public class KeyboardManager
 
     private Dictionary<string, KeyboadMappedInput> mapping;
 
-    public KeyboardManager()
+    private KeyboardManager()
     {
         instance = this;
         mapping = new Dictionary<string, KeyboadMappedInput>();
