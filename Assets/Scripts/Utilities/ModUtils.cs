@@ -27,7 +27,7 @@ public static class ModUtils
         return new Vector3(x, y, z);
     }
 
-    public static Vector3 LUAVector4(float x, float y, float z, float w)
+    public static Vector4 LUAVector4(float x, float y, float z, float w)
     {
         return new Vector4(x, y, z, w);
     }
