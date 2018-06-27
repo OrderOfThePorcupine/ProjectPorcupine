@@ -79,9 +79,11 @@ public class LuaFunctionsTest
         // This makes sure that the channel lua is activated since we require to to be
         // we set it back to the old value afterwards as to not annoy the 'dev'
         bool oldVal = true;
-        if (UnityDebugger.Debugger.Channels.ContainsKey("Lua")) {
+        if (UnityDebugger.Debugger.Channels.ContainsKey("Lua"))
+        {
             oldVal = UnityDebugger.Debugger.Channels["Lua"];
         }
+
         UnityDebugger.Debugger.Channels["Lua"] = true;
 
         LogAssert.Expect(LogType.Error, "[testCode2] LUA Parse error: chunk_1:(5,8): 'end' expected near '<eof>'");

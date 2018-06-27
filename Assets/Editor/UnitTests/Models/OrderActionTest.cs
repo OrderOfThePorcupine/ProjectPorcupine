@@ -11,10 +11,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using NUnit.Framework;
-using ProjectPorcupine.OrderActions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+using ProjectPorcupine.OrderActions;
 
 public class OrderActionTest
 {
