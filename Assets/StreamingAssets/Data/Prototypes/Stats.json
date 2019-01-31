@@ -1,0 +1,22 @@
+{
+  "Stat": {
+    "Strength": {
+      "Name": "Strength"
+    },
+    "Dexterity": {
+      "Name": "Dexterity"
+    },
+    "Constitution": {
+      "Name": "Constitution"
+    },
+    "Intelligence": {
+      "Name": "Intelligence"
+    },
+    "Wisdom": {
+      "Name": "Wisdom"
+    },
+    "Charisma": {
+      "Name": "Charisma"
+    }
+  }
+}

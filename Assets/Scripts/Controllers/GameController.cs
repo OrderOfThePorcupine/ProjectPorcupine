@@ -18,8 +18,6 @@ public class GameController : MonoBehaviour
 
     public static GameController Instance { get; protected set; }
 
-    public KeyboardManager KeyboardManager { get; private set; }
-
     public SoundController SoundController { get; private set; }
 
     // If true, a modal dialog box is open, so normal inputs should be ignored.
@@ -57,21 +55,15 @@ public class GameController : MonoBehaviour
 
         SoundController = new SoundController();
 
-        // Load Keyboard Mapping.
-        KeyboardManager = KeyboardManager.Instance;
-
         IsModal = false;
         IsPaused = false;
 
-        KeyboardManager.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });
+        KeyboardManager.Instance.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });
     }
 
     // Only on first time a scene is loaded.
     private void Start()
     {
-        // Load settings.
-        Settings.LoadSettings();
-
         // Add a gameobject that Localization
         this.gameObject.AddComponent<LocalizationLoader>();
     }
@@ -84,14 +76,14 @@ public class GameController : MonoBehaviour
     // Game Controller will persist between scenes. 
     private void EnableDontDestroyOnLoad()
     {
-        if (Instance == null)
+        if (Instance == null || Instance == this)
         {
             Instance = this;
         }
         else
         {
+            UnityDebugger.Debugger.LogError("Two 'MainMenuController' exist, deleting the new version rather than the old.");
             Destroy(this.gameObject);
-            Destroy(this);
         }
 
         DontDestroyOnLoad(this);

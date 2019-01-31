@@ -15,7 +15,7 @@ using ProjectPorcupine.PowerNetwork;
 public class PowerNetworkTest
 {
     private PowerNetwork powerNetwork;
-    private HashSet<Grid> powerGrids;
+    private HashSet<UtilityGrid> powerGrids;
 
     [SetUp]
     public void Init()
@@ -24,7 +24,7 @@ public class PowerNetworkTest
         Type livePowerSystemType = typeof(PowerNetwork);
         FieldInfo field = livePowerSystemType.GetField("powerGrids", BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.IsNotNull(field);
-        powerGrids = field.GetValue(powerNetwork) as HashSet<Grid>;
+        powerGrids = field.GetValue(powerNetwork) as HashSet<UtilityGrid>;
         Assert.IsNotNull(powerGrids);
         Assert.AreEqual(0, powerGrids.Count);
     }
@@ -48,7 +48,7 @@ public class PowerNetworkTest
         MockConnection connection = new MockConnection();
         Assert.IsTrue(powerNetwork.PlugIn(connection));
         Assert.AreEqual(1, powerGrids.Count);
-        Grid grid;
+        UtilityGrid grid;
         Assert.IsTrue(powerNetwork.IsPluggedIn(connection, out grid));
         Assert.IsNotNull(grid);
     }
@@ -57,7 +57,7 @@ public class PowerNetworkTest
     public void UnplugTest()
     {
         MockConnection connection = new MockConnection();
-        Grid grid = new Grid();
+        UtilityGrid grid = new UtilityGrid();
         Assert.IsTrue(powerNetwork.PlugIn(connection, grid));
         Assert.AreEqual(1, powerGrids.Count);
         powerNetwork.Unplug(connection);

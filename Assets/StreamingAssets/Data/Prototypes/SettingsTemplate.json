@@ -1,0 +1,324 @@
+{
+  "Category": {
+    "general": {
+      "Headings": {
+        "autosave": [
+          {
+            "Name": "autosave_every",
+            "Key": "general_autosave_interval",
+            "DefaultValue": "10",
+            "ClassName": "AutosaveIntervalInputField",
+            "Parameters": {
+              "Verification": "PositiveInteger"
+            },
+            "Tooltip": "autosave_every_tooltip"
+          },
+          {
+            "Name": "max_autosaves",
+            "Key": "general_autosave_maxFiles",
+            "DefaultValue": "5",
+            "ClassName": "GenericInputField",
+            "Parameters": {
+              "Verification": "PositiveInteger"
+            },
+            "Tooltip": "max_autosaves_tooltip"
+          }
+        ],
+        "localization": [
+          {
+            "Name": "language",
+            "Key": "general_localization_language",
+            "DefaultValue": "en_US",
+            "ClassName": "LocalizationComboBox",
+            "Tooltip": "language_tooltip"
+          },
+          {
+            "Name": "auto_update_language",
+            "Key": "general_localization_autoUpdate",
+            "DefaultValue": "true",
+            "ClassName": "GenericToggle",
+            "Tooltip": "auto_update_language_tooltip"
+          }
+        ],
+        "Movement": [
+          {
+            "Name": "zoom_lerp_time",
+            "Key": "general_movement_zoomLerp",
+            "DefaultValue": "10",
+            "ClassName": "GenericSlider",
+            "Parameters": {
+              "MinimumValue": "1",
+              "MaximumValue": "20"
+            },
+            "Tooltip": "zoom_lerp_time_tooltip"
+          },
+          {
+            "Name": "zoom_sensitivity",
+            "Key": "general_movement_zoomSensitivity",
+            "DefaultValue": "3",
+            "ClassName": "GenericSlider",
+            "Parameters": {
+              "MinimumValue": "1",
+              "MaximumValue": "9"
+            },
+            "Tooltip": "zoom_sensitivity_tooltip"
+          }
+        ]
+      }
+    },
+    "sound": {
+      "Headings": {
+        "volume": [
+          {
+            "Name": "master_volume",
+            "Key": "sound_volume_master",
+            "DefaultValue": "1",
+            "ClassName": "SoundSlider",
+            "Parameters": {
+              "SoundChannel": "master",
+              "MinimumValue": "0",
+              "MaximumValue": "100",
+              "WholeNumbers": "true"
+            },
+            "Tooltip": "master_volume_tooltip"
+          },
+          {
+            "Name": "music_volume",
+            "Key": "sound_volume_music",
+            "DefaultValue": "1",
+            "ClassName": "SoundSlider",
+            "Parameters": {
+              "SoundChannel": "music",
+              "MinimumValue": "0",
+              "MaximumValue": "100",
+              "WholeNumbers": "true"
+            },
+            "Tooltip": "music_volume_tooltip"
+          },
+          {
+            "Name": "game_volume",
+            "Key": "sound_volume_game",
+            "DefaultValue": "1",
+            "ClassName": "SoundSlider",
+            "Parameters": {
+              "SoundChannel": "gameSounds",
+              "MinimumValue": "0",
+              "MaximumValue": "100",
+              "WholeNumbers": "true"
+            },
+            "Tooltip": "game_volume_tooltip"
+          },
+          {
+            "Name": "alert_volume",
+            "Key": "sound_volume_alerts",
+            "DefaultValue": "1",
+            "ClassName": "SoundSlider",
+            "Parameters": {
+              "SoundChannel": "alerts",
+              "MinimumValue": "0",
+              "MaximumValue": "100",
+              "WholeNumbers": "true"
+            },
+            "Tooltip": "alert_volume_tooltip"
+          },
+          {
+            "Name": "ui_volume",
+            "Key": "sound_volume_ui",
+            "DefaultValue": "1",
+            "ClassName": "SoundSlider",
+            "Parameters": {
+              "SoundChannel": "UI",
+              "MinimumValue": "0",
+              "MaximumValue": "100",
+              "WholeNumbers": "true"
+            },
+            "Tooltip": "ui_volume_tooltip"
+          }
+        ],
+        "advanced": [
+          {
+            "Name": "sound_device",
+            "Key": "sound_advanced_device",
+            "DefaultValue": "0",
+            "ClassName": "SoundDeviceComboBox",
+            "Tooltip": "sound_device_tooltip"
+          },
+          {
+            "Name": "locational_sound",
+            "Key": "sound_advanced_locational",
+            "DefaultValue": "true",
+            "ClassName": "GenericToggle",
+            "Tooltip": "locational_sound_tooltip"
+          }
+        ]
+      }
+    },
+    "video": {
+      "Headings": {
+        "general": [
+          {
+            "Name": "ui_skin",
+            "Key": "video_general_uiSkin",
+            "DefaultValue": "0",
+            "ClassName": "UISkinComboBox",
+            "Tooltip": "ui_skin_tooltip"
+          },
+          {
+            "Name": "quality",
+            "Key": "video_general_quality",
+            "DefaultValue": "2",
+            "ClassName": "QualityComboBox",
+            "Tooltip": "quality_tooltip"
+          },
+          {
+            "Name": "vsync",
+            "Key": "video_general_vsync",
+            "DefaultValue": "0",
+            "ClassName": "VSyncComboBox",
+            "Tooltip": "vsync_tooltip"
+          },
+          {
+            "Name": "ui_scale",
+            "Key": "video_general_ui_scale",
+            "DefaultValue": "1",
+            "ClassName": "UIScaleSlider",
+            "Parameters": {
+              "MinimumValue": "0.5",
+              "MaximumValue": "2"
+            },
+            "Tooltip": "ui_scale_tooltip"
+          }
+        ],
+        "advanced": [
+          {
+            "Name": "soft_particles",
+            "Key": "video_advanced_particles",
+            "DefaultValue": "true",
+            "ClassName": "SoftParticlesToggle",
+            "Tooltip": "soft_particles_tooltip"
+          },
+          {
+            "Name": "shadows",
+            "Key": "video_advanced_shadows",
+            "DefaultValue": "0",
+            "ClassName": "ShadowComboBox",
+            "Tooltip": "shadows_tooltip"
+          },
+          {
+            "Name": "anisotropic_filtering",
+            "Key": "video_advanced_anisotropicFiltering",
+            "DefaultValue": "2",
+            "ClassName": "AnisotropicFilteringComboBox",
+            "Tooltip": "anisotropic_filtering_tooltip"
+          },
+          {
+            "Name": "aa",
+            "Key": "video_advanced_aa",
+            "DefaultValue": "0",
+            "ClassName": "AAComboBox",
+            "Tooltip": "aa_tooltip"
+          }
+        ],
+        "window": [
+          {
+            "Name": "fullscreen",
+            "Key": "video_window_mode",
+            "DefaultValue": "true",
+            "ClassName": "FullScreenToggle",
+            "Tooltip": "fullscreen_tooltip"
+          },
+          {
+            "Name": "resolution",
+            "Key": "video_window_resoultion",
+            "DefaultValue": "0",
+            "ClassName": "ResolutionComboBox",
+            "Tooltip": "resolution_tooltip"
+          }
+        ]
+      }
+    },
+    "developer": {
+      "Headings": {
+        "general": [
+          {
+            "Name": "developer_mode",
+            "Key": "developer_general_developerMode",
+            "DefaultValue": "false",
+            "ClassName": "GenericToggle",
+            "Parameters": {
+              "Type": "Switch",
+              "LUAInitializeFunction": "InitDevMode"
+            },
+            "Tooltip": "developer_mode_tooltip"
+          },
+          {
+            "Name": "logging_level",
+            "Key": "developer_general_loggingLevel",
+            "DefaultValue": "false",
+            "ClassName": "GenericToggle",
+            "Tooltip": "logging_level_tooltip"
+          },
+          {
+            "Name": "tooltip_options",
+            "Key": "video_general_tooltip_options",
+            "DefaultValue": "1,1,1,1,1",
+            "ClassName": "TooltipOptionsMultiSelect",
+            "Tooltip": "tooltip_options_tooltip"
+          }
+        ],
+        "console": [
+          {
+            "Name": "scroll_sensitivity",
+            "Key": "developer_console_scrollSensitivity",
+            "DefaultValue": "6",
+            "ClassName": "DeveloperConsoleSlider",
+            "Parameters": {
+              "WholeNumbers": "true",
+              "MinimumValue": "5",
+              "MaximumValue": "15"
+            },
+            "Tooltip": "scroll_sensitivity_tooltip"
+          },
+          {
+            "Name": "time_stamps",
+            "Key": "developer_console_timeStamp",
+            "DefaultValue": "false",
+            "ClassName": "DeveloperConsoleToggle",
+            "Tooltip": "time_stamps_tooltip"
+          },
+          {
+            "Name": "console_enable",
+            "Key": "developer_console_enableDevConsole",
+            "DefaultValue": "true",
+            "ClassName": "DeveloperConsoleToggle",
+            "Parameters": {
+              "Type": "Switch"
+            },
+            "Tooltip": "console_enable_tooltip"
+          },
+          {
+            "Name": "font_size",
+            "Key": "developer_console_fontSize",
+            "DefaultValue": "15",
+            "ClassName": "DeveloperConsoleSlider",
+            "Parameters": {
+              "WholeNumbers": "true",
+              "MinimumValue": "12",
+              "MaximumValue": "20"
+            },
+            "Tooltip": "font_size_tooltip"
+          }
+        ],
+        "utilities": [
+          {
+            "Name": "performance_hud",
+            "Key": "developer_utilities_performanceHUD",
+            "DefaultValue": "none",
+            "ClassName": "PerformanceHUDComboBox",
+            "Tooltip": "performance_hud_tooltip"
+          }
+        ]
+      }
+    }
+  }
+}

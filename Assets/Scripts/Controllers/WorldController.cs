@@ -12,9 +12,9 @@ using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
+using ProjectPorcupine.Mouse;
 using Scheduler;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 [MoonSharpUserData]
 public class WorldController : MonoBehaviour
@@ -67,14 +67,24 @@ public class WorldController : MonoBehaviour
 
     #endregion
 
+    public GameObject CircleCursorPrefab
+    {
+        get
+        {
+            return circleCursorPrefab;
+        }
+    }
+
     public void OnEnable()
     {
-        if (Instance != null)
+        if (Instance == null || Instance == this)
+        {
+            Instance = this;
+        }
+        else
         {
             UnityDebugger.Debugger.LogError("WorldController", "There should never be two world controllers.");
         }
-
-        Instance = this;
 
         new FunctionsManager();
         new PrototypeManager();
@@ -89,6 +99,9 @@ public class WorldController : MonoBehaviour
                 (evt) => UnityDebugger.Debugger.LogFormat("Scheduler", "Event {0} fired", evt.Name)));
 
         ModsManager = new ModsManager();
+
+        // Reload incase any mods have changed settings
+        Settings.LoadSettings();
 
         if (SceneController.LoadWorldFromFileName != null)
         {
@@ -119,11 +132,14 @@ public class WorldController : MonoBehaviour
 
         BuildModeController = new BuildModeController();
         SpawnInventoryController = new SpawnInventoryController();
-        MouseController = new MouseController(BuildModeController, FurnitureSpriteController, UtilitySpriteController, circleCursorPrefab);
+        MouseController = new MouseController();
         QuestController = new QuestController();
         CameraController = new CameraController();
         TradeController = new TradeController();
         AutosaveManager = new AutosaveManager();
+
+        MouseController.RegisterModeHandler(MouseMode.BUILD, BuildModeController);
+        MouseController.RegisterModeHandler(MouseMode.INVENTORY, SpawnInventoryController);
 
         // Register inputs actions
         KeyboardManager.Instance.RegisterInputAction("DevMode", KeyboardMappedInputType.KeyDown, ChangeDevMode);

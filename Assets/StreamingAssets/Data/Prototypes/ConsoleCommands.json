@@ -1,0 +1,273 @@
+{
+  "ConsoleCommand": {
+    "SetTimeStamp": {
+      "Description": "Sets the time stamp",
+      "Parameters": "Boolean on",
+      "FunctionName": "SetTimeStamp",
+      "Tags": [
+        "Console",
+        "UI"
+      ]
+    },
+    "CameraPos": {
+      "Description": "Changes the camera position to the one provided",
+      "Parameters": "Vector3 NewPos",
+      "FunctionName": "ChangeCameraPosition",
+      "DefaultValue": "'Center'",
+      "Tags": [
+        "Camera"
+      ]
+    },
+    "Run_LUA": {
+      "Description": "Runs the string as LUA",
+      "Parameters": "String luaText",
+      "FunctionName": "Run_LUA",
+      "Tags": [
+        "LUA",
+        "Modding",
+        "Compile"
+      ]
+    },
+    "SetCharacterHealth": {
+      "Description": "Sets the character's health to the value provided",
+      "Parameters": "String name, Single health",
+      "FunctionName": "SetCharacterHealth",
+      "Tags": [
+        "Character",
+        "Health"
+      ]
+    },
+    "DamageCharacter": {
+      "Description": "Damages the character by the amount provided",
+      "Parameters": "String name, Single amount",
+      "FunctionName": "DamageCharacter",
+      "Tags": [
+        "Character",
+        "Health"
+      ]
+    },
+    "CharacterHealthSystemSet": {
+      "Description": "Sets the character's health system",
+      "Parameters": "String name, Single hp, Boolean overheal, Boolean healable, Boolean invincible, Boolean revivable",
+      "FunctionName": "CharacterHealthSystemSet",
+      "Tags": [
+        "Character",
+        "Health"
+      ]
+    },
+    "CharacterClearStateQueue": {
+      "Description": "Clears the characters state queue",
+      "Parameters": "String name",
+      "FunctionName": "CharacterClearStateQueue",
+      "Tags": [
+        "Character",
+        "State"
+      ]
+    },
+    "ClearAllStateQueues": {
+      "Description": "Clears all character's state queues",
+      "FunctionName": "AllCharactersClearStateQueue",
+      "Tags": [
+        "Character",
+        "State"
+      ]
+    },
+    "AddCurrency": {
+      "Description": "Adds the specified amount of currency",
+      "Parameters": "String currencyName, Single amount",
+      "FunctionName": "AddCurrency",
+      "Tags": [
+        "Currency"
+      ]
+    },
+    "ConsumeInventory": {
+      "Description": "Consumes the inventory at the position",
+      "Parameters": "Vector3 pos, Int32 amount",
+      "FunctionName": "ConsumeInventory",
+      "Tags": [
+        "Inventory"
+      ]
+    },
+    "PlaceInventory": {
+      "Description": "Places an inventory item at the position provided",
+      "Parameters": "Vector3 pos, String type, Vector2 stackSizeRange",
+      "FunctionName": "PlaceInventory",
+      "Tags": [
+        "Inventory",
+        "Build"
+      ]
+    },
+    "PlaceInventoryAtCharacter": {
+      "Description": "Places inventory ",
+      "Parameters": "String characterName, Int32 amount, String type, Vector2 stackSizeRange",
+      "FunctionName": "PlaceInventoryAmount",
+      "Tags": [
+        "Character",
+        "Inventory",
+        "Build"
+      ]
+    },
+    "RemoveInventory": {
+      "Description": "Removes inventory",
+      "Parameters": "string type, Int32 amount, Boolean onlyFromStockpiles",
+      "FunctionName": "RemoveInventoryOfType",
+      "Tags": [
+        "Inventory"
+      ]
+    },
+    "PlaceFurniture": {
+      "Description": "Places furniture",
+      "Parameters": "string type, Vector3 pos, Single rotation",
+      "FunctionName": "PlaceFurniture",
+      "Tags": [
+        "Furniture",
+        "Build"
+      ]
+    },
+    "IsWorkSpotClear": {
+      "Description": "Is the work spot clear?",
+      "Parameters": "string type, Vector3 pos",
+      "FunctionName": "IsWorkSpotClear",
+      "Tags": [
+        "Work",
+        "Check"
+      ]
+    },
+    "IsPlacementValid": {
+      "Description": "Is the placement spot valid",
+      "Parameters": "string type, Vector3 pos, Single rotation",
+      "FunctionName": "IsPlacementValid",
+      "Tags": [
+        "Check",
+        "Build"
+      ]
+    },
+    "GetTemperature": {
+      "Description": "Gets the temperature at the position",
+      "Parameters": " Vector3 pos",
+      "FunctionName": "GetTemperature",
+      "DefaultValue": "'Center'",
+      "Tags": [
+        "Temperature"
+      ]
+    },
+    "GetThermalDiffusivity": {
+      "Description": "Gets the thermal diffusivity at the position",
+      "Parameters": "Vector3 pos",
+      "FunctionName": "GetThermalDiffusivity",
+      "DefaultValue": "{Center}",
+      "Tags": [
+        "Temperature"
+      ]
+    },
+    "FloodFillRoom": {
+      "Description": "Floods fills the room at the position provided",
+      "Parameters": "Vector3 pos",
+      "FunctionName": "FloodFillRoomAt",
+      "DefaultValue": "'Center'",
+      "Tags": [
+        "Room"
+      ]
+    },
+    "GetAllRoomIDs": {
+      "Description": "Logs all the room ids",
+      "FunctionName": "GetAllRoomIDs",
+      "Tags": [
+        "Room"
+      ]
+    },
+    "DevMode": {
+      "Description": "Turns dev mode on/off.",
+      "Parameters": "Boolean isOn",
+      "FunctionName": "DevMode",
+      "DefaultValue": "true",
+      "Tags": [
+        "Developer"
+      ]
+    },
+    "NewCharacter": {
+      "Description": "Creates a new character at the position provided",
+      "Parameters": "Vector3 pos, string name",
+      "FunctionName": "NewCharacter",
+      "DefaultValue": "{Center}, \"\"",
+      "Tags": [
+        "Character"
+      ]
+    },
+    "DoBuild": {
+      "Description": "Builds the object provided at the position passed in",
+      "Parameters": "Int32 buildMode, string type, Vector3 pos",
+      "DetailedDescription": "Does build mode using the furniture/floor/whatever type provided at position pos.  The options for build mode are: FLOOR = 0, ROOMBEHAVIOUR= 1, FURNITURE= 2, UTILITY = 3, and DECONSTRUCT= 4",
+      "FunctionName": "DoBuild",
+      "Tags": [
+        "Build"
+      ]
+    },
+    "InvalidateTileGraph": {
+      "Description": "Invalidates the tile graph",
+      "FunctionName": "InvalidateTileGraph",
+      "Tags": [
+        "Check"
+      ]
+    },
+    "GetCharacterNames": {
+      "Description": "Logs all the character's names",
+      "FunctionName": "GetCharacterNames",
+      "Tags": [
+        "Character"
+      ]
+    },
+    "SetRoomGas": {
+      "Description": "Sets the gas in the room",
+      "Parameters": "Int32 roomID, string gasName, Single pressure",
+      "FunctionName": "SetRoomGas",
+      "Tags": [
+        "Room",
+        "Gas"
+      ]
+    },
+    "SetAllRoomGas": {
+      "Description": "Sets the gas in all rooms",
+      "Parameters": "string gasName, Single pressure",
+      "FunctionName": "SetAllRoomGas",
+      "Tags": [
+        "Room",
+        "Gas"
+      ]
+    },
+    "FillRoomWithAir": {
+      "Description": "Set's the room's gasses to standard atmosphere (20/80 O2/N2 mix)",
+      "Parameters": "Int32 roomID",
+      "FunctionName": "FillRoomWithAir",
+      "Tags": [
+        "Room",
+        "Gas"
+      ]
+    },
+    "FillAllRoomsWithAir": {
+      "Description": "Set's all rooms' gasses to standard atmosphere (20/80 O2/N2 mix)\"",
+      "FunctionName": "FillAllRoomsWithAir",
+      "Tags": [
+        "Room",
+        "Gas"
+      ]
+    },
+    "EmptyRoom": {
+      "Description": "Empties the room's atmosphere",
+      "Parameters": "Int32 roomID",
+      "FunctionName": "EmptyRoom",
+      "Tags": [
+        "Room",
+        "Gas"
+      ]
+    },
+    "EmptyAllRooms": {
+      "Description": "Empties all rooms' atmosphere",
+      "FunctionName": "EmptyAllRooms",
+      "Tags": [
+        "Room",
+        "Gas"
+      ]
+    }
+  }
+}

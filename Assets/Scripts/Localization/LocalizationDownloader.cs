@@ -10,7 +10,10 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Xml;
+
 using ICSharpCode.SharpZipLib.Zip;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace ProjectPorcupine.Localization
@@ -46,10 +49,8 @@ namespace ProjectPorcupine.Localization
     /// </summary>
     public static class LocalizationDownloader
     {
-        // TODO: Change this to the official repo before PR.
         private static readonly string LocalizationRepositoryZipLocation = "https://github.com/OrderOfThePorcupine/Localization/archive/" + GameController.GameVersion + ".zip";
 
-        // TODO: Change this to the official repo before PR.
         private static readonly string LastCommitGithubApiLocation = "https://api.github.com/repos/OrderOfThePorcupine/Localization/commits/" + GameController.GameVersion;
 
         private static readonly string LocalizationFolderPath = Path.Combine(Application.streamingAssetsPath, "Localization");
@@ -347,9 +348,7 @@ namespace ProjectPorcupine.Localization
         }
 
         /// <summary>
-        /// This is a really wonky way of parsing JSON. I didn't want to include something like
-        /// Json.NET library purely for this functionality but if we will be using it somewhere else
-        /// this need to change. DO NOT TOUCH and this will be fine.
+        /// Parses the JSON and returns the sha value.
         /// </summary>
         /// <param name="githubApiResponse">GitHub API response.</param>
         /// <returns></returns>
@@ -360,49 +359,8 @@ namespace ProjectPorcupine.Localization
                 throw new ArgumentNullException("githubApiResponse");
             }
 
-            string hashSearchPattern = "sha\":\"";
-
-            // Index of the first char of hash. 
-            int index = githubApiResponse.IndexOf(hashSearchPattern);
-
-            if (index == -1)
-            {
-                // Either the response was damaged or GitHub API returned an error.
-                throw new Exception("Error at parsing JSON - sha\":\" not found.");
-            }
-
-            // hashSearchPattern length
-            index += 6;
-
-            // + 1 for that while loop first run.
-            if (index + 1 >= githubApiResponse.Length - 1)
-            {
-                // Either the response was damaged or GitHub API returned an error.
-                throw new Exception("Error at parsing JSON - githubApiResponse too short.");
-            }
-
-            char currentChar = githubApiResponse[index];
-
-            // Hash of the commit.
-            string hash = string.Empty;
-
-            // Get the commit hash
-            do
-            {
-                hash += currentChar;
-                index++;
-                currentChar = githubApiResponse[index];
-
-                // Check if this is the end of the commit string.
-                if (index + 1 == githubApiResponse.Length - 1)
-                {
-                    // Either the response was damaged or GitHub API returned an error.
-                    throw new Exception("Error at parsing JSON - hash closing tag not found.");
-                }
-            }
-            while (currentChar != '\"');
-
-            return hash;
+            JObject json = JObject.Parse(githubApiResponse);
+            return (string)json["sha"];
         }
     }
 }

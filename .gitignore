@@ -24,7 +24,12 @@ ExportedObj/
 *.pidb
 *.booproj
 *.svd
-
+*.userosscache
+*.sln.docstates
+*.userprefs
+/.vs/
+/.vscode/
+Packages/
 
 # Unity3D generated meta files
 *.pidb.meta
@@ -38,6 +43,7 @@ sysinfo.txt
 
 # StyleCop
 **StyleCop.Cache*
+StyleCopViolations.xml
 
 # Localization files
 /Assets/StreamingAssets/Localization/*

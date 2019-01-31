@@ -77,7 +77,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         bool explicitSpriteUsed;
         string spriteName = furniture.GetSpriteName(out explicitSpriteUsed);
 
-        if (string.IsNullOrEmpty(furniture.LinksToNeighbour) || explicitSpriteUsed)
+        if (string.IsNullOrEmpty(furniture.LinksToNeighbours) || explicitSpriteUsed)
         {
             return SpriteManager.GetSprite("Furniture", spriteName);
         }
@@ -191,9 +191,9 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
 
         UpdateIconObjectsVisibility(furniture, childObjects);
 
-        if (furniture.Animation != null)
+        if (furniture.Animations != null)
         {
-            furniture.Animation.Renderer = sr;
+            furniture.Animations.Renderer = sr;
         }
 
         // Register our callback so that our GameObject gets updated whenever
@@ -236,9 +236,9 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         }
 
         // don't change sprites on furniture with animations
-        if (furn.Animation != null)
+        if (furn.Animations != null)
         {
-            furn.Animation.OnFurnitureChanged();
+            furn.Animations.OnFurnitureChanged();
             return;
         }
 
@@ -312,7 +312,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
     private string GetSuffixForNeighbour(Furniture furn, int x, int y, int z, string suffix)
     {
         Tile t = world.GetTileAt(x, y, z);
-        if (t != null && t.Furniture != null && t.Furniture.LinksToNeighbour == furn.LinksToNeighbour)
+        if (t != null && t.Furniture != null && t.Furniture.LinksToNeighbours == furn.LinksToNeighbours)
         {
             return suffix;
         }

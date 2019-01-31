@@ -108,7 +108,7 @@ namespace DeveloperConsole.Core
 
             for (int i = 0; i < consoleCommands.Length; i++)
             {
-                text += "\n<color=orange>" + consoleCommands[i].Title + DevConsole.GetParameters(consoleCommands[i]) + "</color>" + (consoleCommands[i].DescriptiveText == null ? string.Empty : " //" + consoleCommands[i].DescriptiveText);
+                text += "\n<color=orange>" + consoleCommands[i].Title + DevConsole.GetParameters(consoleCommands[i]) + "</color>" + (consoleCommands[i].Description == null ? string.Empty : " //" + consoleCommands[i].Description);
             }
 
             DevConsole.Log(text);

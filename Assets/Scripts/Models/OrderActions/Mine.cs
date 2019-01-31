@@ -22,21 +22,6 @@ namespace ProjectPorcupine.OrderActions
 
         private Mine(Mine other) : base(other)
         {
-            JobInfo = other.JobInfo;
-        }
-
-        [XmlElement("Job")]
-        public JobInformation JobInfo { get; set; }
-
-        public override void Initialize(string type)
-        {
-            base.Initialize(type);
-
-            // if there is no JobInfo defined, use defaults (time=0, ...)
-            if (JobInfo == null)
-            {
-                JobInfo = new JobInformation();
-            }
         }
 
         public override OrderAction Clone()
@@ -46,7 +31,7 @@ namespace ProjectPorcupine.OrderActions
 
         public override Job CreateJob(Tile tile, string type)
         {
-            Job job = CheckJobFromFunction(JobInfo.FromFunction, tile.Furniture);
+            Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
 
             return job;
         }

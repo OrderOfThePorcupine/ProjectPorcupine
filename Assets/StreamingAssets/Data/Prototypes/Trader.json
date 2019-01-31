@@ -1,0 +1,85 @@
+{
+  "Trader": {
+    "Wire Inc.": {
+      "PotentialNames": [
+        "Wire Inc.",
+        "Connectron Corp."
+      ],
+      "MinCurrencyBalance": 1000.0,
+      "MaxCurrencyBalance": 5000.0,
+      "CurrencyName": "Quill Corp Bucks",
+      "MinSaleMarginMultiplier": 1.2,
+      "MaxSaleMarginMultiplier": 1.5,
+      "PotentialStock": [
+        {
+          "Category": "inv_cat_raw",
+          "MinQuantity": 100,
+          "MaxQuantity": 150
+        }
+      ],
+      "Animations": {
+        "idle": {
+          "Delay": 1.0,
+          "Loops": false,
+          "Frames": [
+            "BasicHaulShip"
+          ]
+        },
+        "flying": {
+          "Delay": 4.0,
+          "Frames": [
+            "BasicHaulShip_01",
+            "BasicHaulShip_02"
+          ]
+        }
+      }
+    },
+    "Raw Depot": {
+      "PotentialNames": [
+        "Raw Depot",
+        "Miners Delight"
+      ],
+      "MinCurrencyBalance": 200.0,
+      "MaxCurrencyBalance": 1500.0,
+      "CurrencyName": "Inter-Galactic Credits",
+      "MinSaleMarginMultiplier": 1.2,
+      "MaxSaleMarginMultiplier": 1.3,
+      "PotentialStock": [
+        {
+          "Type": "Uranium",
+          "MinQuantity": 100,
+          "MaxQuantity": 150,
+          "Rarity": 0.1
+        },
+        {
+          "Type": "Raw Iron",
+          "MinQuantity": 2000,
+          "MaxQuantity": 3000,
+          "Rarity": 0.3
+        },
+        {
+          "Type": "Ice",
+          "MinQuantity": 1000,
+          "MaxQuantity": 2500,
+          "Rarity": 0.8
+        }
+      ],
+      "Animations": {
+        "idle": {
+          "Delay": 1.0,
+          "Loops": false,
+          "Frames": [
+            "BasicHaulShip"
+          ]
+        },
+        "flying": {
+          "Delay": 4.0,
+          "Frames": [
+            "BasicHaulShip_01",
+            "BasicHaulShip_02"
+          ]
+        }
+      }
+    }
+  }
+}

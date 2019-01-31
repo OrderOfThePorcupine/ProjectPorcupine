@@ -19,7 +19,7 @@ public class KeyboardManager
 
     private Dictionary<string, KeyboadMappedInput> mapping;
 
-    public KeyboardManager()
+    private KeyboardManager()
     {
         instance = this;
         mapping = new Dictionary<string, KeyboadMappedInput>();
@@ -106,7 +106,8 @@ public class KeyboardManager
         RegisterInputMapping("DevMode", KeyboardInputModifier.None, KeyCode.F12);
         RegisterInputMapping("DevConsole", KeyboardInputModifier.Control, KeyCode.BackQuote);
 
-        RegisterInputMapping("ToggleCursorTextBox", KeyboardInputModifier.Control, KeyCode.M);
+        RegisterInputMapping("Escape", KeyboardInputModifier.None, KeyCode.Escape);
+        RegisterInputMapping("ToggleCoords", KeyboardInputModifier.Control, KeyCode.M);
     }
 
     /// <summary>

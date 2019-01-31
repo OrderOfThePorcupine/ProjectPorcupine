@@ -139,6 +139,9 @@ public class JobQueue
                 else if ((job.RequestedItems.Count > 0) && !job.CanGetToInventory(character))
                 {
                     job.AddCharCantReach(character);
+
+                    // Is this a bug?  Or a warning
+                    // @ Decide
                     UnityDebugger.Debugger.LogError("JobQueue", "Character could not find a path to any inventory available.");
                     ReInsertHelper(job);
                     continue;

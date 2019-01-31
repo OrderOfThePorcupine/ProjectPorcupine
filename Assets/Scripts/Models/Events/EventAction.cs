@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// This class handles LUA actions take in response to events triggered within C# or LUA. For each event name (e.g. OnUpdate, ...) there
@@ -61,6 +62,30 @@ public class EventActions
         }
 
         Register(name, functionName);
+    }
+
+    /// <summary>
+    /// Fill the values of this from Json.
+    /// </summary>
+    /// <param name="eventActionsToken">JToken pointing to an Action tag.</param>
+    public void ReadJson(JToken eventActionsToken)
+    {
+        if (eventActionsToken == null)
+        {
+            return;
+        }
+
+        foreach (JProperty eventAction in eventActionsToken)
+        {
+            string name = eventAction.Name;
+
+            // TODO: this could possibly be converted over to use tools from PrototpeReader
+            foreach (JToken function in (JArray)eventAction.Value)
+            {
+                string functionName = (string)function;
+                Register(name, functionName);
+            }
+        }
     }
 
     /// <summary>

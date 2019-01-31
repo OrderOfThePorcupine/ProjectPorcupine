@@ -1,0 +1,39 @@
+{
+  "RoomBehavior": {
+    "airlock": {
+	  "Requirements": [
+	    {
+		  "Furniture":{ 
+			"Type": "pump_air",
+			"Count": 1
+		  }
+		},
+		{
+		  "Furniture":{ 
+			"TypeTag": "Pressure Door",
+			"Count": 2
+		  }
+		},
+		{
+		  "Size": 3
+		}
+	  ],
+      "EventActions": {
+        "OnControl": [
+          "OnControl_Airlock"
+        ],
+        "PumpOut": [
+          "PumpOut_Airlock"
+        ],
+        "PumpIn": [
+          "PumpIn_Airlock"
+        ],
+        "PumpOff": [
+          "PumpOff_Airlock"
+        ]
+      },
+      "LocalizationName": "roombehavior_airlock",
+      "LocalizationDescription": "roombehavior_airlock_desc"
+    }
+  }
+}

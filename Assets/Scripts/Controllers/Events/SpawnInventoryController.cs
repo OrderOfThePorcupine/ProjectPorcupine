@@ -7,13 +7,16 @@
 // ====================================================
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
+using ProjectPorcupine.Mouse;
 using UnityEngine;
 using UnityEngine.UI;
 
 [MoonSharp.Interpreter.MoonSharpUserData]
-public class SpawnInventoryController
+public class SpawnInventoryController : IMouseHandler
 {
     private GameObject spawnUI;
 
@@ -26,6 +29,24 @@ public class SpawnInventoryController
     public string InventoryToBuild { get; protected set; }
 
     public int AmountToCreate { get; protected set; }
+
+    public Inventory CurrentInventory { get; protected set; }
+
+    public bool DisableDragging
+    {
+        get
+        {
+            return true;
+        }
+    }
+
+    public MouseHandlerCallbacks CallbacksEnabled
+    {
+        get
+        {
+            return MouseHandlerCallbacks.HANDLE_CLICK | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL;
+        }
+    }
 
     public void HideUI()
     {
@@ -50,8 +71,6 @@ public class SpawnInventoryController
             return;
         }
 
-        Inventory inventoryChange = new Inventory(InventoryToBuild, AmountToCreate);
-
         // You can't spawn on occupied tiles
         if (t.Furniture != null)
         {
@@ -60,15 +79,86 @@ public class SpawnInventoryController
 
         if (t.Inventory == null || t.Inventory.Type == InventoryToBuild)
         {
-            World.Current.InventoryManager.PlaceInventory(t, inventoryChange);
+            World.Current.InventoryManager.PlaceInventory(t, CurrentInventory);
         }
     }
 
+    public void HandleClick(Vector2 position, int mouseKey)
+    {
+        if (mouseKey == 0 && SettingsKeyHolder.DeveloperMode)
+        {
+            Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
+            SpawnInventory(t);
+        }
+    }
+
+    public void HandleTooltip(Vector2 position, MouseCursor cursor, bool isDragging)
+    {
+        cursor.Reset();
+        cursor.DisplayCursorInfo(TextAnchor.MiddleRight, AmountToCreate + "x " + InventoryToBuild, MouseCursor.TextColor, false);
+    }
+
+    public List<GameObject> HandleDragVisual(MouseController.DragParameters parameters, Transform parent)
+    {
+        List<GameObject> objects = new List<GameObject>();
+
+        if (parameters.EndX != parameters.StartX)
+        {
+            // We should NEVER reach here, the disable dragging means that this should NEVER be true
+            throw new ArgumentException("Parameters Start X/Y values should Equal End X/Y values, this is taken care by the DisableDragging = true property.");
+        }
+
+        Tile t = WorldController.Instance.World.GetTileAt(parameters.StartX, parameters.StartY, WorldController.Instance.CameraController.CurrentLayer);
+        if (t != null)
+        {
+            // Show generic visuals
+            GameObject go = new GameObject();
+            go.transform.SetParent(parent);
+            go.transform.position = new Vector3(parameters.StartX, parameters.StartY);
+
+            if (t.Furniture == null && (t.Inventory == null || t.Inventory.Type == InventoryToBuild) && t.Type != TileType.Empty)
+            {
+                InventorySpriteController.SetSprite(go, CurrentInventory).color = Color.green; // = new Color(0.5f, 1f, 0.5f, 0.25f);
+            }
+            else
+            {
+                InventorySpriteController.SetSprite(go, CurrentInventory).color = Color.red; // new Color(1f, 0.5f, 0.5f, 0.25f);
+            }
+
+            objects.Add(go);
+        }
+
+        return objects;
+    }
+
+    #region InvalidOperations
+
+    /// <summary>
+    /// NOT IMPLEMENTED BY SPAWN INVENTORY CONTROLLER.  Will throw on call.
+    /// NOT MEANT TO BE CALLED.
+    /// </summary>
+    public void HandleDragFinished(MouseController.DragParameters parameters)
+    {
+        throw new InvalidOperationException("Not supported by this class");
+    }
+
+    /// <summary>
+    /// NOT IMPLEMENTED BY SPAWN INVENTORY CONTROLLER.  Will throw on call.
+    /// NOT MEANT TO BE CALLED.
+    /// </summary>
+    public Vector3 HandlePlacingPosition(Vector3 position)
+    {
+        throw new InvalidOperationException("Not supported by this class");
+    }
+    #endregion
+
     private void CreateSpawnUI()
     {
-        spawnUI = new GameObject();
-        spawnUI.name = "Spawn Inventory UI";
-        spawnUI.layer = LayerMask.NameToLayer("UI");
+        spawnUI = new GameObject()
+        {
+            name = "Spawn Inventory UI",
+            layer = LayerMask.NameToLayer("UI")
+        };
 
         Canvas canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         spawnUI.transform.SetParent(canvas.transform, false);
@@ -95,9 +185,11 @@ public class SpawnInventoryController
     {
         foreach (Inventory inventory in PrototypeManager.Inventory.Values.OrderByDescending(inv => inv.Category))
         {
-            GameObject inventorySlot_go = new GameObject();
-            inventorySlot_go.name = "Slot - " + inventory.Type;
-            inventorySlot_go.layer = LayerMask.NameToLayer("UI");
+            GameObject inventorySlot_go = new GameObject()
+            {
+                name = "Slot - " + inventory.Type,
+                layer = LayerMask.NameToLayer("UI")
+            };
 
             inventorySlot_go.transform.SetParent(spawnUI.transform);
 
@@ -125,9 +217,11 @@ public class SpawnInventoryController
     {
         foreach (int amount in amounts)
         {
-            GameObject button_go = new GameObject();
-            button_go.name = "Button";
-            button_go.layer = LayerMask.NameToLayer("UI");
+            GameObject button_go = new GameObject()
+            {
+                name = "Button",
+                layer = LayerMask.NameToLayer("UI")
+            };
 
             button_go.AddComponent<Image>();
 
@@ -150,9 +244,11 @@ public class SpawnInventoryController
 
     private GameObject CreateTextComponent(GameObject go, string invName, TextAnchor textAnchor)
     {
-        GameObject text_go = new GameObject();
-        text_go.name = "Text";
-        text_go.layer = LayerMask.NameToLayer("UI");
+        GameObject text_go = new GameObject()
+        {
+            name = "Text",
+            layer = LayerMask.NameToLayer("UI")
+        };
 
         RectTransform rectTransform = text_go.AddComponent<RectTransform>();
         rectTransform.SetParent(go.transform);
@@ -178,6 +274,7 @@ public class SpawnInventoryController
     {
         InventoryToBuild = invName;
         AmountToCreate = amount;
-        WorldController.Instance.MouseController.StartSpawnMode();
+        CurrentInventory = new Inventory(InventoryToBuild, AmountToCreate);
+        WorldController.Instance.MouseController.ChangeMouseMode(MouseMode.INVENTORY);
     }
 }

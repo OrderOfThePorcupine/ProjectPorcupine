@@ -6,7 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
@@ -62,17 +61,6 @@ public class SettingsMenu : MonoBehaviour
         else
         {
             DisplayCategory("No Settings Loaded");
-        }
-
-        RectTransform rectTransform = instance.mainRoot.GetComponent<RectTransform>();
-        if (rectTransform.sizeDelta.x > Screen.width * 0.8f)
-        {
-            rectTransform.sizeDelta = new Vector2(Screen.width * 0.8f, rectTransform.sizeDelta.y);
-        }
-
-        if (rectTransform.sizeDelta.y > Screen.height * 0.8f)
-        {
-            rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, Screen.height * 0.8f);
         }
     }
 
@@ -146,7 +134,12 @@ public class SettingsMenu : MonoBehaviour
                     if (instance.options[instance.currentCategory][headingName][i] != null)
                     {
                         BaseSettingsElement element = instance.options[instance.currentCategory][headingName][i];
-                        heading.AddObjectToRoot(element.InitializeElement());
+                        GameObject go = element.InitializeElement();
+                        TooltipComponent tc = go.AddComponent<TooltipComponent>();
+                        tc.Tooltip = element.option.tooltip;
+                        tc.UseHeavyTextMode = true;
+
+                        heading.AddObjectToRoot(go);
                         element.valueChanged = false;
                     }
                 }
@@ -348,9 +341,9 @@ public class SettingsMenu : MonoBehaviour
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.ClassName, true);
+                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.Type, true);
                     element.option = keyValuePair.Value[j];
-                    element.parameterData = keyValuePair.Value[j].classData.ParameterData;
+                    element.parameterData = keyValuePair.Value[j].classData.Parameters;
                     element.InitializeLUA();
                     options[categories[i].Type][keyValuePair.Key][j] = element;
                 }

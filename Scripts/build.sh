@@ -36,10 +36,13 @@ echo "Attempting to build $project for Linux"
 echo 'Logs from build'
 cat $(pwd)/unity.log
 
-echo 'Attempting to zip builds'
+echo 'Attempting to zip builds for week $BUILD_VERSION'
 cd $(pwd)/Build/
+echo 'Attempting to zip linux'
 zip -q -r Linux-$BUILD_VERSION.zip linux/
+echo 'Attempting to zip osx'
 zip -q -r MacOSX-$BUILD_VERSION.zip osx/
+echo 'Attempting to zip windows'
 zip -q -r Windows-$BUILD_VERSION.zip windows/
 cd -
 

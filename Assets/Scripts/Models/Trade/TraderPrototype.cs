@@ -6,10 +6,12 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using Animation;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class TraderPrototype : IPrototypable
@@ -32,9 +34,7 @@ public class TraderPrototype : IPrototypable
 
     public List<TraderPotentialInventory> PotentialStock { get; set; }
 
-    public SpritenameAnimation AnimationIdle { get; set; }
-
-    public SpritenameAnimation AnimationFlying { get; set; }
+    public Dictionary<string, SpritenameAnimation> Animations { get; set; }
 
     /// <summary>
     /// Value from 0 to 1, higher value represent higher availability of the trade resource.
@@ -124,6 +124,26 @@ public class TraderPrototype : IPrototypable
             }
         }
     }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+        PotentialNames = new List<string>(PrototypeReader.ReadJsonArray<string>(innerJson["PotentialNames"]));
+
+        CurrencyName = PrototypeReader.ReadJson(CurrencyName, innerJson["CurrencyName"]);
+        MinCurrencyBalance = PrototypeReader.ReadJson(MinCurrencyBalance, innerJson["MinCurrencyBalance"]);
+        MaxCurrencyBalance = PrototypeReader.ReadJson(MaxCurrencyBalance, innerJson["MaxCurrencyBalance"]);
+        MinSaleMarginMultiplier = PrototypeReader.ReadJson(MinSaleMarginMultiplier, innerJson["MinSaleMarginMultiplier"]);
+        MaxSaleMarginMultiplier = PrototypeReader.ReadJson(MaxSaleMarginMultiplier, innerJson["MaxSaleMarginMultiplier"]);
+        PotentialStock = PrototypeReader.ReadTraderPotentialInventory(innerJson["PotentialStock"]);
+
+        Animations = PrototypeReader.ReadAnimations(innerJson["Animations"]);
+    }
     
     /// <summary>
     /// Create a random Trader out of this TraderPrototype.
@@ -202,15 +222,8 @@ public class TraderPrototype : IPrototypable
                     }
                 }
 
-                switch (state)
-                {
-                    case "idle":
-                        AnimationIdle = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
-                        break;
-                    case "flying":
-                        AnimationFlying = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
-                        break;
-                }
+                SpritenameAnimation animation = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
+                Animations.Add(state, animation);
             }
         }
     }

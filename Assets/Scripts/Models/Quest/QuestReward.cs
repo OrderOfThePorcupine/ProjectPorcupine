@@ -6,8 +6,10 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 
 [MoonSharpUserData]
 public class QuestReward
@@ -35,6 +37,18 @@ public class QuestReward
                     Parameters = Parameter.ReadXml(reader);
                     break;
             }
+        }
+    }
+
+    public void ReadJsonPrototype(JToken token)
+    {
+        if (token != null)
+        {
+            Description = PrototypeReader.ReadJson(Description, token["Description"]);
+            OnRewardLuaFunction = PrototypeReader.ReadJson(OnRewardLuaFunction, token["OnRewardLuaFunction"]);
+
+            Parameters = new Parameter();
+            Parameters.FromJson(token["Parameters"]);
         }
     }
 }
