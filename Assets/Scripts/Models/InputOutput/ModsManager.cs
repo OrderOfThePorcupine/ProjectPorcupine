@@ -205,9 +205,16 @@ public class ModsManager
             // This *should* handle tags spread across multiple files, multiple tags in a single file, and multiple handlers per type.
             foreach (JToken prototypeGroup in protoJson)
             {
-                foreach (Action<JProperty> handler in prototypeHandlers[tagName])
+                if (prototypeHandlers.ContainsKey(tagName))
                 {
-                    handler((JProperty)prototypeGroup);
+                    foreach (Action<JProperty> handler in prototypeHandlers[tagName])
+                    {
+                        handler((JProperty)prototypeGroup);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No handler for key " + tagName);
                 }
             }
         }
@@ -290,7 +297,7 @@ public class ModsManager
         }
         else
         {
-            UnityDebugger.Debugger.LogError("Directory at " + directoryPath + " not found");
+            UnityDebugger.Debugger.LogWarning("Directory at " + directoryPath + " not found");
         }
 
         foreach (DirectoryInfo mod in mods)
