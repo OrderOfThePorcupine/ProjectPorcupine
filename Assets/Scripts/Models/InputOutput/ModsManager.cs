@@ -114,7 +114,7 @@ public class ModsManager
     private void LoadIntroFiles()
     {
         LoadDirectoryAssets("MainMenu/Images", SpriteManager.LoadSpriteFiles);
-        LoadDirectoryAssets("MainMenu/Audio", AudioManager.LoadAudioFiles);
+        LoadDirectoryAssets("Audio", AudioManager.LoadAudioFiles);
     }
 
     private void LoadSharedFiles()
