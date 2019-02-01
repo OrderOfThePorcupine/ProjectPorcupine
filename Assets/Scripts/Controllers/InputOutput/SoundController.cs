@@ -42,7 +42,6 @@ public struct DriverInfo
 
 public class SoundController
 {
-    private Dictionary<int, float> cooldowns;
     private VECTOR up;
     private VECTOR forward;
     private VECTOR zero;
