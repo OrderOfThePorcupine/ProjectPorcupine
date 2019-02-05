@@ -3,7 +3,7 @@
 # adapated from: http://blog.stablekernel.com/continuous-integration-for-unity-5-using-travisci
 BASE_URL=http://netstorage.unity3d.com/unity
 HASH=d3101c3b8468
-VERSION=5.6.3f1
+VERSION=2017.2.5f1
 
 download() {
     file=$1
