@@ -1,37 +1,42 @@
 #! /bin/sh
 
-# adapated from: http://blog.stablekernel.com/continuous-integration-for-unity-5-using-travisci
-BASE_URL=http://netstorage.unity3d.com/unity
-HASH=d3101c3b8468
-VERSION=2017.2.5f1
+# See https://unity3d.com/get-unity/download/archive
+# to get download URLs
+UNITY_DOWNLOAD_CACHE="$(pwd)/unity_download_cache"
+UNITY_OSX_PACKAGE_URL="https://download.unity3d.com/download_unity/46dda1414e51/MacEditorInstaller/Unity-2017.2.5f1.pkg"
+UNITY_WINDOWS_TARGET_PACKAGE_URL="https://beta.unity3d.com/download/46dda1414e51/MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-2017.2.5f1.pkg"
 
+
+# Downloads a file if it does not exist
 download() {
-    file=$1
-    url="$BASE_URL/$HASH/$package"
 
-    echo "Downloading from $url: "
-    curl -o `basename "$package"` "$url"
+	URL=$1
+	FILE=`basename "$URL"`
+	
+	# Downloads a package if it does not already exist in cache
+	if [ ! -e $UNITY_DOWNLOAD_CACHE/`basename "$URL"` ] ; then
+		echo "$FILE does not exist. Downloading from $URL: "
+		mkdir -p "$UNITY_DOWNLOAD_CACHE"
+		curl -o $UNITY_DOWNLOAD_CACHE/`basename "$URL"` "$URL"
+	else
+		echo "$FILE Exists. Skipping download."
+	fi
 }
 
+# Downloads and installs a package from an internet URL
 install() {
-    package=$1
-    download "$package"
+	PACKAGE_URL=$1
+	download $1
 
-    echo "Installing "`basename "$package"`
-    sudo installer -dumplog -package `basename "$package"` -target /
+	echo "Installing `basename "$PACKAGE_URL"`"
+	sudo installer -dumplog -package $UNITY_DOWNLOAD_CACHE/`basename "$PACKAGE_URL"` -target /
 }
 
-# See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list
-# of available packages, where PLATFORM is `osx` or `win`
 
-echo 'travis_fold:start:install-unity'
-echo 'Installing Unity.pkg'
-install "MacEditorInstaller/Unity-$VERSION.pkg"
 
-# These packages are only necessary to build the binary for these platforms
-# and at the moment the build should only be done through the cronjob
-if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
-    install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
-    install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
-fi
-echo 'travis_fold:end:install-unity'
+echo "Contents of Unity Download Cache:"
+ls $UNITY_DOWNLOAD_CACHE
+
+echo "Installing Unity..."
+install $UNITY_OSX_PACKAGE_URL
+install $UNITY_WINDOWS_TARGET_PACKAGE_URL
