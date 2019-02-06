@@ -20,7 +20,7 @@ download() {
 		curl -o $UNITY_DOWNLOAD_CACHE/`basename "$URL"` "$URL"
 	else
 		echo "$FILE Exists. Path not included."
-		exit(1)
+		exit 1
 	fi
 }
 
