@@ -1,7 +1,7 @@
 # adapted from: https://github.com/JonathanPorta/ci-build
 
 # Using objective-c since windows build images are not available
-# The chmod-ing may be uneccesary 
+# The chmod-ing may be unnecessary 
 language: objective-c
 osx_image: xcode6.4
 rvm:

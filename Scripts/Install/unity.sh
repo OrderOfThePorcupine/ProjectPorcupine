@@ -1,37 +1,39 @@
 #! /bin/sh
 
-# adapated from: http://blog.stablekernel.com/continuous-integration-for-unity-5-using-travisci
-BASE_URL=http://netstorage.unity3d.com/unity
-HASH=d3101c3b8468
-VERSION=5.6.3f1
+echo "Contents of Unity Download Cache:"
+ls $UNITY_DOWNLOAD_CACHE
+
+echo "Installing Unity..."
+install $UNITY_OSX_PACKAGE_URL
+install $UNITY_WINDOWS_TARGET_PACKAGE_URL
+
+# See https://unity3d.com/get-unity/download/archive
+# to get download version names and hashes
+
+BASE_URL=https://netstorage.unity3d.com/unity
+HASH=588dc79c95ed
+VERSION=2017.2.5f1
 
 download() {
-    file=$1
-    url="$BASE_URL/$HASH/$package"
+  file=$1
+  url="$BASE_URL/$HASH/$package"
 
-    echo "Downloading from $url: "
-    curl -o `basename "$package"` "$url"
+  echo "Downloading from $url: "
+  curl -o `basename "$package"` "$url"
 }
 
 install() {
-    package=$1
-    download "$package"
+  package=$1
+  download "$package"
 
-    echo "Installing "`basename "$package"`
-    sudo installer -dumplog -package `basename "$package"` -target /
+  echo "Installing "`basename "$package"`
+  sudo installer -dumplog -package `basename "$package"` -target /
 }
 
 # See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list
 # of available packages, where PLATFORM is `osx` or `win`
 
-echo 'travis_fold:start:install-unity'
-echo 'Installing Unity.pkg'
 install "MacEditorInstaller/Unity-$VERSION.pkg"
-
-# These packages are only necessary to build the binary for these platforms
-# and at the moment the build should only be done through the cronjob
-if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
-    install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
-    install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
-fi
-echo 'travis_fold:end:install-unity'
+install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
+install "MacEditorTargetInstaller/UnitySetup-Mac-Support-for-Editor-$VERSION.pkg"
+install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
