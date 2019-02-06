@@ -57,7 +57,7 @@ public class World
             Seed = SceneController.Seed;
         }
 
-        Debug.LogWarning("World Seed: " + Seed);
+        UnityDebugger.Debugger.Log("World", "World Seed: " + Seed);
         WorldGenerator.Instance.Generate(this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
