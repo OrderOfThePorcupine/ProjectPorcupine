@@ -102,7 +102,8 @@ fi
 
 
 #TERRIBLE error check logic - Please fix ASAP
-errorCount=$(grep -m 1 "failed" EditorTestResults.xml | head -1 | awk -F"\"" '{print $26}') #find line with 'failed' and returns characters in quote mark delimited "field" 26
+result=$(sed -n 's/<test-run.*result="\([^"]*\).*/\1/p' EditorTestResults.xml)
+errorCount=$(sed -n 's/<test-run.*failed="\([^"]*\).*/\1/p' EditorTestResults.xml)
 
 if [ "$errorCount" != "0" ]; then
     echo "$errorCount" ' unit tests failed!'
@@ -123,22 +124,17 @@ fi
 #    exitStatus=1
 #fi
 
-errorCount=$(grep -m 1 "inconclusive" EditorTestResults.xml | head -1 | awk -F"\"" '{print $28}') #inconlusive tests
 
-if [ "$errorCount" != "0" ]; then
-    echo "$errorCount" ' unit tests were inconlusive!'
+inconclusiveCount=$(sed -n 's/<test-run.*inconclusive="\([^"]*\).*/\1/p' EditorTestResults.xml)
+if [ "$inconclusiveCount" != "0" ]; then
+    echo "$inconclusiveCount" ' unit tests were inconlusive!'
 
     exitStatus=1
 fi
 
-# Unity unit test report no longer reports invalid tests, if this returns, this functionality should be readded
-#errorCount=$(grep "failures" EditorTestResults.xml | awk -F"\"" '{print $18}') #finally for invalid tests
-#
-#if [ "$errorCount" != "0" ]; then
-#    echo "$errorCount" ' unit tests were invalid!'
-#
-#    exitStatus=1
-#fi
-#end of unit test checks. at this point the test have suceeded or set exitStatus to 1.
+
+#end of unit test checks. at this point the test have succeeded or set exitStatus to 1.
 rm "$(pwd)"/EditorTestResults.xml
 exit $exitStatus
+
+

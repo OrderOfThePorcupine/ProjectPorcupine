@@ -33,4 +33,3 @@ deploy:
   on:
     condition: ($TRAVIS_EVENT_TYPE = cron) && ($JOB = unit-test)
 	
-
