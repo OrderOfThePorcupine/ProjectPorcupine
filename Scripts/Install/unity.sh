@@ -4,7 +4,7 @@
 # to get download URLs
 UNITY_DOWNLOAD_CACHE="$(pwd)/unity_download_cache"
 UNITY_OSX_PACKAGE_URL="https://download.unity3d.com/download_unity/588dc79c95ed/MacEditorInstaller/Unity-2017.2.5f1.pkg"
-UNITY_WINDOWS_TARGET_PACKAGE_URL="https://download.unity3d.com/download_unity/588dc79c95ed/Windows64EditorInstaller/UnitySetup64-2017.2.5f1.pkg"
+UNITY_WINDOWS_TARGET_PACKAGE_URL="https://download.unity3d.com/download_unity/588dc79c95ed/MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-2017.2.5f1.pkg"
 
 
 # Downloads a file if it does not exist
@@ -19,7 +19,8 @@ download() {
 		mkdir -p "$UNITY_DOWNLOAD_CACHE"
 		curl -o $UNITY_DOWNLOAD_CACHE/`basename "$URL"` "$URL"
 	else
-		echo "$FILE Exists. Skipping download."
+		echo "$FILE Exists. Path not included."
+		exit(1)
 	fi
 }
 
