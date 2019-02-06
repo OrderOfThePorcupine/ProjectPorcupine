@@ -2,6 +2,8 @@
 # This script is responsible for running the script that matches
 # the environment variable travis selects.
 
+set -x
+
 if [ "$JOB" == "unit-test" ]; then
     ./Scripts/Install/unity.sh
     ./Scripts/test.sh --travis
