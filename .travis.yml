@@ -4,8 +4,15 @@
 # The chmod-ing may be unnecessary 
 language: objective-c
 osx_image: xcode6.4
-rvm:
- - 2.1.2
+env:
+  global:
+    - BUILD_VERSION=$( date +%Y.%V )
+  matrix:
+    - JOB=unit-test
+    - JOB=stylecop
+cache:
+  directories:
+    - $UNITY_DOWNLOAD_CACHE
 before_install:
  - chmod +x ./Scripts/Install/unity.sh
  - chmod +x ./Scripts/Install/mono.sh
@@ -14,12 +21,6 @@ before_install:
  - chmod +x ./Scripts/check-style.sh
  - chmod +x ./Scripts/travis.sh
  - chmod +x ./Scripts/build.sh
-env:
-  global:
-    - BUILD_VERSION=$( date +%Y.%V )
-  matrix:
-    - JOB=unit-test
-    - JOB=stylecop
 script:
 - ./Scripts/travis.sh
 notifications:

@@ -36,7 +36,5 @@ fi
 echo "Finishing with code $ERROR_CODE"
 exit $ERROR_CODE
 
-# create the config file for Bintray through ERB (an ruby cli-tool)
-erb ./Scripts/bintray.json.erb > ./Scripts/bintray.json
-
-
+# Create the config file for Bintray
+generate-bintray-json > ./Scripts/bintray.json
