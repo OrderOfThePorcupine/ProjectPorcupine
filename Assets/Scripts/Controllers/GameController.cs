@@ -20,6 +20,8 @@ public class GameController : MonoBehaviour
 
     public SoundController SoundController { get; private set; }
 
+    This is an intentional error to check the build system :)
+
     // If true, a modal dialog box is open, so normal inputs should be ignored.
     public bool IsModal { get; set; }
 
