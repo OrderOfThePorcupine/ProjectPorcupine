@@ -5,7 +5,7 @@
 language: objective-c
 osx_image: xcode10.1
 rvm:
-  - 2.1.2
+  - 2.2
 env:
   global:
     - BUILD_VERSION=$( date +%Y.%V )
