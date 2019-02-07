@@ -1,14 +1,19 @@
+#! /bin/bash
+
+NOW_DATE=`date +%Y-%m-%d`
+
+cat << EOF
 {
     "package": {
         "name": "Prebuilt-Binaries",
         "repo": "ProjectPorcupine",
         "subject": "orderoftheporcupine",
-        "desc": "Weekly dev-build #<%= ENV['BUILD_VERSION'] %>"
+        "desc": "Weekly dev-build #$BUILD_VERSION"
     },
 
     "version": {
-        "name": "<%= ENV['BUILD_VERSION'] %>",
-        "released": "<%= Time.now.strftime("%Y-%m-%d") %>",
+        "name": "$BUILD_VERSION",
+        "released": "$NOW_DATE",
         "attributes": [],
         "gpgSign": false
     },
@@ -19,3 +24,4 @@
         ],
     "publish": true
 }
+EOF
