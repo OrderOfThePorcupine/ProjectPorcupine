@@ -86,7 +86,6 @@ if [ ! -f "$(pwd)"/EditorTestResults.xml ]; then
 
             printf '\nBuild Failed! \nThe compiler generated the following messages:'
             echo | awk '/CompilerOutput:/,/EndCompilerOutput/' < unity.log #show lines in between compiler output "tags" including tags
-
         fi
     fi
     rm "$(pwd)"/unity.log
@@ -101,7 +100,7 @@ if [ "$endTestsFold" = 0 ]; then
 fi
 
 
-#TERRIBLE error check logic - Please fix ASAP
+
 result=$(sed -n 's/<test-run.*result="\([^"]*\).*/\1/p' EditorTestResults.xml)
 errorCount=$(sed -n 's/<test-run.*failed="\([^"]*\).*/\1/p' EditorTestResults.xml)
 
