@@ -12,9 +12,6 @@ env:
   matrix:
     - JOB=unit-test
     - JOB=stylecop
-cache:
-  directories:
-    - /home/travis/.rvm/
 before_install:
  - chmod +x ./Scripts/Install/unity.sh
  - chmod +x ./Scripts/Install/mono.sh
