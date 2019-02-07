@@ -3,7 +3,9 @@
 # Using objective-c since windows build images are not available
 # The chmod-ing may be unnecessary 
 language: objective-c
-osx_image: xcode6.4
+osx_image: xcode10.1
+rvm:
+  - 2.1.2
 env:
   global:
     - BUILD_VERSION=$( date +%Y.%V )
@@ -13,6 +15,7 @@ env:
 cache:
   directories:
     - $UNITY_DOWNLOAD_CACHE
+    - /home/travis/.rvm/
 before_install:
  - chmod +x ./Scripts/Install/unity.sh
  - chmod +x ./Scripts/Install/mono.sh
