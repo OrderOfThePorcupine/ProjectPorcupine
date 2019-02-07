@@ -14,7 +14,6 @@ env:
     - JOB=stylecop
 cache:
   directories:
-    - $UNITY_DOWNLOAD_CACHE
     - /home/travis/.rvm/
 before_install:
  - chmod +x ./Scripts/Install/unity.sh

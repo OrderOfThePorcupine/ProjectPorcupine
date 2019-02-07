@@ -1,6 +1,6 @@
 #! /bin/sh
 
-echo "Contents of Unity Download Cache:"
+echo "Contents of Unity Download Cache: $UNITY_DOWNLOAD_CACHE"
 ls $UNITY_DOWNLOAD_CACHE
 
 echo "Installing Unity..."
