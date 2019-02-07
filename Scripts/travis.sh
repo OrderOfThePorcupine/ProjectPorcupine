@@ -6,7 +6,7 @@ if [ "$JOB" == "unit-test" ]; then
     ./Scripts/Install/unity.sh
 
     ./Scripts/test.sh --travis
-    if [ $? -nq 0 ]; then
+    if [ $? -ne 0 ]; then
         # If the tests failed we don't run the build.
         echo "Tests failed with exit code $?!"
         exit 1
