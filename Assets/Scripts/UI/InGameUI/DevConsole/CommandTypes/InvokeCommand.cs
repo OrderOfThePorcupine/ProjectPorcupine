@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace DeveloperConsole.Core
 {
@@ -168,13 +169,18 @@ namespace DeveloperConsole.Core
                 {
                     string[] parameterSections = parameterTypes[i].Split(';');
 
-                   // First try to load var with System
+                    // First try to load var with System
                     types[i] = System.Type.GetType("System." + parameterSections[1], false, true);
-
+                    
                     // If that doesn't resolve try with UnityEngine
                     if (types[i] == null)
                     {
-                        types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ",UnityEngine", false, true);
+                        types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ", UnityEngine", false, true);
+                    }
+
+                    if (types[i] == null)
+                    {
+                        types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ", UnityEngine.CoreModule", false, true);
                     }
 
                     // If that doesn't work fallback to object and throw a warning
