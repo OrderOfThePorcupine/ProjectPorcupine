@@ -48,7 +48,6 @@ public class HeadlineGeneratorTest
         stringPrinted = false;
         Scheduler.Scheduler.Current.Update(1);
         Assert.AreEqual(false, stringPrinted);
-        Assert.AreEqual(false, true);
     }
 
     [Test]
