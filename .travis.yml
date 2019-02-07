@@ -3,7 +3,7 @@
 # Using objective-c since windows build images are not available
 # The chmod-ing may be unnecessary 
 language: objective-c
-osx_image: xcode10.1
+osx_image: xcode6.4 # Mono doesn't work on other xcode versions https://github.com/travis-ci/travis-ci/issues/6697
 rvm:
   - 2.2
 env:
