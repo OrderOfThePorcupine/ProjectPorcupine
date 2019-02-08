@@ -14,17 +14,25 @@ namespace ProjectPorcupine.Entities
     /// <summary>
     /// Character name manager that holds all the possible names and tries to give a random and unused name everytime is requested.
     /// </summary>
-    public class CharacterNameManager
+    public static class CharacterNameManager
     {
         private static string[] characterNames;
         private static int ptr;
+        private static bool isInitialized;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CharacterNameManager"/> class.
         /// </summary>
-        public CharacterNameManager()
+        public static void Initialize()
         {
+            if (isInitialized)
+            {
+                return;
+            }
+
             characterNames = new string[0];
+
+            isInitialized = true;
         }
 
         /// <summary>

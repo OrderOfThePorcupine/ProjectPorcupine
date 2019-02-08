@@ -14,13 +14,20 @@ using Scheduler;
 /// <summary>
 /// A class that holds the Prototype Maps of each entity that requires it.
 /// </summary>
-public class PrototypeManager
+public static class PrototypeManager
 {
+    private static bool isInitialized = false;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PrototypeManager"/> class.
     /// </summary>
-    public PrototypeManager()
+    public static void Initialize()
     {
+        if (isInitialized)
+        {
+            return;
+        }
+
         Inventory = new PrototypeMap<Inventory>("Inventories", "Inventory");
         TileType = new PrototypeMap<TileType>("Tiles", "Tile");
         Furniture = new PrototypeMap<Furniture>("Furnitures", "Furniture");
@@ -39,6 +46,8 @@ public class PrototypeManager
         DevConsole = new PrototypeMap<DeveloperConsole.Core.InvokeCommand>("ConsoleCommands", "ConsoleCommand");
         SettingsCategories = new PrototypeMap<SettingsCategory>("Categories", "Category");
         PerformanceHUD = new PrototypeMap<PerformanceGroup>("ComponentGroups", "ComponentGroup");
+
+        isInitialized = true;
     }
 
     /// <summary>

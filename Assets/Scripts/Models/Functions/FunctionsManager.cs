@@ -8,12 +8,19 @@
 #endregion
 using System.Collections.Generic;
 
-public class FunctionsManager
+public static class FunctionsManager
 {
     private static Dictionary<string, Functions> actions;
 
-    public FunctionsManager()
+    private static bool isInitialized = false;
+
+    public static void Initialize()
     {
+        if (isInitialized)
+        {
+            return;
+        }
+
         actions = new Dictionary<string, Functions>();
 
         actions.Add("Furniture", new Functions());
@@ -29,6 +36,8 @@ public class FunctionsManager
         actions.Add("ModDialogBox", new Functions());
         actions.Add("SettingsMenu", new Functions());
         actions.Add("PerformanceHUD", new Functions());
+
+        isInitialized = true;
     }
 
     /// <summary>

@@ -32,17 +32,11 @@ public class SchedulerEditorTest
     [SetUp]
     public void Init()
     {
-        if (FunctionsManager.ScheduledEvent == null)
-        {
-            new FunctionsManager();
-        }
+        FunctionsManager.Initialize();
 
         FunctionsManager.ScheduledEvent.LoadScript(LuaFunctionString, "ScheduledEvent", Functions.Type.Lua);
 
-        if (PrototypeManager.ScheduledEvent == null)
-        {
-            new PrototypeManager();
-        }
+        PrototypeManager.Initialize();
 
         PrototypeManager.ScheduledEvent.Add(new ScheduledEvent("ping_log", evt => UnityDebugger.Debugger.LogFormat("Scheduler", "Event {0} fired", evt.Name)));
         PrototypeManager.ScheduledEvent.LoadPrototypes(XmlPrototypeString);

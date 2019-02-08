@@ -86,10 +86,10 @@ public class WorldController : MonoBehaviour
             UnityDebugger.Debugger.LogError("WorldController", "There should never be two world controllers.");
         }
 
-        new FunctionsManager();
-        new PrototypeManager();
-        new CharacterNameManager();
-        new SpriteManager();
+        FunctionsManager.Initialize();
+        PrototypeManager.Initialize();
+        CharacterNameManager.Initialize();
+        SpriteManager.Initialize();
         AudioManager.Initialize();
 
         // FIXME: Do something real here. This is just to show how to register a C# event prototype for the Scheduler.

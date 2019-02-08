@@ -17,7 +17,7 @@ using UnityEngine;
 /// That is going to be the job of the individual ________SpriteController scripts.
 /// Our job is simply to load all sprites from disk and keep the organized.
 /// </summary>
-public class SpriteManager
+public static class SpriteManager
 {
     // A sprite image with a "ph_" as a prefix will be loaded as a placeholder if the normal spite image is missing.
     // This is used to easily identity spires that needs improvement.
@@ -27,14 +27,23 @@ public class SpriteManager
 
     private static Dictionary<string, Sprite> sprites;
 
+    private static bool isInitialized;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="SpriteManager"/> class.
     /// </summary>
-    public SpriteManager()
+    public static void Initialize()
     {
+        if (isInitialized)
+        {
+            return;
+        }
+
         sprites = new Dictionary<string, Sprite>();
 
-        CreateNoTexture();
+        CreateEmptyTexture();
+
+        isInitialized = true;
     }
 
     /// <summary>
@@ -266,7 +275,7 @@ public class SpriteManager
     /// <summary>
     /// Creates the no resource texture.
     /// </summary>
-    private void CreateNoTexture()
+    private static void CreateEmptyTexture()
     {
         // Generate a 32x32 magenta image
         noResourceTexture = new Texture2D(32, 32, TextureFormat.ARGB32, false);

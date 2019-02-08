@@ -8,6 +8,7 @@
 #endregion
 using System;
 using NUnit.Framework;
+using ProjectPorcupine.Entities;
 
 public class ModTester
 {
@@ -15,7 +16,10 @@ public class ModTester
     [SetUp]
     public void Setup()
     {
+        FunctionsManager.Initialize();
+        SpriteManager.Initialize();
         AudioManager.Initialize();
+        CharacterNameManager.Initialize();
     }
 
     [Test]
