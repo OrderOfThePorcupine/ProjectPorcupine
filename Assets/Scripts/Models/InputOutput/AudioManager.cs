@@ -15,7 +15,7 @@ using FMOD;
 /// <summary>
 /// The Manager that handles the loading and storing of audio from streamingAssets.
 /// </summary>
-public class AudioManager
+public static class AudioManager
 {
     public static FMOD.System SoundSystem;
 
@@ -26,11 +26,18 @@ public class AudioManager
 
     private static Dictionary<string, SoundClip> audioClips;
 
+    private static bool isInitialized = false;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AudioManager"/> class.
     /// </summary>
-    public AudioManager()
+    public static void Initialize()
     {
+        if (isInitialized)
+        {
+            return;
+        }
+
         channelGroups = new Dictionary<string, ChannelGroup>();
         Factory.System_Create(out SoundSystem);
         SoundSystem.setDSPBufferSize(1024, 10);
@@ -53,6 +60,8 @@ public class AudioManager
 
         SoundSystem.set3DSettings(1f, 1f, .25f);
         audioClips = new Dictionary<string, SoundClip>();
+
+        isInitialized = true;
     }
 
     /// <summary>

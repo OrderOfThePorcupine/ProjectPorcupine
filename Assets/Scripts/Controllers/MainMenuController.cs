@@ -30,10 +30,10 @@ public class MainMenuController : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        new PrototypeManager();
-        new FunctionsManager();
-        new SpriteManager();
-        new AudioManager();
+        PrototypeManager.Initialize();
+        FunctionsManager.Initialize();
+        SpriteManager.Initialize();
+        AudioManager.Initialize();
 
         // Load Mods and Settings on awake rather than on Starts
         ModsManager = new ModsManager();

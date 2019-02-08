@@ -24,10 +24,7 @@ public class HeadlineGeneratorTest
     [SetUp]
     public void SetUp()
     {
-        if (PrototypeManager.Headline == null)
-        {
-            new PrototypeManager();
-        }
+        PrototypeManager.Initialize();
 
         PrototypeManager.Headline.LoadPrototypes(testHeadlineXml);
 

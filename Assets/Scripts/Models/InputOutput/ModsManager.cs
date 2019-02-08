@@ -23,20 +23,24 @@ public class ModsManager
 
     public ModsManager()
     {
-        mods = GetModsFiles();
-
-        LoadSharedFiles();
-
         if (SceneController.IsAtIntroScene())
         {
-            LoadIntroFiles();
+            SetUp(Type.Intro);
         }
         else if (SceneController.IsAtMainScene())
         {
-            LoadMainSceneFiles();
+            SetUp(Type.MainScene);
         }
+    }
 
-        LoadPrototypes();
+    public ModsManager(Type type)
+    {
+        SetUp(type);
+    }
+
+    public enum Type
+    {
+        Intro, MainScene
     }
 
     /// <summary>
@@ -72,6 +76,27 @@ public class ModsManager
     private static string GetPathToModsFolder()
     {
         return Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Mods");
+    }
+
+    /// <summary>
+    /// Common initialization to make testing easier.
+    /// </summary>
+    private void SetUp(Type type)
+    {
+        mods = GetModsFiles();
+
+        LoadSharedFiles();
+
+        if (type == Type.Intro)
+        {
+            LoadIntroFiles();
+        }
+        else if (type == Type.MainScene)
+        {
+            LoadMainSceneFiles();
+        }
+
+        LoadPrototypes();
     }
 
     private void LoadMainSceneFiles()
