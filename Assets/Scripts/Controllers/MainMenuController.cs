@@ -33,7 +33,7 @@ public class MainMenuController : MonoBehaviour
         new PrototypeManager();
         new FunctionsManager();
         new SpriteManager();
-        new AudioManager();
+        AudioManager.Initialize();
 
         // Load Mods and Settings on awake rather than on Starts
         ModsManager = new ModsManager();

@@ -12,17 +12,21 @@ using NUnit.Framework;
 public class ModTester
 {
 
+    [SetUp]
+    public void Setup()
+    {
+        AudioManager.Initialize();
+    }
+
     [Test]
     public void T01_Introduction()
     {
-        new AudioManager();
-        ModsManager manager = new ModsManager(ModsManager.Type.Intro);
+        new ModsManager(ModsManager.Type.Intro);
     }
 
     [Test]
     public void T02_MainScene()
     {
-        new AudioManager();
-        ModsManager manager = new ModsManager(ModsManager.Type.MainScene);
+        new ModsManager(ModsManager.Type.MainScene);
     }
 }

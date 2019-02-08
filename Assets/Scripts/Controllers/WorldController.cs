@@ -90,7 +90,7 @@ public class WorldController : MonoBehaviour
         new PrototypeManager();
         new CharacterNameManager();
         new SpriteManager();
-        new AudioManager();
+        AudioManager.Initialize();
 
         // FIXME: Do something real here. This is just to show how to register a C# event prototype for the Scheduler.
         PrototypeManager.ScheduledEvent.Add(
