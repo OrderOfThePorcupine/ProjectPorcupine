@@ -12,7 +12,6 @@ using ProjectPorcupine.Entities;
 
 public class ModTester
 {
-
     [SetUp]
     public void Setup()
     {

@@ -19,38 +19,6 @@ public static class PrototypeManager
     private static bool isInitialized = false;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PrototypeManager"/> class.
-    /// </summary>
-    public static void Initialize()
-    {
-        if (isInitialized)
-        {
-            return;
-        }
-
-        Inventory = new PrototypeMap<Inventory>("Inventories", "Inventory");
-        TileType = new PrototypeMap<TileType>("Tiles", "Tile");
-        Furniture = new PrototypeMap<Furniture>("Furnitures", "Furniture");
-        Utility = new PrototypeMap<Utility>("Utilities", "Utility");
-        RoomBehavior = new PrototypeMap<RoomBehavior>("RoomBehaviors", "RoomBehavior");
-        Need = new PrototypeMap<Need>("Needs", "Need");
-        Trader = new PrototypeMap<TraderPrototype>("Traders", "Trader");
-        Currency = new PrototypeMap<Currency>("Currencies", "Currency");
-        Quest = new PrototypeMap<Quest>("Quests", "Quest");
-        Stat = new PrototypeMap<Stat>("Stats", "Stat");
-        GameEvent = new PrototypeMap<GameEvent>("GameEvents", "GameEvent");
-        ScheduledEvent = new PrototypeMap<ScheduledEvent>("ScheduledEvents", "ScheduledEvent");
-        Headline = new PrototypeMap<Headline>("Headlines", "Headline");
-        Overlay = new PrototypeMap<OverlayDescriptor>("Overlays", "Overlay");
-        Ship = new PrototypeMap<Ship>("Ships", "Ship");
-        DevConsole = new PrototypeMap<DeveloperConsole.Core.InvokeCommand>("ConsoleCommands", "ConsoleCommand");
-        SettingsCategories = new PrototypeMap<SettingsCategory>("Categories", "Category");
-        PerformanceHUD = new PrototypeMap<PerformanceGroup>("ComponentGroups", "ComponentGroup");
-
-        isInitialized = true;
-    }
-
-    /// <summary>
     /// Gets the tile type prototype map.
     /// </summary>
     /// <value>The furniture prototype map.</value>
@@ -156,4 +124,36 @@ public static class PrototypeManager
     /// </summary>
     /// <value>The ship prototype map.</value>
     public static PrototypeMap<Ship> Ship { get; private set; }
+
+    /// <summary>
+    /// Initializes the <see cref="PrototypeManager"/> static class files.
+    /// </summary>
+    public static void Initialize()
+    {
+        if (isInitialized)
+        {
+            return;
+        }
+
+        Inventory = new PrototypeMap<Inventory>("Inventories", "Inventory");
+        TileType = new PrototypeMap<TileType>("Tiles", "Tile");
+        Furniture = new PrototypeMap<Furniture>("Furnitures", "Furniture");
+        Utility = new PrototypeMap<Utility>("Utilities", "Utility");
+        RoomBehavior = new PrototypeMap<RoomBehavior>("RoomBehaviors", "RoomBehavior");
+        Need = new PrototypeMap<Need>("Needs", "Need");
+        Trader = new PrototypeMap<TraderPrototype>("Traders", "Trader");
+        Currency = new PrototypeMap<Currency>("Currencies", "Currency");
+        Quest = new PrototypeMap<Quest>("Quests", "Quest");
+        Stat = new PrototypeMap<Stat>("Stats", "Stat");
+        GameEvent = new PrototypeMap<GameEvent>("GameEvents", "GameEvent");
+        ScheduledEvent = new PrototypeMap<ScheduledEvent>("ScheduledEvents", "ScheduledEvent");
+        Headline = new PrototypeMap<Headline>("Headlines", "Headline");
+        Overlay = new PrototypeMap<OverlayDescriptor>("Overlays", "Overlay");
+        Ship = new PrototypeMap<Ship>("Ships", "Ship");
+        DevConsole = new PrototypeMap<DeveloperConsole.Core.InvokeCommand>("ConsoleCommands", "ConsoleCommand");
+        SettingsCategories = new PrototypeMap<SettingsCategory>("Categories", "Category");
+        PerformanceHUD = new PrototypeMap<PerformanceGroup>("ComponentGroups", "ComponentGroup");
+
+        isInitialized = true;
+    }
 }

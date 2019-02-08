@@ -14,32 +14,6 @@ public static class FunctionsManager
 
     private static bool isInitialized = false;
 
-    public static void Initialize()
-    {
-        if (isInitialized)
-        {
-            return;
-        }
-
-        actions = new Dictionary<string, Functions>();
-
-        actions.Add("Furniture", new Functions());
-        actions.Add("Utility", new Functions());
-        actions.Add("RoomBehavior", new Functions());
-        actions.Add("Need", new Functions());
-        actions.Add("GameEvent", new Functions());
-        actions.Add("TileType", new Functions());
-        actions.Add("Quest", new Functions());
-        actions.Add("ScheduledEvent", new Functions());
-        actions.Add("Overlay", new Functions());
-        actions.Add("DevConsole", new Functions());
-        actions.Add("ModDialogBox", new Functions());
-        actions.Add("SettingsMenu", new Functions());
-        actions.Add("PerformanceHUD", new Functions());
-
-        isInitialized = true;
-    }
-
     /// <summary>
     /// Gets the furniture Functions.
     /// </summary>
@@ -165,5 +139,34 @@ public static class FunctionsManager
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Initializes the functions. Must be called at least once before calling any other function in this file.
+    /// </summary>
+    public static void Initialize()
+    {
+        if (isInitialized)
+        {
+            return;
+        }
+
+        actions = new Dictionary<string, Functions>();
+
+        actions.Add("Furniture", new Functions());
+        actions.Add("Utility", new Functions());
+        actions.Add("RoomBehavior", new Functions());
+        actions.Add("Need", new Functions());
+        actions.Add("GameEvent", new Functions());
+        actions.Add("TileType", new Functions());
+        actions.Add("Quest", new Functions());
+        actions.Add("ScheduledEvent", new Functions());
+        actions.Add("Overlay", new Functions());
+        actions.Add("DevConsole", new Functions());
+        actions.Add("ModDialogBox", new Functions());
+        actions.Add("SettingsMenu", new Functions());
+        actions.Add("PerformanceHUD", new Functions());
+
+        isInitialized = true;
     }
 }
