@@ -6,11 +6,8 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System.Xml;
-using NUnit.Framework;
-using UnityEngine.TestTools;
-using ProjectPorcupine.Buildable.Components;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 
 public class HeadlineGeneratorTest
 {
