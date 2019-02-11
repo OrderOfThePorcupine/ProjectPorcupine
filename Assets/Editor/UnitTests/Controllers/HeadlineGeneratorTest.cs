@@ -9,24 +9,31 @@
 using System.Xml;
 using NUnit.Framework;
 using UnityEngine.TestTools;
+using ProjectPorcupine.Buildable.Components;
+using Newtonsoft.Json.Linq;
 
 public class HeadlineGeneratorTest
 {
     private HeadlineGenerator gen;
     private bool stringPrinted;
 
-    private string testHeadlineXml = @"
-<Headlines>
-    <Headline>The CEO of Quillcorp, has announced that it main and only shareholder is still the main and only shareholder, Quill18.</Headline>
-    <Headline>Notice: Quillcorp has placed an embargo on ""Chairs"", any Quillcorp Basic Utility Station found in possession of this illegal contraband will be fined 2 million Quillbucks.</Headline>
-</Headlines>";
+    private string testHeadlineJson = @"{
+  ""Headline"": [
+    ""The CEO of Quillcorp, has announced that it main and only shareholder is still the main and only shareholder, Quill18."",
+    ""Notice: Quillcorp has placed an embargo on \""Chairs\"", any Quillcorp Basic Utility Station found in possession of this illegal contraband will be fined 2 million Quillbucks."",
+  ]
+}";
 
     [SetUp]
     public void SetUp()
     {
         PrototypeManager.Initialize();
 
-        PrototypeManager.Headline.LoadPrototypes(testHeadlineXml);
+        JToken reader = JToken.Parse(testHeadlineJson);
+
+        UnityEngine.Debug.Log(reader);
+
+        PrototypeManager.Headline.LoadJsonPrototypes((JProperty)reader.First);
 
         gen = new HeadlineGenerator();
         gen.UpdatedHeadline += StringPrinted;
