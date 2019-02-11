@@ -31,8 +31,6 @@ public class HeadlineGeneratorTest
 
         JToken reader = JToken.Parse(testHeadlineJson);
 
-        UnityEngine.Debug.Log(reader);
-
         PrototypeManager.Headline.LoadJsonPrototypes((JProperty)reader.First);
 
         gen = new HeadlineGenerator();

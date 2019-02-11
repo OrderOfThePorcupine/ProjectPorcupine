@@ -21,10 +21,14 @@ public class SchedulerEditorTest
             return
         end";
 
-    private const string XmlPrototypeString = @"
-        <ScheduledEvents>
-            <ScheduledEvent name=""ping_log_lua"" onFire=""ping_log_lua""/>
-        </ScheduledEvents>";
+    private const string JsonPrototypeString = @"
+{
+  ""ScheduledEvent"": {
+    ""ping_log_lua"": {
+      ""FunctionName"": ""ping_log_lua""
+    }
+  }
+}";
 
     private Scheduler.Scheduler scheduler;
     private Action<ScheduledEvent> callback;
@@ -36,10 +40,10 @@ public class SchedulerEditorTest
 
         FunctionsManager.ScheduledEvent.LoadScript(LuaFunctionString, "ScheduledEvent", Functions.Type.Lua);
 
-        PrototypeManager.Initialize();
+        JToken reader = JToken.Parse(JsonPrototypeString);
 
         PrototypeManager.ScheduledEvent.Add(new ScheduledEvent("ping_log", evt => UnityDebugger.Debugger.LogFormat("Scheduler", "Event {0} fired", evt.Name)));
-        PrototypeManager.ScheduledEvent.LoadPrototypes(XmlPrototypeString);
+        PrototypeManager.Headline.LoadJsonPrototypes((JProperty)reader.First);
 
         // The problem with unit testing singletons
         ///scheduler = Scheduler.Scheduler.Current;
