@@ -1339,5 +1339,4 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     }
 
     #endregion
-
 }

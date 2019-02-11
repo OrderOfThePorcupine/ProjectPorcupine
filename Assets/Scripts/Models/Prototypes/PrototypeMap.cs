@@ -177,5 +177,4 @@ public class PrototypeMap<T> where T : IPrototypable, new()
             }
         }
     }
-
 }
