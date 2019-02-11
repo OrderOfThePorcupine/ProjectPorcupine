@@ -7,7 +7,6 @@
 // ====================================================
 #endregion
 
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 public class Currency : IPrototypable
@@ -60,16 +59,6 @@ public class Currency : IPrototypable
     public Currency Clone()
     {
         return new Currency(this);
-    }
-
-    /// <summary>
-    /// Reads the prototype from the specified XML reader.
-    /// </summary>
-    /// <param name="reader">The Xml reader.</param>
-    public void ReadXmlPrototype(XmlReader reader)
-    {
-        Name = reader.GetAttribute("Name");
-        ShortName = reader.GetAttribute("ShortName");
     }
 
     /// <summary>

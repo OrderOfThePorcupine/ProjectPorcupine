@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
@@ -261,16 +260,6 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
     public override string ToString()
     {
         return string.Format("{0} [{1}/{2}]", Type, StackSize, MaxStackSize);
-    }
-
-    public void ReadXmlPrototype(XmlReader reader_parent)
-    {
-        Type = reader_parent.GetAttribute("type");
-        MaxStackSize = int.Parse(reader_parent.GetAttribute("maxStackSize") ?? "50");
-        BasePrice = float.Parse(reader_parent.GetAttribute("basePrice") ?? "1");
-        Category = reader_parent.GetAttribute("category");
-        LocalizationName = reader_parent.GetAttribute("localizationName");
-        LocalizationDescription = reader_parent.GetAttribute("localizationDesc");
     }
 
     /// <summary>

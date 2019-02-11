@@ -9,7 +9,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using Animation;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -49,79 +48,6 @@ public class TraderPrototype : IPrototypable
         set
         {
             rarity = Mathf.Clamp(value, 0f, 1f);
-        }
-    }
-
-    public void ReadXmlPrototype(XmlReader reader_parent)
-    {
-        Type = reader_parent.GetAttribute("type");
-
-        XmlReader reader = reader_parent.ReadSubtree();
-
-        while (reader.Read())
-        {
-            switch (reader.Name)
-            {
-                case "potentialNames":
-                    PotentialNames = new List<string>();
-                    XmlReader namesReader = reader.ReadSubtree();
-
-                    while (namesReader.Read())
-                    {
-                        if (namesReader.Name == "name")
-                        {
-                            PotentialNames.Add(namesReader.ReadElementContentAsString());
-                        }
-                    }
-
-                    break;
-                case "currencyName":
-                    reader.Read();
-                    CurrencyName = reader.ReadContentAsString();
-                    break;
-                case "minCurrencyBalance":
-                    reader.Read();
-                    MinCurrencyBalance = reader.ReadContentAsInt();
-                    break;
-                case "maxCurrencyBalance":
-                    reader.Read();
-                    MaxCurrencyBalance = reader.ReadContentAsInt();
-                    break;
-                case "minSaleMarginMultiplier":
-                    reader.Read();
-                    MinSaleMarginMultiplier = reader.ReadContentAsFloat();
-                    break;
-                case "maxSaleMarginMultiplier":
-                    reader.Read();
-                    MaxSaleMarginMultiplier = reader.ReadContentAsFloat();
-                    break;
-                
-                case "potentialStock":
-                    PotentialStock = new List<TraderPotentialInventory>();
-                    XmlReader invs_reader = reader.ReadSubtree();
-
-                    while (invs_reader.Read())
-                    {
-                        if (invs_reader.Name == "Inventory")
-                        {
-                            // Found an inventory requirement, so add it to the list!
-                            PotentialStock.Add(new TraderPotentialInventory
-                            {
-                                Type = invs_reader.GetAttribute("type"),
-                                Category = invs_reader.GetAttribute("category"),
-                                MinQuantity = int.Parse(invs_reader.GetAttribute("minQuantity")),
-                                MaxQuantity = int.Parse(invs_reader.GetAttribute("maxQuantity")),
-                                Rarity = float.Parse(invs_reader.GetAttribute("rarity"))
-                            });
-                        }
-                    }
-
-                    break;
-                case "Animations":
-                    XmlReader animationReader = reader.ReadSubtree();
-                    ReadAnimationXml(animationReader);
-                    break;
-            }
         }
     }
 
@@ -192,40 +118,6 @@ public class TraderPrototype : IPrototypable
         }
 
         return t;
-    }
-
-    /// <summary>
-    /// Reads and creates Animations from the prototype xml. 
-    /// For now, this requires an idle animation and a flying animation state.
-    /// </summary>
-    private void ReadAnimationXml(XmlReader animationReader)
-    {
-        while (animationReader.Read())
-        {
-            if (animationReader.Name == "Animation")
-            {
-                string state = animationReader.GetAttribute("state");
-                float fps = 1;
-                float.TryParse(animationReader.GetAttribute("fps"), out fps);
-                bool looping = true;
-                bool.TryParse(animationReader.GetAttribute("looping"), out looping);
-                bool valueBased = false;
-
-                // read frames
-                XmlReader frameReader = animationReader.ReadSubtree();
-                List<string> framesSpriteNames = new List<string>();
-                while (frameReader.Read())
-                {
-                    if (frameReader.Name == "Frame")
-                    {
-                        framesSpriteNames.Add(frameReader.GetAttribute("name"));
-                    }
-                }
-
-                SpritenameAnimation animation = new SpritenameAnimation(state, framesSpriteNames.ToArray(), fps, looping, false, valueBased);
-                Animations.Add(state, animation);
-            }
-        }
     }
 
     private List<Inventory> GetInventoryCommonWithCategory(string category)

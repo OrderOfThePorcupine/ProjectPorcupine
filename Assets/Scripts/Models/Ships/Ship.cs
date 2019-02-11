@@ -7,9 +7,7 @@
 // ====================================================
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -351,42 +349,6 @@ public class Ship : IPrototypable
     }
 
     /// <summary>
-    /// Reads the xml definition for a <see cref="Ship"/> prototype.
-    /// </summary>
-    /// <param name="parentReader">The parent reader that reads the bigger file.</param>
-    public void ReadXmlPrototype(XmlReader parentReader)
-    {
-        Type = parentReader.GetAttribute("type");
-        Width = int.Parse(parentReader.GetAttribute("width"));
-        Height = int.Parse(parentReader.GetAttribute("height"));
-
-        InstantiateTiles();
-
-        XmlReader reader = parentReader.ReadSubtree();
-
-        while (reader.Read())
-        {
-            switch (reader.Name)
-            {
-                case "BerthPoint":
-                    BerthPointX = int.Parse(reader.GetAttribute("x"));
-                    BerthPointY = int.Parse(reader.GetAttribute("y"));
-                    BerthDirection = (BerthDirection)Enum.Parse(typeof(BerthDirection), reader.GetAttribute("direction"));
-                    break;
-                case "Storages":
-                    ReadXmlStorages(reader);
-                    break;
-                case "Tiles":
-                    ReadXmlTiles(reader);
-                    break;
-                case "Furnitures":
-                    ReadXmlFurnitures(reader);
-                    break;
-            }
-        }
-    }
-
-    /// <summary>
     /// Reads the prototype from the specified JObject.
     /// </summary>
     /// <param name="jsonProto">The JProperty containing the prototype.</param>
@@ -474,63 +436,6 @@ public class Ship : IPrototypable
         }
 
         return world.GetTileAt(worldX, worldY, z);
-    }
-
-    /// <summary>
-    /// Reads storage locations from XML and stores them in the prototype.
-    /// </summary>
-    /// <param name="reader">The XML reader.</param>
-    private void ReadXmlStorages(XmlReader reader)
-    {
-        if (reader.ReadToDescendant("Storage"))
-        {
-            do
-            {
-                int x = int.Parse(reader.GetAttribute("x"));
-                int y = int.Parse(reader.GetAttribute("y"));
-                ShipStorage storage = new ShipStorage(x, y);
-                storages.Add(storage);
-            }
-            while (reader.ReadToNextSibling("Storage"));
-        }
-    }
-
-    /// <summary>
-    /// Reads Tiles XML tag that defines what tiles the ship occupies when unwrapped 
-    /// and writes them to the tile type array.
-    /// </summary>
-    /// <param name="reader">The XML reader.</param>
-    private void ReadXmlTiles(XmlReader reader)
-    {
-        if (reader.ReadToDescendant("Tile"))
-        {
-            do
-            {
-                int x = int.Parse(reader.GetAttribute("x"));
-                int y = int.Parse(reader.GetAttribute("y"));
-                tileTypes[x, y] = reader.GetAttribute("type");
-            }
-            while (reader.ReadToNextSibling("Tile"));
-        }
-    }
-
-    /// <summary>
-    /// Reads furniture types that the ship contains while unwrapped and
-    /// writes them to the furniture type array.
-    /// </summary>
-    /// <param name="reader">The XML reader.</param>
-    private void ReadXmlFurnitures(XmlReader reader)
-    {
-        if (reader.ReadToDescendant("Furniture"))
-        {
-            do
-            {
-                int x = int.Parse(reader.GetAttribute("x"));
-                int y = int.Parse(reader.GetAttribute("y"));
-                furnitureTypes[x, y] = reader.GetAttribute("type");
-            }
-            while (reader.ReadToNextSibling("Furniture"));
-        }
     }
 
     /// <summary>
