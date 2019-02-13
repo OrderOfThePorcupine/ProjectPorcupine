@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+#pragma warning disable 0649
 using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
@@ -41,24 +42,12 @@ namespace ProjectPorcupine.Entities
         /// Current tile the character is standing on.
         private Tile currTile;
 
-        /// The next tile in the pathfinding sequence (the one we are about to enter).
-        private Tile nextTile;
-
-        /// Goes from 0 to 1 as we move from CurrTile to nextTile.
-        private float movementPercentage;
-
-        /// Holds the path to reach DestTile.
-        private List<Tile> movementPath;
-
         /// Tiles per second.
         private float speed;
         private float baseSpeed = 5f;
 
         /// Used for health system.
         private HealthSystem health;
-
-        /// Tile where job should be carried out, if different from MyJob.tile.
-        private Tile jobTile;
 
         private bool selected = false;
 

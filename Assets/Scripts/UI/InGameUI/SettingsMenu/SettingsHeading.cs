@@ -6,6 +6,8 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+#pragma warning disable 0649
+
 using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;

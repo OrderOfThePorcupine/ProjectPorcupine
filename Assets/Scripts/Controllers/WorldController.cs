@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+#pragma warning disable 0649
 using System.IO;
 using System.Threading;
 using MoonSharp.Interpreter;

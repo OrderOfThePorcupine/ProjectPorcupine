@@ -19,7 +19,6 @@ public class SpriteToXML : EditorWindow
     private string inputDirPath = string.Empty;
 
     private Texture2D[] images;
-    private Texture2D image;
     private Sprite[] sprites;
     private string[] filesInDir;
 

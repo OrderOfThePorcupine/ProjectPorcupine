@@ -133,8 +133,6 @@ namespace ProjectPorcupine.Mouse
         /// </summary>
         private Vector3 panningMouseStart = Vector3.zero;
 
-        private bool[] situationsEnabled;
-
         /// <summary>
         /// Construct a new mouse controller.
         /// </summary>

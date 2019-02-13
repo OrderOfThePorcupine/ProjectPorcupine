@@ -14,7 +14,6 @@ using UnityEngine;
 
 public class DebuggerChannelControl : EditorWindow, IHasCustomMenu
 { 
-    private EditorWindow window;
     private bool allState;
     private bool allPreveState;
     private ChannelSettingsSO channelSettings;
