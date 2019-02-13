@@ -11,7 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace ProjectPorcupine.Localization
@@ -24,6 +25,9 @@ namespace ProjectPorcupine.Localization
         // The current language. This will be automatically be set by the LocalizationLoader.
         // Default is English.
         public static string currentLanguage = DefaultLanguage;
+
+        // The hash for the current localization code
+        public static string hash = string.Empty;
 
         // Used by the LocalizationLoader to ensure that the localization files are only loaded once.
         public static bool initialized = false;
@@ -110,7 +114,7 @@ namespace ProjectPorcupine.Localization
         {
             if (localizationConfigurations.ContainsKey(code) == false)
             {
-                UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config.xml");
+                UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config file.");
                 return code;
             }
 
@@ -156,23 +160,38 @@ namespace ProjectPorcupine.Localization
                 return;
             }
 
-            XmlReader reader = XmlReader.Create(pathToConfigFile);
-            while (reader.Read())
-            {
-                if (reader.NodeType == XmlNodeType.Element && reader.Name == "language")
-                {
-                    if (reader.HasAttributes)
-                    {
-                        string code = reader.GetAttribute("code");
-                        string localName = reader.GetAttribute("name");
-                        bool rtl = (reader.GetAttribute("rtl") == "true") ? true : false;
+            StreamReader reader = File.OpenText(pathToConfigFile);
+            JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
 
-                        localizationConfigurations.Add(code, new LocalizationData(code, localName, rtl));
+
+            hash = protoJson["version"].ToString();
+
+            if (protoJson["languages"] != null)
+            {
+                foreach (JToken item in protoJson["languages"])
+                {
+                    string code = item["code"].ToString();
+                    string localName = code;
+                    bool rtl = false;
+                    try
+                    {
+                        rtl = bool.Parse(item["rtl"].ToString());
                     }
+                    catch (NullReferenceException)
+                    {
+                    }
+
+                    try
+                    {
+                        localName = item["name"].ToString();
+                    }
+                    catch (NullReferenceException)
+                    {
+                    }
+
+                    localizationConfigurations.Add(code, new LocalizationData(code, localName, rtl));
                 }
             }
-
-            reader.Close();
         }
 
         /// <summary>

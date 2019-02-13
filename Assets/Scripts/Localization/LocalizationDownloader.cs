@@ -101,26 +101,36 @@ namespace ProjectPorcupine.Localization
                 UnityDebugger.Debugger.Log("LocalizationDownloader", "There is an update for localization files!");
                 yield return DownloadLocalizationFromWeb(onLocalizationDownloadedCallback);
 
-                // Because config.xml exists in the new downloaded localization, we have to add the version element to it.
-                try
-                {
-                    string configPath = Path.Combine(LocalizationFolderPath, "config.xml");
-                    XmlDocument document = new XmlDocument();
-                    document.Load(configPath);
-                    XmlNode node = document.SelectSingleNode("//config");
+                UpdateConfigFile(latestCommitHash);
+            }
+        }
 
-                    XmlElement versionElement = document.CreateElement("version");
-                    versionElement.SetAttribute("hash", latestCommitHash);
-                    node.InsertBefore(versionElement, document.SelectSingleNode("//languages"));
-                    document.Save(configPath);
-                }
-                catch (Exception e)
+        private static void UpdateConfigFile(string latestCommitHash)
+        {
+            // Because config.xml exists in the new downloaded localization, we have to add the version element to it.
+            try
+            {
+                if (LocalizationTable.hash!=latestCommitHash)
                 {
-                    // Not a big deal:
-                    // Next time the LocalizationDownloader will force an update.
-                    UnityDebugger.Debugger.LogWarning("LocalizationDownloader", "Writing version in config.xml file failed: " + e.Message);
-                    throw;
+
                 }
+
+                string configPath = Path.Combine(LocalizationFolderPath, "config.json");
+                XmlDocument document = new XmlDocument();
+                document.Load(configPath);
+                XmlNode node = document.SelectSingleNode("//config");
+
+                XmlElement versionElement = document.CreateElement("version");
+                versionElement.SetAttribute("hash", latestCommitHash);
+                node.InsertBefore(versionElement, document.SelectSingleNode("//languages"));
+                document.Save(configPath);
+            }
+            catch (Exception e)
+            {
+                // Not a big deal:
+                // Next time the LocalizationDownloader will force an update.
+                UnityDebugger.Debugger.LogWarning("LocalizationDownloader", "Writing version in config.json file failed: " + e.Message);
+                throw;
             }
         }
 
@@ -295,56 +305,7 @@ namespace ProjectPorcupine.Localization
         /// </summary>
         private static string GetLocalizationVersionFromConfig()
         {
-            string localizationConfigFilePath = Path.Combine(LocalizationFolderPath, "config.xml");
-
-            string currentLocalizationVersion = null;
-            try
-            {
-                XmlReader reader = XmlReader.Create(localizationConfigFilePath);
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "version")
-                    {
-                        if (reader.HasAttributes)
-                        {
-                            currentLocalizationVersion = reader.GetAttribute("hash");
-                            break;
-                        }
-                    }
-                }
-
-                reader.Close();
-            }
-            catch (FileNotFoundException)
-            {
-                // It's fine - we will create that file later.
-                UnityDebugger.Debugger.Log("LocalizationDownloader", localizationConfigFilePath + " file not found, forcing an update.");
-            }
-            catch (DirectoryNotFoundException)
-            {
-                // This is probably first launch of the game.
-                UnityDebugger.Debugger.Log("LocalizationDownloader", LocalizationFolderPath + " folder not found, creating...");
-
-                try
-                {
-                    Directory.CreateDirectory(LocalizationFolderPath);
-                }
-                catch (Exception e)
-                {
-                    // If any exception happen here then we don't have a Localization folder in place
-                    // so we can just throw - we won't do anything good here.
-                    throw e;
-                }
-            }
-            catch (Exception e)
-            {
-                // i.e. UnauthorizedAccessException, NotSupportedException or UnauthorizedAccessException.
-                // Those should never happen and if they do something is really fucked up so we should
-                // probably start a fire, call 911 or at least throw an exception.
-                throw e;
-            }
-
-            return currentLocalizationVersion;
+            return LocalizationTable.hash;
         }
 
         /// <summary>
