@@ -8,7 +8,6 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Localization;

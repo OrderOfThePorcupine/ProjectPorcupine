@@ -8,7 +8,6 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
 using ProjectPorcupine.Rooms;
 
@@ -16,7 +15,6 @@ namespace ProjectPorcupine.Buildable.Components
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    [XmlRoot("Component")]
     [BuildableComponentName("GasConnection")]
     public class GasConnection : BuildableComponent
     {
@@ -30,15 +28,12 @@ namespace ProjectPorcupine.Buildable.Components
             Requires = other.Requires;
         }
 
-        [XmlElement("Provides")]
         [JsonProperty("Provides")]
         public List<GasInfo> Provides { get; set; }
 
-        [XmlElement("Requires")]
         [JsonProperty("Requires")]
         public List<GasInfo> Requires { get; set; }
 
-        [XmlElement("Efficiency")]
         [JsonProperty("Efficiency")]
         public SourceDataInfo Efficiency { get; set; }
 
@@ -119,16 +114,9 @@ namespace ProjectPorcupine.Buildable.Components
                 MaxLimit = 1f;
             }
 
-            [XmlAttribute("gas")]
             public string Gas { get; set; }
-
-            [XmlAttribute("rate")]
             public float Rate { get; set; }
-
-            [XmlAttribute("minLimit")]
             public float MinLimit { get; set; }
-
-            [XmlAttribute("maxLimit")]
             public float MaxLimit { get; set; }
 
             public override string ToString()

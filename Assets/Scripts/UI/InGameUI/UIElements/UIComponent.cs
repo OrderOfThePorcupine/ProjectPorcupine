@@ -6,8 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 /// <summary>
@@ -40,25 +38,6 @@ public class UIComponent
     /// Parameters for the class.
     /// </summary>
     public Parameter Parameters { get; private set; }
-
-    public void ReadXml(XmlReader reader)
-    {
-        string className = reader.GetAttribute("ClassName");
-        XmlReader subReader = reader.ReadSubtree();
-        subReader.Read();
-        if (string.IsNullOrEmpty(className) == false)
-        {
-            Type = className;
-            if (subReader != null && subReader.ReadToDescendant("Params"))
-            {
-                Parameters = Parameter.ReadXml(subReader);
-            }
-            else
-            {
-                Parameters = new Parameter();
-            }
-        }
-    }
 
     public void ReadJson(JToken componentToken)
     {

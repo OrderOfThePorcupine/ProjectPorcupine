@@ -7,14 +7,10 @@
 // ====================================================
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
 
 /// <summary>
 /// A class that holds prototypes to be used later.

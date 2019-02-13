@@ -11,8 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace ProjectPorcupine.OrderActions
@@ -36,7 +34,6 @@ namespace ProjectPorcupine.OrderActions
             JobTime = other.JobTime;
         }
 
-        [XmlIgnore]
         public string Type { get; set; }
 
         public float JobTime { get; set; }
@@ -44,31 +41,6 @@ namespace ProjectPorcupine.OrderActions
         public string JobTimeFunction { get; set; }
 
         public Dictionary<string, int> Inventory { get; set; }
-
-        public static OrderAction Deserialize(XmlReader xmlReader)
-        {
-            if (orderActionTypes == null)
-            {
-                orderActionTypes = FindOrderActionsInAssembly();
-            }
-
-            string orderActionType = xmlReader.GetAttribute("type");
-            if (orderActionTypes.ContainsKey(orderActionType))
-            {
-                xmlReader = xmlReader.ReadSubtree();
-                Type t = orderActionTypes[orderActionType];
-                XmlSerializer serializer = new XmlSerializer(t);
-                OrderAction orderAction = (OrderAction)serializer.Deserialize(xmlReader);
-                //// need to set name explicitly (not part of deserialization as it's passed in)
-                orderAction.Initialize(orderActionType);
-                return orderAction;
-            }
-            else
-            {
-                UnityDebugger.Debugger.Log(OrderActionsLogChannel, string.Format("There is no deserializer for OrderAction '{0}'", orderActionType));
-                return null;
-            }
-        }
 
         public static OrderAction FromJson(JProperty orderActionProp)
         {

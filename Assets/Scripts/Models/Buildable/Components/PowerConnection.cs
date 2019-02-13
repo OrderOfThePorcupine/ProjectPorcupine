@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 using ProjectPorcupine.Localization;
@@ -19,7 +18,6 @@ namespace ProjectPorcupine.Buildable.Components
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    [XmlRoot("Component")]
     [BuildableComponentName("PowerConnection")]
     [MoonSharpUserData]
     public class PowerConnection : BuildableComponent, IPluggable
@@ -40,7 +38,6 @@ namespace ProjectPorcupine.Buildable.Components
 
         public event Action Reconnecting;
 
-        [XmlElement("ParameterDefinitions")]
         [JsonProperty("ParameterDefinitions")]
         public PowerConnectionParameterDefinitions ParamsDefinitions { get; set; }
 
@@ -60,7 +57,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         public bool IsRunning
         {
             get
@@ -74,7 +70,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         public bool IsConnected
         {
             get
@@ -88,7 +83,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         public float Efficiency
         {
             get
@@ -102,7 +96,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         public bool OutputIsNeeded
         {
             get
@@ -116,19 +109,15 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlElement("Provides")]
         [JsonProperty("Provides")]
         public Info Provides { get; set; }
 
-        [XmlElement("Requires")]
         [JsonProperty("Requires")]
         public Info Requires { get; set; }
 
-        [XmlElement("RunConditions")]
         [JsonProperty("RunConditions")]
         public Conditions RunConditions { get; set; }
         
-        [XmlIgnore]
         public float StoredAmount
         {
             get

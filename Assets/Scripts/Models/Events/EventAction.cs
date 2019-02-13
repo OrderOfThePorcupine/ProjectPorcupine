@@ -8,7 +8,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 
@@ -35,33 +34,6 @@ public class EventActions
         evt.actionsList = new Dictionary<string, List<string>>(actionsList);
 
         return evt;
-    }
-
-    /// <summary>
-    /// Fill the values of this using an xml specification.
-    /// </summary>
-    /// <param name="reader">Reader pointing to an Action tag.</param>
-    public void ReadXml(XmlReader reader)
-    {
-        reader.Read();
-        if (reader.Name != "Action")
-        {
-            UnityDebugger.Debugger.LogError("EventActions", string.Format("The element is not an Action, but a \"{0}\"", reader.Name));
-        }
-
-        string name = reader.GetAttribute("event");
-        if (name == null)
-        {
-            UnityDebugger.Debugger.LogError("EventActions", string.Format("The attribute \"event\" is a mandatory for an \"Action\" element."));
-        }
-
-        string functionName = reader.GetAttribute("functionName");
-        if (functionName == null)
-        {
-            UnityDebugger.Debugger.LogError("EventActions", string.Format("No function name was provided for the Action {0}.", name));
-        }
-
-        Register(name, functionName);
     }
 
     /// <summary>

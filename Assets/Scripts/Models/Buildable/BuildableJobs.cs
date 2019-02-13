@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -115,33 +114,6 @@ public class BuildableJobs
     public Job this[int i]
     {
         get { return activeJobs[i]; }
-    }
-
-    /// <summary>
-    /// Reads the job work spot offset from the xml.
-    /// </summary>
-    /// <param name="reader">The Xml Reader.</param>
-    public void ReadWorkSpotOffset(XmlReader reader)
-    {
-        WorkSpotOffset = ReadVector(reader);
-    }
-
-    /// <summary>
-    /// Reads the input spot offset from the xml.
-    /// </summary>
-    /// <param name="reader">The Xml Reader.</param>
-    public void ReadInputSpotOffset(XmlReader reader)
-    {
-        InputSpotOffset = ReadVector(reader);
-    }
-
-    /// <summary>
-    /// Reads the output spot offset from the xml.
-    /// </summary>
-    /// <param name="reader">The Xml Reader.</param>
-    public void ReadOutputSpotOffset(XmlReader reader)
-    {
-        OutputSpotOffset = ReadVector(reader);
     }
 
     public void ReadOffsets(JToken jobToken)
@@ -285,18 +257,6 @@ public class BuildableJobs
     private Tile GetTileAtOffset(Vector2 offset)
     {
         return World.Current.GetTileAt(buildable.Tile.X + (int)offset.x, buildable.Tile.Y + (int)offset.y, buildable.Tile.Z);
-    }
-
-    /// <summary>
-    /// Reads from the Xml Reader and creates a vector.
-    /// </summary>
-    /// <returns>The vector.</returns>
-    /// <param name="reader">The Xml Reader.</param>
-    private Vector2 ReadVector(XmlReader reader)
-    {
-        return new Vector2(
-            int.Parse(reader.GetAttribute("X")),
-            int.Parse(reader.GetAttribute("Y")));
     }
 
     private Vector2 ReadVector(JToken vectorToken)

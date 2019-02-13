@@ -8,7 +8,6 @@
 #endregion
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 
@@ -92,54 +91,6 @@ public class Parameter
         {
             contents[key] = value;
         }
-    }
-
-    public static Parameter ReadXml(XmlReader reader)
-    {
-        Parameter paramGroup = new Parameter(reader.GetAttribute("name"));
-        XmlReader subReader = reader.ReadSubtree();
-
-        // Advance to the first inner element. Two reads are needed to ensure we don't get stuck on containing Element, or an EndElement
-        subReader.Read();
-
-        // In case the reader gets passed early, we descend to Params if it's not a Params or Param
-        if (subReader.Name != "Params" && subReader.Name != "Param")
-        {
-            subReader.ReadToDescendant("Params");
-        }
-
-        subReader.Read();
-
-        do
-        {
-            string k = subReader.GetAttribute("name");
-
-            // Sometimes the look will get stuck on a Whitespace or an EndElement and error, so continue to next loop if we encounter one
-            if (subReader.NodeType == XmlNodeType.Whitespace || subReader.NodeType == XmlNodeType.EndElement || string.IsNullOrEmpty(k))
-            {
-                continue;
-            }
-
-            // Somewhat redundant check to make absolutely sure we're on an Element
-            if (subReader.NodeType == XmlNodeType.Element)
-            {
-                // An empty element is a singular Param such as <Param name="name" value="value />
-                if (subReader.IsEmptyElement)
-                {
-                    string v = subReader.GetAttribute("value");
-                    paramGroup[k] = new Parameter(k, v);
-                }
-                else
-                {
-                    // This must be a group element, so we recurse and dive deeper
-                    paramGroup[k] = Parameter.ReadXml(subReader);
-                }
-            }
-        }
-        while (subReader.ReadToNextSibling("Param"));
-
-        subReader.Close();
-        return paramGroup;
     }
 
     public override string ToString()
