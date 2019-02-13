@@ -17,12 +17,12 @@ public class ParametersEditorTest
     [SetUp]
     public void Init()
     {
-        JsonTest1 = @"{""Parameters"":{
-            ""gas_limit"": ""0.2"",
-            ""gas_per_second"": ""0.16"",
-            ""gas_gen"":{
-                ""O2"":{ ""gas_limit"":""0.2""},
-                ""N2"":{ ""gas_limit"":""0.8""}
+        JsonTest1 = @"{'Parameters':{
+            'gas_limit': '0.2',
+            'gas_per_second': '0.16',
+            'gas_gen':{
+                'O2':{ 'gas_limit':'0.2'},
+                'N2':{ 'gas_limit':'0.8'}
                 }
             }}";
 

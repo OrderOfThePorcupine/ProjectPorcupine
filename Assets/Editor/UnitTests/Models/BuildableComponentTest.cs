@@ -51,8 +51,6 @@ public class BuildableComponentTest
                 }
             }";
 
-        inputJson = inputJson.Replace("'", "\"");
-
         JToken reader = JToken.Parse(inputJson);
 
         BuildableComponent component = ProjectPorcupine.Buildable.Components.BuildableComponent.Deserialize(reader);
