@@ -219,7 +219,7 @@ public class Parameter
             Parameter parameter = new Parameter(key);
             JToken valueToken = parameterProperty.Value;
 
-            if (valueToken.Children().Count() > 1)
+            if (valueToken.Children().Count() >= 1)
             {
                 parameter.FromJson(valueToken);
             }

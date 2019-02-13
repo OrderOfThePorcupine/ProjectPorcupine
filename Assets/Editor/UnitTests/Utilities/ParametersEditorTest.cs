@@ -6,11 +6,79 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using NUnit.Framework;
+using UnityEditor;
+using UnityEngine;
+using Newtonsoft.Json.Linq;
 
 public class ParametersEditorTest
 {
+    private string JsonTest1;
     private Parameter param1;
+
+    [SetUp]
+    public void Init()
+    {
+        JsonTest1 = @"{""Parameters"":{
+            ""gas_limit"": ""0.2"",
+            ""gas_per_second"": ""0.16"",
+            ""gas_gen"":{
+                ""O2"":{ ""gas_limit"":""0.2""},
+                ""N2"":{ ""gas_limit"":""0.8""}
+                }
+            }}";
+
+        JToken token = JToken.Parse(JsonTest1)["Parameters"];
+        param1 = new Parameter();
+        param1.FromJson(token);
+    }
+
+    [Test]
+    public void ParameterReadKeys()
+    {
+        Assert.That(param1, Is.Not.Null);
+
+        Assert.That(param1.ContainsKey("gas_limit"), Is.True);
+        Assert.That(param1.ContainsKey("gas_per_second"), Is.True);
+        Assert.That(param1.ContainsKey("gas_gen"), Is.True);
+
+        Assert.That(param1["gas_gen"].ContainsKey("O2"), Is.True);
+        Assert.That(param1["gas_gen"].ContainsKey("N2"), Is.True);
+    }
+
+    [Test]
+    public void ParameterReadValues()
+    {
+        Assert.That(param1["gas_limit"], Is.TypeOf(typeof(Parameter)));
+        Assert.That(param1["gas_limit"].HasContents(), Is.False);
+        Assert.That(param1["gas_limit"].ToString(), Is.EqualTo("0.2"));
+
+        Assert.That(param1["gas_per_second"], Is.TypeOf(typeof(Parameter)));
+        Assert.That(param1["gas_per_second"].HasContents(), Is.False);
+        Assert.That(param1["gas_per_second"].ToString(), Is.EqualTo("0.16"));
+
+        Assert.That(param1["gas_gen"], Is.TypeOf(typeof(Parameter)));
+        Assert.That(param1["gas_gen"].HasContents(), Is.True);
+        Assert.That(param1["gas_gen"].ToFloat(), Is.EqualTo(0));
+        Assert.That(param1["gas_gen"].ToString(), Is.EqualTo(null));
+
+        Assert.That(param1["gas_gen"]["O2"], Is.TypeOf(typeof(Parameter)));
+        Assert.That(param1["gas_gen"]["O2"].HasContents(), Is.True);
+        Assert.That(param1["gas_gen"]["O2"].ToString(), Is.EqualTo(null));
+        Assert.That(param1["gas_gen"]["O2"].Keys().Length, Is.EqualTo(1));
+        Assert.That(param1["gas_gen"]["O2"].ContainsKey("gas_limit"), Is.True);
+        Assert.That(param1["gas_gen"]["O2"]["gas_limit"].ToString(), Is.EqualTo("0.2"));
+
+        Assert.That(param1["gas_gen"]["N2"], Is.TypeOf(typeof(Parameter)));
+        Assert.That(param1["gas_gen"]["N2"].HasContents(), Is.True);
+        Assert.That(param1["gas_gen"]["N2"].ToString(), Is.EqualTo(null));
+        Assert.That(param1["gas_gen"]["N2"].Keys().Length, Is.EqualTo(1));
+        Assert.That(param1["gas_gen"]["N2"].ContainsKey("gas_limit"), Is.True);
+        Assert.That(param1["gas_gen"]["N2"]["gas_limit"].ToString(), Is.EqualTo("0.8"));
+    }
 
     [Test]
     public void ParameterAccessingKeyNotDefined()
