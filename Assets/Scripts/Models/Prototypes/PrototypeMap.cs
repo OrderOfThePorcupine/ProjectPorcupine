@@ -143,35 +143,6 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     }
 
     /// <summary>
-    /// Loads all the prototypes from the specified text.
-    /// </summary>
-    /// <param name="xmlText">Xml text to parse.</param>
-    public void LoadPrototypes(string xmlText)
-    {
-        XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
-
-        if (reader.ReadToDescendant(listTag))
-        {
-            if (reader.ReadToDescendant(elementTag))
-            {
-                do
-                {
-                    LoadPrototype(reader);
-                }
-                while (reader.ReadToNextSibling(elementTag));
-            }
-            else
-            {
-                UnityDebugger.Debugger.LogError("PrototypeMap", "The '" + listTag + "' prototype definition file doesn't have any '" + elementTag + "' elements.");
-            }
-        }
-        else
-        {
-            UnityDebugger.Debugger.LogError("PrototypeMap", "Did not find a '" + listTag + "' element in the prototype definition file.");
-        }
-    }
-
-    /// <summary>
     /// Loads all the prototypes from the specified JProperty.
     /// </summary>
     /// <param name="protoToken">JProperty to parse.</param>
@@ -205,25 +176,5 @@ public class PrototypeMap<T> where T : IPrototypable, new()
                 Set(prototype);
             }
         }
-    }
-
-    /// <summary>
-    /// Loads a single prototype.
-    /// </summary>
-    /// <param name="reader">The Xml Reader.</param>
-    private void LoadPrototype(XmlReader reader)
-    {
-        T prototype = new T();
-        try
-        {
-            prototype.ReadXmlPrototype(reader);
-        }
-        catch (Exception e)
-        {
-            // Leaving this for Unitys console because UberLogger doesn't show multiline messages correctly.
-            UnityDebugger.Debugger.LogError("PrototypeMap", "Error reading '" + elementTag + "' prototype for: " + listTag + Environment.NewLine + "Exception: " + e.Message + Environment.NewLine + "StackTrace: " + e.StackTrace);
-        }
-
-        Set(prototype);
     }
 }

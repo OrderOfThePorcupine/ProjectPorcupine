@@ -8,8 +8,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 /// <summary>
@@ -26,48 +24,6 @@ public class SettingsCategory : IPrototypable
     /// In JSON its the 'Name' of the category.
     /// </summary>
     public string Type { get; set; }
-
-    /// <summary>
-    /// Reads from the reader provided.
-    /// </summary>
-    public void ReadXmlPrototype(XmlReader parentReader)
-    {
-        Type = parentReader.GetAttribute("Name");
-        if (Type == null)
-        {
-            throw new System.Exception("Type ('Name') doesn't exist in category.");
-        }
-
-        XmlReader reader = parentReader.ReadSubtree();
-
-        string currentHeading = string.Empty;
-        List<SettingsOption> options = new List<SettingsOption>();
-
-        while (reader.Read())
-        {
-            switch (reader.Name)
-            {
-                case "OptionHeading":
-                    // Assign then switch over
-                    if (string.IsNullOrEmpty(currentHeading) == false && options.Count > 0)
-                    {
-                        headings.Add(currentHeading, options.ToList());
-                    }
-
-                    currentHeading = reader.GetAttribute("Name");
-                    options.Clear();
-                    break;
-                case "Option":
-                    options.Add(new SettingsOption(reader));
-                    break;
-            }
-        }
-
-        if (string.IsNullOrEmpty(currentHeading) == false)
-        {
-            headings.Add(currentHeading, options);
-        }
-    }
 
     /// <summary>
     /// Reads the prototype from the specified JObject.

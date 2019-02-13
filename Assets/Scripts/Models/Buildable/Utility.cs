@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using Newtonsoft.Json.Linq;
@@ -300,67 +299,6 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     }
 
     /// <summary>
-    /// Reads the prototype utility from XML.
-    /// </summary>
-    /// <param name="readerParent">The XML reader to read from.</param>
-    public void ReadXmlPrototype(XmlReader readerParent)
-    {
-        Type = readerParent.GetAttribute("type");
-
-        XmlReader reader = readerParent.ReadSubtree();
-
-        while (reader.Read())
-        {
-            switch (reader.Name)
-            {
-                case "TypeTag":
-                    reader.Read();
-                    typeTags.Add(reader.ReadContentAsString());
-                    break;
-                case "CanBeBuiltOn":
-                    tileTypeBuildPermissions.Add(reader.GetAttribute("tileType"));
-                    break;
-                case "Action":
-                    XmlReader subtree = reader.ReadSubtree();
-                    EventActions.ReadXml(subtree);
-                    subtree.Close();
-                    break;
-                case "ContextMenuAction":
-                    contextMenuLuaActions.Add(new ContextMenuLuaAction
-                    {
-                        LuaFunction = reader.GetAttribute("FunctionName"),
-                        LocalizationKey = reader.GetAttribute("Text"),
-                        RequireCharacterSelected = bool.Parse(reader.GetAttribute("RequireCharacterSelected")),
-                        DevModeOnly = bool.Parse(reader.GetAttribute("DevModeOnly") ?? "false")
-                    });
-                    break;
-                case "GetSpriteName":
-                    getSpriteNameAction = reader.GetAttribute("FunctionName");
-                    break;
-                case "Params":
-                    ReadXmlParams(reader);  // Read in the Param tag
-                    break;
-                case "LocalizationCode":
-                    reader.Read();
-                    LocalizationName = reader.ReadContentAsString();
-                    break;
-                case "UnlocalizedDescription":
-                    reader.Read();
-                    LocalizationDescription = reader.ReadContentAsString();
-                    break;
-                case "OrderAction":
-                    OrderAction orderAction = OrderAction.Deserialize(reader);
-                    if (orderAction != null)
-                    {
-                        orderActions[orderAction.Type] = orderAction;
-                    }
-
-                    break;
-            }
-        }
-    }
-
-    /// <summary>
     /// Reads the prototype from the specified JObject.
     /// </summary>
     /// <param name="jsonProto">The JProperty containing the prototype.</param>
@@ -382,17 +320,6 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             Parameters.FromJson(innerJson["Parameters"]);
         }
-    }
-
-    /// <summary>
-    /// Reads the XML for parameters that this utility has and assign it to the utility.
-    /// </summary>
-    /// <param name="reader">The reader to read the parameters from.</param>
-    public void ReadXmlParams(XmlReader reader)
-    {
-        // X, Y, and type have already been set, and we should already
-        // be assigned to a tile.  So just read extra data.
-        Parameters = Parameter.ReadXml(reader);
     }
 
     /// <summary>

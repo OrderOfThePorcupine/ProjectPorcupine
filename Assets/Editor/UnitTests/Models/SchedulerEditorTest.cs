@@ -40,10 +40,12 @@ public class SchedulerEditorTest
 
         FunctionsManager.ScheduledEvent.LoadScript(LuaFunctionString, "ScheduledEvent", Functions.Type.Lua);
 
+        PrototypeManager.Initialize();
+
         JToken reader = JToken.Parse(JsonPrototypeString);
 
         PrototypeManager.ScheduledEvent.Add(new ScheduledEvent("ping_log", evt => UnityDebugger.Debugger.LogFormat("Scheduler", "Event {0} fired", evt.Name)));
-        PrototypeManager.Headline.LoadJsonPrototypes((JProperty)reader.First);
+        PrototypeManager.ScheduledEvent.LoadJsonPrototypes((JProperty)reader.First);
 
         // The problem with unit testing singletons
         ///scheduler = Scheduler.Scheduler.Current;

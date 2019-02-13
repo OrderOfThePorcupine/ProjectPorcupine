@@ -10,7 +10,6 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -63,32 +62,6 @@ namespace DeveloperConsole.Core
             catch (Exception e)
             {
                 DevConsole.LogError(e.Message);
-            }
-        }
-
-        /// <summary>
-        /// Reads from the reader provided.
-        /// </summary>
-        public void ReadXmlPrototype(XmlReader reader)
-        {
-            Title = reader.GetAttribute("Title");
-            FunctionName = reader.GetAttribute("FunctionName");
-            Description = reader.GetAttribute("Description");
-            DetailedDescription = reader.GetAttribute("DetailedDescription");
-            Parameters = reader.GetAttribute("Parameters");
-            ParseParameterToTypeInfo();
-            Tags = reader.GetAttribute("Tags").Split(',').Select(x => x.Trim()).ToArray();
-            DefaultValue = reader.GetAttribute("DefaultValue");
-
-            // This is an optional checker basically
-            if (Tags == null)
-            {
-                Tags = new string[0];
-            }
-
-            if (DefaultValue == null)
-            {
-                DefaultValue = string.Empty;
             }
         }
 

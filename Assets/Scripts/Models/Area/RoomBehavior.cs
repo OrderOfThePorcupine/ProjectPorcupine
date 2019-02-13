@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 using Newtonsoft.Json.Linq;
@@ -194,93 +193,6 @@ namespace ProjectPorcupine.Rooms
         public bool IsValidRoom(Room room)
         {
             return funcRoomValidation(room);
-        }
-
-        /// <summary>
-        /// Reads the prototype room behavior from XML.
-        /// </summary>
-        /// <param name="readerParent">The XML reader to read from.</param>
-        public void ReadXmlPrototype(XmlReader readerParent)
-        {
-            Type = readerParent.GetAttribute("type");
-
-            XmlReader reader = readerParent.ReadSubtree();
-
-            while (reader.Read())
-            {
-                switch (reader.Name)
-                {
-                    case "Name":
-                        reader.Read();
-                        Name = reader.ReadContentAsString();
-                        break;
-                    case "TypeTag":
-                        reader.Read();
-                        typeTags.Add(reader.ReadContentAsString());
-                        break;
-                    case "Description":
-                        reader.Read();
-                        description = reader.ReadContentAsString();
-                        break;
-                    case "Requirements":
-                        ReadXmlRequirements(reader);
-                        break;
-                    case "Optional":
-                        ReadXmlRequirements(reader, true);
-                        break;
-                    case "Action":
-                        XmlReader subtree = reader.ReadSubtree();
-                        EventActions.ReadXml(subtree);
-                        subtree.Close();
-                        break;
-                    case "ContextMenuAction":
-                        contextMenuLuaActions.Add(new ContextMenuLuaAction
-                        {
-                            LuaFunction = reader.GetAttribute("FunctionName"),
-                            LocalizationKey = reader.GetAttribute("Text"),
-                            RequireCharacterSelected = bool.Parse(reader.GetAttribute("RequireCharacterSelected")),
-                            DevModeOnly = bool.Parse(reader.GetAttribute("DevModeOnly") ?? "false")
-                        });
-                        break;
-                    case "Params":
-                        ReadXmlParams(reader);  // Read in the Param tag
-                        break;
-                    case "LocalizationCode":
-                        reader.Read();
-                        LocalizationName = reader.ReadContentAsString();
-                        break;
-                    case "UnlocalizedDescription":
-                        reader.Read();
-                        LocalizationDescription = reader.ReadContentAsString();
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Reads the specified XMLReader (pass it to <see cref="ReadXmlParams(XmlReader)"/>)
-        /// This is used to load room behavior from a save file.
-        /// </summary>
-        /// <param name="reader">The XML reader to read from.</param>
-        public void ReadXml(XmlReader reader)
-        {
-            // X, Y, and type have already been set, and we should already
-            // be assigned to a tile.  So just read extra data if we have any.
-            if (!reader.IsEmptyElement)
-            {
-                ReadXmlParams(reader);
-            }
-        }
-
-        /// <summary>
-        /// Reads the XML for parameters that this room behavior has and assign it to the room behavior.
-        /// </summary>
-        /// <param name="reader">The reader to read the parameters from.</param>
-        public void ReadXmlParams(XmlReader reader)
-        {
-            // X, Y, and type have already been set, and we should already
-            // be assigned to a tile.  So just read extra data.
-            Parameters = Parameter.ReadXml(reader);
         }
 
         /// <summary>
@@ -505,38 +417,6 @@ namespace ProjectPorcupine.Rooms
                 else if (requirementToken["Size"] != null && !isOptional)
                 {
                     requiredSize = PrototypeReader.ReadJson(requiredSize, requirementToken["Size"]);
-                }
-            }
-        }
-
-        private void ReadXmlRequirements(XmlReader readerParent, bool isOptional = false)
-        {
-            XmlReader reader = readerParent.ReadSubtree();
-            reader.Read();
-
-            while (reader.Read())
-            {
-                switch (reader.Name)
-                {
-                    case "Furniture":
-                        // Furniture must have either Type or TypeTag, try both, check for null later
-                        string type = reader.GetAttribute("type");
-                        string typeTag = reader.GetAttribute("typeTag");
-                        int count = 0;
-                        if (!isOptional)
-                        {
-                            int.TryParse(reader.GetAttribute("count"), out count);
-                        }
-
-                        requiredFurniture.Add(new FurnitureRequirement(type, typeTag, count));
-                        break;
-                    case "Size":
-                        if (!isOptional)
-                        {
-                            int.TryParse(reader.GetAttribute("tiles"), out requiredSize);
-                        }
-
-                        break;
                 }
             }
         }

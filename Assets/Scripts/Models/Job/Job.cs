@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
@@ -555,10 +554,6 @@ public class Job : ISelectable, IPrototypable
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
-    }
-
-    public void ReadXmlPrototype(XmlReader reader)
-    {
     }
 
     // TODO: Why does this implement IPrototypable? It isn't a prototype.
