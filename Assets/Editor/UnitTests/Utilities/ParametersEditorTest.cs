@@ -6,12 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using NUnit.Framework;
-using UnityEditor;
-using UnityEngine;
 using Newtonsoft.Json.Linq;
 
 public class ParametersEditorTest

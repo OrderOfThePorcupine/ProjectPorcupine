@@ -115,8 +115,11 @@ namespace ProjectPorcupine.Buildable.Components
             }
 
             public string Gas { get; set; }
+
             public float Rate { get; set; }
+
             public float MinLimit { get; set; }
+
             public float MaxLimit { get; set; }
 
             public override string ToString()

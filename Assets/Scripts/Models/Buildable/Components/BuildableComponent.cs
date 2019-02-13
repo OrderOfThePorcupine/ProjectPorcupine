@@ -365,7 +365,9 @@ namespace ProjectPorcupine.Buildable.Components
         public class SourceDataInfo
         {
             public string Value { get; set; }
+
             public string FromParameter { get; set; }
+
             public string FromFunction { get; set; }
         }
 
@@ -374,8 +376,11 @@ namespace ProjectPorcupine.Buildable.Components
         public class Info
         {
             public float Rate { get; set; }
+
             public float Capacity { get; set; }
+
             public int CapacityThresholds { get; set; }
+
             public bool CanUseVariableEfficiency { get; set; }
         }
 

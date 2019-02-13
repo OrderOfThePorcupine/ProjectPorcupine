@@ -552,9 +552,13 @@ namespace ProjectPorcupine.Buildable.Components
         public class Item
         {
             public string ObjectType { get; set; }
+
             public int Amount { get; set; }
+
             public int SlotPosX { get; set; }
+
             public int SlotPosY { get; set; }
+
             public bool HasHopper { get; set; }
         }
 
@@ -563,6 +567,7 @@ namespace ProjectPorcupine.Buildable.Components
         public class ProductionChain
         {
             public string Name { get; set; }
+
             public float ProcessingTime { get; set; }
 
             public List<Item> Input { get; set; }
