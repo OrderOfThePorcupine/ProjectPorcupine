@@ -15,7 +15,6 @@ using ProjectPorcupine.Buildable.Components;
 
 public class BuildableComponentTest
 {
-
     [Test]
     public void TestComponentCreationFromJson()
     {

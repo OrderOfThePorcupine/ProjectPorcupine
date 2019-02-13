@@ -6,18 +6,18 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using NUnit.Framework;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 
 public class ParametersEditorTest
 {
-    private string JsonTest1;
+    private string jsonTestCode;
     private Parameter param1;
 
     [SetUp]
     public void Init()
     {
-        JsonTest1 = @"{'Parameters':{
+        jsonTestCode = @"{'Parameters':{
             'gas_limit': '0.2',
             'gas_per_second': '0.16',
             'gas_gen':{
@@ -26,7 +26,7 @@ public class ParametersEditorTest
                 }
             }}";
 
-        JToken token = JToken.Parse(JsonTest1)["Parameters"];
+        JToken token = JToken.Parse(jsonTestCode)["Parameters"];
         param1 = new Parameter();
         param1.FromJson(token);
     }
