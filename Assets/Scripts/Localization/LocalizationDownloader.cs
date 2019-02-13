@@ -9,10 +9,8 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Xml;
 
 using ICSharpCode.SharpZipLib.Zip;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -116,14 +114,7 @@ namespace ProjectPorcupine.Localization
                 }
 
                 string configPath = Path.Combine(LocalizationFolderPath, "config.json");
-                XmlDocument document = new XmlDocument();
-                document.Load(configPath);
-                XmlNode node = document.SelectSingleNode("//config");
-
-                XmlElement versionElement = document.CreateElement("version");
-                versionElement.SetAttribute("hash", latestCommitHash);
-                node.InsertBefore(versionElement, document.SelectSingleNode("//languages"));
-                document.Save(configPath);
+                LocalizationTable.SaveConfigFile(latestCommitHash,configPath);
             }
             catch (Exception e)
             {

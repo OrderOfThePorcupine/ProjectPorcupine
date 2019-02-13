@@ -14,6 +14,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using System.Threading;
 
 namespace ProjectPorcupine.Localization
 {
@@ -27,7 +28,7 @@ namespace ProjectPorcupine.Localization
         public static string currentLanguage = DefaultLanguage;
 
         // The hash for the current localization code
-        public static string hash = string.Empty;
+        public static string hash = "empty";    //Set to something to ensure will be downloaded if not available.
 
         // Used by the LocalizationLoader to ensure that the localization files are only loaded once.
         public static bool initialized = false;
@@ -47,6 +48,8 @@ namespace ProjectPorcupine.Localization
         private static HashSet<string> missingKeysLogged = new HashSet<string>();
 
         public static event Action CBLocalizationFilesChanged;
+
+        public static JToken protoJson;
 
         public enum FallbackMode
         {
@@ -141,6 +144,33 @@ namespace ProjectPorcupine.Localization
             }
         }
 
+        public static void SaveConfigFile(string latestCommitHash, string filePath)
+        {
+            protoJson["version"] = latestCommitHash;
+            hash = latestCommitHash;
+            StreamWriter sw = new StreamWriter(filePath);
+            JsonWriter writer = new JsonTextWriter(sw);
+
+            JObject worldJson = World.Current.ToJson();
+
+            // Launch saving operation in a separate thread.
+            // This reduces lag while saving by a little bit.
+            Thread t = new Thread(new ThreadStart(delegate { SaveJsonToHdd(worldJson, writer); }));
+            t.Start();
+        }
+
+        private static void SaveJsonToHdd(JObject json, JsonWriter writer)
+        {
+            JsonSerializer serializer = new JsonSerializer()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            };
+            serializer.Serialize(writer, json);
+
+            writer.Flush();
+        }
+
         /// <summary>
         /// Gets all languages present in library.
         /// </summary>
@@ -161,7 +191,7 @@ namespace ProjectPorcupine.Localization
             }
 
             StreamReader reader = File.OpenText(pathToConfigFile);
-            JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+            protoJson = JToken.ReadFrom(new JsonTextReader(reader));
 
 
             hash = protoJson["version"].ToString();
