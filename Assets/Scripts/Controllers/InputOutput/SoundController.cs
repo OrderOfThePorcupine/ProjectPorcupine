@@ -45,7 +45,6 @@ public class SoundController
     private VECTOR up;
     private VECTOR forward;
     private VECTOR zero;
-    private VECTOR ignore;
 
     // Use this for initialization
     public SoundController(World world = null)

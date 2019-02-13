@@ -8,7 +8,6 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 using ProjectPorcupine.Localization;
@@ -18,7 +17,6 @@ namespace ProjectPorcupine.Buildable.Components
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    [XmlRoot("Component")]
     [BuildableComponentName("FluidConnection")]
     [MoonSharpUserData]
     public class FluidConnection : BuildableComponent, IPluggable
@@ -41,7 +39,6 @@ namespace ProjectPorcupine.Buildable.Components
 
         public event Action Reconnecting;
 
-        [XmlElement("ParameterDefinitions")]
         [JsonProperty("ParameterDefinitions")]
         public FluidConnectionParameterDefinitions ParamsDefinitions { get; set; }
 
@@ -61,7 +58,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         public bool IsRunning
         {
             get
@@ -75,19 +71,15 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlElement("Provides")]
         [JsonProperty("Provides")]
         public Info Provides { get; set; }
 
-        [XmlElement("Requires")]
         [JsonProperty("Requires")]
         public Info Requires { get; set; }
 
-        [XmlElement("RunConditions")]
         [JsonProperty("RunConditions")]
         public Conditions RunConditions { get; set; }
 
-        [XmlIgnore]
         public float StoredAmount
         {
             get
@@ -131,7 +123,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlElement("FluidType")]
         [JsonProperty("FluidType")]
         public string SubType { get; set; }
 

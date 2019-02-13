@@ -8,7 +8,6 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 
@@ -16,7 +15,6 @@ namespace ProjectPorcupine.Buildable.Components
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    [XmlRoot("Component")]
     [BuildableComponentName("Visuals")]
     public class Visuals : BuildableComponent
     {
@@ -32,23 +30,18 @@ namespace ProjectPorcupine.Buildable.Components
             UsedAnimations = other.UsedAnimations;
         }
 
-        [XmlElement("DefaultSpriteName")]
         [JsonProperty("DefaultSpriteName")]
         public SourceDataInfo DefaultSpriteName { get; set; }
 
-        [XmlElement("SpriteName")]
         [JsonProperty("SpriteName")]
         public SourceDataInfo SpriteName { get; set; }
 
-        [XmlElement("OverlaySpriteName")]
         [JsonProperty("OverlaySpriteName")]
         public SourceDataInfo OverlaySpriteName { get; set; }
 
-        [XmlElement("UseAnimation")]
         [JsonProperty("UseAnimation")]
         public List<UseAnimation> UsedAnimations { get; set; }
         
-        [XmlIgnore]
         public string CurrentAnimationName { get; private set; }
 
         public override bool RequiresSlowUpdate
@@ -59,7 +52,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         private string DefaultAnimationName { get; set; }
 
         public override BuildableComponent Clone()

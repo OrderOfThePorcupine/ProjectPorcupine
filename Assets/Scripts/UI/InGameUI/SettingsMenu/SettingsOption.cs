@@ -6,8 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 /// <summary>
@@ -55,20 +53,6 @@ public struct SettingsOption
         this.defaultValue = defaultValue;
         this.classData = classData;
         this.tooltip = tooltip;
-    }
-
-    /// <summary>
-    /// A nice little helper.
-    /// </summary>
-    public SettingsOption(XmlReader reader)
-    {
-        XmlReader subReader = reader.ReadSubtree();
-        name = reader.GetAttribute("Name");
-        key = reader.GetAttribute("Key");
-        defaultValue = reader.GetAttribute("DefaultValue");
-        tooltip = reader.GetAttribute("Tooltip");
-        classData = new UIComponent(reader.GetAttribute("ClassName"), (reader != null && subReader.ReadToDescendant("Params")) ? Parameter.ReadXml(reader) : new Parameter());
-        subReader.Close();
     }
 
     /// <summary>

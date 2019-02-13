@@ -6,45 +6,33 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Xml;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using UnityEditor;
-using UnityEngine;
 
 public class ParametersEditorTest
 {
-    private string xmlTest1;
+    private string jsonTestCode;
     private Parameter param1;
 
     [SetUp]
     public void Init()
     {
-        xmlTest1 = @"<Params>
-            <Param name='gas_limit' value='0.2' />
-            <Param name='gas_per_second' value='0.16' />
-            <Param name='gas_gen'>
-                <Param name='O2'>
-                    <Param name='gas_limit' value='0.2' />
-                </Param>
-                <Param name='N2'>
-                    <Param name='gas_limit' value='0.8' />
-                </Param>
-            </Param>
-        </Params>";
+        jsonTestCode = @"{'Parameters':{
+            'gas_limit': '0.2',
+            'gas_per_second': '0.16',
+            'gas_gen':{
+                'O2':{ 'gas_limit':'0.2'},
+                'N2':{ 'gas_limit':'0.8'}
+                }
+            }}";
 
-        XmlTextReader reader = new XmlTextReader(new StringReader(xmlTest1));
-        
-        // Initializes the reader.
-        reader.Read();
-
-        param1 = Parameter.ReadXml(reader);
+        JToken token = JToken.Parse(jsonTestCode)["Parameters"];
+        param1 = new Parameter();
+        param1.FromJson(token);
     }
 
     [Test]
-    public void ParameterReadXmlKeys()
+    public void ParameterReadKeys()
     {
         Assert.That(param1, Is.Not.Null);
 
@@ -57,7 +45,7 @@ public class ParametersEditorTest
     }
 
     [Test]
-    public void ParameterReadXmlValues()
+    public void ParameterReadValues()
     {
         Assert.That(param1["gas_limit"], Is.TypeOf(typeof(Parameter)));
         Assert.That(param1["gas_limit"].HasContents(), Is.False);
