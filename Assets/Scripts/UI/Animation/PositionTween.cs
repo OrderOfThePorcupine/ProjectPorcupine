@@ -1,50 +1,67 @@
-﻿using System;
+﻿#region License
+// ====================================================
+// Project Porcupine Copyright(C) 2016 Team Porcupine
+// This program comes with ABSOLUTELY NO WARRANTY; This is free software,
+// and you are welcome to redistribute it under certain conditions; See
+// file LICENSE, which is part of this source code package, for details.
+// ====================================================
+#endregion
+
+using System;
 using UnityEngine;
 
-public class PositionTween
+namespace ProjectPorcupine.UI.Animation
 {
-    private RectTransform rect;
-    private Vector2 target;
-    private float duration;
-    private Action onEnded;
-    private float elapsedTime;
-
-    public PositionTween(RectTransform rect, Vector2 target, float duration)
+    public class PositionTween
     {
-        this.rect = rect;
-        this.target = target;
-        this.duration = duration;
-    }
+        private RectTransform rect;
+        private Vector2 target;
+        private float duration;
+        private Action onEnded;
+        private float elapsedTime;
 
-    public PositionTween(RectTransform rect, Vector2 target, float duration, Action onEnded) : this(rect, target, duration)
-    {
-        this.onEnded = onEnded;
-    }
-
-    public void Start()
-    {
-        elapsedTime = 0;
-        TimeManager.Instance.EveryFrame += Update;
-    }
-
-    public void Stop()
-    {
-        TimeManager.Instance.EveryFrame -= Update;
-    }
-
-    private void Update(float time)
-    {
-        if (elapsedTime < duration)
+        public PositionTween(RectTransform rect, Vector2 target, float duration)
         {
-            elapsedTime += time;
-            float percentage = Mathf.Clamp01(elapsedTime / duration);
-            rect.anchoredPosition = Vector2.Lerp(rect.anchoredPosition, target, percentage);
+            this.rect = rect;
+            this.target = target;
+            this.duration = duration;
         }
-        else
+
+        public PositionTween(RectTransform rect, Vector2 target, float duration, Action onEnded) : this(rect, target, duration)
         {
-            Stop();
-            if (onEnded != null) onEnded();
-            rect.anchoredPosition = target;
+            this.onEnded = onEnded;
+        }
+
+        public void Start()
+        {
+            elapsedTime = 0;
+            TimeManager.Instance.EveryFrame += Update;
+        }
+
+        public void Stop()
+        {
+            TimeManager.Instance.EveryFrame -= Update;
+        }
+
+        private void Update(float time)
+        {
+            if (elapsedTime < duration)
+            {
+                elapsedTime += time;
+                float percentage = Mathf.Clamp01(elapsedTime / duration);
+                rect.anchoredPosition = Vector2.Lerp(rect.anchoredPosition, target, percentage);
+            }
+            else
+            {
+                Stop();
+
+                if (onEnded != null)
+                {
+                    onEnded();
+                }
+
+                rect.anchoredPosition = target;
+            }
         }
     }
 }
