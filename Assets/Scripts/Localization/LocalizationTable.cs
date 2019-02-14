@@ -11,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using System.Threading;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace ProjectPorcupine.Localization
@@ -25,8 +27,13 @@ namespace ProjectPorcupine.Localization
         // Default is English.
         public static string currentLanguage = DefaultLanguage;
 
+        // The hash for the current localization code
+        public static string hash = "empty";    // Set to something to ensure will be downloaded if not available.
+
         // Used by the LocalizationLoader to ensure that the localization files are only loaded once.
         public static bool initialized = false;
+
+        public static JToken protoJson;
 
         private static readonly string DefaultLanguage = "en_US";
 
@@ -92,7 +99,7 @@ namespace ProjectPorcupine.Localization
             if (!missingKeysLogged.Contains(key))
             {
                 missingKeysLogged.Add(key);
-                UnityDebugger.Debugger.Log("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
+                UnityDebugger.Debugger.LogWarning("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
             }
 
             switch (fallbackMode)
@@ -110,7 +117,7 @@ namespace ProjectPorcupine.Localization
         {
             if (localizationConfigurations.ContainsKey(code) == false)
             {
-                UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config.xml");
+                UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config file.");
                 return code;
             }
 
@@ -137,6 +144,22 @@ namespace ProjectPorcupine.Localization
             }
         }
 
+        public static void SaveConfigFile(string latestCommitHash, string filePath)
+        {
+            protoJson["version"] = latestCommitHash;
+            hash = latestCommitHash;
+            StreamWriter sw = new StreamWriter(filePath);
+            JsonWriter writer = new JsonTextWriter(sw);
+
+            JObject worldJson = World.Current.ToJson();
+            sw.Close();
+
+            // Launch saving operation in a separate thread.
+            // This reduces lag while saving by a little bit.
+            Thread t = new Thread(new ThreadStart(delegate { SaveJsonToHdd(worldJson, writer); }));
+            t.Start();
+        }
+
         /// <summary>
         /// Gets all languages present in library.
         /// </summary>
@@ -156,23 +179,38 @@ namespace ProjectPorcupine.Localization
                 return;
             }
 
-            XmlReader reader = XmlReader.Create(pathToConfigFile);
-            while (reader.Read())
-            {
-                if (reader.NodeType == XmlNodeType.Element && reader.Name == "language")
-                {
-                    if (reader.HasAttributes)
-                    {
-                        string code = reader.GetAttribute("code");
-                        string localName = reader.GetAttribute("name");
-                        bool rtl = (reader.GetAttribute("rtl") == "true") ? true : false;
+            StreamReader reader = File.OpenText(pathToConfigFile);
+            protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+            reader.Close();
 
-                        localizationConfigurations.Add(code, new LocalizationData(code, localName, rtl));
+            hash = protoJson["version"].ToString();
+
+            if (protoJson["languages"] != null)
+            {
+                foreach (JToken item in protoJson["languages"])
+                {
+                    string code = item["code"].ToString();
+                    string localName = code;
+                    bool rtl = false;
+                    try
+                    {
+                        rtl = bool.Parse(item["rtl"].ToString());
                     }
+                    catch (NullReferenceException)
+                    {
+                    }
+
+                    try
+                    {
+                        localName = item["name"].ToString();
+                    }
+                    catch (NullReferenceException)
+                    {
+                    }
+
+                    localizationConfigurations.Add(code, new LocalizationData(code, localName, rtl));
                 }
             }
-
-            reader.Close();
         }
 
         /// <summary>
@@ -258,7 +296,7 @@ namespace ProjectPorcupine.Localization
                     }
                     else
                     {
-                        rightToLeftLanguage = localizationConfigurations[localizationCode].IsRightToLeft;
+                        rightToLeftLanguage = localizationConfigurations[localizationCode].isRightToLeft;
                     }
 
                     string[] lines = File.ReadAllLines(path);
@@ -292,6 +330,18 @@ namespace ProjectPorcupine.Localization
             {
                 UnityDebugger.Debugger.LogError("LocalizationTable", new Exception(string.Format("There is no localization file for {0}", localizationCode), exception).ToString());
             }
+        }
+
+        private static void SaveJsonToHdd(JObject json, JsonWriter writer)
+        {
+            JsonSerializer serializer = new JsonSerializer()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            };
+            serializer.Serialize(writer, json);
+
+            writer.Flush();
         }
     }
 }
