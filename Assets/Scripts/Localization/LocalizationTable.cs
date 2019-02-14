@@ -11,10 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-using System.Threading;
 
 namespace ProjectPorcupine.Localization
 {
@@ -28,10 +28,12 @@ namespace ProjectPorcupine.Localization
         public static string currentLanguage = DefaultLanguage;
 
         // The hash for the current localization code
-        public static string hash = "empty";    //Set to something to ensure will be downloaded if not available.
+        public static string hash = "empty";    // Set to something to ensure will be downloaded if not available.
 
         // Used by the LocalizationLoader to ensure that the localization files are only loaded once.
         public static bool initialized = false;
+
+        public static JToken protoJson;
 
         private static readonly string DefaultLanguage = "en_US";
 
@@ -48,8 +50,6 @@ namespace ProjectPorcupine.Localization
         private static HashSet<string> missingKeysLogged = new HashSet<string>();
 
         public static event Action CBLocalizationFilesChanged;
-
-        public static JToken protoJson;
 
         public enum FallbackMode
         {
@@ -99,7 +99,7 @@ namespace ProjectPorcupine.Localization
             if (!missingKeysLogged.Contains(key))
             {
                 missingKeysLogged.Add(key);
-                UnityDebugger.Debugger.Log("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
+                UnityDebugger.Debugger.LogWarning("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
             }
 
             switch (fallbackMode)
@@ -152,23 +152,12 @@ namespace ProjectPorcupine.Localization
             JsonWriter writer = new JsonTextWriter(sw);
 
             JObject worldJson = World.Current.ToJson();
+            sw.Close();
 
             // Launch saving operation in a separate thread.
             // This reduces lag while saving by a little bit.
             Thread t = new Thread(new ThreadStart(delegate { SaveJsonToHdd(worldJson, writer); }));
             t.Start();
-        }
-
-        private static void SaveJsonToHdd(JObject json, JsonWriter writer)
-        {
-            JsonSerializer serializer = new JsonSerializer()
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented
-            };
-            serializer.Serialize(writer, json);
-
-            writer.Flush();
         }
 
         /// <summary>
@@ -192,7 +181,7 @@ namespace ProjectPorcupine.Localization
 
             StreamReader reader = File.OpenText(pathToConfigFile);
             protoJson = JToken.ReadFrom(new JsonTextReader(reader));
-
+            reader.Close();
 
             hash = protoJson["version"].ToString();
 
@@ -307,7 +296,7 @@ namespace ProjectPorcupine.Localization
                     }
                     else
                     {
-                        rightToLeftLanguage = localizationConfigurations[localizationCode].IsRightToLeft;
+                        rightToLeftLanguage = localizationConfigurations[localizationCode].isRightToLeft;
                     }
 
                     string[] lines = File.ReadAllLines(path);
@@ -341,6 +330,18 @@ namespace ProjectPorcupine.Localization
             {
                 UnityDebugger.Debugger.LogError("LocalizationTable", new Exception(string.Format("There is no localization file for {0}", localizationCode), exception).ToString());
             }
+        }
+
+        private static void SaveJsonToHdd(JObject json, JsonWriter writer)
+        {
+            JsonSerializer serializer = new JsonSerializer()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            };
+            serializer.Serialize(writer, json);
+
+            writer.Flush();
         }
     }
 }

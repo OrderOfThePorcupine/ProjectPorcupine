@@ -17,11 +17,11 @@ namespace ProjectPorcupine.Localization
     [JsonObject(MemberSerialization.OptIn)]
     public class LocalizationData
     {
-        [JsonProperty("code")]
-        public readonly string LocalizationCode;
-
         [JsonProperty("rtl")]
-        public bool IsRightToLeft = false;
+        public bool isRightToLeft = false;
+
+        [JsonProperty("code")]
+        private readonly string localizationCode;
 
         // Even for RTL languages, this is kept as defined in xml. The property does the character reversal
         [JsonProperty("name")]
@@ -29,34 +29,34 @@ namespace ProjectPorcupine.Localization
 
         public LocalizationData(string localizationCode, string localName, bool isRightToLeft = false)
         {
-            this.LocalizationCode = localizationCode;
+            this.localizationCode = localizationCode;
             this.localName = localName ?? localizationCode;
-            this.IsRightToLeft = isRightToLeft;
+            this.isRightToLeft = isRightToLeft;
         }
 
         public string LocalName
         {
             get
             {
-                if (IsRightToLeft == false)
+                if (isRightToLeft == false)
                 {
-                    return localName;
+                    return LocalName;
                 }
                 else
                 {
-                    return LocalizationTable.ReverseString(localName);
+                    return LocalizationTable.ReverseString(LocalName);
                 }
             }
 
             set
             {
-                localName = value;
+                LocalName = value;
             }
         }
 
         public override string ToString()
         {
-            return LocalizationCode + "," + IsRightToLeft + "," + localName;
+            return localizationCode + "," + isRightToLeft + "," + LocalName;
         }
     }
 }
