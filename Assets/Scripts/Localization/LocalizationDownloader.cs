@@ -106,10 +106,11 @@ namespace ProjectPorcupine.Localization
         private static void UpdateConfigFile(string latestCommitHash)
         {
             string configPath = Path.Combine(LocalizationFolderPath, "config.json");
+
             // Because config.json exists in the new downloaded localization, we have to add the version element to it.
             try
             {
-                if ((LocalizationTable.hash != latestCommitHash || LocalizationTable.hash==string.Empty) && latestCommitHash!=string.Empty)
+                if ((LocalizationTable.hash != latestCommitHash || LocalizationTable.hash == string.Empty) && latestCommitHash != string.Empty)
                 {
                     LocalizationTable.SaveConfigFile(latestCommitHash, configPath);
                 }

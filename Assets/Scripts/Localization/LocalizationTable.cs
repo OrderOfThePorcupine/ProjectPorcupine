@@ -168,7 +168,8 @@ namespace ProjectPorcupine.Localization
         public static void LoadConfigFile(string pathToConfigFile)
         {
             localizationConfigurations = new Dictionary<string, LocalizationData>();
-            try {
+            try
+            {
                 if (File.Exists(pathToConfigFile) == false)
                 {
                     UnityDebugger.Debugger.LogError("LocalizationTable", "No config file found at: " + pathToConfigFile);
