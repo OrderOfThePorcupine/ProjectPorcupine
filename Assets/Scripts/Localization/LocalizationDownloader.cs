@@ -105,12 +105,12 @@ namespace ProjectPorcupine.Localization
 
         private static void UpdateConfigFile(string latestCommitHash)
         {
-            // Because config.xml exists in the new downloaded localization, we have to add the version element to it.
+            string configPath = Path.Combine(LocalizationFolderPath, "config.json");
+            // Because config.json exists in the new downloaded localization, we have to add the version element to it.
             try
             {
-                if (LocalizationTable.hash != latestCommitHash)
+                if ((LocalizationTable.hash != latestCommitHash || LocalizationTable.hash==string.Empty) && latestCommitHash!=string.Empty)
                 {
-                    string configPath = Path.Combine(LocalizationFolderPath, "config.json");
                     LocalizationTable.SaveConfigFile(latestCommitHash, configPath);
                 }
             }
@@ -119,6 +119,11 @@ namespace ProjectPorcupine.Localization
                 // Not a big deal:
                 // Next time the LocalizationDownloader will force an update.
                 UnityDebugger.Debugger.LogWarning("LocalizationDownloader", "Writing version in config.json file failed: " + e.Message);
+                if (File.Exists(configPath))
+                {
+                    File.Delete(configPath);
+                }
+
                 throw;
             }
         }
@@ -290,7 +295,7 @@ namespace ProjectPorcupine.Localization
         }
 
         /// <summary>
-        /// Reads Application.streamingAssetsPath/Localization/config.xml making sure that Localization folder exists.
+        /// Reads Application.streamingAssetsPath/Localization/config.json making sure that Localization folder exists.
         /// </summary>
         private static string GetLocalizationVersionFromConfig()
         {

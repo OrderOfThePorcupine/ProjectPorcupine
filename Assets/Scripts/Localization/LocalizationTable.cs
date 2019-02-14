@@ -28,7 +28,7 @@ namespace ProjectPorcupine.Localization
         public static string currentLanguage = DefaultLanguage;
 
         // The hash for the current localization code
-        public static string hash = "empty";    // Set to something to ensure will be downloaded if not available.
+        public static string hash = string.Empty;    // Set to something to ensure will be downloaded if not available.
 
         // Used by the LocalizationLoader to ensure that the localization files are only loaded once.
         public static bool initialized = false;
@@ -151,12 +151,9 @@ namespace ProjectPorcupine.Localization
             StreamWriter sw = new StreamWriter(filePath);
             JsonWriter writer = new JsonTextWriter(sw);
 
-            JObject worldJson = World.Current.ToJson();
-            sw.Close();
-
             // Launch saving operation in a separate thread.
             // This reduces lag while saving by a little bit.
-            Thread t = new Thread(new ThreadStart(delegate { SaveJsonToHdd(worldJson, writer); }));
+            Thread t = new Thread(new ThreadStart(delegate { SaveJsonToHdd(protoJson, writer); }));
             t.Start();
         }
 
@@ -171,47 +168,52 @@ namespace ProjectPorcupine.Localization
         public static void LoadConfigFile(string pathToConfigFile)
         {
             localizationConfigurations = new Dictionary<string, LocalizationData>();
-
-            if (File.Exists(pathToConfigFile) == false)
-            {
-                UnityDebugger.Debugger.LogError("LocalizationTable", "No config file found at: " + pathToConfigFile);
-                configExists = false;
-                return;
-            }
-
-            StreamReader reader = File.OpenText(pathToConfigFile);
-            protoJson = JToken.ReadFrom(new JsonTextReader(reader));
-            reader.Close();
-
-            hash = protoJson["version"].ToString();
-
-            if (protoJson["languages"] != null)
-            {
-                foreach (JToken item in protoJson["languages"])
+            try {
+                if (File.Exists(pathToConfigFile) == false)
                 {
-                    string code = item["code"].ToString();
-                    string localName = code;
-                    bool rtl = false;
-                    try
-                    {
-                        rtl = bool.Parse(item["rtl"].ToString());
-                    }
-                    catch (NullReferenceException)
-                    {
-                    }
+                    UnityDebugger.Debugger.LogError("LocalizationTable", "No config file found at: " + pathToConfigFile);
+                    configExists = false;
+                    return;
+                }
 
-                    try
-                    {
-                        localName = item["name"].ToString();
-                    }
-                    catch (NullReferenceException)
-                    {
-                    }
+                StreamReader reader = File.OpenText(pathToConfigFile);
+                protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+                reader.Close();
 
-                    localizationConfigurations.Add(code, new LocalizationData(code, localName, rtl));
+                hash = protoJson["version"].ToString();
+
+                if (protoJson["languages"] != null)
+                {
+                    foreach (JToken item in protoJson["languages"])
+                    {
+                        string code = item["code"].ToString();
+                        string localName = code;
+                        bool rtl = false;
+                        try
+                        {
+                            rtl = bool.Parse(item["rtl"].ToString());
+                        }
+                        catch (NullReferenceException)
+                        {
+                        }
+
+                        try
+                        {
+                            localName = item["name"].ToString();
+                        }
+                        catch (NullReferenceException)
+                        {
+                        }
+
+                        localizationConfigurations.Add(code, new LocalizationData(code, localName, rtl));
+                    }
                 }
             }
-        }
+            catch (Exception e)
+            {
+                UnityDebugger.Debugger.LogWarning("LocalizationTable", e);
+            }
+            }
 
         /// <summary>
         /// Reverses the order of characters in a string. Used for Right to Left languages, since UI doesn't do so automatically.
@@ -282,7 +284,7 @@ namespace ProjectPorcupine.Localization
 
                 if (configExists && localizationConfigurations.ContainsKey(localizationCode) == false)
                 {
-                    UnityDebugger.Debugger.LogError("LocalizationTable", "Language: " + localizationCode + " not defined in localization/config.xml");
+                    UnityDebugger.Debugger.LogError("LocalizationTable", "Language: " + localizationCode + " not defined in localization/config.json");
                 }
 
                 // Only the current and default languages translations will be loaded in memory.
@@ -332,7 +334,7 @@ namespace ProjectPorcupine.Localization
             }
         }
 
-        private static void SaveJsonToHdd(JObject json, JsonWriter writer)
+        private static void SaveJsonToHdd(JToken json, JsonWriter writer)
         {
             JsonSerializer serializer = new JsonSerializer()
             {
@@ -342,6 +344,7 @@ namespace ProjectPorcupine.Localization
             serializer.Serialize(writer, json);
 
             writer.Flush();
+            writer.Close();
         }
     }
 }
