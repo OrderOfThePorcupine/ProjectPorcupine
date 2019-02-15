@@ -196,8 +196,8 @@ GameObject:
   - component: {fileID: 224000013529044892}
   - component: {fileID: 222000013910140856}
   - component: {fileID: 114000012491780442}
-  - component: {fileID: 114000011946741832}
   - component: {fileID: 114692733302157912}
+  - component: {fileID: 114000011946741832}
   m_Layer: 5
   m_Name: ConstructionMenu
   m_TagString: Untagged
@@ -840,8 +840,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2497eb3efa16b4ca496fd9898b20832b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {x: -200, y: 0}
-  duration: 3
+  duration: 1
 --- !u!222 &222000010334367532
 CanvasRenderer:
   m_ObjectHideFlags: 1
