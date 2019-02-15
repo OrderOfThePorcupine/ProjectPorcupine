@@ -6,10 +6,12 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -147,10 +149,10 @@ public static class SpriteManager
     /// <param name="filePath">File path.</param>
     private static void LoadImage(string spriteCategory, string filePath)
     {
-        // TODO:  LoadImage is returning TRUE for things like .meta and .xml files.  What??!
+        // TODO:  LoadImage is returning TRUE for things like .meta and .json files.  What??!
         //      So as a temporary fix, let's just bail if we have something we KNOW should not
         //      be an image.
-        if (filePath.Contains(".xml") || filePath.Contains(".meta") || filePath.Contains(".db"))
+        if (filePath.Contains(".json") || filePath.Contains(".meta") || filePath.Contains(".db"))
         {
             return;
         }
@@ -167,34 +169,27 @@ public static class SpriteManager
             // Image was successfully loaded.
             imageTexture.filterMode = FilterMode.Point;
 
-            // So let's see if there's a matching XML file for this image.
+            // So let's see if there's a matching JSON file for this image.
             string baseSpriteName = Path.GetFileNameWithoutExtension(filePath);
             string basePath = Path.GetDirectoryName(filePath);
 
             // NOTE: The extension must be in lower case!
-            string xmlPath = Path.Combine(basePath, baseSpriteName + ".xml");
+            string jsonPath = Path.Combine(basePath, baseSpriteName + ".json");
 
-            if (File.Exists(xmlPath))
+            if (File.Exists(jsonPath))
             {
-                string xmlText = File.ReadAllText(xmlPath);
+                StreamReader reader = File.OpenText(jsonPath);
 
-                // Loop through the xml file finding all the <sprite> tags
+                JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+                reader.Close();
+
+                JArray array = (JArray)protoJson;
+
+                // Loop through the json file for each object
                 // and calling LoadSprite once for each of them.
-                XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
-
-                // Set our cursor on the first Sprite we find.
-                if (reader.ReadToDescendant("Sprites") && reader.ReadToDescendant("Sprite"))
+                foreach (JObject obj in array)
                 {
-                    do
-                    {
-                        ReadSpriteFromXml(spriteCategory, reader, imageTexture);
-                    }
-                    while (reader.ReadToNextSibling("Sprite"));
-                }
-                else
-                {
-                    UnityDebugger.Debugger.LogError("SpriteManager", "Could not find a <Sprites> tag.");
-                    return;
+                    ReadSpriteFromJson(spriteCategory, obj, imageTexture);
                 }
             }
             else
@@ -204,53 +199,60 @@ public static class SpriteManager
                 LoadSprite(spriteCategory, baseSpriteName, imageTexture, new Rect(0, 0, imageTexture.width, imageTexture.height), 64, new Vector2(0.5f, 0.5f));
             }
 
-            // Attempt to load/parse the XML file to get information on the sprite(s)
+            // Attempt to load/parse the data file to get information on the sprite(s)
         }
 
         // Else, the file wasn't actually a image file, so just move on.
     }
 
     /// <summary>
-    /// Reads the sprite from xml for the image.
+    /// Reads the sprite from data file for the image.
     /// </summary>
     /// <param name="spriteCategory">Sprite category.</param>
-    /// <param name="reader">The Xml Reader.</param>
+    /// <param name="obj">The Json Object Reader.</param>
     /// <param name="imageTexture">Image texture.</param>
-    private static void ReadSpriteFromXml(string spriteCategory, XmlReader reader, Texture2D imageTexture)
+    private static void ReadSpriteFromJson(string spriteCategory, JObject obj, Texture2D imageTexture)
     {
-        string name = reader.GetAttribute("name");
-        int x = int.Parse(reader.GetAttribute("x"));
-        int y = int.Parse(reader.GetAttribute("y"));
-        int w = int.Parse(reader.GetAttribute("w"));
-        int h = int.Parse(reader.GetAttribute("h"));
+        string name = obj["name"].ToString();
+        int x = int.Parse(obj["x"].ToString());
+        int y = int.Parse(obj["y"].ToString());
+        int w = int.Parse(obj["w"].ToString());
+        int h = int.Parse(obj["h"].ToString());
 
-        float pivotX = ReadPivot(reader, "pivotX");
-        float pivotY = ReadPivot(reader, "pivotY");
+        float pivotX = ReadPivot(obj, "pivotX");
+        float pivotY = ReadPivot(obj, "pivotY");
 
-        int pixelPerUnit = int.Parse(reader.GetAttribute("pixelPerUnit"));
+        int pixelPerUnit = int.Parse(obj["pixelPerUnit"].ToString());
 
         LoadSprite(spriteCategory, name, imageTexture, new Rect(x * pixelPerUnit, y * pixelPerUnit, w * pixelPerUnit, h * pixelPerUnit), pixelPerUnit, new Vector2(pivotX, pivotY));
     }
 
     /// <summary>
-    /// Reads the x or y pivot from the XML reader.
+    /// Reads the x or y pivot .
     /// </summary>
     /// <returns>The pivot.</returns>
-    /// <param name="reader">The Xml Reader.</param>
+    /// <param name="obj">Data object.</param>
     /// <param name="pivotName">The pivot attribute name.</param>
-    private static float ReadPivot(XmlReader reader, string pivotName)
+    private static float ReadPivot(JObject obj, string pivotName)
     {
-        string pivotAttribute = reader.GetAttribute(pivotName);
-        float pivot;
-        if (float.TryParse(pivotAttribute, out pivot) == false)
+        float pivot = 0.5f;
+
+        try
         {
-            // If pivot point didn't exist default to 0.5f
-            pivot = 0.5f;
+            string pivotAttribute = obj[pivotName].ToString();
+            if (float.TryParse(pivotAttribute, out pivot) == false)
+            {
+                // If pivot point didn't exist default to 0.5f
+                pivot = 0.5f;
+            }
+        }
+        catch (NullReferenceException)
+        {
         }
 
         // Clamp pivot between 0..1
         pivot = Mathf.Clamp01(pivot);
-
+        
         return pivot;
     }
 

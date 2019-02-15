@@ -1,0 +1,10 @@
+[
+   {
+      "name": "mining_drone_station",
+      "x": "0",
+      "y": "0",
+      "w": "3",
+      "h": "2",
+      "pixelPerUnit": "64"
+   }
+]
