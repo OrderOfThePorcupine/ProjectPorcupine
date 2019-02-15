@@ -13,7 +13,6 @@ namespace ProjectPorcupine.UI.Animation
 {
     public class SlideAnimation : MonoBehaviour
     {
-        [SerializeField] private float duration;
         private PositionTween slideIn;
         private PositionTween slideOut;
         private Vector2 outPosition;
@@ -41,8 +40,8 @@ namespace ProjectPorcupine.UI.Animation
             inPosition = rect.anchoredPosition;
             rect.anchoredPosition = outPosition;
 
-            slideIn = new PositionTween(rect, inPosition, duration);
-            slideOut = new PositionTween(rect, outPosition, duration, () => gameObject.SetActive(false));
+            slideIn = new PositionTween(rect, inPosition, 1);
+            slideOut = new PositionTween(rect, outPosition, 1, () => gameObject.SetActive(false));
         }
     }
 }
