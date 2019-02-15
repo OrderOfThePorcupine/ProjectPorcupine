@@ -6,16 +6,16 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
 public class SpriteToJson : EditorWindow
 {
-    private string spriteToXmlPath = Application.dataPath + "/Resources/Editor/SpriteToJSON/";
+    private string spriteToJson;
     private string outputDirPath = string.Empty;
     private string inputDirPath = string.Empty;
 
@@ -60,6 +60,16 @@ public class SpriteToJson : EditorWindow
     public static void ShowWindow()
     {
         GetWindow(typeof(SpriteToJson));
+    }
+
+    private void OnEnable()
+    {
+        spriteToJson = Application.dataPath + "/Resources/Editor/SpriteToJSON/";
+    }
+
+    private void OnLostFocus()
+    {
+        Close();
     }
 
     private int PixelsPerUnit()
@@ -130,27 +140,27 @@ public class SpriteToJson : EditorWindow
         {
             EditorGUILayout.BeginVertical("Box");
             GUILayout.Label("Instructions", EditorStyles.boldLabel);            
-            GUILayout.Label("1. Sprite must be in 'Resources/Editor/SpriteToXML'.");
+            GUILayout.Label("1. Sprite must be in 'Resources/Editor/SpriteToJson'.");
             GUILayout.Label("2. Edit your sprite in Unity's sprite editor as normal.");
-            GUILayout.Label("3. Select the folder to output the sprite and XML.");
+            GUILayout.Label("3. Select the folder to output the sprite and Json.");
             GUILayout.Label("4. Press 'Export' button");
-            GUILayout.Label("5. XML will be generated moved along with the sprite to the specified folder");
+            GUILayout.Label("5. Json will be generated moved along with the sprite to the specified folder");
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();            
         }
         
         EditorGUILayout.BeginVertical("Box");
-        GUILayout.Label("Image must be in this folder: " + spriteToXmlPath);
+        GUILayout.Label("Image must be in this folder: " + spriteToJson);
         if (GUILayout.Button("Open Image Folder"))
         {
-            if (Directory.Exists(spriteToXmlPath))
+            if (Directory.Exists(spriteToJson))
             {
-                EditorUtility.RevealInFinder(spriteToXmlPath);
+                EditorUtility.RevealInFinder(spriteToJson);
             }
             else
             {
-                Directory.CreateDirectory(spriteToXmlPath);
-                EditorUtility.RevealInFinder(spriteToXmlPath);
+                Directory.CreateDirectory(spriteToJson);
+                EditorUtility.RevealInFinder(spriteToJson);
             }            
         }
 
@@ -159,19 +169,19 @@ public class SpriteToJson : EditorWindow
 
         if (GUILayout.Button("Set Output Folder"))
         {
-            outputDirPath = EditorUtility.OpenFolderPanel("Select folder to save XML", outputDirPath, string.Empty);
+            outputDirPath = EditorUtility.OpenFolderPanel("Select folder to save Json", outputDirPath, string.Empty);
         }
 
-        if (GUILayout.Button("Export Sprite to XML"))
+        if (GUILayout.Button("Export Sprite to Json"))
         {
-            images = Resources.LoadAll<Texture2D>("Editor/SpriteToXML");
-            sprites = Resources.LoadAll<Sprite>("Editor/SpriteToXML");
+            images = Resources.LoadAll<Texture2D>("Editor/SpriteToJson");
+            sprites = Resources.LoadAll<Sprite>("Editor/SpriteToJson");
             
-            filesInDir = Directory.GetFiles(spriteToXmlPath);
+            filesInDir = Directory.GetFiles(spriteToJson);
 
             if (images.Length > 1)
             {
-                UnityDebugger.Debugger.LogError("SpriteToXML", "Place only one sprite in 'Resources/Editor/SpriteToXML'");
+                UnityDebugger.Debugger.LogError("SpriteToJson", "Place only one sprite in 'Resources/Editor/SpriteToJson'");
                 return;
             }
 
@@ -191,26 +201,26 @@ public class SpriteToJson : EditorWindow
 
     private void ExportSprites()
     {
-        UnityDebugger.Debugger.Log("SpriteToXML", "Files saved to: " + outputDirPath);
+        UnityDebugger.Debugger.Log("SpriteToJson", "Files saved to: " + outputDirPath);
 
         foreach (string fn in filesInDir)
         {
-            UnityDebugger.Debugger.Log("SpriteToXML", "files in dir: " + fn);
+            UnityDebugger.Debugger.Log("SpriteToJson", "files in dir: " + fn);
         }   
             
         foreach (Texture2D t in images)
         {
-            UnityDebugger.Debugger.Log("SpriteToXML", "Filename: " + t.name);            
+            UnityDebugger.Debugger.Log("SpriteToJson", "Filename: " + t.name);            
         }
 
-        WriteXml();        
+        WriteDataFile();        
     }   
 
-    private void WriteXml()
+    private void WriteDataFile()
     {
         if (outputDirPath == string.Empty)
         {
-            UnityDebugger.Debugger.LogError("SpriteToXML", "Please select a folder");
+            UnityDebugger.Debugger.LogError("SpriteToJson", "Please select a folder");
             return;
         }
         
@@ -220,19 +230,16 @@ public class SpriteToJson : EditorWindow
             StreamWriter sw = new StreamWriter(filePath);
             JsonWriter writer = new JsonTextWriter(sw);
 
-            JObject json = new JObject();
-
-            JArray jSprites = new JArray();
+            JArray array = new JArray();
 
             foreach (Sprite s in sprites)
             {
-                jSprites.Add(ToJson(s));
+                array.Add(SingleSpriteToJson(s));
             }
 
-            json.Add("Sprites", jSprites);
-            SaveJsonToHdd(json, writer);
+            SaveJsonToHdd(array, writer);
 
-            // Move the .png and meta file to the same directory as the xml.
+            // Move the .png and meta file to the same directory as the json.
             foreach (string s in filesInDir)
             {
                 if (s.Contains(".png"))
@@ -255,18 +262,18 @@ public class SpriteToJson : EditorWindow
 
     private void ShowVersion2()
     {
-        GUILayout.Label("Generates XML based on image and settings selected", EditorStyles.boldLabel);
+        GUILayout.Label("Generates JSon based on image and settings selected", EditorStyles.boldLabel);
         EditorGUILayout.Space();
 
         if (showInstructions)
         {
             EditorGUILayout.BeginVertical("Box");
             GUILayout.Label("Instructions", EditorStyles.boldLabel);
-            GUILayout.Label("1. Select the image you want an XML for ");
+            GUILayout.Label("1. Select the image you want an Json for ");
             GUILayout.Label("2. Specify the rows and columns of the image ");
-            GUILayout.Label("3. Select the folder to output the sprite and xml");
+            GUILayout.Label("3. Select the folder to output the sprite and Json");
             GUILayout.Label("4. Press 'Export' button");
-            GUILayout.Label("5. XML will generate and sprite will be moved to the specified folder");
+            GUILayout.Label("5. Json will generate and sprite will be moved to the specified folder");
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
         }
@@ -275,7 +282,7 @@ public class SpriteToJson : EditorWindow
 
         if (GUILayout.Button("Select Image"))
         {
-            inputDirPath = EditorUtility.OpenFilePanelWithFilters("Select file to generate a XML for", inputDirPath, new string[] { "Image files", "png,jpg,jpeg" });
+            inputDirPath = EditorUtility.OpenFilePanelWithFilters("Select file to generate a Json for", inputDirPath, new string[] { "Image files", "png,jpg,jpeg" });
             if (File.Exists(inputDirPath))
             {
                 LoadImage(inputDirPath);
@@ -284,7 +291,7 @@ public class SpriteToJson : EditorWindow
 
         if (GUILayout.Button("Set Output Folder"))
         {
-            outputDirPath = EditorUtility.OpenFolderPanel("Select folder to save XML", outputDirPath, string.Empty);
+            outputDirPath = EditorUtility.OpenFolderPanel("Select folder to save Json", outputDirPath, string.Empty);
         }
 
         GUILayout.EndHorizontal();
@@ -360,12 +367,12 @@ public class SpriteToJson : EditorWindow
         {
             EditorGUILayout.Space();
             
-            if (GUILayout.Button("Export " + imageName + ".xml"))
+            if (GUILayout.Button("Export " + imageName + ".json"))
             {
                 if ((columnIndex == 0 && rowIndex == 0) && isMultipleSprite == true)
                 {
                     EditorUtility.DisplayDialog("Select proper Row/Column count", "Please select more than 1 Row/Column!", "OK");
-                    UnityDebugger.Debugger.LogError("SpriteToXML", "Please select more than 1 Row/Column");
+                    UnityDebugger.Debugger.LogError("SpriteToJson", "Please select more than 1 Row/Column");
                 }
                 else
                 {
@@ -405,7 +412,7 @@ public class SpriteToJson : EditorWindow
             myTexture = imageTexture;
             imageName = Path.GetFileNameWithoutExtension(filePath);
             imageExt = Path.GetExtension(filePath);
-            UnityDebugger.Debugger.Log("SpriteToXML", imageName + " Loaded");
+            UnityDebugger.Debugger.Log("SpriteToJson", imageName + " Loaded");
             textureLoaded = true;            
         }        
     }
@@ -414,33 +421,32 @@ public class SpriteToJson : EditorWindow
     {
         StreamWriter sw = new StreamWriter(filePath);
         JsonWriter writer = new JsonTextWriter(sw);
-        JObject obj = null;
+        JArray array = null;
 
         switch (isMultipleSprite)
         {
             case false:
-                obj=SingleSpriteJson(imageTexture);
+                array = SingleSpriteJson(imageTexture);
                 break;
             case true:
-                obj=MultiSpriteJson(imageTexture);
+                array = MultiSpriteJson(imageTexture);
                 break;
         }
 
-        SaveJsonToHdd(obj, writer);
+        SaveJsonToHdd(array, writer);
 
         MoveImage(filePath);
         ResetForm();        
     }
 
-    private static JObject ToJson(Sprite s)
+    private JObject SingleSpriteToJson(Sprite s)
     {
-        JObject root = new JObject();
         JObject obj = new JObject();
         obj.Add("name", s.name);
-        obj.Add("x", (s.rect.x / s.pixelsPerUnit));
-        obj.Add("y", (s.rect.y / s.pixelsPerUnit));
-        obj.Add("w", (s.rect.width / s.pixelsPerUnit));
-        obj.Add("h", (s.rect.height / s.pixelsPerUnit));
+        obj.Add("x", s.rect.x / s.pixelsPerUnit);
+        obj.Add("y", s.rect.y / s.pixelsPerUnit);
+        obj.Add("w", s.rect.width / s.pixelsPerUnit);
+        obj.Add("h", s.rect.height / s.pixelsPerUnit);
         obj.Add("pixelPerUnit", s.pixelsPerUnit);
 
         float pivotX = s.pivot.x / s.rect.width;
@@ -449,20 +455,17 @@ public class SpriteToJson : EditorWindow
         float pivotY = s.pivot.y / s.rect.height;
         obj.Add("pivotY", pivotY);
 
-        JArray array = new JArray();
-        array.Add(obj);
-        root.Add("sprites", array);
-        return root;
+        return obj;
     }
 
-    private JObject SingleSpriteJson(Texture2D imageTexture)
+    private JArray SingleSpriteJson(Texture2D imageTexture)
     {
         JObject obj = new JObject();
         obj.Add("name", imageName);
         obj.Add("x", "0");
         obj.Add("y", "0");
-        obj.Add("w", (imageTexture.width / PixelsPerUnit()));
-        obj.Add("h", (imageTexture.height / PixelsPerUnit()));
+        obj.Add("w", imageTexture.width / PixelsPerUnit());
+        obj.Add("h", imageTexture.height / PixelsPerUnit());
         obj.Add("pixelPerUnit", PixelsPerUnit());
 
         if (useCustomPivot)
@@ -470,12 +473,14 @@ public class SpriteToJson : EditorWindow
             obj.Add("pivotX", pivotX);
             obj.Add("pivotY", pivotY);
         }
-        return obj;      
+
+        JArray array = new JArray();
+        array.Add(obj);
+        return array;      
     }
 
-    private JObject MultiSpriteJson(Texture2D imageTexture)
+    private JArray MultiSpriteJson(Texture2D imageTexture)
     {
-        JObject root = new JObject();
         JArray array = new JArray();
         for (int y = int.Parse(columnRowOptions[rowIndex]) - 1; y > -1; y--)
         {
@@ -483,10 +488,10 @@ public class SpriteToJson : EditorWindow
             {
                 JObject obj = new JObject();
                 obj.Add("name", imageName);
-                obj.Add("x", (((imageTexture.width / int.Parse(columnRowOptions[columnIndex])) / PixelsPerUnit()) * x));
-                obj.Add("y", (((imageTexture.height / int.Parse(columnRowOptions[rowIndex])) / PixelsPerUnit()) * y));
-                obj.Add("w", ((imageTexture.width / int.Parse(columnRowOptions[columnIndex])) / PixelsPerUnit()));
-                obj.Add("h", ((imageTexture.height / int.Parse(columnRowOptions[rowIndex])) / PixelsPerUnit()));
+                obj.Add("x", ((imageTexture.width / int.Parse(columnRowOptions[columnIndex])) / PixelsPerUnit()) * x);
+                obj.Add("y", ((imageTexture.height / int.Parse(columnRowOptions[rowIndex])) / PixelsPerUnit()) * y);
+                obj.Add("w", (imageTexture.width / int.Parse(columnRowOptions[columnIndex])) / PixelsPerUnit());
+                obj.Add("h", (imageTexture.height / int.Parse(columnRowOptions[rowIndex])) / PixelsPerUnit());
                 obj.Add("pixelPerUnit", PixelsPerUnit());
 
                 if (useCustomPivot)
@@ -499,11 +504,11 @@ public class SpriteToJson : EditorWindow
                 array.Add(obj);
             }
         }
-        root.Add("Sprites", array);
-        return root;      
+
+        return array;      
     }
 
-    private static void SaveJsonToHdd(JToken json, JsonWriter writer)
+    private void SaveJsonToHdd(JToken json, JsonWriter writer)
     {
         JsonSerializer serializer = new JsonSerializer()
         {
@@ -525,18 +530,18 @@ public class SpriteToJson : EditorWindow
             try
             {
                 File.Replace(filePath, destPath, destPath + ".bak");
-                UnityDebugger.Debugger.LogWarning("SpriteToXML", "Image already exsists, backing old one up to: " + destPath + ".bak");
+                UnityDebugger.Debugger.LogWarning("SpriteToJson", "Image already exsists, backing old one up to: " + destPath + ".bak");
             }
             catch (Exception ex)
             {
-                UnityDebugger.Debugger.LogWarning("SpriteToXML", ex.Message + " - " + imageName + imageExt + " not moved.");
-                EditorUtility.DisplayDialog(imageName + imageExt + " not moved.", "The original and output directories cannot be the same!" + "\n\n" + "XML was still generated.", "OK");
+                UnityDebugger.Debugger.LogWarning("SpriteToJson", ex.Message + " - " + imageName + imageExt + " not moved.");
+                EditorUtility.DisplayDialog(imageName + imageExt + " not moved.", "The original and output directories cannot be the same!" + "\n\n" + "Json was still generated.", "OK");
             }
         }
         else
         {
             File.Move(filePath, destPath);            
-            UnityDebugger.Debugger.Log("SpriteToXML", "Image moved to: " + destPath);
+            UnityDebugger.Debugger.Log("SpriteToJson", "Image moved to: " + destPath);
         }
 
         if (File.Exists(filePath + ".meta") && File.Exists(destPath + ".meta"))
@@ -547,7 +552,7 @@ public class SpriteToJson : EditorWindow
             }
             catch (Exception ex)
             {
-                UnityDebugger.Debugger.LogWarning("SpriteToXML", ex.Message + " - " + imageName + imageExt + ".meta not moved.");
+                UnityDebugger.Debugger.LogWarning("SpriteToJson", ex.Message + " - " + imageName + imageExt + ".meta not moved.");
             }            
         }
         else
