@@ -1,26 +1,26 @@
 [
    {
       "name": "cloning_pod_0",
-      "x": "0",
-      "y": "4",
-      "w": "2",
-      "h": "3",
-      "pixelPerUnit": "32"
+      "x": 0,
+      "y": 4,
+      "w": 2,
+      "h": 3,
+      "pixelPerUnit": 32
    },
    {
       "name": "cloning_pod_1",
-      "x": "2",
-      "y": "4",
-      "w": "2",
-      "h": "3",
-      "pixelPerUnit": "32"
+      "x": 2,
+      "y": 4,
+      "w": 2,
+      "h": 3,
+      "pixelPerUnit": 32
    },
    {
       "name": "cloning_pod",
-      "x": "0",
-      "y": "0",
-      "w": "2",
-      "h": "3",
-      "pixelPerUnit": "32"
+      "x": 0,
+      "y": 0,
+      "w": 2,
+      "h": 3,
+      "pixelPerUnit": 32
    }
 ]
