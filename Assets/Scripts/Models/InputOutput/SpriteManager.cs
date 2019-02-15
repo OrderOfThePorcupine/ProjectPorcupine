@@ -213,47 +213,18 @@ public static class SpriteManager
     /// <param name="imageTexture">Image texture.</param>
     private static void ReadSpriteFromJson(string spriteCategory, JObject obj, Texture2D imageTexture)
     {
-        string name = obj["name"].ToString();
-        int x = int.Parse(obj["x"].ToString());
-        int y = int.Parse(obj["y"].ToString());
-        int w = int.Parse(obj["w"].ToString());
-        int h = int.Parse(obj["h"].ToString());
+        string name = PrototypeReader.ReadJson("", obj["name"]);;
+        int x = PrototypeReader.ReadJson( 0,obj["x"]);
+        int y = PrototypeReader.ReadJson(0, obj["y"]);
+        int w = PrototypeReader.ReadJson(1, obj["w"]);
+        int h = PrototypeReader.ReadJson(1, obj["h"]);
 
-        float pivotX = ReadPivot(obj, "pivotX");
-        float pivotY = ReadPivot(obj, "pivotY");
+        float pivotX = PrototypeReader.ReadJson(0.5f, "pivotX");
+        float pivotY = PrototypeReader.ReadJson(0.5f, "pivotY");
 
         int pixelPerUnit = int.Parse(obj["pixelPerUnit"].ToString());
 
         LoadSprite(spriteCategory, name, imageTexture, new Rect(x * pixelPerUnit, y * pixelPerUnit, w * pixelPerUnit, h * pixelPerUnit), pixelPerUnit, new Vector2(pivotX, pivotY));
-    }
-
-    /// <summary>
-    /// Reads the x or y pivot .
-    /// </summary>
-    /// <returns>The pivot.</returns>
-    /// <param name="obj">Data object.</param>
-    /// <param name="pivotName">The pivot attribute name.</param>
-    private static float ReadPivot(JObject obj, string pivotName)
-    {
-        float pivot = 0.5f;
-
-        try
-        {
-            string pivotAttribute = obj[pivotName].ToString();
-            if (float.TryParse(pivotAttribute, out pivot) == false)
-            {
-                // If pivot point didn't exist default to 0.5f
-                pivot = 0.5f;
-            }
-        }
-        catch (NullReferenceException)
-        {
-        }
-
-        // Clamp pivot between 0..1
-        pivot = Mathf.Clamp01(pivot);
-        
-        return pivot;
     }
 
     /// <summary>
