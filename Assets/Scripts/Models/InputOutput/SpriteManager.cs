@@ -194,7 +194,7 @@ public static class SpriteManager
                         ReadSpriteFromJson(spriteCategory, obj, imageTexture);
                     } catch (Exception e)
                     {
-                        UnityDebugger.Debugger.LogWarning("SpriteManager",obj);
+                        UnityDebugger.Debugger.LogWarning("SpriteManager", obj);
                         throw new Exception("Error in file " + jsonPath, e);
                     }
                 }
@@ -220,14 +220,18 @@ public static class SpriteManager
     /// <param name="imageTexture">Image texture.</param>
     private static void ReadSpriteFromJson(string spriteCategory, JObject obj, Texture2D imageTexture)
     {
-        string name = PrototypeReader.ReadJson("", obj["name"]);;
-        int x = PrototypeReader.ReadJson( 0,obj["x"]);
+        string name = PrototypeReader.ReadJson("", obj["name"]); ;
+        int x = PrototypeReader.ReadJson(0, obj["x"]);
         int y = PrototypeReader.ReadJson(0, obj["y"]);
         int w = PrototypeReader.ReadJson(1, obj["w"]);
         int h = PrototypeReader.ReadJson(1, obj["h"]);
 
         float pivotX = PrototypeReader.ReadJson(0.5f, obj["pivotX"]);
         float pivotY = PrototypeReader.ReadJson(0.5f, obj["pivotY"]);
+        if (pivotX < 0 || pivotX > 1 || pivotY < 0 || pivotY > 1)
+        {
+            UnityDebugger.Debugger.LogWarning("SpriteManager", "Pivot for object "+name+" has pivots of "+pivotX+","+pivotY);
+        }
 
         int pixelPerUnit = int.Parse(obj["pixelPerUnit"].ToString());
 
