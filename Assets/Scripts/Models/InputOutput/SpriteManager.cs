@@ -189,7 +189,15 @@ public static class SpriteManager
                 // and calling LoadSprite once for each of them.
                 foreach (JObject obj in array)
                 {
-                    ReadSpriteFromJson(spriteCategory, obj, imageTexture);
+                    try
+                    {
+                        ReadSpriteFromJson(spriteCategory, obj, imageTexture);
+                    } catch (Exception e)
+                    {
+                        UnityDebugger.Debugger.LogError("Error in file " + jsonPath);
+                        UnityDebugger.Debugger.LogWarning(obj);
+                        throw new Exception("Error in file " + jsonPath, e);
+                    }
                 }
             }
             else
@@ -219,8 +227,8 @@ public static class SpriteManager
         int w = PrototypeReader.ReadJson(1, obj["w"]);
         int h = PrototypeReader.ReadJson(1, obj["h"]);
 
-        float pivotX = PrototypeReader.ReadJson(0.5f, "pivotX");
-        float pivotY = PrototypeReader.ReadJson(0.5f, "pivotY");
+        float pivotX = PrototypeReader.ReadJson(0.5f, obj["pivotX"]);
+        float pivotY = PrototypeReader.ReadJson(0.5f, obj["pivotY"]);
 
         int pixelPerUnit = int.Parse(obj["pixelPerUnit"].ToString());
 
