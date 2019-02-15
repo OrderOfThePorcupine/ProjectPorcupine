@@ -6,9 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
-using System;
-using System.Collections.Generic;
 using ProjectPorcupine.UI.Animation;
 using UnityEngine;
 
@@ -17,35 +14,32 @@ public class MenuLeft : MonoBehaviour
     // This is the parent of the menus.
     private Transform parent;
 
-    private List<GameObject> menus;
-
-    private GameObject currentlyOpen;
+    public GameObject CurrentlyOpen { get; private set; }
 
     // Use this for initialization
     public void Start()
     {
-        parent = gameObject.transform;
+        parent = this.gameObject.transform;
 
-        GameObject constructionMenu = AddMenu("ConstructionMenu", typeof(ConstructionMenu));
-        GameObject orderMenu = AddMenu("OrderMenu", typeof(OrderMenu));
+        AddMenu("ConstructionMenu", "ConstructionMenu", typeof(ConstructionMenu));
+        AddMenu("OrderMenu", "ConstructionMenu", typeof(OrderMenu));
 
-        AddMenuButton(constructionMenu, "menu_construction", 0);
-        AddMenuButton(orderMenu, "menu_orders", 1);
-
-        menus = new List<GameObject>
-        {
-            constructionMenu,
-            orderMenu
-        };
+        GameMenuManager.Instance.AddMenuItem("menu_construction", OnButtonConstruction, 0);
+        GameMenuManager.Instance.AddMenuItem("menu_orders", OnButtonOrder, 1);
     }
 
-    public void OpenMenu(GameObject menu)
+    public void OpenMenu(string menuName)
     {
+        GameObject menu = parent.Find(menuName).gameObject;
+
+        CloseMenu();
+
         menu.GetComponent<SlideAnimation>().Show();
+        CurrentlyOpen = menu;
 
         WorldController.Instance.SoundController.OnButtonSFX();
 
-        if (menus.Contains(currentlyOpen))
+        if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
         {
             WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
         }
@@ -53,48 +47,54 @@ public class MenuLeft : MonoBehaviour
 
     public void CloseMenu()
     {
-        if (currentlyOpen != null)
+        if (CurrentlyOpen != null)
         {
-            currentlyOpen.GetComponent<SlideAnimation>().Hide();
+            CurrentlyOpen.GetComponent<SlideAnimation>().Hide();
 
-            if (menus.Contains(currentlyOpen))
+            if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
             {
                 WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
                 BuildModeController.Instance.Building = false;
             }
 
             WorldController.Instance.SoundController.OnButtonSFX();
+
+            CurrentlyOpen = null;
         }
     }
 
     // Use this function to add all the menus.
-    private GameObject AddMenu(string menuName, Type useComponent)
+    private void AddMenu(string menuName, string prefabName, System.Type useComponent)
     {
         GameObject tempGoObj;
-        tempGoObj = (GameObject)Instantiate(Resources.Load("UI/MenuLeft/" + "ConstructionMenu"));
+        tempGoObj = (GameObject)Instantiate(Resources.Load("UI/MenuLeft/" + prefabName));
         tempGoObj.name = menuName;
         tempGoObj.transform.SetParent(parent, false);
+
         tempGoObj.AddComponent(useComponent);
-
-        return tempGoObj;
     }
 
-    private void AddMenuButton(GameObject menu, string key, int position)
+    private void OnButtonConstruction()
     {
-        Action onButtonClicked = () => OnButtonClicked(menu);
-        GameMenuManager.Instance.AddMenuItem(key, onButtonClicked, position);
-    }
-
-    private void OnButtonClicked(GameObject menu)
-    {
-        if (currentlyOpen && currentlyOpen.name.Equals(menu.name))
+        if (CurrentlyOpen != null && CurrentlyOpen.gameObject.name == "ConstructionMenu")
         {
-            currentlyOpen = null;
+            CloseMenu();
         }
         else
         {
-            currentlyOpen = menu;
-            OpenMenu(menu);
+            OpenMenu("ConstructionMenu");
+        }
+    }
+
+    private void OnButtonOrder()
+    {
+        if (CurrentlyOpen != null && CurrentlyOpen.gameObject.name == "OrderMenu")
+        {
+            CloseMenu();
+        }
+        else
+        {
+            OpenMenu("OrderMenu");
         }
     }
 }
