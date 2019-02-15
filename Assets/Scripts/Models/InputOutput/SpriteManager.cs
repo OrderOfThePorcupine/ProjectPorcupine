@@ -194,8 +194,7 @@ public static class SpriteManager
                         ReadSpriteFromJson(spriteCategory, obj, imageTexture);
                     } catch (Exception e)
                     {
-                        UnityDebugger.Debugger.LogError("Error in file " + jsonPath);
-                        UnityDebugger.Debugger.LogWarning(obj);
+                        UnityDebugger.Debugger.LogWarning("SpriteManager",obj);
                         throw new Exception("Error in file " + jsonPath, e);
                     }
                 }
