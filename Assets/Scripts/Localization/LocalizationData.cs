@@ -40,11 +40,11 @@ namespace ProjectPorcupine.Localization
             {
                 if (isRightToLeft == false)
                 {
-                    return LocalName;
+                    return localName;
                 }
                 else
                 {
-                    return LocalizationTable.ReverseString(LocalName);
+                    return LocalizationTable.ReverseString(localName);
                 }
             }
 
