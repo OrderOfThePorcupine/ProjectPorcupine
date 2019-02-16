@@ -13,14 +13,14 @@ public class VisualPath : MonoBehaviour
 {
     public Material lineMaterial;
 
+    public Color PathColor = Color.red;
+
     public static VisualPath Instance { get; private set; }
 
     /// <summary>
     /// Character IDs to a list of their path.
     /// </summary>
     public Dictionary<int, List<Tile>> VisualPoints { get; private set; }
-
-    public Color PathColor = Color.red;
 
     /// <summary>
     /// Set a list of points that will be visualized.

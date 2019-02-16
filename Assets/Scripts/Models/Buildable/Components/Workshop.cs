@@ -520,6 +520,7 @@ namespace ProjectPorcupine.Buildable.Components
                     }
                 }
             }
+
             return outPlacement;
         }
         
