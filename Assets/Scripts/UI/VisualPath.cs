@@ -20,7 +20,7 @@ public class VisualPath : MonoBehaviour
     /// </summary>
     public Dictionary<int, List<Tile>> VisualPoints { get; private set; }
 
-    public Color PathColor { get; set; }
+    public Color PathColor = Color.red;
 
     /// <summary>
     /// Set a list of points that will be visualized.

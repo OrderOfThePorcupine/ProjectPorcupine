@@ -491,33 +491,35 @@ namespace ProjectPorcupine.Buildable.Components
 
             // processing is done, try to spit the output
             // check if output can be placed in world
-            foreach (Item outObjType in prodChain.Output)
+            if (prodChain != null)
             {
-                int amount = outObjType.Amount;
-
-                // check ouput slots for products:                        
-                Tile outputTile = World.Current.GetTileAt(
-                    ParentFurniture.Tile.X + outObjType.SlotPosX,
-                    ParentFurniture.Tile.Y + outObjType.SlotPosY,
-                    ParentFurniture.Tile.Z);
-
-                bool tileHasOtherFurniture = outputTile.Furniture != null && outputTile.Furniture != ParentFurniture;
-
-                if (!tileHasOtherFurniture &&
-                    (outputTile.Inventory == null ||
-                    (outputTile.Inventory.Type == outObjType.ObjectType && outputTile.Inventory.StackSize + amount <= outputTile.Inventory.MaxStackSize)))
+                foreach (Item outObjType in prodChain.Output)
                 {
-                    // out product can be placed here
-                    outPlacement.Add(new TileObjectTypeAmount()
+                    int amount = outObjType.Amount;
+
+                    // check ouput slots for products:                        
+                    Tile outputTile = World.Current.GetTileAt(
+                        ParentFurniture.Tile.X + outObjType.SlotPosX,
+                        ParentFurniture.Tile.Y + outObjType.SlotPosY,
+                        ParentFurniture.Tile.Z);
+
+                    bool tileHasOtherFurniture = outputTile.Furniture != null && outputTile.Furniture != ParentFurniture;
+
+                    if (!tileHasOtherFurniture &&
+                        (outputTile.Inventory == null ||
+                        (outputTile.Inventory.Type == outObjType.ObjectType && outputTile.Inventory.StackSize + amount <= outputTile.Inventory.MaxStackSize)))
                     {
-                        Tile = outputTile,
-                        IsEmpty = outputTile.Inventory == null,
-                        ObjectType = outObjType.ObjectType,
-                        Amount = outObjType.Amount
-                    });
+                        // out product can be placed here
+                        outPlacement.Add(new TileObjectTypeAmount()
+                        {
+                            Tile = outputTile,
+                            IsEmpty = outputTile.Inventory == null,
+                            ObjectType = outObjType.ObjectType,
+                            Amount = outObjType.Amount
+                        });
+                    }
                 }
             }
-
             return outPlacement;
         }
         

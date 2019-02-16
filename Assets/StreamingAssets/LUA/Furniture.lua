@@ -296,11 +296,11 @@ function MiningDroneStation_JobComplete(job)
 end
 
 function MiningDroneStation_Change_to_Raw_Iron(furniture, character)
-	furniture.Parameters["mine_type"].SetValue("Raw Iron")
+	furniture.Parameters["mine_type"].SetValue("raw_iron")
 end
 
 function MiningDroneStation_Change_to_Raw_Copper(furniture, character)
-	furniture.Parameters["mine_type"].SetValue("Raw Copper")
+	furniture.Parameters["mine_type"].SetValue("raw_copper")
 end
 
 function MetalSmelter_UpdateAction(furniture, deltaTime)
@@ -344,7 +344,7 @@ function MetalSmelter_UpdateAction(furniture, deltaTime)
     if(inputSpot.Inventory ~= nil and inputSpot.Inventory.StackSize < inputSpot.Inventory.MaxStackSize) then
         desiredStackSize = inputSpot.Inventory.MaxStackSize - inputSpot.Inventory.StackSize
     end
-    local itemsDesired = { RequestedItem.__new("Raw Iron", desiredStackSize) }
+    local itemsDesired = { RequestedItem.__new("raw_iron", desiredStackSize) }
     ModUtils.ULog("MetalSmelter: Creating job for " .. desiredStackSize .. " raw iron.")
 
     local job = Job.__new(
