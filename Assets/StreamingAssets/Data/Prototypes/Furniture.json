@@ -387,7 +387,7 @@
         }
       },
       "Parameters": {
-        "mine_type": "Raw Iron"
+        "mine_type": "raw_iron"
       },
       "ContextMenuActions": [
         {
