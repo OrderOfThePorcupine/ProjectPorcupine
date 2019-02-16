@@ -1,0 +1,182 @@
+﻿[
+   {
+      "name": "2IdleBack",
+      "x": 2,
+      "y": 4,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2IdleFront",
+      "x": 0,
+      "y": 4,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2IdleSide",
+      "x": 1,
+      "y": 4,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2WalkBack1",
+      "x": 2,
+      "y": 2,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2WalkBack2",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2WalkFront1",
+      "x": 1,
+      "y": 0,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2WalkFront2",
+      "x": 2,
+      "y": 0,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2WalkSide1",
+      "x": 0,
+      "y": 2,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "2WalkSide2",
+      "x": 1,
+      "y": 2,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "IdleBack",
+      "x": 2,
+      "y": "10",
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "IdleFront",
+      "x": 0,
+      "y": "10",
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "IdleSide",
+      "x": 1,
+      "y": "10",
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "WalkBack1",
+      "x": 2,
+      "y": 8,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "WalkBack2",
+      "x": 0,
+      "y": 6,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "WalkFront1",
+      "x": 1,
+      "y": 6,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "WalkFront2",
+      "x": 2,
+      "y": 6,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "WalkSide1",
+      "x": 0,
+      "y": 8,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   },
+   {
+      "name": "WalkSide2",
+      "x": 1,
+      "y": 8,
+      "w": 1,
+      "h": 2,
+      "pixelPerUnit": 64,
+      "pivotX": 0.5,
+      "pivotY": 0.15
+   }
+]
