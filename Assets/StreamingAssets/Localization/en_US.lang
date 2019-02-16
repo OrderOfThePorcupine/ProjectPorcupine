@@ -229,6 +229,7 @@ developer_mode=Developer Mode:
 master_volume=Master Volume:
 music_volume=Music Volume:
 ui_scale=UI Scale:
+ui_animation_speed=UI Speed:
 tooltip_options=Select Popup Text To Toggle:
 
 ##########Settings-Tooltips##########
@@ -249,6 +250,7 @@ ui_skin_tooltip=Skins for the UI
 quality_tooltip=Quality Presets
 vsync_tooltip=Helps prevent screen tearing by capping frame rate
 ui_scale_tooltip=Scale the UI manually
+ui_animation_speed_tooltip=Addjust the speed of UI animations
 soft_particles_tooltip=Softer particles use more resources 
 shadows_tooltip=Higher level shadows use more resources
 anisotropic_filtering_tooltip=Reduce jaggedness of surfaces
