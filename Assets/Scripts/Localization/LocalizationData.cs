@@ -7,48 +7,56 @@
 // ====================================================
 #endregion
 
-using System.Collections;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace ProjectPorcupine.Localization
 {
     /// <summary>
     /// Holds information about a language's configuration data.
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class LocalizationData
     {
-        public readonly string LocalizationCode;
+        [JsonProperty("rtl")]
+        public bool isRightToLeft = false;
 
-        public bool IsRightToLeft;
+        [JsonProperty("code")]
+        private readonly string localizationCode;
 
         // Even for RTL languages, this is kept as defined in xml. The property does the character reversal
+        [JsonProperty("name")]
         private string localName;
 
         public LocalizationData(string localizationCode, string localName, bool isRightToLeft = false)
         {
-            this.LocalizationCode = localizationCode;
+            this.localizationCode = localizationCode;
             this.localName = localName ?? localizationCode;
-            this.IsRightToLeft = isRightToLeft;
+            this.isRightToLeft = isRightToLeft;
         }
 
         public string LocalName
         {
             get
             {
-                if (IsRightToLeft == false)
+                if (isRightToLeft == false)
                 {
-                    return localName;
+                    return LocalName;
                 }
                 else
                 {
-                    return LocalizationTable.ReverseString(localName);
+                    return LocalizationTable.ReverseString(LocalName);
                 }
             }
 
             set
             {
-                localName = value;
+                LocalName = value;
             }
+        }
+
+        public override string ToString()
+        {
+            return localizationCode + "," + isRightToLeft + "," + LocalName;
         }
     }
 }
