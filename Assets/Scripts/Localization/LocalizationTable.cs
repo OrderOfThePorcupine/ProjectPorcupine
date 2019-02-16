@@ -84,10 +84,6 @@ namespace ProjectPorcupine.Localization
         public static string GetLocalization(string key, FallbackMode fallbackMode, string language, params object[] additionalValues)
         {
             string value;
-            if (key == string.Empty)
-            {
-                return string.Empty;
-            }
 
             if (localizationTable.ContainsKey(language) && localizationTable[language].TryGetValue(key, out value))
             {
@@ -101,7 +97,7 @@ namespace ProjectPorcupine.Localization
                 GetLocalization(key, fallbackMode, language, additionalValues);
             }
 
-            if (!missingKeysLogged.Contains(key))
+            if (!missingKeysLogged.Contains(key) && key!=string.Empty)
             {
                 missingKeysLogged.Add(key);
                 UnityDebugger.Debugger.LogWarning("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
