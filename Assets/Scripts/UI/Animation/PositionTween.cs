@@ -17,18 +17,16 @@ namespace ProjectPorcupine.UI.Animation
         private RectTransform rect;
         private Vector2 target;
         private float duration;
-        private float speed;
         private Action onEnded;
         private float elapsedTime;
 
-        public PositionTween(RectTransform rect, Vector2 target, float speed)
+        public PositionTween(RectTransform rect, Vector2 target)
         {
             this.rect = rect;
             this.target = target;
-            this.speed = speed;
         }
 
-        public PositionTween(RectTransform rect, Vector2 target, float duration, Action onEnded) : this(rect, target, duration)
+        public PositionTween(RectTransform rect, Vector2 target, Action onEnded) : this(rect, target)
         {
             this.onEnded = onEnded;
         }
@@ -36,7 +34,8 @@ namespace ProjectPorcupine.UI.Animation
         public void Start()
         {
             float distance = Vector2.Distance(rect.anchoredPosition, target);
-            duration = distance / (speed * 100);
+            float speed = SettingsKeyHolder.UIAnimationSpeed * 100;
+            duration = distance / speed;
             elapsedTime = 0;
             TimeManager.Instance.EveryFrame += Update;
         }

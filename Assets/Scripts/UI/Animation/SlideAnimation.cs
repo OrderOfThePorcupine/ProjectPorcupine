@@ -40,8 +40,8 @@ namespace ProjectPorcupine.UI.Animation
             inPosition = rect.anchoredPosition;
             rect.anchoredPosition = outPosition;
 
-            slideIn = new PositionTween(rect, inPosition, 5);
-            slideOut = new PositionTween(rect, outPosition, 5, () => gameObject.SetActive(false));
+            slideIn = new PositionTween(rect, inPosition);
+            slideOut = new PositionTween(rect, outPosition, () => gameObject.SetActive(false));
         }
     }
 }
