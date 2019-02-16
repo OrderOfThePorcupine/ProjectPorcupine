@@ -185,12 +185,12 @@ public class SettingsMenu : MonoBehaviour
 
     public void Cancel()
     {
-		// If we have made no changes we can freely exit
-		// Issue #155 Fix
-		if (changesTracker.Count == 0)
-		{
-			return;
-		}
+        // If we have made no changes we can freely exit
+        // Issue #155 Fix
+        if (changesTracker.Count == 0)
+        {
+            return;
+        }
 
         // Open a dialog box to double check
         DialogBoxPromptOrInfo check;
@@ -205,7 +205,7 @@ public class SettingsMenu : MonoBehaviour
         }
         else
         {
-			// We can't display cancel box so just automatically cancel
+            // We can't display cancel box so just automatically cancel
             mainRoot.SetActive(false);
             return;
         }
