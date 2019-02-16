@@ -97,7 +97,7 @@ namespace ProjectPorcupine.Localization
                 GetLocalization(key, fallbackMode, language, additionalValues);
             }
 
-            if (!missingKeysLogged.Contains(key) && key!=string.Empty)
+            if (!missingKeysLogged.Contains(key) && key != string.Empty)
             {
                 missingKeysLogged.Add(key);
                 UnityDebugger.Debugger.LogWarning("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
