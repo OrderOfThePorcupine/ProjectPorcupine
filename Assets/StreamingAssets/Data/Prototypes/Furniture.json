@@ -623,8 +623,8 @@
       "PathfindingWeight": 2.0,
       "Width": 1,
       "Height": 1,
-      "LocalizationName": "furn_tank",
-      "LocalizationDescription": "furn_tank_desc",
+      "LocalizationName": "furn_water_tank",
+      "LocalizationDescription": "furn_water_tank_desc",
       "Health": 1.0,
       "DragType": "single",
       "Components": {

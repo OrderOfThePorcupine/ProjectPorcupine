@@ -70,20 +70,28 @@ furn_air_pump=Air Pump
 furn_air_pump_desc=Pumps air between two rooms.
 furn_vent=Vent
 furn_vent_desc=Allows air to flow between rooms
+furn_astro_wall=Asteroid surface
+furn_astro_wall_desc=A sharp pointy surface of a space rock. Be careful not to nick your space suit!
+furn_water_generator=Water Generator
+furn_water_generator_desc=Turns ice in to water, like magic!
+furn_water_tank=Water Tank
+furn_water_tank_desc=A big ball of metal, holding the stuff of life.
+furn_berth=Berth
+furn_berth_desc=Build it, and you never know who might come...
 
 ##########Utility##########
 util_power_cable=Power Cable
 util_power_cable_desc=Carries power
-util_water_pipe=Water Pipe
-util_water_pipe_desc=Transports water
+util_fluid_pipe=Pipe
+util_fluid_pipe_desc=Transports any kind of fluid, just don't let it escape outside!
 
 ##########Tiles##########
-tile_Empty=Empty
-tile_Empty_desc=An empty tile.
-tile_Floor=Floor
-tile_Floor_desc=Meets the highest non-skid standards.
-tile_Ladder=Ladder
-tile_Ladder_desc=High-tech space movement system. Effectiveness reduced when held by weak noodle arms.
+tile_empty=Empty
+tile_empty_desc=An empty tile.
+tile_floor=Floor
+tile_floor_desc=Meets the highest non-skid standards.
+tile_ladder=Ladder
+tile_ladder_desc=High-tech space movement system. Effectiveness reduced when held by weak noodle arms.
 
 ##########Room Behaviors##########
 roombehavior_airlock=Airlock
