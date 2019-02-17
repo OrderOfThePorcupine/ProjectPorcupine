@@ -187,6 +187,17 @@
               "MaximumValue": "2"
             },
             "Tooltip": "ui_scale_tooltip"
+          },
+          {
+            "Name": "ui_animation_speed",
+            "Key": "video_general_ui_animation_speed",
+            "DefaultValue": "5",
+            "ClassName": "GenericSlider",
+            "Parameters": {
+              "MinimumValue": "1",
+              "MaximumValue": "10"
+            },
+            "Tooltip": "ui_animation_speed_tooltip"
           }
         ],
         "advanced": [

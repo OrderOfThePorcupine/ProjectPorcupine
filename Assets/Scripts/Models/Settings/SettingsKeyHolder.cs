@@ -265,6 +265,20 @@ public static partial class SettingsKeyHolder
         }
     }
 
+    public static float UIAnimationSpeed
+    {
+        get
+        {
+            float temp;
+            return Settings.GetSetting("video_general_ui_animation_speed", out temp) ? temp : 5f;
+        }
+
+        set
+        {
+            Settings.SetSetting("video_general_ui_animation_speed", value);
+        }
+    }
+
     public static string TooltipOptions
     {
         get

@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using ProjectPorcupine.UI.Animation;
 using UnityEngine;
 
 public class MenuLeft : MonoBehaviour
@@ -33,7 +34,7 @@ public class MenuLeft : MonoBehaviour
 
         CloseMenu();
 
-        menu.SetActive(true);
+        menu.GetComponent<SlideAnimation>().Show();
         CurrentlyOpen = menu;
 
         WorldController.Instance.SoundController.OnButtonSFX();
@@ -48,7 +49,7 @@ public class MenuLeft : MonoBehaviour
     {
         if (CurrentlyOpen != null)
         {
-            CurrentlyOpen.SetActive(false);
+            CurrentlyOpen.GetComponent<SlideAnimation>().Hide();
 
             if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
             {
