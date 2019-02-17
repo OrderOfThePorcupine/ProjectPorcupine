@@ -237,12 +237,6 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
 
     public IEnumerable<ContextMenuAction> GetContextMenuActions(ContextMenu contextMenu)
     {
-        yield return new ContextMenuAction
-        {
-            LocalizationKey = "Sample Item Context action",
-            RequireCharacterSelected = true,
-            Action = (cm, c) => UnityDebugger.Debugger.Log("Inventory", "Sample menu action")
-        };
 
         if (PrototypeManager.Furniture.Has(this.Type))
         {

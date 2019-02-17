@@ -132,7 +132,7 @@ public class JobQueue
             {
                 if (CharacterCantReachHelper(job, character))
                 {
-                    UnityDebugger.Debugger.LogWarning("JobQueue", "Character could not find a path to the job site.");
+                    UnityDebugger.Debugger.Log("JobQueue", "Character could not find a path to the job site.");
                     ReInsertHelper(job);
                     continue;
                 }
@@ -142,7 +142,7 @@ public class JobQueue
 
                     // Is this a bug?  Or a warning
                     // @ Decide
-                    UnityDebugger.Debugger.LogWarning("JobQueue", "Character could not find a path to any inventory available.");
+                    UnityDebugger.Debugger.Log("JobQueue", "Character could not find a path to any inventory available.");
                     ReInsertHelper(job);
                     continue;
                 }

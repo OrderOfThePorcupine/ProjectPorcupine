@@ -35,7 +35,7 @@ namespace ProjectPorcupine.Localization
         // The string the text had before localizing.
         // Hide this in the inspector, due to it being useless there.
         [HideInInspector]
-        public string defaultText;
+        public string defaultText = string.Empty;
 
         // The language that was selected last frame.
         // This is used for auto-translating as soon as the user switches language to something else.

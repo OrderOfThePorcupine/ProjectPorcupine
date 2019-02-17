@@ -297,7 +297,7 @@ namespace ProjectPorcupine.Rooms
             yield return new ContextMenuAction
             {
                 LocalizationKey = "deconstruct",
-                LocalizationParameter=LocalizationName,
+                LocalizationParameter = LocalizationName,
                 RequireCharacterSelected = false,
                 Action = (contextMenuAction, character) => Deconstruct(this)
             };

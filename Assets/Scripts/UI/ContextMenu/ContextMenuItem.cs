@@ -28,7 +28,14 @@ public class ContextMenuItem : MonoBehaviour
     /// </summary>
     public void BuildInterface()
     {
-        text.text = Action.LocalizationKey;
+        if (Action.LocalizationParameter == null)
+        {
+            text.text = LocalizationTable.GetLocalization(Action.LocalizationKey);
+        }
+        else
+        {
+            text.text = LocalizationTable.GetLocalization(Action.LocalizationKey, Action.LocalizationParameter);
+        }
     }
 
     /// <summary>
