@@ -137,6 +137,17 @@ namespace ProjectPorcupine.Entities
             GameObject char_go = objectGameObjectMap[character];
 
             char_go.transform.position = new Vector3(character.X, character.Y, character.Z);
+
+            if (character.IsSelected)
+            {
+                VisualPath path = char_go.GetComponentInChildren<VisualPath>();
+                if (path == null)
+                {
+                    path = GameObject.Instantiate<VisualPath>(Resources.Load<VisualPath>("UI/VisualPath"), char_go.transform);
+                }
+
+                path.SetVisualPoints(character.Path);
+            }
         }
 
         protected override void OnRemoved(Character character)
