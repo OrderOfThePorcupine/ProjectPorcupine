@@ -12,6 +12,7 @@ jobs:
   include:
     - stage: unit_tests
       script: ./Scripts/unit_tests.sh
+      mono: none
     - stage: style_cop
       script: ./Scripts/stylecop.sh
     - stage: deploy
