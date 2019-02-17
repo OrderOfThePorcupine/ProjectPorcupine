@@ -96,7 +96,7 @@ public class ConstructionMenu : MonoBehaviour, IGameMenu
 
         this.transform.Find("Close Button").GetComponent<Button>().onClick.AddListener(delegate
         {
-            menuLeft.CloseCurrentlyMenu();
+            menuLeft.CloseCurrentMenu();
         });
 
         RenderRoomBehaviorButtons();
@@ -147,7 +147,7 @@ public class ConstructionMenu : MonoBehaviour, IGameMenu
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_BuildFurniture(objectId);
-                    menuLeft.CloseCurrentlyMenu();
+                    menuLeft.CloseCurrentMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -196,7 +196,7 @@ public class ConstructionMenu : MonoBehaviour, IGameMenu
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_DesignateRoomBehavior(objectId);
-                    menuLeft.CloseCurrentlyMenu();
+                    menuLeft.CloseCurrentMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -245,7 +245,7 @@ public class ConstructionMenu : MonoBehaviour, IGameMenu
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_BuildUtility(objectId);
-                    menuLeft.CloseCurrentlyMenu();
+                    menuLeft.CloseCurrentMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -287,7 +287,7 @@ public class ConstructionMenu : MonoBehaviour, IGameMenu
             button.onClick.AddListener(delegate
             {
                 buildModeController.SetModeBuildTile(tileType);
-                menuLeft.CloseCurrentlyMenu();
+                menuLeft.CloseCurrentMenu();
             });
 
             LocalizationTable.CBLocalizationFilesChanged += delegate

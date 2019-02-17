@@ -29,7 +29,7 @@ public class MenuLeft : MonoBehaviour
         AddMenuButton(orderMenu, "menu_orders", 1);
     }
 
-    public void OpenCurrentlyMenu()
+    public void OpenCurrentMenu()
     {
         CurrentlyOpen.GetComponent<IGameMenu>().Open();
 
@@ -41,7 +41,7 @@ public class MenuLeft : MonoBehaviour
         }
     }
 
-    public void CloseCurrentlyMenu()
+    public void CloseCurrentMenu()
     {
         if (CurrentlyOpen != null)
         {
@@ -84,7 +84,7 @@ public class MenuLeft : MonoBehaviour
         else
         {
             CurrentlyOpen = menu;
-            OpenCurrentlyMenu();
+            OpenCurrentMenu();
         }
     }
 }

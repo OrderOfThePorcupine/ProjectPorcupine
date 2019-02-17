@@ -72,7 +72,7 @@ public class OrderMenu : MonoBehaviour, IGameMenu
 
         this.transform.Find("Close Button").GetComponent<Button>().onClick.AddListener(delegate
         {
-            menuLeft.CloseCurrentlyMenu();
+            menuLeft.CloseCurrentMenu();
         });
 
         RenderDeconstructButton();
