@@ -32,7 +32,7 @@ before_install:
  - chmod +x ./Scripts/Install/unity.sh
  - chmod +x ./Scripts/Install/stylecop.sh
  - chmod +x ./Scripts/stylecop.sh
- - chmod +x ./SCripts/unit_tests.sh
+ - chmod +x ./Scripts/unit_tests.sh
  - chmod +x ./Scripts/test.sh
  - chmod +x ./Scripts/check-style.sh
  - chmod +x ./Scripts/build.sh
