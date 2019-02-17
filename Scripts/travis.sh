@@ -20,7 +20,6 @@ if [ "$JOB" == "unit-test" ]; then
 fi
 
 if [ "$JOB" == "stylecop" ]; then
-    ./Scripts/Install/mono.sh
     ./Scripts/Install/stylecop.sh
     ./Scripts/check-style.sh
 fi
