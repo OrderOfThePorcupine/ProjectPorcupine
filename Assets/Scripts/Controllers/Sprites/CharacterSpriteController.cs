@@ -141,10 +141,11 @@ namespace ProjectPorcupine.Entities
             if (character.IsSelected)
             {
                 VisualPath path = char_go.GetComponentInChildren<VisualPath>();
-                if (path==null)
+                if (path == null)
                 {
                     path = GameObject.Instantiate<VisualPath>(Resources.Load<VisualPath>("UI/VisualPath"), char_go.transform);
                 }
+
                 path.SetVisualPoints(character.Path);
             }
         }
