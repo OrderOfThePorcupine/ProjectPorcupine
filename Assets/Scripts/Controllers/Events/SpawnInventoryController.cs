@@ -80,6 +80,7 @@ public class SpawnInventoryController : IMouseHandler
         if (t.Inventory == null || t.Inventory.Type == InventoryToBuild)
         {
             World.Current.InventoryManager.PlaceInventory(t, CurrentInventory);
+            CurrentInventory = new Inventory(InventoryToBuild, AmountToCreate);
         }
     }
 
