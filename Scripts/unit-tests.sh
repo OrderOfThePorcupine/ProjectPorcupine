@@ -1,6 +1,5 @@
 #! /bin/sh
 # Run unit tests
-./Scripts/Install/unity.sh
 ./Scripts/test.sh --travis
 
 if [ $? -ne 0 ]; then
@@ -9,8 +8,4 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Only build binary stuff through the cron-job
-if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
-    ./Scripts/build.sh
-fi
 exit $?

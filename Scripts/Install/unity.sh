@@ -1,5 +1,7 @@
 #! /bin/sh
 
+UNITY_DOWNLOAD_CACHE="$(pwd)/unity_download_cache"
+
 echo "Contents of Unity Download Cache: $UNITY_DOWNLOAD_CACHE"
 ls $UNITY_DOWNLOAD_CACHE
 
@@ -18,8 +20,11 @@ download() {
   file=$1
   url="$BASE_URL/$HASH/$package"
 
-  echo "Downloading from $url: "
-  curl -o `basename "$package"` "$url"
+  if [ ! -e $UNITY_DOWNLOAD_CACHE/`basename "$URL"` ] ; then
+    echo "File doesn't exist, downloading form $url"
+    mkdir -p "$UNITY_DOWNLOAD_CACHE"
+    curl -o $UNITY_DOWNLOAD_CACHE/`basename "$package"` "$url"
+  fi
 }
 
 install() {
@@ -27,7 +32,7 @@ install() {
   download "$package"
 
   echo "Installing "`basename "$package"`
-  sudo installer -dumplog -package `basename "$package"` -target /
+  sudo installer -dumplog -package $UNITY_DOWNLOAD_CACHE/`basename "$package"` -target /
 }
 
 # See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list

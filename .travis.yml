@@ -8,16 +8,22 @@ rvm:
   - 2.2
 mono:
   - latest
+cache:
+  directories:
+    - $UNITY_DOWNLOAD_CACHE
+install:
+  - ./Scripts/Install/unity.sh
+  - ./Scripts/Install/stylecop.sh
 jobs:
   include:
-    - stage: unit_tests
-      script: ./Scripts/unit_tests.sh
+    - stage: unit-tests
+      script: ./Scripts/unit-tests.sh
       mono: none
-    - stage: style_cop
-      script: ./Scripts/stylecop.sh
+    - stage: stylecop
+      script: ./Scripts/check-style.sh
     - stage: deploy
       if: type = cron
-      script: ./Scripts/deploy_build.sh
+      script: ./Scripts/deploy-build.sh
       deploy: &bintray
         provider: bintray
         file: ./Scripts/bintray.json
@@ -31,11 +37,10 @@ env:
 before_install:
  - chmod +x ./Scripts/Install/unity.sh
  - chmod +x ./Scripts/Install/stylecop.sh
- - chmod +x ./Scripts/stylecop.sh
- - chmod +x ./Scripts/unit_tests.sh
+ - chmod +x ./Scripts/unit-tests.sh
  - chmod +x ./Scripts/test.sh
  - chmod +x ./Scripts/check-style.sh
  - chmod +x ./Scripts/build.sh
- - chmod +x ./Scripts/deploy_build.sh
+ - chmod +x ./Scripts/deploy-build.sh
 notifications:
   email: false
