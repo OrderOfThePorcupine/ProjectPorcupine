@@ -6,8 +6,6 @@ os:
 osx_image: xcode9.2
 rvm:
   - 2.2
-mono:
-  - latest
 jobs:
   include:
     - stage: unit-tests
@@ -22,6 +20,7 @@ jobs:
     - stage: deploy
       if: type = cron
       script: ./Scripts/deploy-build.sh
+      mono: none
       install:
         - ./Scripts/Install/unity.sh
       deploy: &bintray
