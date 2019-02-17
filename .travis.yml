@@ -1,6 +1,8 @@
 # adapted from: https://github.com/JonathanPorta/ci-build
 
 language: csharp
+os:
+  - osx
 osx_image: xcode9.2
 rvm:
   - 2.2
