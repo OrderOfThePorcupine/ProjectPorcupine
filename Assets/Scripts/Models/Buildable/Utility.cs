@@ -467,7 +467,8 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     {
         yield return new ContextMenuAction
         {
-            LocalizationKey = "Deconstruct " + GetName(),
+            LocalizationKey = "deconstruct_furniture", 
+            LocalizationParameter=GetName(),
             RequireCharacterSelected = false,
             Action = (contextMenuAction, character) => SetDeconstructJob()
         };
@@ -479,7 +480,8 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
                 {
                     yield return new ContextMenuAction
                     {
-                        LocalizationKey = "Prioritize " + GetName(),
+                        LocalizationKey = "prioritize", 
+                        LocalizationParameter=GetName(),
                         RequireCharacterSelected = true,
                         Action = (contextMenuAcion, character) => character.PrioritizeJob(Jobs[0])
                     };

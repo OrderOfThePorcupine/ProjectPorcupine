@@ -127,6 +127,7 @@ job_cloning_pod_cloning_desc=Cloning Character
 job_fission_reactor_filling_desc=Filling Fission Reactor
 job_ore_mine_mining_desc=Mining Ore from Mine
 uninstall_furniture=Pack in crate
+install_order=Unpack from crate
 deconstruct_furniture=Break in to pieces
 
 ##########Overlay##########
