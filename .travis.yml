@@ -6,8 +6,6 @@ os:
 osx_image: xcode9.2
 rvm:
   - 2.2
-mono:
-  - latest
 jobs:
   include:
     - stage: unit-tests
@@ -21,7 +19,8 @@ jobs:
         - ./Scripts/Install/stylecop.sh
     - stage: deploy
       if: type = cron
-      script: ./Scripts/deploy-build.sh
+      script: ./Scripts/build.sh
+      mono: none
       install:
         - ./Scripts/Install/unity.sh
       deploy: &bintray
@@ -41,6 +40,5 @@ before_install:
  - chmod +x ./Scripts/test.sh
  - chmod +x ./Scripts/check-style.sh
  - chmod +x ./Scripts/build.sh
- - chmod +x ./Scripts/deploy-build.sh
 notifications:
   email: false
