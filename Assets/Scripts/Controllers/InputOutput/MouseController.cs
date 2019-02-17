@@ -138,7 +138,7 @@ namespace ProjectPorcupine.Mouse
         /// </summary>
         public MouseController()
         {
-            BuildModeController.Instance.SetMouseController(this);
+            WorldController.Instance.BuildModeController.SetMouseController(this);
             contextMenu = GameObject.FindObjectOfType<ContextMenu>();
             DragPreviewGameObjects = new List<GameObject>();
 
@@ -212,7 +212,14 @@ namespace ProjectPorcupine.Mouse
         {
             this.uiTooltip = null;
             mouseCursor.UIMode = false;
-            currentMode = BuildModeController.Instance.Building ? MouseMode.BUILD : MouseMode.COORDINATES;
+            if (WorldController.Instance.BuildModeController.Building)
+            {
+                currentMode = MouseMode.BUILD;
+            }
+            else
+            {
+                currentMode = MouseMode.COORDINATES;
+            }
 
             if (stopDragging)
             {

@@ -241,7 +241,7 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
             {
                 LocalizationKey = "install_order",
                 RequireCharacterSelected = false,
-                Action = (cm, c) => BuildModeController.Instance.SetMode_BuildFurniture(Type, true)
+                Action = (cm, c) => WorldController.Instance.BuildModeController.SetMode_BuildFurniture(Type, true)
             };
         }
     }
