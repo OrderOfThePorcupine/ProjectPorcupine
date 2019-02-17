@@ -192,7 +192,7 @@
             "Name": "ui_animation_speed",
             "Key": "video_general_ui_animation_speed",
             "DefaultValue": "5",
-            "ClassName": "UIAnimationSpeedSlider",
+            "ClassName": "GenericSlider",
             "Parameters": {
               "MinimumValue": "1",
               "MaximumValue": "10"

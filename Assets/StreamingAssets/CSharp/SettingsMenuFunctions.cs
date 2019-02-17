@@ -1093,19 +1093,6 @@ public class UIScaleSlider : GenericSlider
     }
 }
 
-public class UIAnimationSpeedSlider : GenericSlider
-{
-    public override void ApplySetting()
-    {
-        base.ApplySetting();
-    }
-
-    public override void CancelSetting()
-    {
-        base.CancelSetting();
-    }
-}
-
 public class SoundSlider : GenericSlider
 {
     public override GameObject InitializeElement()
