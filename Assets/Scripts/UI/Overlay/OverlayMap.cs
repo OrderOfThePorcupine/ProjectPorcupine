@@ -577,17 +577,17 @@ public class OverlayMap : MonoBehaviour
         LayoutElement layout;
 
         colorMapView = new GameObject();
-        Image image=colorMapView.AddComponent<UnityEngine.UI.Image>();
+        Image image = colorMapView.AddComponent<UnityEngine.UI.Image>();
         colorMapView.transform.SetParent(parentPanel.transform);
-        layout=colorMapView.AddComponent<LayoutElement>();
+        layout = colorMapView.AddComponent<LayoutElement>();
         layout.minHeight = 30;
         layout.minWidth = 150;
         Material overlayMaterial = new Material(Resources.Load<Material>("Shaders/UI-Unlit-Transparent"));
         image.material = overlayMaterial;
 
         textView = new GameObject();
-        Text text=textView.AddComponent<Text>();
-        layout=textView.AddComponent<LayoutElement>();
+        Text text = textView.AddComponent<Text>();
+        layout = textView.AddComponent<LayoutElement>();
         layout.minHeight = 30;
         layout.minWidth = 150;
         textView.transform.SetParent(parentPanel.transform);
