@@ -138,6 +138,7 @@ public class TimeScaleUpdater : MonoBehaviour
 
         // Hardcoded till timemanager gets a little bit of attention and becomes less constant heavy
         slider.minValue = 0;
+
         // -1 otherwise it doesn't go all the way to the right.
         slider.maxValue = timeScales.Length - 1;
 
