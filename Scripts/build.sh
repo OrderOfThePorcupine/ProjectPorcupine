@@ -76,4 +76,4 @@ cd -
 echo "All builds done creating config file"
 
 # Create the config file for Bintray
-generate-bintray-json > ./Scripts/bintray.json
+./generate-bintray-json.sh > ./Scripts/bintray.json
