@@ -7,7 +7,7 @@ osx_image: xcode9.2
 rvm:
   - 2.2
 mono:
-  - 3.12.1
+  - latest
 env:
   global:
     - BUILD_VERSION=$( date +%Y.%V )
