@@ -9,95 +9,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(LineRenderer))]
 public class VisualPath : MonoBehaviour
 {
-    public Material lineMaterial;
-
-    public Color PathColor = Color.red;
-
-    public static VisualPath Instance { get; private set; }
-
-    /// <summary>
-    /// Character IDs to a list of their path.
-    /// </summary>
-    public Dictionary<int, List<Tile>> VisualPoints { get; private set; }
+    private LineRenderer lineRenderer;
 
     /// <summary>
     /// Set a list of points that will be visualized.
     /// </summary>
     /// <param name="charName"></param>
     /// <param name="points"></param>
-    public void SetVisualPoints(int charID, List<Tile> points)
+    public void SetVisualPoints(IEnumerable<Tile> tiles)
     {
-        // A character changed there path, so we need to update the new path
-        if (VisualPoints.ContainsKey(charID))
+        List<Vector3> vertexes = new List<Vector3>();
+        foreach (Tile tile in tiles)
         {
-            VisualPoints[charID] = points;
-            return;
+            vertexes.Add(tile.Vector3);
         }
-
-        VisualPoints.Add(charID, points);
-    }
-
-    /// <summary>
-    /// Removes a charcters entry in the VisualPoints dictionary.
-    /// </summary>
-    /// <param name="charName"></param>
-    public void RemoveVisualPoints(int charID)
-    {
-        // maybe the character has died or we just no longer wnat to see his path any more
-        if (VisualPoints.ContainsKey(charID))
-        {
-            VisualPoints.Remove(charID);
-        }
+        lineRenderer.positionCount = vertexes.Count;
+        lineRenderer.SetPositions(vertexes.ToArray());
     }
 
     private void Awake()
     {
-        // initalize dictionary
-        VisualPoints = new Dictionary<int, List<Tile>>();
+        lineRenderer = GetComponent<LineRenderer>();
 
-        // default PathColor to red
-        PathColor = Color.red;
     }
 
-    private void OnEnable()
-    {
-        Instance = this;
-    }
-
-    private void OnRenderObject()
-    {
-        // Apply the line material
-        lineMaterial.SetPass(0);
-
-        GL.PushMatrix();
-
-        // Set transformation matrix for drawing to
-        // match our transform
-        GL.MultMatrix(transform.localToWorldMatrix);
-
-        // Draw lines
-        GL.Begin(GL.LINES);
-        GL.Color(PathColor);
-        foreach (int entry in VisualPoints.Keys)
-        {
-            for (int i = 0; i < VisualPoints[entry].Count; i++)
-            {
-                if (i != 0)
-                {
-                    GL.Vertex3(VisualPoints[entry][i - 1].X, VisualPoints[entry][i - 1].Y, VisualPoints[entry][i - 1].Z);
-                }
-                else
-                {
-                    GL.Vertex3(VisualPoints[entry][i].X, VisualPoints[entry][i].Y, VisualPoints[entry][i].Z);
-                }
-
-                GL.Vertex3(VisualPoints[entry][i].X, VisualPoints[entry][i].Y, VisualPoints[entry][i].Z);
-            }
-        }
-
-        GL.End();
-        GL.PopMatrix();
-    }
 }

@@ -49,8 +49,6 @@ namespace ProjectPorcupine.Entities
         /// Used for health system.
         private HealthSystem health;
 
-        private bool selected = false;
-
         private Color characterColor;
         private Color characterUniformColor;
         private Color characterSkinColor;
@@ -99,6 +97,9 @@ namespace ProjectPorcupine.Entities
 
         /// Holds all character animations.
         public Animation.CharacterAnimation Animation { get; set; }
+
+        /// Path character will be walking on
+        public List<Tile> Path { get; set; }
 
         /// Is the character walking or idle.
         public bool IsWalking { get; set; }
@@ -209,23 +210,7 @@ namespace ProjectPorcupine.Entities
             }
         }
 
-        public bool IsSelected
-        {
-            get
-            {
-                return selected;
-            }
-
-            set
-            {
-                if (value == false)
-                {
-                    VisualPath.Instance.RemoveVisualPoints(ID);
-                }
-
-                selected = value;
-            }
-        }
+        public bool IsSelected { get; set; }
 
         /// <summary>
         /// Gets the Health of this object.
