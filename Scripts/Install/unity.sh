@@ -1,8 +1,5 @@
 #! /bin/sh
 
-echo "Contents of Unity Download Cache: $UNITY_DOWNLOAD_CACHE"
-ls $UNITY_DOWNLOAD_CACHE
-
 echo "Installing Unity..."
 install $UNITY_OSX_PACKAGE_URL
 install $UNITY_WINDOWS_TARGET_PACKAGE_URL
@@ -17,8 +14,6 @@ VERSION=2017.2.5f1
 download() {
   file=$1
   url="$BASE_URL/$HASH/$package"
-
-  echo "Downloading from $url: "
   curl -o `basename "$package"` "$url"
 }
 
@@ -34,6 +29,9 @@ install() {
 # of available packages, where PLATFORM is `osx` or `win`
 
 install "MacEditorInstaller/Unity-$VERSION.pkg"
-install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
-install "MacEditorTargetInstaller/UnitySetup-Mac-Support-for-Editor-$VERSION.pkg"
-install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
+
+if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
+  install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
+  install "MacEditorTargetInstaller/UnitySetup-Mac-Support-for-Editor-$VERSION.pkg"
+  install "MacEditorTargetInstaller/UnitySetup-Linux-Support-for-Editor-$VERSION.pkg"
+fi

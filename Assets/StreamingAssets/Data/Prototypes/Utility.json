@@ -20,13 +20,13 @@
         "Build": {
           "JobTime": 1.0,
           "Inventory": {
-            "copper_wire": 2
+            "copper_plate": 1
           }
         },
         "Deconstruct": {
           "JobTime": 1.0,
           "Inventory": {
-            "copper_wire": 1
+            "copper_plate": 1
           }
         }
       }

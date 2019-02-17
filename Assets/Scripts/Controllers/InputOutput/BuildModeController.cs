@@ -36,14 +36,11 @@ public class BuildModeController : IMouseHandler
 
     public BuildModeController()
     {
-        Instance = this;
         CurrentPreviewRotation = 0f;
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureLeft", KeyboardMappedInputType.KeyUp, RotateFurnitireLeft);
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureRight", KeyboardMappedInputType.KeyUp, RotateFurnitireRight);
         furnitureParent = new GameObject("Furniture Preview Sprites");
     }
-
-    public static BuildModeController Instance { get; protected set; }
 
     public float CurrentPreviewRotation { get; private set; }
 
@@ -57,7 +54,7 @@ public class BuildModeController : IMouseHandler
     {
         get
         {
-            return MouseHandlerCallbacks.HANDLE_DRAG_FINISHED | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION;
+            return MouseHandlerCallbacks.HANDLE_DRAG_FINISHED | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION | MouseHandlerCallbacks.HANDLE_CLICK;
         }
     }
 
@@ -679,7 +676,10 @@ public class BuildModeController : IMouseHandler
     /// </summary>
     public void HandleClick(Vector2 position, int mouseKey)
     {
-        throw new InvalidOperationException("Not supported by this class");
+        if (mouseKey == 2)
+        {
+            WorldController.Instance.MouseController.ClearMouseMode(true);
+        }
     }
 
     #region HelperFunctions

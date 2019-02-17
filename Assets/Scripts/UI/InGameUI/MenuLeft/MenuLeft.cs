@@ -54,7 +54,7 @@ public class MenuLeft : MonoBehaviour
             if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
             {
                 WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
-                BuildModeController.Instance.Building = false;
+                WorldController.Instance.BuildModeController.Building = false;
             }
 
             WorldController.Instance.SoundController.OnButtonSFX();

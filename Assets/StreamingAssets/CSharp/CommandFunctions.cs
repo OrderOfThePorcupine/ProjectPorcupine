@@ -272,8 +272,8 @@ public static class CommandFunctions
         Tile t;
         if (ModUtils.GetTileAt(pos, out t))
         {
-            BuildModeController.Instance.SetBuildMode((BuildMode)buildMode, type, useCrated, false);
-            BuildModeController.Instance.DoBuild(t);
+            WorldController.Instance.BuildModeController.SetBuildMode((BuildMode)buildMode, type, useCrated, false);
+            WorldController.Instance.BuildModeController.DoBuild(t);
         }
     }
 

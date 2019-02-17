@@ -19,7 +19,9 @@ public class TimeScaleUpdater : MonoBehaviour
     [SerializeField]
     private Sprite timeUnPaused;
     [SerializeField]
-    private Color[] colorTimeScaleArray; // Follows the time manager array 0.1, 0.5, 1, 2, 4, 8.  Then the final '7'th one is pause
+    private Color[] colorTimeScaleArray; // Follows the time manager array 0.1, 0.5, 1, 2, 4, 8.
+    [SerializeField]
+    private Color pausedColor;
 
     private Image imageElement;
     private Image[] sliderBackground;
@@ -94,7 +96,7 @@ public class TimeScaleUpdater : MonoBehaviour
             {
                 if (isPaused)
                 {
-                    img.color = colorTimeScaleArray[colorTimeScaleArray.Length - 1];
+                    img.color = pausedColor;
                 }
                 else if (timeScalePosition < colorTimeScaleArray.Length)
                 {
@@ -105,7 +107,9 @@ public class TimeScaleUpdater : MonoBehaviour
 
         imageElement.sprite = isPaused ? timePaused : timeUnPaused;
 
-        // Due to Unity's system, we need to implement this kind of hack -_-, ik stupid.
+        // A hack due to how unity updates properties like this
+        // (We are subscribed to all updates but when we self update it can 
+        //  and does still trigger our update call so we have to do this)
         userDriven = false;
         slider.value = timeScalePosition;
         userDriven = true;
@@ -121,7 +125,6 @@ public class TimeScaleUpdater : MonoBehaviour
         sliderBackground = slider.GetComponentsInChildren<Image>();
     }
 
-    // Initalise
     private void OnEnable()
     {
         if (TimeManager.Instance == null)
@@ -135,7 +138,9 @@ public class TimeScaleUpdater : MonoBehaviour
 
         // Hardcoded till timemanager gets a little bit of attention and becomes less constant heavy
         slider.minValue = 0;
-        slider.maxValue = timeScales.Length;
+
+        // -1 otherwise it doesn't go all the way to the right.
+        slider.maxValue = timeScales.Length - 1;
 
         isPaused = TimeManager.Instance.IsPaused;
         slider.value = TimeManager.Instance.TimeScalePosition;
