@@ -24,6 +24,7 @@ jobs:
       install:
         - ./Scripts/Install/unity.sh
       deploy: &bintray
+        skip_cleanup: true
         provider: bintray
         file: ./Scripts/bintray.json
         user: koosemose
