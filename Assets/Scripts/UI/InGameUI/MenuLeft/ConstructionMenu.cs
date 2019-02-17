@@ -10,10 +10,11 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
 using ProjectPorcupine.Rooms;
+using ProjectPorcupine.UI.Animation;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ConstructionMenu : MonoBehaviour
+public class ConstructionMenu : MonoBehaviour, IGameMenu
 {
     private const string LocalizationDeconstruct = "deconstruct_furniture";
 
@@ -21,6 +22,8 @@ public class ConstructionMenu : MonoBehaviour
     private List<GameObject> roomBehaviorItems;
     private List<GameObject> utilityItems;
     private List<GameObject> tileItems;
+
+    private SlideAnimation menuAnimation;
 
     private bool showAllFurniture;
 
@@ -74,6 +77,16 @@ public class ConstructionMenu : MonoBehaviour
         }
     }
 
+    public void Open()
+    {
+        menuAnimation.Show();
+    }
+
+    public void Close()
+    {
+        menuAnimation.Hide();
+    }
+
     private void Start()
     {
         Text title = GetComponentInChildren<Text>();
@@ -83,7 +96,7 @@ public class ConstructionMenu : MonoBehaviour
 
         this.transform.Find("Close Button").GetComponent<Button>().onClick.AddListener(delegate
         {
-            menuLeft.CloseMenu();
+            menuLeft.CloseCurrentlyMenu();
         });
 
         RenderRoomBehaviorButtons();
@@ -91,9 +104,13 @@ public class ConstructionMenu : MonoBehaviour
         RenderFurnitureButtons();
         RenderUtilityButtons();
 
+        menuAnimation = GetComponent<SlideAnimation>();
+
         InputField filterField = GetComponentInChildren<InputField>();
         filterField.onValueChanged.AddListener(delegate { FilterTextChanged(filterField.text); });
         KeyboardManager.Instance.RegisterModalInputField(filterField);
+
+        gameObject.SetActive(false);
     }
 
     private void RenderFurnitureButtons()
@@ -130,7 +147,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_BuildFurniture(objectId);
-                    menuLeft.CloseMenu();
+                    menuLeft.CloseCurrentlyMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -179,7 +196,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_DesignateRoomBehavior(objectId);
-                    menuLeft.CloseMenu();
+                    menuLeft.CloseCurrentlyMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -228,7 +245,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_BuildUtility(objectId);
-                    menuLeft.CloseMenu();
+                    menuLeft.CloseCurrentlyMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -270,7 +287,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
             {
                 buildModeController.SetModeBuildTile(tileType);
-                menuLeft.CloseMenu();
+                menuLeft.CloseCurrentlyMenu();
             });
 
             LocalizationTable.CBLocalizationFilesChanged += delegate

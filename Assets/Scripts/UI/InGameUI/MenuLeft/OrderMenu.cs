@@ -9,15 +9,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
+using ProjectPorcupine.UI.Animation;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class OrderMenu : MonoBehaviour
+public class OrderMenu : MonoBehaviour, IGameMenu
 {
     private const string LocalizationDeconstruct = "deconstruct_furniture";
     private const string LocalizationMine = "mine_furniture";
 
     private List<GameObject> taskItems;
+
+    private SlideAnimation menuAnimation;
 
     private MenuLeft menuLeft;
 
@@ -50,6 +53,16 @@ public class OrderMenu : MonoBehaviour
         }
     }
 
+    public void Open()
+    {
+        menuAnimation.Show();
+    }
+
+    public void Close()
+    {
+        menuAnimation.Hide();
+    }
+
     private void Start()
     {
         Text title = GetComponentInChildren<Text>();
@@ -59,15 +72,19 @@ public class OrderMenu : MonoBehaviour
 
         this.transform.Find("Close Button").GetComponent<Button>().onClick.AddListener(delegate
         {
-            menuLeft.CloseMenu();
+            menuLeft.CloseCurrentlyMenu();
         });
 
         RenderDeconstructButton();
         RenderMineButton();
 
+        menuAnimation = GetComponent<SlideAnimation>();
+
         InputField filterField = GetComponentInChildren<InputField>();
         filterField.onValueChanged.AddListener(delegate { FilterTextChanged(filterField.text); });
         KeyboardManager.Instance.RegisterModalInputField(filterField);
+
+        gameObject.SetActive(false);
     }    
 
     private void RenderDeconstructButton()

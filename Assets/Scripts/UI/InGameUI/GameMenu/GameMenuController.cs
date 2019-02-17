@@ -19,7 +19,7 @@ public class GameMenuController : MonoBehaviour
     // Deactivates All Menus.
     public void DeactivateAll()
     {
-        menuLeft.CloseMenu();
+        menuLeft.CloseCurrentlyMenu();
         WorldController.Instance.MouseController.ClearMouseMode(true);
     }
 
