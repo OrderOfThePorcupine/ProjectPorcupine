@@ -19,7 +19,7 @@ jobs:
         - ./Scripts/Install/stylecop.sh
     - stage: deploy
       if: type = cron
-      script: ./Scripts/deploy-build.sh
+      script: ./Scripts/build.sh
       mono: none
       install:
         - ./Scripts/Install/unity.sh
