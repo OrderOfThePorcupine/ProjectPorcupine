@@ -1,12 +1,5 @@
 #! /bin/sh
 
-PROJECT_PATH=$(pwd)/$UNITY_PROJECT_PATH
-UNITY_BUILD_DIR=$(pwd)/Build
-
-ERROR_CODE=0
-echo "Items in project path ($PROJECT_PATH):"
-ls "$PROJECT_PATH"
-
 echo "Attempting to build $project for Windows"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
     -batchmode \
@@ -14,10 +7,8 @@ echo "Attempting to build $project for Windows"
     -silent-crashes \
     -logFile $(pwd)/unity.log \
     -projectPath $(pwd) \
-    -buildWindowsPlayer "$(pwd)/Build/windows/$project.exe" \
+    -buildWindowsPlayer "$(pwd)/Build/windows/ProjectPorcupine.exe" \
     -quit
-
-cat $(pwd)/unity.log
 
 if [ $? = 0 ] ; then
   echo "Building Windows exe completed successfully."
@@ -33,10 +24,8 @@ echo "Attempting to build $project for OS X"
     -silent-crashes \
     -logFile $(pwd)/unity.log \
     -projectPath $(pwd) \
-    -buildOSXUniversalPlayer "$(pwd)/Build/osx/$project.app" \
+    -buildOSXUniversalPlayer "$(pwd)/Build/osx/ProjectPorcupine.app" \
     -quit
-    
-cat $(pwd)/unity.log
 
 if [ $? = 0 ] ; then
   echo "Building Mac exe completed successfully."
@@ -52,10 +41,8 @@ echo "Attempting to build $project for Linux"
     -silent-crashes \
     -logFile $(pwd)/unity.log \
     -projectPath $(pwd) \
-    -buildLinuxUniversalPlayer "$(pwd)/Build/linux/$project.exe" \
+    -buildLinuxUniversalPlayer "$(pwd)/Build/linux/ProjectPorcupine.exe" \
     -quit
-
-cat $(pwd)/unity.log
 
 if [ $? = 0 ] ; then
   echo "Building Linux exe completed successfully."
@@ -65,7 +52,7 @@ else
   exit $?
 fi
 
-echo 'Attempting to zip builds for week $BUILD_VERSION'
+echo "Attempting to zip builds for week $BUILD_VERSION"
 cd $(pwd)/Build/
 echo 'Attempting to zip linux'
 zip -q -r Linux-$BUILD_VERSION.zip linux/
