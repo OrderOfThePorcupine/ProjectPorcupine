@@ -36,14 +36,11 @@ public class BuildModeController : IMouseHandler
 
     public BuildModeController()
     {
-        Instance = this;
         CurrentPreviewRotation = 0f;
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureLeft", KeyboardMappedInputType.KeyUp, RotateFurnitireLeft);
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureRight", KeyboardMappedInputType.KeyUp, RotateFurnitireRight);
         furnitureParent = new GameObject("Furniture Preview Sprites");
     }
-
-    public static BuildModeController Instance { get; protected set; }
 
     public float CurrentPreviewRotation { get; private set; }
 
