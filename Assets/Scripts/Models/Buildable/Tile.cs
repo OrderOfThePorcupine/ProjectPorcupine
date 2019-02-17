@@ -629,7 +629,8 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
             {
                 yield return new ContextMenuAction
                 {
-                    LocalizationKey = LocalizationTable.GetLocalization("cancel_job", pendingJob.GetName()),
+                    LocalizationKey = "cancel_job",
+                    LocalizationParameter = pendingJob.GetName(),
                     RequireCharacterSelected = false,
                     Action = (cm, c) =>
                     {
@@ -640,7 +641,8 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
                 {
                     yield return new ContextMenuAction
                     {
-                        LocalizationKey = LocalizationTable.GetLocalization("prioritize", pendingJob.GetName()),
+                        LocalizationKey = "prioritize",
+                        LocalizationParameter = pendingJob.GetName(),
                         RequireCharacterSelected = true,
                         Action = (cm, c) =>
                         {

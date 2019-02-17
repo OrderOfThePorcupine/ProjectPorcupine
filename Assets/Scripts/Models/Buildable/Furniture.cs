@@ -1151,7 +1151,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = LocalizationTable.GetLocalization("deconstruct_furniture", LocalizationName),
+                LocalizationKey = "deconstruct_furniture",
+                LocalizationParameter = LocalizationName,
                 RequireCharacterSelected = false,
                 Action = (ca, c) => SetDeconstructJob()
             };
@@ -1161,7 +1162,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = LocalizationTable.GetLocalization("uninstall_furniture", LocalizationName),
+                LocalizationKey = "uninstall_furniture",
+                LocalizationParameter = LocalizationName,
                 RequireCharacterSelected = false,
                 Action = (ca, c) => SetUninstallJob()
             };
@@ -1173,7 +1175,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 yield return new ContextMenuAction
                 {
-                    LocalizationKey = LocalizationTable.GetLocalization("prioritize_furniture", LocalizationName),
+                    LocalizationKey = "prioritize_furniture",
+                    LocalizationParameter = LocalizationName,
                     RequireCharacterSelected = true,
                     Action = (ca, c) => c.PrioritizeJob(Jobs[0])
                 };

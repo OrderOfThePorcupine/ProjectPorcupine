@@ -206,7 +206,7 @@ namespace ProjectPorcupine.Buildable.Components
         {
             return new ContextMenuAction
             {
-                LocalizationKey = componentContextMenuAction.Name, // TODO: localization here
+                LocalizationKey = componentContextMenuAction.Name, 
                 RequireCharacterSelected = false,
                 Action = (cma, c) => InvokeContextMenuAction(componentContextMenuAction.Function, componentContextMenuAction.Name)
             };

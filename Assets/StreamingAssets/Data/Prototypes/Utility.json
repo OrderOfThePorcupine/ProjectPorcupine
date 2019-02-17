@@ -6,16 +6,6 @@
       "TypeTags": [
         "Power"
       ],
-      "ContextMenuActions": [
-        {
-          "LuaFunction": "UtilityContextTest1",
-          "LocalizationKey": "Test Context 1"
-        },
-        {
-          "LuaFunction": "UtilityContextTest2",
-          "LocalizationKey": "Test Context 2"
-        }
-      ],
       "OrderActions": {
         "Build": {
           "JobTime": 1.0,

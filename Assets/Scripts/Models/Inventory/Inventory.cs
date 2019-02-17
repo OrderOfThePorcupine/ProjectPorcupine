@@ -13,6 +13,7 @@ using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
+using ProjectPorcupine.Localization;
 
 // Inventory are things that are lying on the floor/stockpile, like a bunch of metal bars
 // or potentially a non-installed copy of furniture (e.g. a cabinet still in the box from Ikea).
@@ -74,6 +75,14 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
     public string LocalizationName { get; private set; }
 
     public string LocalizationDescription { get; private set; }
+
+    public string LocalizedName
+    {
+        get
+        {
+            return LocalizationTable.GetLocalization(LocalizationName);
+        }
+    }
 
     public Tile Tile { get; set; }
 
@@ -228,13 +237,6 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
 
     public IEnumerable<ContextMenuAction> GetContextMenuActions(ContextMenu contextMenu)
     {
-        yield return new ContextMenuAction
-        {
-            LocalizationKey = "Sample Item Context action",
-            RequireCharacterSelected = true,
-            Action = (cm, c) => UnityDebugger.Debugger.Log("Inventory", "Sample menu action")
-        };
-
         if (PrototypeManager.Furniture.Has(this.Type))
         {
             yield return new ContextMenuAction

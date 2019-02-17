@@ -247,14 +247,16 @@ namespace ProjectPorcupine.Entities
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = "Poke " + GetName(),
+                LocalizationKey = "Poke",
+                LocalizationParameter = GetName(),
                 RequireCharacterSelected = false,
                 Action = (cm, c) => { UnityDebugger.Debugger.Log("Character", GetDescription()); health.CurrentHealth -= 5; }
             };
 
             yield return new ContextMenuAction
             {
-                LocalizationKey = "Heal +5",
+                LocalizationKey = "heal",
+                LocalizationParameter = "+5",
                 RequireCharacterSelected = false,
                 Action = (cm, c) => { health.CurrentHealth += 5; }
             };
