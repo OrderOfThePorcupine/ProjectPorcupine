@@ -40,6 +40,5 @@ before_install:
  - chmod +x ./Scripts/test.sh
  - chmod +x ./Scripts/check-style.sh
  - chmod +x ./Scripts/build.sh
- - chmod +x ./Scripts/deploy-build.sh
 notifications:
   email: false

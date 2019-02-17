@@ -20,7 +20,7 @@ cat << EOF
 
     "files":
         [
-        {"includePattern": "Build/(.*\\.zip)", "uploadPattern": "$1"}
+        {"includePattern": "Build/(.*\\.zip)", "uploadPattern": "\$1"}
         ],
     "publish": true
 }
