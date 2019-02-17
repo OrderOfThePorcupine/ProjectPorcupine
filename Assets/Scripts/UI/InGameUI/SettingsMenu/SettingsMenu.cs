@@ -189,6 +189,7 @@ public class SettingsMenu : MonoBehaviour
         // Issue #155 Fix
         if (changesTracker.Count == 0)
         {
+            mainRoot.SetActive(false);
             return;
         }
 
