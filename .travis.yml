@@ -8,22 +8,22 @@ rvm:
   - 2.2
 mono:
   - latest
-cache:
-  directories:
-    - $UNITY_DOWNLOAD_CACHE
-install:
-  - ./Scripts/Install/unity.sh
-  - ./Scripts/Install/stylecop.sh
 jobs:
   include:
     - stage: unit-tests
       script: ./Scripts/unit-tests.sh
+      install:
+        - ./Scripts/Install/unity.sh
       mono: none
     - stage: stylecop
       script: ./Scripts/check-style.sh
+      install:
+        - ./Scripts/Install/stylecop.sh
     - stage: deploy
       if: type = cron
       script: ./Scripts/deploy-build.sh
+      install:
+        - ./Scripts/Install/unity.sh
       deploy: &bintray
         provider: bintray
         file: ./Scripts/bintray.json
