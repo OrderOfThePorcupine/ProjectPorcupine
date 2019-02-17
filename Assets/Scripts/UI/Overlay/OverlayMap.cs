@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using MoonSharp.Interpreter;
 using ProjectPorcupine.Localization;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// This game object manages a mesh+texture+renderer+material that is
@@ -387,7 +388,7 @@ public class OverlayMap : MonoBehaviour
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if (valueAt != null)
         {
-            textView.GetComponent<UnityEngine.UI.Text>().text = string.Format("[DEBUG] Currently over: {0}", valueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), WorldController.Instance.CameraController.CurrentLayer));
+            textView.GetComponent<Text>().text = string.Format("[DEBUG] Currently over: {0}", valueAt((int)(pos.x + 0.5f), (int)(pos.y + 0.5f), WorldController.Instance.CameraController.CurrentLayer));
         }
     }
 
@@ -573,25 +574,26 @@ public class OverlayMap : MonoBehaviour
             return;
         }
 
+        LayoutElement layout;
+
         colorMapView = new GameObject();
-        colorMapView.AddComponent<UnityEngine.UI.Image>();
+        Image image=colorMapView.AddComponent<UnityEngine.UI.Image>();
         colorMapView.transform.SetParent(parentPanel.transform);
-        colorMapView.AddComponent<UnityEngine.UI.Text>();
-        colorMapView.AddComponent<UnityEngine.UI.LayoutElement>();
-        colorMapView.GetComponent<UnityEngine.UI.LayoutElement>().minHeight = 30;
-        colorMapView.GetComponent<UnityEngine.UI.LayoutElement>().minWidth = 150;
+        layout=colorMapView.AddComponent<LayoutElement>();
+        layout.minHeight = 30;
+        layout.minWidth = 150;
         Material overlayMaterial = new Material(Resources.Load<Material>("Shaders/UI-Unlit-Transparent"));
-        colorMapView.GetComponent<UnityEngine.UI.Image>().material = overlayMaterial;
+        image.material = overlayMaterial;
 
         textView = new GameObject();
-        textView.AddComponent<UnityEngine.UI.Text>();
-        textView.AddComponent<UnityEngine.UI.LayoutElement>();
-        textView.GetComponent<UnityEngine.UI.LayoutElement>().minHeight = 30;
-        textView.GetComponent<UnityEngine.UI.LayoutElement>().minWidth = 150;
+        Text text=textView.AddComponent<Text>();
+        layout=textView.AddComponent<LayoutElement>();
+        layout.minHeight = 30;
+        layout.minWidth = 150;
         textView.transform.SetParent(parentPanel.transform);
-        textView.GetComponent<UnityEngine.UI.Text>().text = "Currently Selected:";
-        textView.GetComponent<UnityEngine.UI.Text>().fontSize = 14;
-        textView.GetComponent<UnityEngine.UI.Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.text = "Currently Selected:";
+        text.fontSize = 14;
+        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
 
         List<string> options = new List<string> { LocalizationTable.GetLocalization("overlay_none") };
         List<string> types = new List<string> { "None" };
