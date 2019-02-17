@@ -2,7 +2,6 @@
 
 PROJECT_PATH=$(pwd)/$UNITY_PROJECT_PATH
 UNITY_BUILD_DIR=$(pwd)/Build
-LOG_FILE=$UNITY_BUILD_DIR/unity-win.log
 
 ERROR_CODE=0
 echo "Items in project path ($PROJECT_PATH):"
@@ -18,11 +17,12 @@ echo "Attempting to build $project for Windows"
     -buildWindowsPlayer "$(pwd)/Build/windows/$project.exe" \
     -quit
 
+cat $(pwd)/unity.log
+
 if [ $? = 0 ] ; then
   echo "Building Windows exe completed successfully."
 else
   echo "Building Windows exe failed. Exited with $?."
-  echo $LOG_FILE
   exit $?
 fi
 
@@ -35,12 +35,13 @@ echo "Attempting to build $project for OS X"
     -projectPath $(pwd) \
     -buildOSXUniversalPlayer "$(pwd)/Build/osx/$project.app" \
     -quit
+    
+cat $(pwd)/unity.log
 
 if [ $? = 0 ] ; then
   echo "Building Mac exe completed successfully."
 else
   echo "Building Mac exe failed. Exited with $?."
-  echo $LOG_FILE
   exit $?
 fi
 
@@ -54,6 +55,7 @@ echo "Attempting to build $project for Linux"
     -buildLinuxUniversalPlayer "$(pwd)/Build/linux/$project.exe" \
     -quit
 
+cat $(pwd)/unity.log
 
 if [ $? = 0 ] ; then
   echo "Building Linux exe completed successfully."
