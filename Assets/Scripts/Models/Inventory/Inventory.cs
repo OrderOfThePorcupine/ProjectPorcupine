@@ -237,7 +237,6 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
 
     public IEnumerable<ContextMenuAction> GetContextMenuActions(ContextMenu contextMenu)
     {
-
         if (PrototypeManager.Furniture.Has(this.Type))
         {
             yield return new ContextMenuAction
