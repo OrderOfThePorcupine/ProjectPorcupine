@@ -26,6 +26,7 @@ public class VisualPath : MonoBehaviour
         {
             vertexes.Add(tile.Vector3);
         }
+
         lineRenderer.positionCount = vertexes.Count;
         lineRenderer.SetPositions(vertexes.ToArray());
     }
@@ -33,7 +34,5 @@ public class VisualPath : MonoBehaviour
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
-
     }
-
 }

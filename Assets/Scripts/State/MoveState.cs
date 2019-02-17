@@ -139,7 +139,6 @@ namespace ProjectPorcupine.Entities.States
             base.Exit();
 
             character.IsWalking = false;
-
         }
 
         public override void Interrupt()
