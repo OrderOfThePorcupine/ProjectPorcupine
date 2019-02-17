@@ -8,28 +8,39 @@ rvm:
   - 2.2
 mono:
   - latest
+jobs:
+  include:
+    - stage: unit-tests
+      script: ./Scripts/unit-tests.sh
+      install:
+        - ./Scripts/Install/unity.sh
+      mono: none
+    - stage: stylecop
+      script: ./Scripts/check-style.sh
+      install:
+        - ./Scripts/Install/stylecop.sh
+    - stage: deploy
+      if: type = cron
+      script: ./Scripts/deploy-build.sh
+      install:
+        - ./Scripts/Install/unity.sh
+      deploy: &bintray
+        provider: bintray
+        file: ./Scripts/bintray.json
+        user: koosemose
+        key:
+          secure: PufaISwFWiFSLoBM/fMIBpABcTAmktf4pYS9nbEB5IrnYPm67FKLsFjVKofCkMVT/Z7/DoglqT88zit/g1nFklcAvAcQ3dz5zfWqftpIX5fWG7KnNggivnM0EZldj81lVlBuwQeg98F84VVK6qVAk1bcTxdosPn8gtGw3/QSGqWpMe1il38YFG8nb/hMx2lgJqw4s/55yau96N6/05WJdSbdmfdtptoz9oXRBr5Yq2vHwvtQPuNJNaxx7fCcf4URPrb78vShB+Uvj3+Lppvmmf7xIKhcSPXLIEXN8Szoa+CSBdbn6jm/7gD4mPdpN8UeK9MtqskSeg2lrdOw6ABzfxFmBfd+NlktTBE01uAXLJmvtoarcyR5jLAI+I0306YjmxYL4ZW7SwcSTaOLz6N6CvzbkAWSk6jJ51Uq90bpVE7k6d1VaA5V9DKdAjL1AdIuyMNMmal+wzo43/7jbij6iBBO482AjEkxEIsbS6C1UXMdfBDwRjT0Os3FcXXX3VVARiRXfXn7ZfYvFpvt1sSil6rxsZkHPrg9egvNLG2fjOVR79+cDQII0xGv25z8cNrVV9ligXCxjJrE4CW5EQ8Jp3188E9QDek/6dt3tgRUS4egA83o+aYLAeQDIYtc09U1gbw6SFI+QhLBllHO0WFPjaAm+MGJtewfwVYuAUNZmXE=
+
 env:
   global:
     - BUILD_VERSION=$( date +%Y.%V )
-  matrix:
-    - JOB=unit-test
-    - JOB=stylecop
 before_install:
  - chmod +x ./Scripts/Install/unity.sh
  - chmod +x ./Scripts/Install/stylecop.sh
+ - chmod +x ./Scripts/unit-tests.sh
  - chmod +x ./Scripts/test.sh
  - chmod +x ./Scripts/check-style.sh
- - chmod +x ./Scripts/travis.sh
  - chmod +x ./Scripts/build.sh
-script:
-- ./Scripts/travis.sh
+ - chmod +x ./Scripts/deploy-build.sh
 notifications:
   email: false
-deploy:
-  provider: bintray
-  file: ./Scripts/bintray.json
-  user: koosemose
-  key:
-    secure: PufaISwFWiFSLoBM/fMIBpABcTAmktf4pYS9nbEB5IrnYPm67FKLsFjVKofCkMVT/Z7/DoglqT88zit/g1nFklcAvAcQ3dz5zfWqftpIX5fWG7KnNggivnM0EZldj81lVlBuwQeg98F84VVK6qVAk1bcTxdosPn8gtGw3/QSGqWpMe1il38YFG8nb/hMx2lgJqw4s/55yau96N6/05WJdSbdmfdtptoz9oXRBr5Yq2vHwvtQPuNJNaxx7fCcf4URPrb78vShB+Uvj3+Lppvmmf7xIKhcSPXLIEXN8Szoa+CSBdbn6jm/7gD4mPdpN8UeK9MtqskSeg2lrdOw6ABzfxFmBfd+NlktTBE01uAXLJmvtoarcyR5jLAI+I0306YjmxYL4ZW7SwcSTaOLz6N6CvzbkAWSk6jJ51Uq90bpVE7k6d1VaA5V9DKdAjL1AdIuyMNMmal+wzo43/7jbij6iBBO482AjEkxEIsbS6C1UXMdfBDwRjT0Os3FcXXX3VVARiRXfXn7ZfYvFpvt1sSil6rxsZkHPrg9egvNLG2fjOVR79+cDQII0xGv25z8cNrVV9ligXCxjJrE4CW5EQ8Jp3188E9QDek/6dt3tgRUS4egA83o+aYLAeQDIYtc09U1gbw6SFI+QhLBllHO0WFPjaAm+MGJtewfwVYuAUNZmXE=
-  on:
-    condition: ($TRAVIS_EVENT_TYPE = cron) && ($JOB = unit-test)
