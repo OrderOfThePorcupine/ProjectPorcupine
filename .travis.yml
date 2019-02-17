@@ -1,11 +1,13 @@
 # adapted from: https://github.com/JonathanPorta/ci-build
 
-# Using objective-c since windows build images are not available
-# The chmod-ing may be unnecessary 
-language: objective-c
-osx_image: xcode6.4 # Mono doesn't work on other xcode versions https://github.com/travis-ci/travis-ci/issues/6697
+language: csharp
+os:
+  - osx
+osx_image: xcode9.2
 rvm:
   - 2.2
+mono:
+  - latest
 env:
   global:
     - BUILD_VERSION=$( date +%Y.%V )
@@ -14,7 +16,6 @@ env:
     - JOB=stylecop
 before_install:
  - chmod +x ./Scripts/Install/unity.sh
- - chmod +x ./Scripts/Install/mono.sh
  - chmod +x ./Scripts/Install/stylecop.sh
  - chmod +x ./Scripts/test.sh
  - chmod +x ./Scripts/check-style.sh
