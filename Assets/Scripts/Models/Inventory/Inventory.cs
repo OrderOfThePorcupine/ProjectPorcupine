@@ -276,8 +276,8 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         MaxStackSize = PrototypeReader.ReadJson(50, innerJson["MaxStackSize"]);
         BasePrice = PrototypeReader.ReadJson(1f, innerJson["BasePrice"]);
         Category = PrototypeReader.ReadJson(Category, innerJson["Category"]);
-        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
-        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+        LocalizationName = PrototypeReader.ReadJson("inv_" + Type, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson("inv_" + Type + "_desc", innerJson["LocalizationDescription"]);
     }
 
     private void ImportPrototypeSettings(int defaulMaxStackSize, float defaultBasePrice, string defaultCategory)
