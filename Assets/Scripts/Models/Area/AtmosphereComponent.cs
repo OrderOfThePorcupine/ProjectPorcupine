@@ -150,6 +150,7 @@ public class AtmosphereComponent
         {
             gasses[gasName] += amount;
         }
+
         UpdateTotalGas();
     }
 
@@ -272,7 +273,10 @@ public class AtmosphereComponent
         destination.ThermalEnergy += thermalDelta;
     }
 
-    private void UpdateTotalGas()
+    /// <summary>
+    /// This should be called any time the gasses values change to update the total amount.
+    /// </summary>
+    public void UpdateTotalGas()
     {
         TotalGas = 0;
         foreach (float amount in gasses.Values)
