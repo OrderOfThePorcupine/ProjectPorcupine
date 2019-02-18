@@ -51,7 +51,7 @@ public class TileSpriteController : BaseSpriteController<Tile>
         // Add our tile/GO pair to the dictionary.
         objectGameObjectMap.Add(tile, tile_go);
 
-        // tile_go.name = "Tile_" + tile.X + "_" + tile.Y + "_" + tile.Z;
+        tile_go.name = "Tile_" + tile.X + "_" + tile.Y + "_" + tile.Z;
         tile_go.transform.position = new Vector3(tile.X, tile.Y, tile.Z);
         tile_go.transform.SetParent(objectParent.transform, true);
 
