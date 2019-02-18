@@ -699,8 +699,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         DragType = PrototypeReader.ReadJson(DragType, innerJson["DragType"]);
         isEnterableAction = PrototypeReader.ReadJson(isEnterableAction, innerJson["IsEnterableAction"]);
         getProgressInfoNameAction = PrototypeReader.ReadJson(getProgressInfoNameAction, innerJson["GetProgressInfoNameAction"]);
-        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
-        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+        LocalizationName = PrototypeReader.ReadJson("furn_" + Type, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson("furn_" + Type + "_desc", innerJson["LocalizationDescription"]);
 
         typeTags = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TypeTags"]));
 
@@ -1175,7 +1175,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 yield return new ContextMenuAction
                 {
-                    LocalizationKey = "prioritize_furniture",
+                    LocalizationKey = "prioritize",
                     LocalizationParameter = LocalizationName,
                     RequireCharacterSelected = true,
                     Action = (ca, c) => c.PrioritizeJob(Jobs[0])

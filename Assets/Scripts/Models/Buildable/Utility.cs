@@ -308,8 +308,8 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         JToken innerJson = jsonProto.Value;
 
         typeTags = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TypeTags"]));
-        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
-        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+        LocalizationName = PrototypeReader.ReadJson("util_" + jsonProto.Name, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson("util_" + jsonProto.Name + "_desc", innerJson["LocalizationDescription"]);
 
         tileTypeBuildPermissions = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["tileTypeBuildPermissions"]));
 
