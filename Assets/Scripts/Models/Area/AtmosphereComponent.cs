@@ -7,12 +7,9 @@
 // ====================================================
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using MoonSharp.Interpreter;
-using ProjectPorcupine.Rooms;
 using UnityEngine;
 
 /// <summary>
@@ -129,7 +126,7 @@ public class AtmosphereComponent
             gasses[gasNames[i]] += delta * GetGasFraction(gasNames[i]);
         }
 
-        TotalGas = newValue;
+        UpdateTotalGas();
         ThermalEnergy += delta * internalTemperature.InKelvin;
     }
 
@@ -147,14 +144,14 @@ public class AtmosphereComponent
 
         if (gasses[gasName] <= -amount)
         {
-            TotalGas -= gasses[gasName];
             gasses.Remove(gasName);
         }
         else
         {
-            TotalGas += amount;
             gasses[gasName] += amount;
         }
+
+        UpdateTotalGas();
     }
 
     /// <summary>
@@ -274,6 +271,18 @@ public class AtmosphereComponent
         float thermalDelta = amount * internalTemperature.InKelvin;
         this.ThermalEnergy -= thermalDelta;
         destination.ThermalEnergy += thermalDelta;
+    }
+
+    /// <summary>
+    /// This should be called any time the gasses values change to update the total amount.
+    /// </summary>
+    public void UpdateTotalGas()
+    {
+        TotalGas = 0;
+        foreach (float amount in gasses.Values)
+        {
+            TotalGas += amount;
+        }
     }
     #endregion
 
