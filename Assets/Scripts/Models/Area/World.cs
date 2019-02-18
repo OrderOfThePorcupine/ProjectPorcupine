@@ -99,7 +99,13 @@ public class World
     // The tile depth of the world
     public int Depth { get; protected set; }
 
-    public int Volume { get { return Width * Height * Depth; } }
+    public int Volume
+    {
+        get
+        {
+            return Width * Height * Depth;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the world seed.

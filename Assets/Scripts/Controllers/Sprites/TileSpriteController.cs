@@ -46,12 +46,12 @@ public class TileSpriteController : BaseSpriteController<Tile>
     protected override void OnCreated(Tile tile)
     {
         // This creates a new GameObject and adds it to our scene.
-        GameObject tile_go = new GameObject("Tile", new [] { typeof(SpriteRenderer) });
+        GameObject tile_go = new GameObject("Tile", new[] { typeof(SpriteRenderer) });
 
         // Add our tile/GO pair to the dictionary.
         objectGameObjectMap.Add(tile, tile_go);
 
-        //tile_go.name = "Tile_" + tile.X + "_" + tile.Y + "_" + tile.Z;
+        // tile_go.name = "Tile_" + tile.X + "_" + tile.Y + "_" + tile.Z;
         tile_go.transform.position = new Vector3(tile.X, tile.Y, tile.Z);
         tile_go.transform.SetParent(objectParent.transform, true);
 
