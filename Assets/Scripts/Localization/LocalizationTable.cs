@@ -77,26 +77,6 @@ namespace ProjectPorcupine.Localization
             // Return the localization of the advanced method.
             return GetLocalization(key, FallbackMode.ReturnDefaultLanguage, currentLanguage, additionalValues);
         }
-        
-        /// <summary>
-        /// Chhecks to see if an object is a number
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private static bool IsNumber(object value)
-        {
-            return value is sbyte
-                    || value is byte
-                    || value is short
-                    || value is ushort
-                    || value is int
-                    || value is uint
-                    || value is long
-                    || value is ulong
-                    || value is float
-                    || value is double
-                    || value is decimal;
-        }
 
         /// <summary>
         /// Returns the localization for the given key, or the key itself, if no translation exists.
@@ -112,7 +92,6 @@ namespace ProjectPorcupine.Localization
                     if (additionalValues[i] is string)
                     {
                         additionalValues[i] = GetLocalization(additionalValues[i].ToString(), fallbackMode, language);
-                        //extras[i] = additionalValues[i].ToString();
                     }
                 }
             }
@@ -293,6 +272,26 @@ namespace ProjectPorcupine.Localization
         public static void UnregisterDelegates()
         {
             CBLocalizationFilesChanged = null;
+        }
+
+        /// <summary>
+        /// Checks to see if an object is a number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static bool IsNumber(object value)
+        {
+            return value is sbyte
+                    || value is byte
+                    || value is short
+                    || value is ushort
+                    || value is int
+                    || value is uint
+                    || value is long
+                    || value is ulong
+                    || value is float
+                    || value is double
+                    || value is decimal;
         }
 
         /// <summary>
