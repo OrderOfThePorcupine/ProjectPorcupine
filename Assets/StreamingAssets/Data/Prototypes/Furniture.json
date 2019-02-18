@@ -804,7 +804,7 @@
               ]
             },
             {
-              "Name": "Iron smelting",
+              "Name": "iron_smelting",
               "ProcessingTime": 4.0,
               "Input": [
                 {

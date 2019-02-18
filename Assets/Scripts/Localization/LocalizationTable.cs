@@ -85,12 +85,23 @@ namespace ProjectPorcupine.Localization
         {
             string value;
 
+            if (additionalValues != null)
+            {
+                for (int i = 0; i < additionalValues.Length; i++)
+                {
+                    if (additionalValues[i] is string)
+                    {
+                        additionalValues[i] = GetLocalization(additionalValues[i].ToString(), fallbackMode, language);
+                    }
+                }
+            }
+
             if (localizationTable.ContainsKey(language) && localizationTable[language].TryGetValue(key, out value))
             {
                 return string.Format(value, additionalValues);
             }
 
-            if (!missingKeysLogged.Contains(key) && key != string.Empty)
+            if (!missingKeysLogged.Contains(key) && key != string.Empty && IsNumber(key))
             {
                 missingKeysLogged.Add(key);
                 UnityDebugger.Debugger.LogWarning("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
@@ -261,6 +272,26 @@ namespace ProjectPorcupine.Localization
         public static void UnregisterDelegates()
         {
             CBLocalizationFilesChanged = null;
+        }
+
+        /// <summary>
+        /// Checks to see if an object is a number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static bool IsNumber(object value)
+        {
+            return value is sbyte
+                    || value is byte
+                    || value is short
+                    || value is ushort
+                    || value is int
+                    || value is uint
+                    || value is long
+                    || value is ulong
+                    || value is float
+                    || value is double
+                    || value is decimal;
         }
 
         /// <summary>
