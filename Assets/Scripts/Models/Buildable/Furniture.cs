@@ -1175,7 +1175,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 yield return new ContextMenuAction
                 {
-                    LocalizationKey = "prioritize_furniture",
+                    LocalizationKey = "prioritize",
                     LocalizationParameter = LocalizationName,
                     RequireCharacterSelected = true,
                     Action = (ca, c) => c.PrioritizeJob(Jobs[0])

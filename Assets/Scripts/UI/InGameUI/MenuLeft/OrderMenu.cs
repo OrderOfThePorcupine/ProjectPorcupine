@@ -14,8 +14,8 @@ using UnityEngine.UI;
 
 public class OrderMenu : MonoBehaviour
 {
-    private const string LocalizationDeconstruct = "deconstruct_furniture";
-    private const string LocalizationMine = "mine_furniture";
+    private const string LocalizationDeconstruct = "menu_deconstruct_furniture";
+    private const string LocalizationMine = "menu_mine";
 
     private List<GameObject> taskItems;
 

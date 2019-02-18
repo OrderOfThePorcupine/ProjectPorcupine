@@ -28,6 +28,8 @@ filename=Filename
 button_yes=Yes
 button_no=No
 new_world=New World
+menu_deconstruct_furniture=Break apart
+menu_mine=Mine
 
 ##########Furniture##########
 furn_steel_wall=Steel Wall
@@ -126,9 +128,10 @@ job_mining_drone_station_mining_desc=Mining Ore from Machine
 job_cloning_pod_cloning_desc=Cloning Character
 job_fission_reactor_filling_desc=Filling Fission Reactor
 job_ore_mine_mining_desc=Mining Ore from Mine
-uninstall_furniture=Pack in crate
-install_order=Unpack from crate
-deconstruct_furniture=Break in to pieces
+uninstall_furniture=Pack {0} in crate
+install_order=Unpack {0} from crate
+copper_smelting=Copper Smelting
+iron_smelting=Iron Smelting
 
 ##########Overlay##########
 overlay_none=None
@@ -161,12 +164,15 @@ hit_points=HitPoints: {0}
 not_applicable_shorthand=N/A
 stat_dexterity=Dexterity: {0}
 stat_strength=Strength: {0}
+stat_wisdom=Wisdom: {0}
+stat_constitution=Constitution: {0}
+stat_intelligence=Intelligence: {0}
+stat_charisma=Charisma: {0}
 generate_asteroids=Generate Asteroids
 time_string={0:h}:{0:mm} {0:tt}
 date_string=Q{0:q} Day {0:d}, {0:y}
 furniture=Furniture: {0}
-deconstruct_furniture=Deconstruct Furniture
-mine_furniture=Mine
+deconstruct_furniture=Break apart {0}
 dummy_message_text=Set message text!!!
 temp_pathfinding_test=Pathfinding Test
 selection_panel_title=Current Selection
@@ -188,7 +194,7 @@ toggle_pressure_lock=Toggle Pressure Lock
 set_filter=Set Filter%
 change_to_raw_iron=Change to Raw Iron
 change_to_raw_copper=Change to Raw Copper
-deconstruct=Deconstruct {0}
+deconstruct=Rip apart {0}
 
 ##########Settings##########
 movement=Camera Movement
