@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class ShipSpriteController : BaseSpriteController<Ship>
 {
-    public ShipSpriteController(World world) : base(world, "Ships")
+    public ShipSpriteController(World world) : base(world, "Ships", 10)
     {
         world.ShipManager.ShipCreated += OnCreated;
         world.ShipManager.ShipRemoved += OnRemoved;

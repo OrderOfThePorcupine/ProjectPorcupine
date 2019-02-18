@@ -19,7 +19,7 @@ public class JobSpriteController : BaseSpriteController<Job>
 
     // Use this for initialization
     public JobSpriteController(World world, FurnitureSpriteController furnitureSpriteController, UtilitySpriteController utilitySpriteController)
-        : base(world, "Jobs")
+        : base(world, "Jobs", 200)
     {
         fsc = furnitureSpriteController;
         usc = utilitySpriteController;

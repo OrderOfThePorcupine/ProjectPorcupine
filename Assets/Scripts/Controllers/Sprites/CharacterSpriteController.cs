@@ -36,7 +36,7 @@ namespace ProjectPorcupine.Entities
         private Color[] swapSpriteColors;
 
         // Use this for initialization
-        public CharacterSpriteController(World world) : base(world, "Characters")
+        public CharacterSpriteController(World world) : base(world, "Characters", 100)
         {
             // prepare swap texture for shader
             Texture2D colorSwapTex = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);

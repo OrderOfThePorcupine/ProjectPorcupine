@@ -13,11 +13,15 @@ using UnityEngine;
 
 public class TileSpriteController : BaseSpriteController<Tile>
 {
+    private Sprite emptySprite;
+
     // Use this for initialization
-    public TileSpriteController(World world) : base(world, "Tiles")
+    public TileSpriteController(World world) : base(world, "Tiles", world.Volume)
     {
         world.OnTileChanged += OnChanged;
         world.OnTileTypeChanged += OnChanged;
+
+        emptySprite = SpriteManager.GetSprite("Tile", "empty");
 
         for (int x = 0; x < world.Width; x++)
         {
@@ -42,21 +46,21 @@ public class TileSpriteController : BaseSpriteController<Tile>
     protected override void OnCreated(Tile tile)
     {
         // This creates a new GameObject and adds it to our scene.
-        GameObject tile_go = new GameObject();
+        GameObject tile_go = new GameObject("Tile", new [] { typeof(SpriteRenderer) });
 
         // Add our tile/GO pair to the dictionary.
         objectGameObjectMap.Add(tile, tile_go);
 
-        tile_go.name = "Tile_" + tile.X + "_" + tile.Y + "_" + tile.Z;
+        //tile_go.name = "Tile_" + tile.X + "_" + tile.Y + "_" + tile.Z;
         tile_go.transform.position = new Vector3(tile.X, tile.Y, tile.Z);
         tile_go.transform.SetParent(objectParent.transform, true);
 
         // Add a Sprite Renderer
         // Add a default sprite for empty tiles.
-        SpriteRenderer sr = tile_go.AddComponent<SpriteRenderer>();
-        sr.sprite = SpriteManager.GetSprite("Tile", "empty");
+        SpriteRenderer sr = tile_go.GetComponent<SpriteRenderer>();
+        sr.sprite = emptySprite;
         sr.sortingLayerName = "Tiles";
-
+        
         OnChanged(tile);
     }
 
@@ -78,14 +82,14 @@ public class TileSpriteController : BaseSpriteController<Tile>
         }
 
         // TODO Evaluate this criteria and naming schema!
-        if (DoesTileSpriteExist(tile.Type.Type + "_heavy") && (tile.WalkCount >= 30))
+        if ((tile.WalkCount >= 30) && DoesTileSpriteExist(tile.Type.Type + "_heavy"))
         {
             if (tile.ForceTileUpdate || tile.WalkCount == 30)
             {
                 ChangeTileSprite(tile_go, tile.Type.Type + "_heavy");
             }
         }
-        else if (DoesTileSpriteExist(tile.Type.Type + "_low") && (tile.WalkCount >= 10))
+        else if ((tile.WalkCount >= 10) && DoesTileSpriteExist(tile.Type.Type + "_low"))
         {
             if (tile.ForceTileUpdate || tile.WalkCount == 10)
             {
@@ -97,6 +101,7 @@ public class TileSpriteController : BaseSpriteController<Tile>
             ChangeTileSprite(tile_go, tile.Type.Type);
         }
 
+        // NOTE: TileType.Empty does a lookup and is not fast!
         if (tile.Type == TileType.Empty)
         {
             tile_go.SetActive(false);

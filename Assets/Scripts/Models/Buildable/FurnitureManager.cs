@@ -187,10 +187,7 @@ public class FurnitureManager : IEnumerable<Furniture>
     /// <returns>Each furniture.</returns>
     IEnumerator<Furniture> IEnumerable<Furniture>.GetEnumerator()
     {
-        foreach (Furniture furniture in furnitures)
-        {
-            yield return furniture;
-        }
+        return furnitures.GetEnumerator();
     }
 
     public JToken ToJson()

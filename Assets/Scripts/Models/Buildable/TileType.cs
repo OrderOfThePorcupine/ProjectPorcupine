@@ -25,14 +25,26 @@ public class TileType : IPrototypable, IEquatable<TileType>
         PathfindingWeight = 1.0f;
     }
 
+    private static TileType empty;
+
     /// <summary>
     /// Gets the empty tile type prototype.
     /// </summary>
     /// <value>The empty tile type.</value>
     public static TileType Empty
     {
-        get { return PrototypeManager.TileType.Get("empty"); }
+        get
+        {
+            if (empty == null)
+            {
+                empty = PrototypeManager.TileType.Get("empty");
+            }
+
+            return empty;
+        }
     }
+
+    private static TileType floor;
 
     /// <summary>
     /// Gets the floor tile type prototype.
@@ -40,7 +52,15 @@ public class TileType : IPrototypable, IEquatable<TileType>
     /// <value>The floor tile type.</value>
     public static TileType Floor
     {
-        get { return PrototypeManager.TileType.Get("floor"); }
+        get
+        {
+            if (floor == null)
+            {
+                floor = PrototypeManager.TileType.Get("floor");
+            }
+
+            return floor;
+        }
     }
 
     /// <summary>
