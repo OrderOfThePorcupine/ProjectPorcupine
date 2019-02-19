@@ -36,7 +36,7 @@ public class World
     // class for managing job queues (plural!) that might also
     // be semi-static or self initializing or some damn thing.
     // For now, this is just a PUBLIC member of World
-    public JobManager jobQueue;
+    public JobManager jobManager;
 
     // A three-dimensional array to hold our tile data.
     private Tile[,,] tiles;
@@ -458,7 +458,7 @@ public class World
         UtilityManager = new UtilityManager();
         CharacterManager = new CharacterManager();
         InventoryManager = new InventoryManager();
-        jobQueue = new JobManager();
+        jobManager = new JobManager();
         GameEventManager = new GameEventManager();
         PowerNetwork = new PowerNetwork();
         FluidNetwork = new FluidNetwork();

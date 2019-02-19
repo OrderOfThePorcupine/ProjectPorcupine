@@ -265,7 +265,7 @@ public class BuildModeController : IMouseHandler
                         }
                     }
 
-                    World.Current.jobQueue.Enqueue(job);
+                    World.Current.jobManager.Enqueue(job);
 
                     // Let our workspot tile know it is reserved for us
                     World.Current.ReserveTileAsWorkSpot((Furniture)job.buildablePrototype, job.tile);
@@ -321,7 +321,7 @@ public class BuildModeController : IMouseHandler
                     offsetTile.PendingBuildJobs.Add(job);
                     job.OnJobStopped += (theJob) => offsetTile.PendingBuildJobs.Remove(job);
 
-                    World.Current.jobQueue.Enqueue(job);
+                    World.Current.jobManager.Enqueue(job);
                 }
             }
         }
@@ -351,7 +351,7 @@ public class BuildModeController : IMouseHandler
                     else
                     {
                         buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
-                        WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                        WorldController.Instance.World.jobManager.Enqueue(buildingJob);
                     }
                 }
                 else

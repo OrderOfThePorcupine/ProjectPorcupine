@@ -168,7 +168,7 @@ public class BuildableJobs
         job.buildable = buildable;
         activeJobs.Add(job);
         job.OnJobStopped += OnJobStopped;
-        World.Current.jobQueue.Enqueue(job);
+        World.Current.jobManager.Enqueue(job);
     }
 
     /// <summary>

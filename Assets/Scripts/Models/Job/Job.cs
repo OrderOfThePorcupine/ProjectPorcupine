@@ -322,6 +322,8 @@ public class Job : ISelectable, IPrototypable
                 OnJobCompleted(this);
             }
 
+            World.Current.jobManager.Remove(this);
+
             if (jobRepeats != true)
             {
                 // Let everyone know that the job is officially concluded
@@ -377,9 +379,8 @@ public class Job : ISelectable, IPrototypable
             }
         }
 
-        // Remove the job out of both job queues.
-        // World.Current.jobWaitingQueue.Remove(this);
-        World.Current.jobQueue.Remove(this);
+        // Remove the job out of job queue.
+        World.Current.jobManager.Remove(this);
     }
 
     /// <summary>

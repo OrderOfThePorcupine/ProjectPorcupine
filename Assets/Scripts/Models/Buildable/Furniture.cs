@@ -812,7 +812,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             Job job = uninstallOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Uninstall();
-            World.Current.jobQueue.Enqueue(job);
+            World.Current.jobManager.Enqueue(job);
         }
     }
 
@@ -914,7 +914,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             Job job = deconstructOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Deconstruct();
-            World.Current.jobQueue.Enqueue(job);
+            World.Current.jobManager.Enqueue(job);
         }
     }
 

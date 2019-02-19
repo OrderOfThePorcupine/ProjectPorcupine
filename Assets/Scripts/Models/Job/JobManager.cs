@@ -42,6 +42,11 @@ public class JobManager
     public void Enqueue(Job job)
     {
         DebugLog("Enqueue({0})", job.Type);
+
+        job.IsBeingWorked = false;
+
+        jobQueue.Add(job);
+
         if (job.JobTime < 0)
         {
             // Job has a negative job time, so it's not actually
@@ -50,52 +55,10 @@ public class JobManager
             return;
         }
 
-        // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
-        if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
-        {
-            string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            DebugLog(" - missingInventory {0}", missing);
-            job.SuspendWaitingForInventory(missing);
-        }
-        else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
-            job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
-        {
-            // No one can reach the job.
-            DebugLog("JobQueue", "- Job can't be reached");
-            job.Suspend();
-        }
-        else
-        {
-            DebugLog(" - {0}", job.acceptsAny ? "Any" : "All");
-            foreach (RequestedItem item in job.RequestedItems.Values)
-            {
-                DebugLog("   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
-            }
-
-            DebugLog(" - job ok");
-
-            jobQueue.Add(job);
-        }
-
         if (OnJobCreated != null)
         {
             OnJobCreated(job);
         }
-    }
-
-    /// <summary>
-    /// Returns the first job from the JobQueue.
-    /// </summary>
-    public Job Dequeue()
-    {
-        if (jobQueue.Count == 0)
-        {
-            return null;
-        }
-
-        Job job = jobQueue.FirstOrDefault();
-        jobQueue.Remove(job);
-        return job;
     }
 
     /// <summary>
@@ -112,32 +75,15 @@ public class JobManager
         // This makes a large assumption that we are the only one accessing the queue right now
         foreach (Job job in jobQueue)
         { 
-            if (job.IsActive == false)
+            if (job.IsActive == false || job.IsBeingWorked == true)
             {
                 continue;
             }
 
-            // TODO: This is a simplistic version and needs to be expanded.
-            // If we can get all material and we can walk to the tile, the job is workable.
-            if (job.IsRequiredInventoriesAvailable() && job.tile.IsReachableFromAnyNeighbor(true))
+            if (CanJobRun(job))
             {
-                if (job.CanCharacterReach(character))
-                {
-                    UnityDebugger.Debugger.Log("JobQueue", "Character could not find a path to the job site.");
-                    job.Suspend();
-                    continue;
-                }
-                else if ((job.RequestedItems.Count > 0) && !job.CanGetToInventory(character))
-                {
-                    job.AddCharCantReach(character);
+                DebugLog("{0} Job Assigned {1} at {2}", character.ID, job, job.tile);
 
-                    // Is this a bug?  Or a warning
-                    // @ Decide
-                    UnityDebugger.Debugger.Log("JobQueue", "Character could not find a path to any inventory available.");
-                    continue;
-                }
-
-                jobQueue.Remove(job);
                 return job;
             }
 
@@ -158,6 +104,36 @@ public class JobManager
     public IEnumerable<Job> PeekAllJobs()
     {
         return jobQueue;
+    }
+
+    private bool CanJobRun(Job job)
+    {
+        // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
+        if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
+        {
+            string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
+            DebugLog(" - missingInventory {0}", missing);
+            job.SuspendWaitingForInventory(missing);
+            return false;
+        }
+        else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
+            job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
+        {
+            // No one can reach the job.
+            DebugLog("JobQueue", "- Job can't be reached");
+            job.Suspend();
+            return false;
+        }
+        else
+        {
+            DebugLog(" - {0}", job.acceptsAny ? "Any" : "All");
+            foreach (RequestedItem item in job.RequestedItems.Values)
+            {
+                DebugLog("   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
+            }
+        }
+
+        return true;
     }
 
     [System.Diagnostics.Conditional("FSM_DEBUG_LOG")]

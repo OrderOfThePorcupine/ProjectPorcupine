@@ -109,7 +109,7 @@ namespace ProjectPorcupine.Entities.States
             }
 
             // If the job gets abandoned because of pathing issues or something else, just return it to the queue
-            World.Current.jobQueue.Enqueue(Job);
+            World.Current.jobManager.Enqueue(Job);
 
             // Tell the player that we need a new task.
             character.SetState(null);
