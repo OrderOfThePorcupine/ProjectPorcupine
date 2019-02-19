@@ -109,7 +109,7 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        protected bool IsValid()
+        protected override bool IsValid()
         {
             if (UsedAnimations != null)
             {

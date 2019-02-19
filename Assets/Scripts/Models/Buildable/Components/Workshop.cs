@@ -336,6 +336,11 @@ namespace ProjectPorcupine.Buildable.Components
             ParentFurniture.Removed += WorkshopRemoved;
         }
 
+        protected override bool IsValid()
+        {
+            return true;
+        }
+
         private void PlaceInventories(List<TileObjectTypeAmount> outPlacement)
         {
             foreach (TileObjectTypeAmount outPlace in outPlacement)

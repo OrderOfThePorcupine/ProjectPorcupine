@@ -249,6 +249,11 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
+        protected override bool IsValid()
+        {
+            return true;
+        }
+
         protected override void Initialize()
         {
             componentRequirements = Requirements.Fluid;

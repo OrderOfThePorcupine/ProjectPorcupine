@@ -124,8 +124,7 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        // TODO: This may be functionally identical to Deserialize(JToken), needs reviewed to see if uses of FromJson can be replaced by Deserialize(JToken)
-        public static BuildableComponent FromJson(JToken componentToken)
+       public static BuildableComponent FromJson(JToken componentToken)
         {
             if (componentTypes == null)
             {
@@ -143,6 +142,7 @@ namespace ProjectPorcupine.Buildable.Components
 
                 // need to set name explicitly (not part of deserialization as it's passed in)
                 component.Type = componentProperty.Name;
+
                 return component;
             }
             else
@@ -168,6 +168,11 @@ namespace ProjectPorcupine.Buildable.Components
             ParentFurniture = parentFurniture;
             Initialize();
             initialized = true;
+
+            if (IsValid() == false)
+            {
+                UnityDebugger.Debugger.LogError("BuildableComponent", "Error parsing " + GetType() + " for " + parentFurniture.GetType());
+            }
         }
 
         public virtual bool CanFunction()
@@ -201,6 +206,12 @@ namespace ProjectPorcupine.Buildable.Components
         public abstract BuildableComponent Clone();
 
         protected abstract void Initialize();
+
+        /// <summary>
+        /// Determines if the configuration. Checked immediately after parsing the JSON config files.
+        /// </summary>
+        /// <returns>true if valid</returns>
+        protected abstract bool IsValid();
 
         protected ContextMenuAction CreateComponentContextMenuItem(ComponentContextMenu componentContextMenuAction)
         {

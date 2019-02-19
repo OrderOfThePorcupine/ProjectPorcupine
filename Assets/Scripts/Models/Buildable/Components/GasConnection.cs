@@ -104,6 +104,11 @@ namespace ProjectPorcupine.Buildable.Components
             componentRequirements = Requirements.Gas;
         }
 
+        protected override bool IsValid()
+        {
+            return true;
+        }
+
         [Serializable]
         [JsonObject(MemberSerialization.OptOut)]
         public class GasInfo

@@ -361,7 +361,12 @@ namespace ProjectPorcupine.Buildable.Components
 
             ParentFurniture.Removed += PowerConnectionRemoved;           
         }
-        
+
+        protected override bool IsValid()
+        {
+            return true;
+        }
+
         private void PowerConnectionRemoved(Furniture obj)
         {
             World.Current.PowerNetwork.Unplug(this);
