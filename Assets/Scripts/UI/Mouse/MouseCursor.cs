@@ -65,7 +65,7 @@ namespace ProjectPorcupine.Mouse
                 this.style = new GUIStyle() { font = Resources.Load<Font>("Fonts/Arial/Arial") as Font, fontSize = 15, alignment = TextAnchor.MiddleCenter };
             }
 
-            cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship.png");
+            cursorTexture = Resources.Load<Texture2D>("UI/Cursors/Ship");
 
             BuildCursor();
         }
