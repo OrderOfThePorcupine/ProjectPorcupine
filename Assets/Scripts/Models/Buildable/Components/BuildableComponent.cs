@@ -333,7 +333,7 @@ namespace ProjectPorcupine.Buildable.Components
         {
             public string Name { get; set; }
 
-            public string ValueBasedParamerName { get; set; }
+            public string ValueBasedParameterName { get; set; }
 
             public Conditions RunConditions { get; set; }
         }
