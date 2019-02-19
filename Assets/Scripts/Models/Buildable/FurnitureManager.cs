@@ -19,6 +19,9 @@ public class FurnitureManager : IEnumerable<Furniture>
 {
     private List<Furniture> furnitures;
 
+    public delegate void RoomsUpdated();
+    public event RoomsUpdated cbRoomsUpdated;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="FurnitureManager"/> class.
     /// </summary>
@@ -88,7 +91,7 @@ public class FurnitureManager : IEnumerable<Furniture>
         if (doRoomFloodFill && furniture.EnclosesRoom)
         {
             World.Current.RoomManager.DoRoomFloodFill(furniture.Tile, true);
-            World.Current.jobQueue.ReevaluateReachability();
+            cbRoomsUpdated();
         }
 
         if (Created != null)
@@ -231,6 +234,9 @@ public class FurnitureManager : IEnumerable<Furniture>
         TimeManager.Instance.UnregisterSlowUpdate(furniture);
 
         // Movement to jobs might have been opened, let's move jobs back into the queue to be re-evaluated.
-        World.Current.jobQueue.ReevaluateReachability();
+        if (cbRoomsUpdated != null)
+        {
+            cbRoomsUpdated();
+        }
     }
 }

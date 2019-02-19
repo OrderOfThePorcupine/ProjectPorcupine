@@ -12,19 +12,13 @@ using System.Linq;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 
-public class JobQueue
+public class JobManager
 {
-    private SortedList<Job.JobPriority, Job> jobQueue;
-    private Dictionary<string, List<Job>> jobsWaitingForInventory;
-    private Queue<Job> unreachableJobs;
+    private HashSet<Job> jobQueue;
 
-    public JobQueue()
+    public JobManager()
     {
-        jobQueue = new SortedList<Job.JobPriority, Job>(new DuplicateKeyComparer<Job.JobPriority>(true));
-        jobsWaitingForInventory = new Dictionary<string, List<Job>>();
-        unreachableJobs = new Queue<Job>();
-
-        World.Current.InventoryManager.InventoryCreated += ReevaluateWaitingQueue;
+        jobQueue = new HashSet<Job>();
     }
 
     public event Action<Job> OnJobCreated;
@@ -61,19 +55,14 @@ public class JobQueue
         {
             string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
             DebugLog(" - missingInventory {0}", missing);
-            if (jobsWaitingForInventory.ContainsKey(missing) == false)
-            {
-                jobsWaitingForInventory[missing] = new List<Job>();
-            }
-
-            jobsWaitingForInventory[missing].Add(job);
+            job.SuspendWaitingForInventory(missing);
         }
         else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
-            job.CharsCantReach.Count == World.Current.CharacterManager.Characters.Count)
+            job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
         {
             // No one can reach the job.
             DebugLog("JobQueue", "- Job can't be reached");
-            unreachableJobs.Enqueue(job);
+            job.Suspend();
         }
         else
         {
@@ -85,7 +74,7 @@ public class JobQueue
 
             DebugLog(" - job ok");
 
-            jobQueue.Add(job.Priority, job);
+            jobQueue.Add(job);
         }
 
         if (OnJobCreated != null)
@@ -104,8 +93,8 @@ public class JobQueue
             return null;
         }
 
-        Job job = jobQueue.Values[0];
-        jobQueue.RemoveAt(0);
+        Job job = jobQueue.FirstOrDefault();
+        jobQueue.Remove(job);
         return job;
     }
 
@@ -121,19 +110,21 @@ public class JobQueue
         }
 
         // This makes a large assumption that we are the only one accessing the queue right now
-        for (int i = 0; i < jobQueue.Count; i++)
-        {
-            Job job = jobQueue.Values[i];
-            jobQueue.RemoveAt(i);
+        foreach (Job  job in jobQueue)
+        { 
+            if (job.isActive==false)
+            {
+                continue;
+            }
 
             // TODO: This is a simplistic version and needs to be expanded.
             // If we can get all material and we can walk to the tile, the job is workable.
             if (job.IsRequiredInventoriesAvailable() && job.tile.IsReachableFromAnyNeighbor(true))
             {
-                if (CharacterCantReachHelper(job, character))
+                if (job.CanCharacterReach(character))
                 {
                     UnityDebugger.Debugger.Log("JobQueue", "Character could not find a path to the job site.");
-                    ReInsertHelper(job);
+                    job.Suspend();
                     continue;
                 }
                 else if ((job.RequestedItems.Count > 0) && !job.CanGetToInventory(character))
@@ -143,10 +134,10 @@ public class JobQueue
                     // Is this a bug?  Or a warning
                     // @ Decide
                     UnityDebugger.Debugger.Log("JobQueue", "Character could not find a path to any inventory available.");
-                    ReInsertHelper(job);
                     continue;
                 }
 
+                jobQueue.Remove(job);
                 return job;
             }
 
@@ -158,20 +149,7 @@ public class JobQueue
 
     public void Remove(Job job)
     {
-        if (jobQueue.ContainsValue(job))
-        {
-            jobQueue.RemoveAt(jobQueue.IndexOfValue(job));
-        }
-        else
-        {
-            foreach (string inventoryType in jobsWaitingForInventory.Keys)
-            {
-                if (jobsWaitingForInventory[inventoryType].Contains(job))
-                {
-                    jobsWaitingForInventory[inventoryType].Remove(job);
-                }
-            }
-        }
+        jobQueue.Remove(job);
     }
 
     /// <summary>
@@ -179,99 +157,7 @@ public class JobQueue
     /// </summary>
     public IEnumerable<Job> PeekAllJobs()
     {
-        foreach (Job job in jobQueue.Values)
-        {
-            yield return job;
-        }
-
-        foreach (string inventoryType in jobsWaitingForInventory.Keys)
-        {
-            foreach (Job job in jobsWaitingForInventory[inventoryType])
-            {
-                yield return job;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Call this whenever a furniture gets changed or removed that might effect the reachability of an object.
-    /// </summary>
-    public void ReevaluateReachability()
-    {
-        // TODO: Should this be an event on the furniture object?
-        DebugLog(" - Reevaluate reachability of {0} jobs", unreachableJobs.Count);
-        Queue<Job> jobsToReevaluate = unreachableJobs;
-        unreachableJobs = new Queue<Job>();
-
-        foreach (Job job in jobsToReevaluate)
-        {
-            job.ClearCharCantReach();
-            Enqueue(job);
-        }
-    }
-
-    /// <summary>
-    /// Returns true if the character is already in the list of characters unable to reach the job.
-    /// </summary>
-    /// <param name="job"></param>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public bool CharacterCantReachHelper(Job job, Character character)
-    {
-        if (job.CharsCantReach != null)
-        {
-            foreach (Character charTemp in job.CharsCantReach)
-            {
-                if (charTemp == character)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public void ReevaluateWaitingQueue(Inventory inv)
-    {
-        DebugLog("ReevaluateWaitingQueue() new resource: {0}, count: {1}", inv.Type, inv.StackSize);
-
-        List<Job> waitingJobs = null;
-
-        // Check that there is a job waiting for this inventory.
-        if (jobsWaitingForInventory.ContainsKey(inv.Type) && jobsWaitingForInventory[inv.Type].Count > 0)
-        {
-            // Get the current list of jobs
-            waitingJobs = jobsWaitingForInventory[inv.Type];
-
-            // Replace it with an empty list
-            jobsWaitingForInventory[inv.Type] = new List<Job>();
-
-            foreach (Job job in waitingJobs)
-            {
-                // Enqueue will put them in the new waiting list we created if they still have unmet needs
-                Enqueue(job);
-            }
-        }
-
-        // Do the same thing for the AnyMaterial jobs
-        if (jobsWaitingForInventory.ContainsKey("*"))
-        {
-            waitingJobs = jobsWaitingForInventory["*"];
-            jobsWaitingForInventory["*"] = new List<Job>();
-
-            foreach (Job job in waitingJobs)
-            {
-                Enqueue(job);
-            }
-        }
-    }
-
-    private void ReInsertHelper(Job job)
-    {
-        jobQueue.Reverse();
-        Enqueue(job);
-        jobQueue.Reverse();
+        return jobQueue;
     }
 
     [System.Diagnostics.Conditional("FSM_DEBUG_LOG")]

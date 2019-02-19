@@ -74,6 +74,7 @@ public class Job : ISelectable, IPrototypable
         this.Critical = critical;
         this.Priority = jobPriority;
         this.adjacent = adjacent;
+        this.isActive = true;
         this.Description = "job_error_missing_desc";
 
         jobWorkedLua = new List<string>();
@@ -167,6 +168,8 @@ public class Job : ISelectable, IPrototypable
 
     public string Description { get; set; }
 
+    public bool isActive { get; protected set; }
+
     /// <summary>
     /// Name of order that created this job. This should prevent multiple same orders on same things if not allowed.
     /// </summary>
@@ -224,11 +227,11 @@ public class Job : ISelectable, IPrototypable
         }
     }
 
-    public List<Character> CharsCantReach
+    public int CharsCantReachCount
     {
         get
         {
-            return charsCantReach;
+            return charsCantReach.Count;
         }
     }
 
@@ -333,6 +336,28 @@ public class Job : ISelectable, IPrototypable
                 JobTime += jobTimeRequired;
             }
         }
+    }
+
+    public void Suspend()
+    {
+        isActive = false;
+    }
+
+    public void SuspendCantReach()
+    {
+        World.Current.FurnitureManager.cbRoomsUpdated += ClearCharCantReach;
+        Suspend();
+    }
+
+    public void SuspendWaitingForInventory(string missing)
+    {
+        World.Current.InventoryManager.RegisterInventoryTypeCreated(CheckIfInventorySufficient, missing);
+        Suspend();
+    }
+
+    public void CheckIfInventorySufficient(Inventory inventory)
+    {
+        isActive = true;
     }
 
     public void CancelJob()
@@ -519,10 +544,15 @@ public class Job : ISelectable, IPrototypable
     /// </summary>
     public void AddCharCantReach(Character character)
     {
-        if (!CharsCantReach.Contains(character))
+        if (!charsCantReach.Contains(character))
         {
             charsCantReach.Add(character);
         }
+    }
+
+    public bool CanCharacterReach(Character character)
+    {
+        return charsCantReach.Contains(character);
     }
 
     /// <summary>
@@ -548,7 +578,8 @@ public class Job : ISelectable, IPrototypable
     /// </summary>
     public void ClearCharCantReach()
     {
-        charsCantReach = new List<Character>();
+        charsCantReach.Clear();
+        isActive = true;
     }
 
     public IEnumerable<string> GetAdditionalInfo()
