@@ -361,6 +361,7 @@ public class Job : ISelectable, IPrototypable
         {
             World.Current.InventoryManager.RegisterInventoryTypeCreated(CheckIfInventorySufficient, missing);
         }
+
         Suspend();
     }
 
