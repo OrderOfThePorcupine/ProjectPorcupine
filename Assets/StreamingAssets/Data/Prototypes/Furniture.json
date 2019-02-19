@@ -635,7 +635,7 @@
           "UseAnimation": [
             {
               "Name": "filling",
-              "ValueBasedParameterName": "fluid_storage_index"
+              "ValueBasedParamerName": "fluid_storage_index"
             }
           ]
         },
@@ -1342,7 +1342,7 @@
           "UseAnimation": [
             {
               "Name": "accumulate",
-              "ValueBasedParameterName": "pow_accumulator_index"
+              "ValueBasedParamerName": "pow_accumulator_index"
             }
           ]
         },

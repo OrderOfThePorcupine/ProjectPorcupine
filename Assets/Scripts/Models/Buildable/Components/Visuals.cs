@@ -63,7 +63,7 @@ namespace ProjectPorcupine.Buildable.Components
         {
             if (UsedAnimations != null && ParentFurniture.Animations != null && UsedAnimations.Count > 0)
             {
-                foreach (var anim in UsedAnimations)
+                foreach (UseAnimation anim in UsedAnimations)
                 {
                     if (!string.IsNullOrEmpty(anim.ValueBasedParamerName))
                     {
@@ -102,27 +102,6 @@ namespace ProjectPorcupine.Buildable.Components
             
             ParentFurniture.Changed += FurnitureChanged;
             ParentFurniture.IsOperatingChanged += (furniture) => SetDefaultAnimation(furniture.IsOperating);
-
-            if (!IsValid())
-            {
-                UnityDebugger.Debugger.LogError("Visuals", "Error found in animation for " + SpriteName);
-            }
-        }
-
-        protected bool IsValid()
-        {
-            if (UsedAnimations != null)
-            {
-                foreach (UseAnimation anim in UsedAnimations)
-                {
-                    if (anim.RunConditions == null)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
 
         private void FurnitureChanged(Furniture obj)
