@@ -236,6 +236,11 @@ namespace ProjectPorcupine.Buildable.Components
             return new PowerConnection(this);
         }
 
+        public override bool IsValid()
+        {
+            return true;
+        }
+
         public override bool CanFunction()
         {
             bool canFunction = true;
@@ -360,11 +365,6 @@ namespace ProjectPorcupine.Buildable.Components
             OnReconnecting();
 
             ParentFurniture.Removed += PowerConnectionRemoved;           
-        }
-
-        protected override bool IsValid()
-        {
-            return true;
         }
 
         private void PowerConnectionRemoved(Furniture obj)

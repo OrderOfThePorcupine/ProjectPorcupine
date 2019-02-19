@@ -165,6 +165,11 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
+        public override bool IsValid()
+        {
+            return true;
+        }
+
         public override bool CanFunction()
         {
             bool canWork = false;
@@ -334,11 +339,6 @@ namespace ProjectPorcupine.Buildable.Components
             InputProcessed.SetValue(0);
             
             ParentFurniture.Removed += WorkshopRemoved;
-        }
-
-        protected override bool IsValid()
-        {
-            return true;
         }
 
         private void PlaceInventories(List<TileObjectTypeAmount> outPlacement)

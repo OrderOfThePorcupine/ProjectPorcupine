@@ -50,6 +50,11 @@ namespace ProjectPorcupine.Buildable.Components
             return new GasConnection(this);
         }
 
+        public override bool IsValid()
+        {
+            return true;
+        }
+
         public override bool CanFunction()
         {
             bool canFunction = true;
@@ -102,11 +107,6 @@ namespace ProjectPorcupine.Buildable.Components
         protected override void Initialize()
         {
             componentRequirements = Requirements.Gas;
-        }
-
-        protected override bool IsValid()
-        {
-            return true;
         }
 
         [Serializable]

@@ -189,6 +189,11 @@ namespace ProjectPorcupine.Buildable.Components
             return new FluidConnection(this);
         }
 
+        public override bool IsValid()
+        {
+            return true;
+        }
+
         public override bool CanFunction()
         {
             bool hasPower = true;
@@ -247,11 +252,6 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 Reconnecting();
             }
-        }
-
-        protected override bool IsValid()
-        {
-            return true;
         }
 
         protected override void Initialize()
