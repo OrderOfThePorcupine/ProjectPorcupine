@@ -110,9 +110,9 @@ public class JobManager
         }
 
         // This makes a large assumption that we are the only one accessing the queue right now
-        foreach (Job  job in jobQueue)
+        foreach (Job job in jobQueue)
         { 
-            if (job.IsActive==false)
+            if (job.IsActive == false)
             {
                 continue;
             }

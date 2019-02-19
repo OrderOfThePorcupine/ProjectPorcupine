@@ -20,7 +20,7 @@ public class InventoryManager
 {
     private static readonly string InventoryManagerLogChanel = "InventoryManager";
 
-    private Dictionary<string, List<InventoryOfTypeCreated>> cbInventoryTypeCreated = new Dictionary<string, List<InventoryOfTypeCreated>>();
+    private Dictionary<string, List<InventoryOfTypeCreated>> inventoryTypeCreated = new Dictionary<string, List<InventoryOfTypeCreated>>();
 
     public InventoryManager()
     {
@@ -47,17 +47,17 @@ public class InventoryManager
 
     public void RegisterInventoryTypeCreated(InventoryOfTypeCreated func, string type)
     {
-        if (cbInventoryTypeCreated.ContainsKey(type) == false)
+        if (inventoryTypeCreated.ContainsKey(type) == false)
         {
-            cbInventoryTypeCreated[type] = new List<InventoryOfTypeCreated>();
+            inventoryTypeCreated[type] = new List<InventoryOfTypeCreated>();
         }
 
-        cbInventoryTypeCreated[type].Add(func);
+        inventoryTypeCreated[type].Add(func);
     }
 
     public void UnregisterInventoryTypeCreated(InventoryOfTypeCreated func, string type)
     {
-        cbInventoryTypeCreated[type].Remove(func);
+        inventoryTypeCreated[type].Remove(func);
     }
 
     public Tile GetFirstTileWithValidInventoryPlacement(int maxOffset, Tile inTile, Inventory inv)
@@ -362,9 +362,9 @@ public class InventoryManager
 
     public void InventoryAvailable(Inventory inventory)
     {
-        if (cbInventoryTypeCreated.ContainsKey(inventory.Type))
+        if (inventoryTypeCreated.ContainsKey(inventory.Type))
         {
-            foreach (InventoryOfTypeCreated func in cbInventoryTypeCreated[inventory.Type])
+            foreach (InventoryOfTypeCreated func in inventoryTypeCreated[inventory.Type])
             {
                 func(inventory);
             }

@@ -34,8 +34,6 @@ public class FurnitureManager : IEnumerable<Furniture>
     /// </summary>
     public event Action<Furniture> Created;
 
-    public event RoomsUpdated CbRoomsUpdated;
-
     /// <summary>
     /// Creates a furniture with the given type and places it at the given tile.
     /// </summary>
@@ -92,7 +90,6 @@ public class FurnitureManager : IEnumerable<Furniture>
         if (doRoomFloodFill && furniture.EnclosesRoom)
         {
             World.Current.RoomManager.DoRoomFloodFill(furniture.Tile, true);
-            CbRoomsUpdated();
         }
 
         if (Created != null)
@@ -233,11 +230,5 @@ public class FurnitureManager : IEnumerable<Furniture>
         furnitures.Remove(furniture);
         TimeManager.Instance.UnregisterFastUpdate(furniture);
         TimeManager.Instance.UnregisterSlowUpdate(furniture);
-
-        // Movement to jobs might have been opened, let's move jobs back into the queue to be re-evaluated.
-        if (CbRoomsUpdated != null)
-        {
-            CbRoomsUpdated();
-        }
     }
 }
