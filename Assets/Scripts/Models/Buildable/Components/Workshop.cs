@@ -165,6 +165,11 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
+        public override bool IsValid()
+        {
+            return true;
+        }
+
         public override bool CanFunction()
         {
             bool canWork = false;

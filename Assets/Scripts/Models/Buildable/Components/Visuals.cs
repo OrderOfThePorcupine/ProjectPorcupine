@@ -92,6 +92,22 @@ namespace ProjectPorcupine.Buildable.Components
             protoFurniture.DefaultSpriteName = RetrieveStringFor(DefaultSpriteName, protoFurniture);
         }
 
+        public override bool IsValid()
+        {
+            if (UsedAnimations != null)
+            {
+                foreach (UseAnimation anim in UsedAnimations)
+                {
+                    if (anim.RunConditions == null && string.IsNullOrEmpty(anim.ValueBasedParameterName))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         protected override void Initialize()
         {
             if (UsedAnimations != null && ParentFurniture.Animations != null && UsedAnimations.Count > 0)

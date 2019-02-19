@@ -50,6 +50,11 @@ namespace ProjectPorcupine.Buildable.Components
             return new GasConnection(this);
         }
 
+        public override bool IsValid()
+        {
+            return true;
+        }
+
         public override bool CanFunction()
         {
             bool canFunction = true;

@@ -731,6 +731,11 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
                 {
                     component.InitializePrototype(this);
                     components.Add(component);
+
+                    if (component.IsValid() == false)
+                    {
+                        UnityDebugger.Debugger.LogError("BuildableComponent", "Error parsing " + component.GetType() + " for " + Type);
+                    }
                 }
             }
         }

@@ -189,6 +189,11 @@ namespace ProjectPorcupine.Buildable.Components
             return new FluidConnection(this);
         }
 
+        public override bool IsValid()
+        {
+            return true;
+        }
+
         public override bool CanFunction()
         {
             bool hasPower = true;
