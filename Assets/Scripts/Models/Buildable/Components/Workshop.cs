@@ -264,13 +264,12 @@ namespace ProjectPorcupine.Buildable.Components
                     CurrentProcessingTime.ChangeFloatValue(deltaTime * efficiency);
                     IsRunning.SetValue(true);
 
-                    if (CurrentProcessingTime.ToFloat() >=
-                        MaxProcessingTime.ToFloat())
+                    if (CurrentProcessingTime.ToFloat() >= MaxProcessingTime.ToFloat())
                     {
                         List<TileObjectTypeAmount> outPlacement = CheckForInventoryAtOutput(prodChain);
 
                         // if output placement was found for all products, place them
-                        if (outPlacement.Count == prodChain.Output.Count)
+                        if (outPlacement.Count == 0 || outPlacement.Count == prodChain.Output.Count)
                         {
                             PlaceInventories(outPlacement);
                             //// processing done, can fetch input for another processing
@@ -496,7 +495,7 @@ namespace ProjectPorcupine.Buildable.Components
 
             // processing is done, try to spit the output
             // check if output can be placed in world
-            if (prodChain != null)
+            if (prodChain != null && prodChain.Output != null)
             {
                 foreach (Item outObjType in prodChain.Output)
                 {
