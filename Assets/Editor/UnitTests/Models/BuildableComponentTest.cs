@@ -137,6 +137,39 @@ public class BuildableComponentTest
         Assert.NotNull(deserializedAnimator);
     }
 
+    [Test] 
+    public void TestForInvalidVisualUseAnimation()
+    {
+        string inputJson = @"
+        {
+            'water_tank': {
+                'LocalizationName': 'furn_water_tank',
+                'LocalizationDescription': 'furn_water_tank_desc',
+                'Health': 1.0,
+                'DragType': 'single',
+                'Components': {
+                    'Visuals': {
+                        'DefaultSpriteName': {
+                            'Value': 'water_tank_0'
+                        },
+                    'UseAnimation': [
+                            {
+                                'Name': 'filling',
+                                'ValueBasedTypo': 'fluid_storage_index'
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        ";
+
+        JToken reader = JToken.Parse(inputJson);
+        Furniture furniture = new Furniture();
+        UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Error, "Error parsing ProjectPorcupine.Buildable.Components.Visuals for water_tank");
+        furniture.ReadJsonPrototype((JProperty)reader.First);
+    }
+
     private static string SerializeObjectToJson(object obj)
     {
         return JsonConvert.SerializeObject(
