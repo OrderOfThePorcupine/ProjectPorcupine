@@ -345,7 +345,7 @@ public class Job : ISelectable, IPrototypable
 
     public void SuspendCantReach()
     {
-        World.Current.RoomManager.Removed += (room)=>ClearCharCantReach();
+        World.Current.RoomManager.Removed += (room) => ClearCharCantReach();
         Suspend();
     }
 
