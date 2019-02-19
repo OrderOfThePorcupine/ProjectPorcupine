@@ -353,7 +353,14 @@ public class Job : ISelectable, IPrototypable
 
     public void SuspendWaitingForInventory(string missing)
     {
-        World.Current.InventoryManager.RegisterInventoryTypeCreated(CheckIfInventorySufficient, missing);
+        if (missing == "*")
+        {
+            World.Current.InventoryManager.InventoryCreated += CheckIfInventorySufficient;
+        }
+        else
+        {
+            World.Current.InventoryManager.RegisterInventoryTypeCreated(CheckIfInventorySufficient, missing);
+        }
         Suspend();
     }
 
