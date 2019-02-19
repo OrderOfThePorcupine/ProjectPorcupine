@@ -112,7 +112,7 @@ public class JobManager
         // This makes a large assumption that we are the only one accessing the queue right now
         foreach (Job  job in jobQueue)
         { 
-            if (job.isActive==false)
+            if (job.IsActive==false)
             {
                 continue;
             }

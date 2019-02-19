@@ -276,6 +276,7 @@
       <AnalyzerSettings>
         <CollectionProperty Name="Hungarian">
           <Value>as</Value>
+		  <Value>cb</Value>
           <Value>do</Value>
           <Value>id</Value>
           <Value>if</Value>

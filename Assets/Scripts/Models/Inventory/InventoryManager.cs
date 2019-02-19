@@ -20,13 +20,14 @@ public class InventoryManager
 {
     private static readonly string InventoryManagerLogChanel = "InventoryManager";
 
+    private Dictionary<string, List<InventoryOfTypeCreated>> cbInventoryTypeCreated = new Dictionary<string, List<InventoryOfTypeCreated>>();
+
     public InventoryManager()
     {
         Inventories = new Dictionary<string, List<Inventory>>();
     }
 
     public delegate void InventoryOfTypeCreated(Inventory inventory);
-    private Dictionary<string, List<InventoryOfTypeCreated>> cbInventoryTypeCreated = new Dictionary<string, List<InventoryOfTypeCreated>>();
 
     public event Action<Inventory> InventoryCreated;
 
@@ -50,6 +51,7 @@ public class InventoryManager
         {
             cbInventoryTypeCreated[type] = new List<InventoryOfTypeCreated>();
         }
+
         cbInventoryTypeCreated[type].Add(func);
     }
 
@@ -358,6 +360,17 @@ public class InventoryManager
         }
     }
 
+    public void InventoryAvailable(Inventory inventory)
+    {
+        if (cbInventoryTypeCreated.ContainsKey(inventory.Type))
+        {
+            foreach (InventoryOfTypeCreated func in cbInventoryTypeCreated[inventory.Type])
+            {
+                func(inventory);
+            }
+        }
+    }
+
     private void CleanupInventory(Inventory inventory)
     {
         if (inventory.StackSize != 0)
@@ -395,17 +408,6 @@ public class InventoryManager
             handler(inventory);
 
             InventoryAvailable(inventory);
-        }
-    }
-
-    public void InventoryAvailable(Inventory inventory)
-    {
-        if (cbInventoryTypeCreated.ContainsKey(inventory.Type))
-        {
-            foreach (InventoryOfTypeCreated func in cbInventoryTypeCreated[inventory.Type])
-            {
-                func(inventory);
-            }
         }
     }
 

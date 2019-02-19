@@ -74,7 +74,7 @@ public class Job : ISelectable, IPrototypable
         this.Critical = critical;
         this.Priority = jobPriority;
         this.adjacent = adjacent;
-        this.isActive = true;
+        this.IsActive = true;
         this.Description = "job_error_missing_desc";
 
         jobWorkedLua = new List<string>();
@@ -168,7 +168,7 @@ public class Job : ISelectable, IPrototypable
 
     public string Description { get; set; }
 
-    public bool isActive { get; protected set; }
+    public bool IsActive { get; protected set; }
 
     /// <summary>
     /// Name of order that created this job. This should prevent multiple same orders on same things if not allowed.
@@ -340,12 +340,12 @@ public class Job : ISelectable, IPrototypable
 
     public void Suspend()
     {
-        isActive = false;
+        IsActive = false;
     }
 
     public void SuspendCantReach()
     {
-        World.Current.FurnitureManager.cbRoomsUpdated += ClearCharCantReach;
+        World.Current.FurnitureManager.CbRoomsUpdated += ClearCharCantReach;
         Suspend();
     }
 
@@ -357,7 +357,7 @@ public class Job : ISelectable, IPrototypable
 
     public void CheckIfInventorySufficient(Inventory inventory)
     {
-        isActive = true;
+        IsActive = true;
     }
 
     public void CancelJob()
@@ -579,7 +579,7 @@ public class Job : ISelectable, IPrototypable
     public void ClearCharCantReach()
     {
         charsCantReach.Clear();
-        isActive = true;
+        IsActive = true;
     }
 
     public IEnumerable<string> GetAdditionalInfo()
