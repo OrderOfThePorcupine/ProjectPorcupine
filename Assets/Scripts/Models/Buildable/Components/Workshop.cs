@@ -496,7 +496,7 @@ namespace ProjectPorcupine.Buildable.Components
 
             // processing is done, try to spit the output
             // check if output can be placed in world
-            if (prodChain != null)
+            if (prodChain != null && prodChain.Output != null)
             {
                 foreach (Item outObjType in prodChain.Output)
                 {
