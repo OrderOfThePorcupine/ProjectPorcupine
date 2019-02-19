@@ -65,12 +65,12 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 foreach (UseAnimation anim in UsedAnimations)
                 {
-                    if (!string.IsNullOrEmpty(anim.ValueBasedParamerName))
+                    if (!string.IsNullOrEmpty(anim.ValueBasedParameterName))
                     {
                         // is value based animation
                         if (ParentFurniture.Animations != null)
                         {
-                            int frmIdx = FurnitureParams[anim.ValueBasedParamerName].ToInt();
+                            int frmIdx = FurnitureParams[anim.ValueBasedParameterName].ToInt();
                             ParentFurniture.Animations.SetFrameIndex(frmIdx);
                         }
                     }
