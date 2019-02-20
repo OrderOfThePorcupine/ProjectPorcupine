@@ -16,7 +16,6 @@ using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Buildable.Components;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
-using ProjectPorcupine.Localization;
 using ProjectPorcupine.OrderActions;
 using ProjectPorcupine.PowerNetwork;
 using UnityEngine;
