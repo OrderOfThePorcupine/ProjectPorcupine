@@ -71,7 +71,7 @@ public class MenuLeft : MonoBehaviour
 
     private void OnMenuButtonClicked(GameObject menu)
     {
-        if (CurrentlyOpen != null && CurrentlyOpen.gameObject.name == menu.name)
+        if (CurrentlyOpen == menu)
         {
             CurrentlyOpen = null;
         }
