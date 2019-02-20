@@ -72,4 +72,9 @@ public class JobCategory : IPrototypable
         IsHidden = PrototypeReader.ReadJson(false, innerJson["hidden"]);
         LocalizationName = (string)innerJson["LocalizationName"];
     }
+
+    public override string ToString()
+    {
+        return base.ToString() + " " + Type;
+    }
 }

@@ -42,7 +42,7 @@ namespace ProjectPorcupine.OrderActions
 
         public string JobTimeFunction { get; set; }
 
-        public virtual string Category { get; protected set; }
+        public virtual JobCategory Category { get; protected set; }
 
         public virtual Job.JobPriority Priority { get; protected set; }
 
@@ -64,7 +64,13 @@ namespace ProjectPorcupine.OrderActions
 
                 OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
                 orderAction.Type = orderActionProp.Name;
-                orderAction.Category = PrototypeReader.ReadJson(orderAction.Category, innerJson["JobCategory"]);
+                string prevCategory = "";
+                if (orderAction.Category!=null)
+                {
+                    prevCategory = orderAction.Category.Type;
+                }
+                string tempCategory = PrototypeReader.ReadJson(prevCategory, innerJson["JobCategory"]);
+                orderAction.Category = PrototypeManager.JobCategory.Get(tempCategory);
                 orderAction.Priority = (Job.JobPriority)PrototypeReader.ReadJson((int)orderAction.Priority, innerJson["JobPriority"]);
                 return orderAction;
             }

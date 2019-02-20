@@ -63,7 +63,13 @@ public class Job : ISelectable, IPrototypable
     {
     }
 
-    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, string category, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false)
+    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, string category, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false) :
+        this(tile, type, jobComplete, jobTime, requestedItems, jobPriority, PrototypeManager.JobCategory.Get(category), jobRepeats, need, critical, adjacent)
+    {
+        // This is identical to the next structure, except the category is a string. Intended primarily for Lua
+    }
+
+    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, JobCategory category, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false)
     {
         this.tile = tile;
         this.Type = type;
@@ -73,7 +79,7 @@ public class Job : ISelectable, IPrototypable
         this.IsNeed = need;
         this.Critical = critical;
         this.Priority = jobPriority;
-        this.Category = PrototypeManager.JobCategory.Get(category);
+        this.Category = category;
         this.adjacent = adjacent;
         this.IsActive = true;
         this.Description = "job_error_missing_desc";
@@ -94,7 +100,7 @@ public class Job : ISelectable, IPrototypable
 
         if (this.Category == null)
         {
-            UnityDebugger.Debugger.LogError("Invalid category " + category);
+            UnityDebugger.Debugger.LogError("Invalid category detected.");
         }
     }
 
@@ -126,7 +132,7 @@ public class Job : ISelectable, IPrototypable
 
         if (this.Category == null)
         {
-            UnityDebugger.Debugger.LogError("Invalid category " + category);
+            UnityDebugger.Debugger.LogError("Invalid category detected.");
         }
     }
 

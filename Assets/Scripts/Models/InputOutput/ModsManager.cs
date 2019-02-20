@@ -114,6 +114,16 @@ public class ModsManager
         LoadFunctions("FurnitureFunctions.cs", "Furniture");
         LoadFunctions("OverlayFunctions.cs", "Overlay");
 
+        SetupPrototypeHandlers();
+
+        LoadCharacterNames("CharacterNames.txt");
+
+        LoadDirectoryAssets("Images", SpriteManager.LoadSpriteFiles);
+        LoadDirectoryAssets("Audio", AudioManager.LoadAudioFiles);
+    }
+
+    public void SetupPrototypeHandlers()
+    {
         HandlePrototypes("Tile", PrototypeManager.TileType.LoadJsonPrototypes);
         HandlePrototypes("Furniture", PrototypeManager.Furniture.LoadJsonPrototypes);
         HandlePrototypes("Utility", PrototypeManager.Utility.LoadJsonPrototypes);
@@ -130,11 +140,6 @@ public class ModsManager
         HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
         HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
         HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
-
-        LoadCharacterNames("CharacterNames.txt");
-
-        LoadDirectoryAssets("Images", SpriteManager.LoadSpriteFiles);
-        LoadDirectoryAssets("Audio", AudioManager.LoadAudioFiles);
     }
 
     private void LoadIntroFiles()
@@ -232,13 +237,21 @@ public class ModsManager
             tagNameToProperty.Add(tagName, protoJson);
         }
 
+        LoadPrototypesFromJTokens(tagNameToProperty);
+    }
+
+    public void LoadPrototypesFromJTokens(Dictionary<string, JToken> tagNameToProperty)
+    {
         foreach (KeyValuePair<string, List<Action<JProperty>>> prototypeHandler in prototypeHandlers)
         {
             foreach (Action<JProperty> handler in prototypeHandler.Value)
             {
-                foreach (JToken prototypeGroup in tagNameToProperty[prototypeHandler.Key])
+                if (tagNameToProperty.ContainsKey(prototypeHandler.Key))
                 {
-                    handler((JProperty)prototypeGroup);
+                    foreach (JToken prototypeGroup in tagNameToProperty[prototypeHandler.Key])
+                    {
+                        handler((JProperty)prototypeGroup);
+                    }
                 }
             }
         }

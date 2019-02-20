@@ -16,7 +16,7 @@ namespace ProjectPorcupine.OrderActions
     {
         public Mine()
         {
-            Category = "mining";
+            Category = PrototypeManager.JobCategory.Get("mining");
             Priority = Job.JobPriority.Medium;
         }
 
@@ -33,7 +33,7 @@ namespace ProjectPorcupine.OrderActions
         {
             Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
             job.Priority = Priority;
-            job.Category = PrototypeManager.JobCategory.Get(Category);
+            job.Category = Category;
 
             return job;
         }
