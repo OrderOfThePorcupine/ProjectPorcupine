@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
 
 namespace ProjectPorcupine.Rooms
 {

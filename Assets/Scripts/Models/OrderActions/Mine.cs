@@ -7,12 +7,10 @@
 // ====================================================
 #endregion
 using System;
-using System.Xml.Serialization;
 
 namespace ProjectPorcupine.OrderActions
 {
     [Serializable]
-    [XmlRoot("OrderAction")]
     [OrderActionName("Mine")]
     public class Mine : OrderAction
     {

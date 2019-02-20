@@ -7,10 +7,6 @@
 // ====================================================
 #endregion
 using System;
-using System.Globalization;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 using MoonSharp.Interpreter;
 
 namespace ProjectPorcupine.PowerNetwork
@@ -19,7 +15,7 @@ namespace ProjectPorcupine.PowerNetwork
     /// Represents connection to electric grid if furniture has connection specified it uses of produce power.
     /// </summary>
     [MoonSharpUserData]
-    public class Connection : IXmlSerializable
+    public class Connection
     {
         private static readonly string InputRateAttributeName = "inputRate";
         private static readonly string OutputRateAttributeName = "outputRate";
@@ -114,34 +110,6 @@ namespace ProjectPorcupine.PowerNetwork
             {
                 Reconnecting();
             }
-        }
-
-        public XmlSchema GetSchema()
-        {
-            return null;
-        }
-
-        public void ReadXml(XmlReader reader)
-        {
-            InputRate = ReadFloatNullAsZero(reader.GetAttribute(InputRateAttributeName));
-            OutputRate = ReadFloatNullAsZero(reader.GetAttribute(OutputRateAttributeName));
-            Capacity = ReadFloatNullAsZero(reader.GetAttribute(CapacityAttributeName));
-            AccumulatedPower = ReadFloatNullAsZero(reader.GetAttribute(AccumulatedPowerAttributeName));
-        }
-
-        public void ReadPrototype(XmlReader reader)
-        {
-            InputRate = ReadFloatNullAsZero(reader.GetAttribute(InputRateAttributeName));
-            OutputRate = ReadFloatNullAsZero(reader.GetAttribute(OutputRateAttributeName));
-            Capacity = ReadFloatNullAsZero(reader.GetAttribute(CapacityAttributeName));
-        }
-
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteAttributeString(InputRateAttributeName, InputRate.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString(OutputRateAttributeName, OutputRate.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString(CapacityAttributeName, Capacity.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString(AccumulatedPowerAttributeName, AccumulatedPower.ToString(CultureInfo.InvariantCulture));
         }
 
         public Connection Clone()
