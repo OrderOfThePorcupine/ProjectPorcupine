@@ -126,6 +126,12 @@ public static class PrototypeManager
     public static PrototypeMap<Ship> Ship { get; private set; }
 
     /// <summary>
+    /// Gets the Job Category prototype map.
+    /// </summary>
+    /// <value>The job category prototype map.</value>
+    public static PrototypeMap<JobCategory> JobCategory { get; private set; }
+
+    /// <summary>
     /// Initializes the <see cref="PrototypeManager"/> static class files.
     /// </summary>
     public static void Initialize()
@@ -135,24 +141,25 @@ public static class PrototypeManager
             return;
         }
 
-        Inventory = new PrototypeMap<Inventory>("Inventories", "Inventory");
-        TileType = new PrototypeMap<TileType>("Tiles", "Tile");
-        Furniture = new PrototypeMap<Furniture>("Furnitures", "Furniture");
-        Utility = new PrototypeMap<Utility>("Utilities", "Utility");
-        RoomBehavior = new PrototypeMap<RoomBehavior>("RoomBehaviors", "RoomBehavior");
-        Need = new PrototypeMap<Need>("Needs", "Need");
-        Trader = new PrototypeMap<TraderPrototype>("Traders", "Trader");
-        Currency = new PrototypeMap<Currency>("Currencies", "Currency");
-        Quest = new PrototypeMap<Quest>("Quests", "Quest");
-        Stat = new PrototypeMap<Stat>("Stats", "Stat");
-        GameEvent = new PrototypeMap<GameEvent>("GameEvents", "GameEvent");
-        ScheduledEvent = new PrototypeMap<ScheduledEvent>("ScheduledEvents", "ScheduledEvent");
-        Headline = new PrototypeMap<Headline>("Headlines", "Headline");
-        Overlay = new PrototypeMap<OverlayDescriptor>("Overlays", "Overlay");
-        Ship = new PrototypeMap<Ship>("Ships", "Ship");
-        DevConsole = new PrototypeMap<DeveloperConsole.Core.InvokeCommand>("ConsoleCommands", "ConsoleCommand");
-        SettingsCategories = new PrototypeMap<SettingsCategory>("Categories", "Category");
-        PerformanceHUD = new PrototypeMap<PerformanceGroup>("ComponentGroups", "ComponentGroup");
+        Inventory = new PrototypeMap<Inventory>();
+        TileType = new PrototypeMap<TileType>();
+        Furniture = new PrototypeMap<Furniture>();
+        Utility = new PrototypeMap<Utility>();
+        RoomBehavior = new PrototypeMap<RoomBehavior>();
+        Need = new PrototypeMap<Need>();
+        Trader = new PrototypeMap<TraderPrototype>();
+        Currency = new PrototypeMap<Currency>();
+        Quest = new PrototypeMap<Quest>();
+        Stat = new PrototypeMap<Stat>();
+        GameEvent = new PrototypeMap<GameEvent>();
+        ScheduledEvent = new PrototypeMap<ScheduledEvent>();
+        Headline = new PrototypeMap<Headline>();
+        Overlay = new PrototypeMap<OverlayDescriptor>();
+        Ship = new PrototypeMap<Ship>();
+        JobCategory = new PrototypeMap<JobCategory>();
+        DevConsole = new PrototypeMap<DeveloperConsole.Core.InvokeCommand>();
+        SettingsCategories = new PrototypeMap<SettingsCategory>();
+        PerformanceHUD = new PrototypeMap<PerformanceGroup>();
 
         isInitialized = true;
     }

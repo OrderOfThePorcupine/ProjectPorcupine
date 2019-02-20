@@ -129,6 +129,7 @@ public class ModsManager
         HandlePrototypes("Headline", PrototypeManager.Headline.LoadJsonPrototypes);
         HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
         HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
+        HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
 
         LoadCharacterNames("CharacterNames.txt");
 
@@ -154,6 +155,7 @@ public class ModsManager
         HandlePrototypes("ConsoleCommand", PrototypeManager.DevConsole.LoadJsonPrototypes);
         HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
         HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
+        HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");

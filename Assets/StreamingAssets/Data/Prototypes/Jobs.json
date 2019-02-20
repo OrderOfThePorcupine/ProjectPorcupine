@@ -1,8 +1,8 @@
 {
-  "JobCategory": [
-	{"type":"construct","localizationName":"job_category_construct"},
-	{"type":"workshop","localizationName":"job_category_workshop"},
-	{"type":"mining","localizationName":"job_category_mining"},
-	{"type":"hauling","localizationName":"job_category_hauling"},
-  ],
+  "JobCategory": {
+	"construct":{"localizationName":"job_category_construct"},
+	"workshop":{"localizationName":"job_category_workshop"},
+	"mining":{"localizationName":"job_category_mining"},
+	"hauling":{"localizationName":"job_category_hauling"},
+  },
 }

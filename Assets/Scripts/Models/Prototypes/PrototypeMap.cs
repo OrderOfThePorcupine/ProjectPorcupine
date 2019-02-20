@@ -18,8 +18,6 @@ using Newtonsoft.Json.Linq;
 public class PrototypeMap<T> where T : IPrototypable, new()
 {
     private readonly Dictionary<string, T> prototypes;
-    private string listTag;
-    private string elementTag;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrototypeMap`1"/> class.
@@ -27,18 +25,6 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     public PrototypeMap()
     {
         this.prototypes = new Dictionary<string, T>();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PrototypeMap`1"/> class.
-    /// </summary>
-    /// <param name="listTag">Name used for the XML tag that holds all the prototypes.</param>
-    /// <param name="elementTag">Name used for the XML tag that hold each prototype.</param>
-    public PrototypeMap(string listTag, string elementTag)
-    {
-        this.prototypes = new Dictionary<string, T>();
-        this.listTag = listTag;
-        this.elementTag = elementTag;
     }
 
     /// <summary>
