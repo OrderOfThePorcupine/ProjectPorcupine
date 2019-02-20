@@ -129,6 +129,24 @@ public static class ModUtils
         return value.Clamp(min, max);
     }
 
+    public static string HandlePath(string file)
+    {
+        if (file.StartsWith("~"))
+        {
+            return file.Replace("~", ModUtils.HomeDirPath());
+        } else
+        {
+            return Application.streamingAssetsPath + file;
+        }
+    }
+
+    public static string HomeDirPath()
+    {
+        string envHome = SystemInfo.operatingSystemFamily == OperatingSystemFamily.Windows ? "HOMEPATH" : "HOME";
+        string home = System.Environment.GetEnvironmentVariable(envHome);
+        return home;
+    }
+
     public static int Min(int a, int b)
     {
         return Mathf.Min(a, b);

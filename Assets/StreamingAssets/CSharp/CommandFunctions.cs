@@ -7,9 +7,6 @@ using ProjectPorcupine.Entities;
 
 public static class CommandFunctions
 {
-    /// <summary>
-    /// To prevent C# Modding side of commands from getting lost
-    /// </summary>
     public static void SetTimeStamp(bool on)
     {
         SettingsKeyHolder.TimeStamps = on;
@@ -22,6 +19,15 @@ public static class CommandFunctions
         DevConsole.Log(logThis, "green");
     }
 
+    /*
+        While I would like to do these two in LUA sadly loadstring and loadfile
+        isn't implemented in moonsharp (prints out a `attempt to index a nil value`
+        and is a currently opened issue on their github with no fixes in over a year and a half
+        - as well as others stating they are running into this as well).
+
+        Oh well this is still fine.
+    */
+
     /// <summary>
     /// Run the passed lua code.
     /// </summary>
@@ -29,9 +35,23 @@ public static class CommandFunctions
     /// <remarks> 
     /// The code isn't optimised since its just a nice little command to run LUA from the command interface.
     /// </remarks>
-    public static void Run_LUA(string code)
+    public static void RunLuaString(string code)
     {
         new LuaFunctions().LoadScript(code, "User Script");
+    }
+
+    /// <summary>
+    /// Run the passed file from lua.
+    /// </summary>
+    /// <param name="luaCode"> The LUA file to run.</param>
+    /// <remarks> 
+    /// The code isn't optimised since its just a nice little command to run LUA from the command interface.
+    /// </remarks>
+    public static void RunLuaFile(string file)
+    {
+        file = ModUtils.HandlePath(file);
+        DevConsole.LogWarning(file);
+        new LuaFunctions().LoadFile(file, "User Script");
     }
 
     public static void SetCharacterHealth(string name, float health)

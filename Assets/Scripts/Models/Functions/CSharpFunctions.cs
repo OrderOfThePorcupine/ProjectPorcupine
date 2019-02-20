@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Reflection;
 using Mono.CSharp;
 using MoonSharp.Interpreter;
@@ -68,8 +69,6 @@ public class CSharpFunctions : IFunctions
     /// <param name="scriptName">The script name.</param>
     public bool LoadScript(string text, string scriptName)
     {
-        bool success = false;
-
         try
         {
             evaluator = new Evaluator(new CompilerContext(new CompilerSettings(), CompilationResult));
@@ -101,13 +100,16 @@ public class CSharpFunctions : IFunctions
                     UnityDebugger.Debugger.LogError(
                         "CSharp",
                         string.Format("[{0}] CSharp compile errors ({1}): {2}", scriptName, CompilationResult.Errors.Count, CompilationResult.GetErrorsLog()));
+                } else if (CompilationResult.HasWarnings) {
+                    UnityDebugger.Debugger.LogWarning(
+                        "CSharp",
+                        string.Format("[{0}] CSharp warning ({1}): {2}", scriptName, CompilationResult.Warnings.Count, CompilationResult.GetWarningsLog()));
                 }
 
                 return false;
             }
 
             CreateDelegates(resAssembly);
-            success = true;
         }
         catch (Exception ex)
         {
@@ -116,7 +118,17 @@ public class CSharpFunctions : IFunctions
                         string.Format("[{0}] Problem loading functions from CSharp script: {1}", scriptName, ex.ToString()));
         }
 
-        return success;
+        return true;
+    }
+
+    /// <summary>
+    /// Loads the script from the specified file.
+    /// </summary>
+    /// <param name="file">The file to open.</param>
+    /// <param name="scriptName">The script name.</param>
+    public bool LoadFile(string file, string scriptName)
+    {
+        return LoadScript(File.ReadAllText(file), scriptName);
     }
 
     /// <summary>
@@ -289,6 +301,11 @@ public class CSharpFunctions : IFunctions
             {
                 Warnings.Add(msgInfo);
             }
+        }
+
+        public string GetWarningsLog()
+        {
+            return string.Join(Environment.NewLine, Warnings.ToArray());
         }
 
         public string GetErrorsLog()

@@ -46,6 +46,28 @@ namespace DeveloperConsole.Core
             }
         }
 
+        [Command("System", "Console", Description = "Records a sequence of calls and saves it to a file", Title = "StartMacro")]
+        public static void StartMacro()
+        {
+            DevConsole.Log("Starting Macro!");
+            DevConsole.StartMacro();
+        }
+
+        [Command("System", "Console", Description = "Saves the recorded lines to the file given", Title = "StopMacro")]
+        public static void FinishMacro(string file)
+        {
+            file = ModUtils.HandlePath(file);
+            DevConsole.FinishMacro(file);
+            DevConsole.Log("Finished Macro saved at: " + file);
+        }
+
+        [Command("System", "Console", Description = "Runs the file as a macro", Title = "RunMacro")]
+        public static void RunMacro(string file)
+        {
+            file = ModUtils.HandlePath(file);
+            DevConsole.RunMacro(file);
+        }
+
         /// <summary>
         /// Exits the console.
         /// </summary>
@@ -108,7 +130,7 @@ namespace DeveloperConsole.Core
 
             for (int i = 0; i < consoleCommands.Length; i++)
             {
-                text += "\n<color=orange>" + consoleCommands[i].Title + DevConsole.GetParameters(consoleCommands[i]) + "</color>" + (consoleCommands[i].Description == null ? string.Empty : " //" + consoleCommands[i].Description);
+                text += "\n<color=orange>" + consoleCommands[i].Title + "</color>" + DevConsole.GetParameters(consoleCommands[i]) + (consoleCommands[i].Description == null ? string.Empty : " <color=green>// " + consoleCommands[i].Description + "</color>");
             }
 
             DevConsole.Log(text);
@@ -270,7 +292,7 @@ namespace DeveloperConsole.Core
         }
 
         /// <summary>
-        /// Parse an float from arguments given.
+        /// Parse a character from arguments given.
         /// </summary>
         /// <param name="args"> The string version of the end result. </param>
         /// <returns> Null if arguments are wrong else the converted arg in object form. </returns>
