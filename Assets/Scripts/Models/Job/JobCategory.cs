@@ -69,7 +69,7 @@ public class JobCategory : IPrototypable
     {
         JToken innerJson = jsonProto.Value;
         type = jsonProto.Name;
-        IsHidden = PrototypeReader.ReadJson(false,innerJson["hidden"]);
+        IsHidden = PrototypeReader.ReadJson(false, innerJson["hidden"]);
         LocalizationName = (string)innerJson["LocalizationName"];
     }
 }

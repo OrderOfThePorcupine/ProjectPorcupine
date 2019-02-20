@@ -65,7 +65,7 @@ namespace ProjectPorcupine.OrderActions
                 OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
                 orderAction.Type = orderActionProp.Name;
                 orderAction.Category = PrototypeReader.ReadJson(orderAction.Category, innerJson["JobCategory"]);
-                orderAction.Priority = (Job.JobPriority) PrototypeReader.ReadJson((int)orderAction.Priority, innerJson["JobPriority"]);
+                orderAction.Priority = (Job.JobPriority)PrototypeReader.ReadJson((int)orderAction.Priority, innerJson["JobPriority"]);
                 return orderAction;
             }
             else

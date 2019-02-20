@@ -24,6 +24,14 @@ namespace ProjectPorcupine.Entities
         WEST
     }
 
+    public enum CharacterJobPriority
+    {
+        Urgent,
+        High,
+        Medium,
+        Low,
+    }
+
     /// <summary>
     /// A Character is an entity on the map that can move between tiles and,
     /// for now, grabs jobs from the work queue and performs this.
@@ -94,6 +102,9 @@ namespace ProjectPorcupine.Entities
 
         /// The item we are carrying (not gear/equipment).
         public Inventory Inventory { get; set; }
+
+        // Priorities for jobs for the character
+        public Dictionary<JobCategory, CharacterJobPriority> Priorities { get; private set; }
 
         /// Holds all character animations.
         public Animation.CharacterAnimation Animation { get; set; }
@@ -468,6 +479,30 @@ namespace ProjectPorcupine.Entities
             throw new InvalidOperationException("Not supported by this class");
         }
 
+        public CharacterJobPriority GetPriority(JobCategory category)
+        {
+            return Priorities[category];
+        }
+
+        public void SetPriority(JobCategory category, CharacterJobPriority priority)
+        {
+            Priorities[category] = priority;
+        }
+
+        public List<JobCategory> CategoriesOfPriority(CharacterJobPriority priority)
+        {
+            List<JobCategory> ret = new List<JobCategory>();
+            foreach (KeyValuePair<JobCategory, CharacterJobPriority> row in Priorities)
+            {
+                if (row.Value == priority)
+                {
+                    ret.Add(row.Key);
+                }
+            }
+
+            return ret;
+        }
+
         private States.State FindInitiatingState()
         {
             if (state == null)
@@ -489,6 +524,17 @@ namespace ProjectPorcupine.Entities
             LoadNeeds();
             LoadStats();
             UseStats();
+            LoadPriorities();
+        }
+
+        private void LoadPriorities()
+        {
+            Priorities = new Dictionary<JobCategory, CharacterJobPriority>();
+
+            foreach (JobCategory category in PrototypeManager.JobCategory.Values)
+            {
+                Priorities[category] = CharacterJobPriority.High; // TODO: Set these in a meaningful way and store them!
+            }
         }
 
         private void LoadNeeds()

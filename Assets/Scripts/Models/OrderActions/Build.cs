@@ -31,7 +31,6 @@ namespace ProjectPorcupine.OrderActions
             return new Build(this);
         }
 
-
         public override Job CreateJob(Tile tile, string type)
         {
             Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);

@@ -91,6 +91,7 @@ public class Job : ISelectable, IPrototypable
                 this.RequestedItems[item.Type] = item.Clone();
             }
         }
+
         if (this.Category == null)
         {
             UnityDebugger.Debugger.LogError("Invalid category " + category);
@@ -122,6 +123,7 @@ public class Job : ISelectable, IPrototypable
                 this.RequestedItems[item.Type] = item.Clone();
             }
         }
+
         if (this.Category == null)
         {
             UnityDebugger.Debugger.LogError("Invalid category " + category);
