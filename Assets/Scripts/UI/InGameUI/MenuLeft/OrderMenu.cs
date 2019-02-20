@@ -59,7 +59,7 @@ public class OrderMenu : MonoBehaviour
 
         this.transform.Find("Close Button").GetComponent<Button>().onClick.AddListener(delegate
         {
-            menuLeft.CloseMenu();
+            menuLeft.CloseCurrentMenu();
         });
 
         RenderDeconstructButton();

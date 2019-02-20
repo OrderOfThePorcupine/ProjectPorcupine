@@ -83,7 +83,7 @@ public class ConstructionMenu : MonoBehaviour
 
         this.transform.Find("Close Button").GetComponent<Button>().onClick.AddListener(delegate
         {
-            menuLeft.CloseMenu();
+            menuLeft.CloseCurrentMenu();
         });
 
         RenderRoomBehaviorButtons();
@@ -130,7 +130,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_BuildFurniture(objectId);
-                    menuLeft.CloseMenu();
+                    menuLeft.CloseCurrentMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -179,7 +179,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_DesignateRoomBehavior(objectId);
-                    menuLeft.CloseMenu();
+                    menuLeft.CloseCurrentMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -228,7 +228,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
                 {
                     buildModeController.SetMode_BuildUtility(objectId);
-                    menuLeft.CloseMenu();
+                    menuLeft.CloseCurrentMenu();
                 });
 
             // http://stackoverflow.com/questions/1757112/anonymous-c-sharp-delegate-within-a-loop
@@ -270,7 +270,7 @@ public class ConstructionMenu : MonoBehaviour
             button.onClick.AddListener(delegate
             {
                 buildModeController.SetModeBuildTile(tileType);
-                menuLeft.CloseMenu();
+                menuLeft.CloseCurrentMenu();
             });
 
             LocalizationTable.CBLocalizationFilesChanged += delegate
