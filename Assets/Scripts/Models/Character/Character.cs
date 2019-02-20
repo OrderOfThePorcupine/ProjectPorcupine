@@ -571,11 +571,18 @@ namespace ProjectPorcupine.Entities
         /// </summary>
         private void UseStats()
         {
-            // The speed is equal to (baseSpeed +/-30% of baseSpeed depending on Dexterity)
-            speed = baseSpeed + (0.3f * baseSpeed * ((float)Stats["Dexterity"].Value - 10) / 10);
+            try
+            {
+                // The speed is equal to (baseSpeed +/-30% of baseSpeed depending on Dexterity)
+                speed = baseSpeed + (0.3f * baseSpeed * ((float)Stats["Dexterity"].Value - 10) / 10);
 
-            // Base character max health on their constitution.
-            health = new HealthSystem(50 + ((float)Stats["Constitution"].Value * 5));
+                // Base character max health on their constitution.
+                health = new HealthSystem(50 + ((float)Stats["Constitution"].Value * 5));
+            }
+            catch (KeyNotFoundException)
+            {
+                UnityDebugger.Debugger.LogError("Stat keys not found. If not testing, this is really bad!");
+            }
         }
     }
 }

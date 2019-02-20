@@ -8,23 +8,27 @@
 #endregion
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using ProjectPorcupine.Entities;
 using ProjectPorcupine.OrderActions;
 
 public class JobTest
 {
-    JobCategory constructCategory;
-    JobCategory haulCategory;
-    OrderAction defaultOrderAction;
-    OrderAction badOrderAction;
-    OrderAction updatedOrderAction;
+    private JobCategory constructCategory;
+    private JobCategory haulCategory;
+    private OrderAction defaultOrderAction;
+    private OrderAction badOrderAction;
+    private OrderAction updatedOrderAction;
+
+    private Character character;
 
     [SetUp]
     public void Setup()
     {
-        string BuildOrderActionJson = @"{""Build"": {
+        string buildOrderActionJson = @"{""Build"": {
           ""JobTime"": 1.0,
           ""Inventory"": {
             ""Steel Plate"": 5,
@@ -32,7 +36,7 @@ public class JobTest
           }
         }}";
 
-        string DeconstructOrderActionJson = @"
+        string deconstructOrderActionJson = @"
         {'Deconstruct': {
           'JobTime': 1.0,
           'JobCategory':'invalid',
@@ -42,7 +46,7 @@ public class JobTest
           }
         }}";
 
-        string MineOrderActionJson = @"{""Uninstall"": {
+        string uninstallOrderActionJson = @"{""Uninstall"": {
           ""JobTime"": 1.0,
           ""JobCategory"":""hauling"",
           ""JobPriority"":2,
@@ -52,7 +56,7 @@ public class JobTest
           }
         }}";
 
-        string JobCategoryJson = @"
+        string jobCategoryJson = @"
         {   
             'JobCategory':{
 	            'construct':{ 'localizationName':'job_category_construct'},
@@ -65,7 +69,7 @@ public class JobTest
         modManager.SetupPrototypeHandlers();
 
         Dictionary<string, JToken> jsonPrototypes = new Dictionary<string, JToken>();
-        JToken protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(JobCategoryJson)));
+        JToken protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(jobCategoryJson)));
         string tagName = ((JProperty)protoJson.First).Name;
 
         jsonPrototypes.Add(tagName, protoJson);
@@ -74,14 +78,17 @@ public class JobTest
         constructCategory = PrototypeManager.JobCategory.Get("construct");
         haulCategory = PrototypeManager.JobCategory.Get("hauling");
 
-        protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(BuildOrderActionJson))).First;
+        protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(buildOrderActionJson))).First;
         defaultOrderAction = ProjectPorcupine.OrderActions.OrderAction.FromJson((JProperty)protoJson);
 
-        protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(DeconstructOrderActionJson))).First;
+        protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(deconstructOrderActionJson))).First;
         badOrderAction = ProjectPorcupine.OrderActions.OrderAction.FromJson((JProperty)protoJson);
 
-        protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(MineOrderActionJson))).First;
+        protoJson = JToken.ReadFrom(new JsonTextReader(new StringReader(uninstallOrderActionJson))).First;
         updatedOrderAction = ProjectPorcupine.OrderActions.OrderAction.FromJson((JProperty)protoJson);
+
+        UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Error, "Stat keys not found. If not testing, this is really bad!");
+        character = new Character();
     }
 
     [Test]
@@ -161,5 +168,28 @@ public class JobTest
         Job job = ((Uninstall)updatedOrderAction).CreateJob(null, "test");
         Assert.AreEqual(job.Category, haulCategory);
         Assert.AreEqual(job.Priority, Job.JobPriority.Low);
+    }
+
+    [Test]
+    public void T09_GetAllCharacterPriorities()
+    {
+        IEnumerable<JobCategory> list1 = character.Priorities.Keys;
+        IEnumerable<JobCategory> list2 = PrototypeManager.JobCategory.Values;
+
+        Assert.IsTrue(Enumerable.SequenceEqual(list1.OrderBy(t => t.Type), list2.OrderBy(t => t.Type)));
+    }
+
+    [Test]
+    public void T10_SetCharacterPriorities()
+    {
+        character.SetPriority(haulCategory, CharacterJobPriority.High);
+        character.SetPriority(constructCategory, CharacterJobPriority.Low);
+
+        Assert.AreEqual(character.GetPriority(haulCategory), CharacterJobPriority.High);
+        Assert.AreEqual(character.GetPriority(constructCategory), CharacterJobPriority.Low);
+        Assert.IsTrue(character.CategoriesOfPriority(CharacterJobPriority.High).Contains(haulCategory));
+        Assert.IsFalse(character.CategoriesOfPriority(CharacterJobPriority.High).Contains(constructCategory));
+        Assert.IsFalse(character.CategoriesOfPriority(CharacterJobPriority.Low).Contains(haulCategory));
+        Assert.IsTrue(character.CategoriesOfPriority(CharacterJobPriority.Low).Contains(constructCategory));
     }
 }

@@ -37,7 +37,8 @@ namespace ProjectPorcupine.OrderActions
             if (tile != null)
             {
                 job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
-            } else
+            }
+            else
             {
                 UnityDebugger.Debugger.LogError("Build", "Invalid tile detected. If this wasn't a test, you have an issue.");
             }
