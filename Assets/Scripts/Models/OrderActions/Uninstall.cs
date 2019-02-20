@@ -39,7 +39,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 null,
-                Job.JobPriority.High);
+                Job.JobPriority.High, 
+                "construct");
                 job.Description = "job_uninstall_" + type + "_desc";
                 job.adjacent = true;
                 job.OrderName = Type;

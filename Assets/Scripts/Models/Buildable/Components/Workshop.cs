@@ -473,7 +473,8 @@ namespace ProjectPorcupine.Buildable.Components
                                      null,
                                      0.4f,
                                      new RequestedItem[] { new RequestedItem(desiredInv, desiredAmount, desiredAmount) },
-                                     Job.JobPriority.Medium,
+                                     Job.JobPriority.High, 
+                                     "hauling",
                                      false,
                                      false,
                                      false);

@@ -224,9 +224,9 @@ public class ModsManager
         for (int i = 0; i < prototypeFiles.Length; i++)
         {
             FileInfo file = prototypeFiles[i];
+            UnityDebugger.Debugger.Log("ModsManager", "Loading " + file.FullName);
             StreamReader reader = File.OpenText(file.FullName);
             JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
-            UnityDebugger.Debugger.Log("ModsManager", "Loading " + file.FullName);
             string tagName = ((JProperty)protoJson.First).Name;
 
             tagNameToProperty.Add(tagName, protoJson);

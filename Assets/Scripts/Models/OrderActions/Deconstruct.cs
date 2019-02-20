@@ -40,7 +40,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 null,
-                Job.JobPriority.High);
+                Job.JobPriority.Medium, 
+                "construct");
                 job.Description = "job_deconstruct_" + type + "_desc";
                 job.adjacent = true;
                 job.OrderName = Type;

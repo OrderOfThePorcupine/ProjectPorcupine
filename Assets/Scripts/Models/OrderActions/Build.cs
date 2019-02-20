@@ -41,7 +41,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 Inventory.Select(it => new RequestedItem(it.Key, it.Value)).ToArray(),
-                Job.JobPriority.High);
+                Job.JobPriority.Medium, 
+                "construct");
                 job.Description = "job_build_" + type + "_desc";
                 job.OrderName = Type;
             }

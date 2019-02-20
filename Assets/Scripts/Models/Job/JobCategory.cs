@@ -30,13 +30,20 @@ public class JobCategory : IPrototypable
     public JobCategory(JobCategory other)
     {
         LocalizationName = other.LocalizationName;
+        IsHidden = other.IsHidden;
     }
 
     /// <summary>
-    /// Gets the currency short name.
+    /// Gets the localization name.
     /// </summary>
-    /// <value>The currency short name.</value>
+    /// <value>The localization name.</value>
     public string LocalizationName { get; private set; }
+
+    /// <summary>
+    /// Is this a hidden job type? Hidden job types will not show up on the list of jobs.
+    /// </summary>
+    /// <value>Should this be hidden.</value>
+    public bool IsHidden { get; private set; }
 
     public string Type
     {
@@ -62,6 +69,7 @@ public class JobCategory : IPrototypable
     {
         JToken innerJson = jsonProto.Value;
         type = jsonProto.Name;
+        IsHidden = PrototypeReader.ReadJson(false,innerJson["hidden"]);
         LocalizationName = (string)innerJson["LocalizationName"];
     }
 }

@@ -63,7 +63,7 @@ public class Job : ISelectable, IPrototypable
     {
     }
 
-    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false)
+    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, string category, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false)
     {
         this.tile = tile;
         this.Type = type;
@@ -73,6 +73,7 @@ public class Job : ISelectable, IPrototypable
         this.IsNeed = need;
         this.Critical = critical;
         this.Priority = jobPriority;
+        this.Category = PrototypeManager.JobCategory.Get(category);
         this.adjacent = adjacent;
         this.IsActive = true;
         this.Description = "job_error_missing_desc";
@@ -92,7 +93,7 @@ public class Job : ISelectable, IPrototypable
         }
     }
 
-    public Job(Tile tile, TileType jobTileType, Action<Job> jobCompleted, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, bool jobRepeats = false, bool adjacent = false)
+    public Job(Tile tile, TileType jobTileType, Action<Job> jobCompleted, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, string category, bool jobRepeats = false, bool adjacent = false)
     {
         this.tile = tile;
         this.JobTileType = jobTileType;
@@ -101,6 +102,7 @@ public class Job : ISelectable, IPrototypable
         this.jobTimeRequired = this.JobTime = jobTime;
         this.jobRepeats = jobRepeats;
         this.Priority = jobPriority;
+        this.Category = PrototypeManager.JobCategory.Get(category);
         this.adjacent = adjacent;
         this.Description = "job_error_missing_desc";
 
@@ -126,6 +128,7 @@ public class Job : ISelectable, IPrototypable
         this.OnJobCompleted = other.OnJobCompleted;
         this.JobTime = other.JobTime;
         this.Priority = other.Priority;
+        this.Category = other.Category;
         this.adjacent = other.adjacent;
         this.Description = other.Description;
         this.acceptsAny = other.acceptsAny;
@@ -208,6 +211,12 @@ public class Job : ISelectable, IPrototypable
     }
 
     public JobPriority Priority
+    {
+        get;
+        protected set;
+    }
+
+    public JobCategory Category
     {
         get;
         protected set;
@@ -515,6 +524,11 @@ public class Job : ISelectable, IPrototypable
     public void DropPriority()
     {
         this.Priority = (Job.JobPriority)Mathf.Min((int)Job.JobPriority.Low, (int)Priority + 1);
+    }
+
+    public void RaisePriority()
+    {
+        this.Priority = (Job.JobPriority)Mathf.Max((int)Job.JobPriority.High, (int)Priority - 1);
     }
 
     public string GetName()
