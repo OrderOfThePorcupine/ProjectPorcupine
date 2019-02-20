@@ -16,11 +16,11 @@ public abstract class BaseSpriteController<T>
     protected World world;
     protected GameObject objectParent;
 
-    public BaseSpriteController(World world, string parentName)
+    public BaseSpriteController(World world, string parentName, int estimatedGameObjects)
     {
         this.world = world;
         objectParent = new GameObject(parentName);
-        objectGameObjectMap = new Dictionary<T, GameObject>();
+        objectGameObjectMap = new Dictionary<T, GameObject>(estimatedGameObjects);
     }
 
     public virtual void RemoveAll()

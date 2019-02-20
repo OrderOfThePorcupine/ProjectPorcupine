@@ -21,13 +21,9 @@ using UnityEngine;
 /// </summary>
 public static class SpriteManager
 {
-    // A sprite image with a "ph_" as a prefix will be loaded as a placeholder if the normal spite image is missing.
-    // This is used to easily identity spires that needs improvement.
-    private const string PlaceHolderPrefix = "ph_";
-
     private static Texture2D noResourceTexture;
-
-    private static Dictionary<string, Sprite> sprites;
+    
+    private static Dictionary<string, Dictionary<string, Sprite>> sprites;
 
     private static bool isInitialized;
 
@@ -41,7 +37,7 @@ public static class SpriteManager
             return;
         }
 
-        sprites = new Dictionary<string, Sprite>();
+        sprites = new Dictionary<string, Dictionary<string, Sprite>>();
 
         CreateEmptyTexture();
 
@@ -56,26 +52,19 @@ public static class SpriteManager
     /// <param name="spriteName">Sprite name.</param>
     public static Sprite GetSprite(string categoryName, string spriteName)
     {
-        Sprite sprite = null;
-
-        string spriteNamePlaceHolder = categoryName + "/" + PlaceHolderPrefix + spriteName;
-        spriteName = categoryName + "/" + spriteName;
-
-        if (sprites.ContainsKey(spriteName))
+        Dictionary<string, Sprite> categorySprites;
+        Sprite sprite;
+        if (sprites.TryGetValue(categoryName, out categorySprites))
         {
-            sprite = sprites[spriteName];
+            if (categorySprites.TryGetValue(spriteName, out sprite))
+            {
+                return sprite;
+            }
         }
-        else if (sprites.ContainsKey(spriteNamePlaceHolder))
-        {
-            sprite = sprites[spriteNamePlaceHolder];
-        }
-        else
-        {
-            sprite = Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
-            UnityDebugger.Debugger.LogWarningFormat("SpriteManager", "No sprite: {0}, using fallback sprite.", spriteName);
-        }
-
-        return sprite;
+        
+        // Return a pink square as a error indication
+        UnityDebugger.Debugger.LogWarningFormat("SpriteManager", "No sprite: {0}, using fallback sprite.", spriteName);
+        return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
     }
 
     /// <summary>
@@ -85,14 +74,16 @@ public static class SpriteManager
     /// <param name="categoryName">Category name.</param>
     public static Sprite GetRandomSprite(string categoryName)
     {
+        Dictionary<string, Sprite> spritesFromCategory;
         Sprite sprite = null;
 
-        Dictionary<string, Sprite> spritesFromCategory = sprites.Where(p => p.Key.StartsWith(categoryName)).ToDictionary(p => p.Key, p => p.Value);
-
-        if (spritesFromCategory.Count > 0)
+        if (sprites.TryGetValue(categoryName, out spritesFromCategory))
         {
-            System.Random rand = new System.Random();
-            sprite = spritesFromCategory.ElementAt(rand.Next(0, spritesFromCategory.Count)).Value;
+            if (spritesFromCategory.Count > 0)
+            {
+                System.Random rand = new System.Random();
+                sprite = spritesFromCategory.ElementAt(rand.Next(0, spritesFromCategory.Count)).Value;
+            }
         }
 
         return sprite;
@@ -106,9 +97,15 @@ public static class SpriteManager
     /// <param name="spriteName">Sprite name.</param>
     public static bool HasSprite(string categoryName, string spriteName)
     {
-        string spriteNamePlaceHolder = categoryName + "/" + PlaceHolderPrefix + spriteName;
-        spriteName = categoryName + "/" + spriteName;
-        return sprites.ContainsKey(spriteName) || sprites.ContainsKey(spriteNamePlaceHolder);
+        Dictionary<string, Sprite> categorySprites;
+        if (sprites.TryGetValue(categoryName, out categorySprites))
+        {
+            return categorySprites.ContainsKey(spriteName);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -131,7 +128,7 @@ public static class SpriteManager
             // Is this an image file?
             // Unity's LoadImage seems to support only png and jpg
             // NOTE: We **could** try to check file extensions, but why not just
-            // have Unity **attemp** to load the image, and if it doesn't work,
+            // have Unity **attempt** to load the image, and if it doesn't work,
             // then I guess it wasn't an image! An advantage of this, is that we
             // don't have to worry about oddball filenames, nor do we have to worry
             // about what happens if Unity adds support for more image format
@@ -250,11 +247,18 @@ public static class SpriteManager
     /// <param name="pivotPoint">Pivot point.</param>
     private static void LoadSprite(string spriteCategory, string spriteName, Texture2D imageTexture, Rect spriteCoordinates, int pixelsPerUnit, Vector2 pivotPoint)
     {
-        spriteName = spriteCategory + "/" + spriteName;
-
         Sprite s = Sprite.Create(imageTexture, spriteCoordinates, pivotPoint, pixelsPerUnit);
 
-        sprites[spriteName] = s;
+        Dictionary<string, Sprite> categorySprites;
+        if (sprites.TryGetValue(spriteCategory, out categorySprites) == false)
+        {
+            // If this category didn't exist until now, we create it
+            categorySprites = new Dictionary<string, Sprite>();
+            sprites[spriteCategory] = categorySprites;
+        }
+
+        // Add the sprite to the category
+        categorySprites[spriteName] = s;
     }
 
     /// <summary>

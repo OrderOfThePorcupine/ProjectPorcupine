@@ -16,6 +16,9 @@ using ProjectPorcupine.OrderActions;
 [MoonSharpUserData]
 public class TileType : IPrototypable, IEquatable<TileType>
 {
+    private static TileType empty;
+    private static TileType floor;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="TileType"/> class.
     /// </summary>
@@ -24,23 +27,39 @@ public class TileType : IPrototypable, IEquatable<TileType>
         PathfindingModifier = 0.0f;
         PathfindingWeight = 1.0f;
     }
-
+    
     /// <summary>
     /// Gets the empty tile type prototype.
     /// </summary>
     /// <value>The empty tile type.</value>
     public static TileType Empty
     {
-        get { return PrototypeManager.TileType.Get("empty"); }
-    }
+        get
+        {
+            if (empty == null)
+            {
+                empty = PrototypeManager.TileType.Get("empty");
+            }
 
+            return empty;
+        }
+    }
+    
     /// <summary>
     /// Gets the floor tile type prototype.
     /// </summary>
     /// <value>The floor tile type.</value>
     public static TileType Floor
     {
-        get { return PrototypeManager.TileType.Get("floor"); }
+        get
+        {
+            if (floor == null)
+            {
+                floor = PrototypeManager.TileType.Get("floor");
+            }
+
+            return floor;
+        }
     }
 
     /// <summary>

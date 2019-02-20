@@ -12,7 +12,7 @@ using UnityEngine;
 public class UtilitySpriteController : BaseSpriteController<Utility>
 {
     // Use this for initialization
-    public UtilitySpriteController(World world) : base(world, "Utility")
+    public UtilitySpriteController(World world) : base(world, "Utility", 500)
     {
         // Register our callback so that our GameObject gets updated whenever
         // the tile's type changes.
