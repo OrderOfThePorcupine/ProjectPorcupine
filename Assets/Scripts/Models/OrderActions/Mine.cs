@@ -16,6 +16,8 @@ namespace ProjectPorcupine.OrderActions
     {
         public Mine()
         {
+            Category = "mining";
+            Priority = Job.JobPriority.Medium;
         }
 
         private Mine(Mine other) : base(other)
@@ -30,6 +32,8 @@ namespace ProjectPorcupine.OrderActions
         public override Job CreateJob(Tile tile, string type)
         {
             Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            job.Priority = Priority;
+            job.Category = PrototypeManager.JobCategory.Get(Category);
 
             return job;
         }

@@ -18,6 +18,8 @@ namespace ProjectPorcupine.OrderActions
     {
         public Build()
         {
+            Category = "construct";
+            Priority = Job.JobPriority.Medium;
         }
 
         private Build(Build other) : base(other)
@@ -28,6 +30,7 @@ namespace ProjectPorcupine.OrderActions
         {
             return new Build(this);
         }
+
 
         public override Job CreateJob(Tile tile, string type)
         {
@@ -41,8 +44,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 Inventory.Select(it => new RequestedItem(it.Key, it.Value)).ToArray(),
-                Job.JobPriority.Medium, 
-                "construct");
+                Priority, 
+                Category);
                 job.Description = "job_build_" + type + "_desc";
                 job.OrderName = Type;
             }

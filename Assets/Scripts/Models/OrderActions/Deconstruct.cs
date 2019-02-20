@@ -17,6 +17,8 @@ namespace ProjectPorcupine.OrderActions
     {
         public Deconstruct()
         {
+            Category = "construct";
+            Priority = Job.JobPriority.Medium;
         }
 
         private Deconstruct(Deconstruct other) : base(other)
@@ -40,8 +42,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 null,
-                Job.JobPriority.Medium, 
-                "construct");
+                Priority,
+                Category);
                 job.Description = "job_deconstruct_" + type + "_desc";
                 job.adjacent = true;
                 job.OrderName = Type;

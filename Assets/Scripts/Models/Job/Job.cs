@@ -91,6 +91,10 @@ public class Job : ISelectable, IPrototypable
                 this.RequestedItems[item.Type] = item.Clone();
             }
         }
+        if (this.Category == null)
+        {
+            UnityDebugger.Debugger.LogError("Invalid category " + category);
+        }
     }
 
     public Job(Tile tile, TileType jobTileType, Action<Job> jobCompleted, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, string category, bool jobRepeats = false, bool adjacent = false)
@@ -117,6 +121,10 @@ public class Job : ISelectable, IPrototypable
             {
                 this.RequestedItems[item.Type] = item.Clone();
             }
+        }
+        if (this.Category == null)
+        {
+            UnityDebugger.Debugger.LogError("Invalid category " + category);
         }
     }
 
@@ -213,13 +221,13 @@ public class Job : ISelectable, IPrototypable
     public JobPriority Priority
     {
         get;
-        protected set;
+        set;
     }
 
     public JobCategory Category
     {
         get;
-        protected set;
+        set;
     }
 
     public bool IsSelected

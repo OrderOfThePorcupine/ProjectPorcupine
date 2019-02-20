@@ -16,6 +16,8 @@ namespace ProjectPorcupine.OrderActions
     {
         public Uninstall()
         {
+            Category = "construct";
+            Priority = Job.JobPriority.High;
         }
 
         private Uninstall(Uninstall other) : base(other)
@@ -39,8 +41,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 null,
-                Job.JobPriority.High, 
-                "construct");
+                Priority,
+                Category);
                 job.Description = "job_uninstall_" + type + "_desc";
                 job.adjacent = true;
                 job.OrderName = Type;
