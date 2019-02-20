@@ -38,7 +38,7 @@ public static class MathUtilities
     }
 
     /// <summary>
-    /// If a - b is less than double.Epsilon value then they are treated as equal.
+    /// If a - b is less than float.Epsilon value then they are treated as equal.
     /// </summary>
     /// <returns>true if a - b &lt; tolerance else false.</returns>
     public static bool AreEqual(this float a, float b)
@@ -48,17 +48,17 @@ public static class MathUtilities
             return true;
         }
 
-        return Math.Abs(a - b) < double.Epsilon;
+        return Math.Abs(a - b) < float.Epsilon;
     }
 
     /// <summary>
-    /// If value is lower than double.Epsilon value then value is treated as zero.
+    /// If value is lower than float.Epsilon value then value is treated as zero.
     /// </summary>
     /// <param name="value"></param>
     /// <returns>true if value is lower than tolerance value.</returns>
     public static bool IsZero(this float value)
     {
-        return Math.Abs(value) < double.Epsilon;
+        return Math.Abs(value) < float.Epsilon;
     }
 
     /// <summary>
