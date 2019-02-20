@@ -346,7 +346,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             Job job = deconstructOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Deconstruct();
-            World.Current.jobQueue.Enqueue(job);
+            World.Current.jobManager.Enqueue(job);
         }
     }
 

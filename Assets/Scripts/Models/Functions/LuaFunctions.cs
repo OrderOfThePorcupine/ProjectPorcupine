@@ -121,12 +121,13 @@ public class LuaFunctions : IFunctions
         }
         catch (ScriptRuntimeException e)
         {
-            UnityDebugger.Debugger.LogError("Lua", "[" + scriptName + "] LUA RunTime error: " + e.DecoratedMessage);
+            UnityDebugger.Debugger.LogError("Lua", "[" + scriptName + "," + functionName + "] LUA RunTime error: " + e.DecoratedMessage);
             return null;
         }
         catch (Exception e)
         {
-            UnityDebugger.Debugger.LogError("Lua", "[" + scriptName + "] Something else went wrong: " + e.Message);
+            UnityDebugger.Debugger.LogError("Lua", "[" + scriptName + "," + functionName + "] Something else went wrong: " + e.Message);
+            UnityDebugger.Debugger.LogError("Lua", e);
             return null;
         }
     }

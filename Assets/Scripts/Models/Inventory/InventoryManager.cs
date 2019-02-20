@@ -20,10 +20,14 @@ public class InventoryManager
 {
     private static readonly string InventoryManagerLogChanel = "InventoryManager";
 
+    private Dictionary<string, List<InventoryOfTypeCreated>> inventoryTypeCreated = new Dictionary<string, List<InventoryOfTypeCreated>>();
+
     public InventoryManager()
     {
         Inventories = new Dictionary<string, List<Inventory>>();
     }
+
+    public delegate void InventoryOfTypeCreated(Inventory inventory);
 
     public event Action<Inventory> InventoryCreated;
 
@@ -39,6 +43,21 @@ public class InventoryManager
 
         Furniture furniture = inventory.Tile.Furniture;
         return furniture == null || canTakeFromStockpile == true || furniture.HasTypeTag("Storage") == false;
+    }
+
+    public void RegisterInventoryTypeCreated(InventoryOfTypeCreated func, string type)
+    {
+        if (inventoryTypeCreated.ContainsKey(type) == false)
+        {
+            inventoryTypeCreated[type] = new List<InventoryOfTypeCreated>();
+        }
+
+        inventoryTypeCreated[type].Add(func);
+    }
+
+    public void UnregisterInventoryTypeCreated(InventoryOfTypeCreated func, string type)
+    {
+        inventoryTypeCreated[type].Remove(func);
     }
 
     public Tile GetFirstTileWithValidInventoryPlacement(int maxOffset, Tile inTile, Inventory inv)
@@ -341,6 +360,17 @@ public class InventoryManager
         }
     }
 
+    public void InventoryAvailable(Inventory inventory)
+    {
+        if (inventoryTypeCreated.ContainsKey(inventory.Type))
+        {
+            foreach (InventoryOfTypeCreated func in inventoryTypeCreated[inventory.Type])
+            {
+                func(inventory);
+            }
+        }
+    }
+
     private void CleanupInventory(Inventory inventory)
     {
         if (inventory.StackSize != 0)
@@ -377,8 +407,7 @@ public class InventoryManager
         {
             handler(inventory);
 
-            // Let the JobQueue know there is new inventory available.
-            World.Current.jobQueue.ReevaluateReachability();
+            InventoryAvailable(inventory);
         }
     }
 

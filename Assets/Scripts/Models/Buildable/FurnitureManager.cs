@@ -27,6 +27,8 @@ public class FurnitureManager : IEnumerable<Furniture>
         furnitures = new List<Furniture>();
     }
 
+    public delegate void RoomsUpdated();
+
     /// <summary>
     /// Occurs when a Furniture is created.
     /// </summary>
@@ -88,7 +90,6 @@ public class FurnitureManager : IEnumerable<Furniture>
         if (doRoomFloodFill && furniture.EnclosesRoom)
         {
             World.Current.RoomManager.DoRoomFloodFill(furniture.Tile, true);
-            World.Current.jobQueue.ReevaluateReachability();
         }
 
         if (Created != null)
@@ -226,8 +227,5 @@ public class FurnitureManager : IEnumerable<Furniture>
         furnitures.Remove(furniture);
         TimeManager.Instance.UnregisterFastUpdate(furniture);
         TimeManager.Instance.UnregisterSlowUpdate(furniture);
-
-        // Movement to jobs might have been opened, let's move jobs back into the queue to be re-evaluated.
-        World.Current.jobQueue.ReevaluateReachability();
     }
 }
