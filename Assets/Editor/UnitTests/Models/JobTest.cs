@@ -192,4 +192,13 @@ public class JobTest
         Assert.IsFalse(character.CategoriesOfPriority(CharacterJobPriority.Low).Contains(haulCategory));
         Assert.IsTrue(character.CategoriesOfPriority(CharacterJobPriority.Low).Contains(constructCategory));
     }
+
+    [Test]
+    public void T11_JobPriorities()
+    {
+        // This is to make sure that the priorities are set in the right order.
+        Assert.IsTrue(Job.JobPriority.High < Job.JobPriority.Low);
+        Assert.IsTrue(Job.JobPriority.High < Job.JobPriority.Medium);
+        Assert.IsTrue(Job.JobPriority.Medium < Job.JobPriority.Low);
+    }
 }
