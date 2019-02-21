@@ -44,13 +44,13 @@ public class JobManager
     /// <param name="job">The job to be inserted into the Queue.</param>
     public void Enqueue(Job job)
     {
-        UnityDebugger.Debugger.LogFormat("JobManager","Enqueue({0})", job.Type);
+        UnityDebugger.Debugger.LogFormat("JobManager", "Enqueue({0})", job.Type);
 
         job.IsBeingWorked = false;
 
         if (job.Category == null)
         {
-            UnityDebugger.Debugger.LogErrorFormat("JobManager","Invalid category for job {1}", job);
+            UnityDebugger.Debugger.LogErrorFormat("JobManager", "Invalid category for job {1}", job);
         }
 
         jobQueue[job.Category].Add(job);
@@ -74,7 +74,7 @@ public class JobManager
     /// </summary>
     public Job GetJob(Character character)
     {
-        UnityDebugger.Debugger.LogFormat("JobManager","{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
+        UnityDebugger.Debugger.LogFormat("JobManager", "{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
         if (jobQueue.Count == 0)
         {
             return null;
@@ -90,7 +90,7 @@ public class JobManager
                     continue;
                 }
 
-                UnityDebugger.Debugger.LogFormat("JobManager","{0} Looking for job of category {1} - {2} options available", character.Name, category.Type, jobQueue[category].Count);
+                UnityDebugger.Debugger.LogFormat("JobManager", "{0} Looking for job of category {1} - {2} options available", character.Name, category.Type, jobQueue[category].Count);
 
                 Job.JobPriority bestJobPriority = Job.JobPriority.Low;
 
@@ -131,7 +131,7 @@ public class JobManager
 
                 if (bestJob != null)
                 {
-                    UnityDebugger.Debugger.LogFormat("JobManager","{0} Job Assigned {1} at {2}", character.ID, bestJob, bestJob.tile);
+                    UnityDebugger.Debugger.LogFormat("JobManager", "{0} Job Assigned {1} at {2}", character.ID, bestJob, bestJob.tile);
                     if (JobModified != null)
                     {
                         JobModified(bestJob);
@@ -175,7 +175,7 @@ public class JobManager
         if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
         {
             string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            UnityDebugger.Debugger.LogFormat("JobManager"," - missingInventory {0}", missing);
+            UnityDebugger.Debugger.LogFormat("JobManager", " - missingInventory {0}", missing);
             job.SuspendWaitingForInventory(missing);
             if (JobModified != null)
             {
@@ -188,7 +188,7 @@ public class JobManager
             job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
         {
             // No one can reach the job.
-            UnityDebugger.Debugger.LogFormat("JobManager","JobQueue", "- Job can't be reached");
+            UnityDebugger.Debugger.LogFormat("JobManager", "JobQueue", "- Job can't be reached");
             job.Suspend();
             if (JobModified != null)
             {
@@ -199,10 +199,10 @@ public class JobManager
         }
         else
         {
-            UnityDebugger.Debugger.LogFormat("JobManager"," - {0}", job.acceptsAny ? "Any" : "All");
+            UnityDebugger.Debugger.LogFormat("JobManager", " - {0}", job.acceptsAny ? "Any" : "All");
             foreach (RequestedItem item in job.RequestedItems.Values)
             {
-                UnityDebugger.Debugger.LogFormat("JobManager","   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
+                UnityDebugger.Debugger.LogFormat("JobManager", "   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
             }
         }
 
