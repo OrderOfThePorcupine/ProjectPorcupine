@@ -30,8 +30,11 @@ public class JobManager
     }
 
     public delegate void JobChanged(Job job);
+
     public event JobChanged OnJobCreated;
+
     public event JobChanged OnJobModified;
+
     public event JobChanged OnJobRemoved;
 
     /// <summary>
@@ -85,6 +88,7 @@ public class JobManager
                 {
                     continue;
                 }
+
                 DebugLog("{0} Looking for job of category {1} - {2} options available", character.Name, category.Type, jobQueue[category].Count);
 
                 Job bestJob = null;
@@ -107,6 +111,7 @@ public class JobManager
                         {
                             OnJobModified(job);
                         }
+
                         return job;
                     }
                 }
@@ -152,6 +157,7 @@ public class JobManager
             {
                 OnJobModified(job);
             }
+
             return false;
         }
         else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
@@ -164,6 +170,7 @@ public class JobManager
             {
                 OnJobModified(job);
             }
+
             return false;
         }
         else
