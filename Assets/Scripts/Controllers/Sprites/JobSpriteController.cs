@@ -23,7 +23,7 @@ public class JobSpriteController : BaseSpriteController<Job>
     {
         fsc = furnitureSpriteController;
         usc = utilitySpriteController;
-        world.jobManager.OnJobCreated += OnCreated;
+        world.jobManager.JobCreated += OnCreated;
 
         foreach (Job job in world.jobManager.PeekAllJobs())
         {
@@ -41,7 +41,7 @@ public class JobSpriteController : BaseSpriteController<Job>
 
     public override void RemoveAll()
     {
-        world.jobManager.OnJobCreated -= OnCreated;
+        world.jobManager.JobCreated -= OnCreated;
 
         foreach (Job job in world.jobManager.PeekAllJobs())
         {
