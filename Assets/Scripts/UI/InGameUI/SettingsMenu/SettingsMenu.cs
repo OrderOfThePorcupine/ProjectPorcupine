@@ -186,9 +186,10 @@ public class SettingsMenu : MonoBehaviour
     public void Cancel()
     {
         // If we have made no changes we can freely exit
-        // Issue #155 Fix
         if (changesTracker.Count == 0)
         {
+            currentCategory = string.Empty;
+            GameController.Instance.IsModal = false;
             mainRoot.SetActive(false);
             return;
         }
@@ -207,6 +208,9 @@ public class SettingsMenu : MonoBehaviour
         else
         {
             // We can't display cancel box so just automatically cancel
+            changesTracker.Clear();
+            currentCategory = string.Empty;
+            GameController.Instance.IsModal = false;
             mainRoot.SetActive(false);
             return;
         }
