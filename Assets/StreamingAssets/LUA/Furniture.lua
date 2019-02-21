@@ -223,6 +223,7 @@ function Stockpile_UpdateAction( furniture, deltaTime )
     		0,
     		itemsDesired,
     		Job.JobPriority.Low,
+			"hauling",
     		false
   	)
   	job.Description = "job_stockpile_moving_desc"
@@ -279,6 +280,7 @@ function MiningDroneStation_UpdateAction( furniture, deltaTime )
 		1,
 		nil,
 		Job.JobPriority.Medium,
+		"hauling",
 		true	-- This job repeats until the destination tile is full.
 	)
 
@@ -354,6 +356,7 @@ function MetalSmelter_UpdateAction(furniture, deltaTime)
         0.4,
         itemsDesired,
         Job.JobPriority.Medium,
+		"hauling",
         false
     )
 
@@ -387,6 +390,7 @@ function CloningPod_UpdateAction(furniture, deltaTime)
         10,
         nil,
         Job.JobPriority.Medium,
+		"workshop",
         false
     )
 
@@ -639,6 +643,7 @@ function OreMine_CreateMiningJob(furniture, character)
         0,
         nil,
         Job.JobPriority.High,
+		"mining",
         false,
         false,
         false,

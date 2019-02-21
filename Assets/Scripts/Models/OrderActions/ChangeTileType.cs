@@ -42,7 +42,8 @@ namespace ProjectPorcupine.OrderActions
                 Tile.ChangeTileTypeJobComplete,
                 JobTime,
                 Inventory.Select(it => new RequestedItem(it.Key, it.Value)).ToArray(),
-                Job.JobPriority.High,
+                Job.JobPriority.High, 
+                "construct",
                 jobRepeats: false,
                 adjacent: true);
                 job.Description = "job_build_" + type + "_desc";

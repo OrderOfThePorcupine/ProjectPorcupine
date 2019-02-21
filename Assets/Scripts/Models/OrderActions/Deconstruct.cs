@@ -17,6 +17,8 @@ namespace ProjectPorcupine.OrderActions
     {
         public Deconstruct()
         {
+            Category = PrototypeManager.JobCategory.Get("construct");
+            Priority = Job.JobPriority.Medium;
         }
 
         private Deconstruct(Deconstruct other) : base(other)
@@ -30,7 +32,15 @@ namespace ProjectPorcupine.OrderActions
 
         public override Job CreateJob(Tile tile, string type)
         {
-            Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            Job job = null;
+            if (tile != null)
+            {
+                CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            }
+            else
+            {
+                UnityDebugger.Debugger.LogError("Deconstruct", "Invalid tile detected. If this wasn't a test, you have an issue.");
+            }
 
             if (job == null)
             {
@@ -40,7 +50,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 null,
-                Job.JobPriority.High);
+                Priority,
+                Category);
                 job.Description = "job_deconstruct_" + type + "_desc";
                 job.adjacent = true;
                 job.OrderName = Type;

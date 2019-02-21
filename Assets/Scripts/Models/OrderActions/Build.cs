@@ -18,6 +18,8 @@ namespace ProjectPorcupine.OrderActions
     {
         public Build()
         {
+            Category = PrototypeManager.JobCategory.Get("construct");
+            Priority = Job.JobPriority.Medium;
         }
 
         private Build(Build other) : base(other)
@@ -31,7 +33,15 @@ namespace ProjectPorcupine.OrderActions
 
         public override Job CreateJob(Tile tile, string type)
         {
-            Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            Job job = null;
+            if (tile != null)
+            {
+                job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            }
+            else
+            {
+                UnityDebugger.Debugger.LogError("Build", "Invalid tile detected. If this wasn't a test, you have an issue.");
+            }
 
             if (job == null)
             {
@@ -41,7 +51,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 Inventory.Select(it => new RequestedItem(it.Key, it.Value)).ToArray(),
-                Job.JobPriority.High);
+                Priority, 
+                Category);
                 job.Description = "job_build_" + type + "_desc";
                 job.OrderName = Type;
             }

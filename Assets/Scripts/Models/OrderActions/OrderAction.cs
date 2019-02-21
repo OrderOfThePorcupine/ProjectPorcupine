@@ -32,6 +32,8 @@ namespace ProjectPorcupine.OrderActions
             Inventory = other.Inventory;
             Type = other.Type;
             JobTime = other.JobTime;
+            Category = other.Category;
+            Priority = other.Priority;
         }
 
         public string Type { get; set; }
@@ -39,6 +41,10 @@ namespace ProjectPorcupine.OrderActions
         public float JobTime { get; set; }
 
         public string JobTimeFunction { get; set; }
+
+        public virtual JobCategory Category { get; protected set; }
+
+        public virtual Job.JobPriority Priority { get; protected set; }
 
         public Dictionary<string, int> Inventory { get; set; }
 
@@ -53,10 +59,20 @@ namespace ProjectPorcupine.OrderActions
 
             if (orderActionTypes.ContainsKey(orderActionType))
             {
+                JToken innerJson = orderActionProp.Value;
                 Type t = orderActionTypes[orderActionType];
 
                 OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
                 orderAction.Type = orderActionProp.Name;
+                string prevCategory = string.Empty;
+                if (orderAction.Category != null)
+                {
+                    prevCategory = orderAction.Category.Type;
+                }
+
+                string tempCategory = PrototypeReader.ReadJson(prevCategory, innerJson["JobCategory"]);
+                orderAction.Category = PrototypeManager.JobCategory.Get(tempCategory);
+                orderAction.Priority = (Job.JobPriority)PrototypeReader.ReadJson((int)orderAction.Priority, innerJson["JobPriority"]);
                 return orderAction;
             }
             else

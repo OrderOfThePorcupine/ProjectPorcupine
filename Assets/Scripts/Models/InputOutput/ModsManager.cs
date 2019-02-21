@@ -71,6 +71,50 @@ public class ModsManager
     }
 
     /// <summary>
+    /// Sets up all of the prototype managers, useful in doing unit tests and always run as a part of normal code.
+    /// </summary>
+    public void SetupPrototypeHandlers()
+    {
+        HandlePrototypes("Tile", PrototypeManager.TileType.LoadJsonPrototypes);
+        HandlePrototypes("Furniture", PrototypeManager.Furniture.LoadJsonPrototypes);
+        HandlePrototypes("Utility", PrototypeManager.Utility.LoadJsonPrototypes);
+        HandlePrototypes("RoomBehavior", PrototypeManager.RoomBehavior.LoadJsonPrototypes);
+        HandlePrototypes("Inventory", PrototypeManager.Inventory.LoadJsonPrototypes);
+        HandlePrototypes("Need", PrototypeManager.Need.LoadJsonPrototypes);
+        HandlePrototypes("Trader", PrototypeManager.Trader.LoadJsonPrototypes);
+        HandlePrototypes("Currency", PrototypeManager.Currency.LoadJsonPrototypes);
+        HandlePrototypes("GameEvent", PrototypeManager.GameEvent.LoadJsonPrototypes);
+        HandlePrototypes("ScheduledEvent", PrototypeManager.ScheduledEvent.LoadJsonPrototypes);
+        HandlePrototypes("Stat", PrototypeManager.Stat.LoadJsonPrototypes);
+        HandlePrototypes("Quest", PrototypeManager.Quest.LoadJsonPrototypes);
+        HandlePrototypes("Headline", PrototypeManager.Headline.LoadJsonPrototypes);
+        HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
+        HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
+        HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
+    }
+
+    /// <summary>
+    /// Takes in a ditionary of tag names and JTokens, which is then parsed by the prototype managers.
+    /// </summary>
+    /// <param name="tagNameToProperty"></param>
+    public void LoadPrototypesFromJTokens(Dictionary<string, JToken> tagNameToProperty)
+    {
+        foreach (KeyValuePair<string, List<Action<JProperty>>> prototypeHandler in prototypeHandlers)
+        {
+            foreach (Action<JProperty> handler in prototypeHandler.Value)
+            {
+                if (tagNameToProperty.ContainsKey(prototypeHandler.Key))
+                {
+                    foreach (JToken prototypeGroup in tagNameToProperty[prototypeHandler.Key])
+                    {
+                        handler((JProperty)prototypeGroup);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Return the path to the mod folder.
     /// </summary>
     private static string GetPathToModsFolder()
@@ -114,21 +158,7 @@ public class ModsManager
         LoadFunctions("FurnitureFunctions.cs", "Furniture");
         LoadFunctions("OverlayFunctions.cs", "Overlay");
 
-        HandlePrototypes("Tile", PrototypeManager.TileType.LoadJsonPrototypes);
-        HandlePrototypes("Furniture", PrototypeManager.Furniture.LoadJsonPrototypes);
-        HandlePrototypes("Utility", PrototypeManager.Utility.LoadJsonPrototypes);
-        HandlePrototypes("RoomBehavior", PrototypeManager.RoomBehavior.LoadJsonPrototypes);
-        HandlePrototypes("Inventory", PrototypeManager.Inventory.LoadJsonPrototypes);
-        HandlePrototypes("Need", PrototypeManager.Need.LoadJsonPrototypes);
-        HandlePrototypes("Trader", PrototypeManager.Trader.LoadJsonPrototypes);
-        HandlePrototypes("Currency", PrototypeManager.Currency.LoadJsonPrototypes);
-        HandlePrototypes("GameEvent", PrototypeManager.GameEvent.LoadJsonPrototypes);
-        HandlePrototypes("ScheduledEvent", PrototypeManager.ScheduledEvent.LoadJsonPrototypes);
-        HandlePrototypes("Stat", PrototypeManager.Stat.LoadJsonPrototypes);
-        HandlePrototypes("Quest", PrototypeManager.Quest.LoadJsonPrototypes);
-        HandlePrototypes("Headline", PrototypeManager.Headline.LoadJsonPrototypes);
-        HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
-        HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
+        SetupPrototypeHandlers();
 
         LoadCharacterNames("CharacterNames.txt");
 
@@ -154,6 +184,7 @@ public class ModsManager
         HandlePrototypes("ConsoleCommand", PrototypeManager.DevConsole.LoadJsonPrototypes);
         HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
         HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
+        HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
@@ -222,6 +253,7 @@ public class ModsManager
         for (int i = 0; i < prototypeFiles.Length; i++)
         {
             FileInfo file = prototypeFiles[i];
+            UnityDebugger.Debugger.Log("ModsManager", "Loading " + file.FullName);
             StreamReader reader = File.OpenText(file.FullName);
             JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
             string tagName = ((JProperty)protoJson.First).Name;
@@ -229,16 +261,7 @@ public class ModsManager
             tagNameToProperty.Add(tagName, protoJson);
         }
 
-        foreach (KeyValuePair<string, List<Action<JProperty>>> prototypeHandler in prototypeHandlers)
-        {
-            foreach (Action<JProperty> handler in prototypeHandler.Value)
-            {
-                foreach (JToken prototypeGroup in tagNameToProperty[prototypeHandler.Key])
-                {
-                    handler((JProperty)prototypeGroup);
-                }
-            }
-        }
+        LoadPrototypesFromJTokens(tagNameToProperty);
     }
 
     /// <summary>
