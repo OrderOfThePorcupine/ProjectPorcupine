@@ -102,7 +102,7 @@ public class JobManager
                     }
 
                     // Lower numbers indicate higher priority.
-                    if (bestJobPriority < job.Priority)
+                    if (bestJobPriority > job.Priority)
                     {
                         bestJobPriority = job.Priority;
                     }
