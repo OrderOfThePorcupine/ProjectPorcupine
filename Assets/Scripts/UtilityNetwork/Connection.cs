@@ -17,12 +17,7 @@ namespace ProjectPorcupine.PowerNetwork
     [MoonSharpUserData]
     public class Connection
     {
-        private static readonly string InputRateAttributeName = "inputRate";
-        private static readonly string OutputRateAttributeName = "outputRate";
-        private static readonly string CapacityAttributeName = "capacity";
-        private static readonly string AccumulatedPowerAttributeName = "accumulatedPower";
-
-        private readonly double[] capacityThresholds = new[] { 0.0, 0.25, 0.5, 0.75, 1.0 };
+        private readonly float[] capacityThresholds = new float[] { 0.0f, 0.25f, 0.5f, 0.75f, 1.0f };
 
         private int currentThresholdIndex = 0;
         private float accumulatedPower;
