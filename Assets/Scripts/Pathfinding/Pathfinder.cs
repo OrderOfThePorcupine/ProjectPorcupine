@@ -222,10 +222,10 @@ namespace ProjectPorcupine.Pathfinding
                 }
 
                 Tile targetTile = null;
-                float distance = 0f;
+                float distance = float.MaxValue;
                 foreach (Furniture furniture in World.Current.FurnitureManager.Where(furniture => furniture.Type == type))
                 {
-                    if (targetTile == null || Vector3.Distance(nearestExit.Vector3, furniture.Tile.Vector3) < distance)
+                    if (Vector3.Distance(nearestExit.Vector3, furniture.Tile.Vector3) < distance)
                     {
                         distance = Vector3.Distance(nearestExit.Vector3, furniture.Tile.Vector3);
                         targetTile = furniture.Tile;

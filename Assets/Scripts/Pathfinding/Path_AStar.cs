@@ -138,7 +138,6 @@ public class Path_AStar
 
         // We don't have a failure state, maybe? It's just that the
         // path list will be null.
-
         PathTime = float.MaxValue;
         Duration = Time.realtimeSinceStartup - startTime;
     }
