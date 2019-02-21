@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
+using ProjectPorcupine.Pathfinding;
 
 public class JobManager
 {
@@ -91,9 +92,7 @@ public class JobManager
 
                 DebugLog("{0} Looking for job of category {1} - {2} options available", character.Name, category.Type, jobQueue[category].Count);
 
-                Job bestJob = null;
                 Job.JobPriority bestJobPriority = Job.JobPriority.Low;
-                int bestJobDist = int.MaxValue;
 
                 foreach (Job job in jobQueue[category])
                 {
@@ -102,18 +101,42 @@ public class JobManager
                         continue;
                     }
 
+                    if (bestJobPriority > job.Priority)
+                    {
+                        bestJobPriority = job.Priority;
+                    }
+                }
+
+                Job bestJob = null;
+                float bestJobPathtime = int.MaxValue;
+
+                foreach (Job job in jobQueue[category])
+                {
+                    if (job.IsActive == false || job.IsBeingWorked == true || job.Priority != bestJobPriority)
+                    {
+                        continue;
+                    }
+
                     if (CanJobRun(job))
                     {
-                        DebugLog("{0} Job Assigned {1} at {2}", character.ID, job, job.tile);
-
-                        // TODO: Don't just return the first job, return the best one!
-                        if (JobModified != null)
+                        float pathtime = Pathfinder.FindMinPathTime(character.CurrTile, job.tile, job.adjacent, bestJobPathtime);
+                        if (pathtime < bestJobPathtime)
                         {
-                            JobModified(job);
+                            bestJob = job;
+                            bestJobPathtime = pathtime;
                         }
-
-                        return job;
                     }
+                }
+
+                if (bestJob != null)
+                {
+                    DebugLog("{0} Job Assigned {1} at {2}", character.ID, bestJob, bestJob.tile);
+                    if (JobModified != null)
+                    {
+                        JobModified(bestJob);
+                    }
+
+                    return bestJob;
                 }
             }
         }

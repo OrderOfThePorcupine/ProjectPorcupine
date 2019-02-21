@@ -47,6 +47,20 @@ namespace ProjectPorcupine.Pathfinding
         }
 
         /// <summary>
+        /// Calculates the distance between tiles, bailing out if that distance exceeds a threshold.
+        /// </summary>
+        /// <param name="start">Start tile.</param>
+        /// <param name="end">The Goal Tile.</param>
+        /// <param name="adjacent">Allows being adjacent.</param>
+        /// <param name="maxPathTime">Maximum path time before bail out.</param>
+        /// <returns>Path time between start and end tiles.</returns>
+        public static float FindMinPathTime(Tile start, Tile end, bool adjacent = false, float maxPathTime = float.MaxValue)
+        {
+            Path_AStar resolver = new Path_AStar(World.Current, start, GoalTileEvaluator(end, adjacent), ManhattanDistance(end), maxPathTime);
+            return resolver.PathTime;
+        }
+
+        /// <summary>
         /// Finds the path to tile.
         /// </summary>
         /// <returns>The path to tile.</returns>
