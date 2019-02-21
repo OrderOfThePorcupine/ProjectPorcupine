@@ -39,12 +39,11 @@ public class TileSpriteController : BaseSpriteController<Tile>
         TileLookup[TileType.Empty.Type] = null;
 
         objectParent.AddComponent<Grid>();
-
-        Sprite floor = SpriteManager.GetSprite("Tile", "floor");
+        
         errorTile = ScriptableObject.CreateInstance<UnityEngine.Tilemaps.Tile>();
-        errorTile.sprite = floor;
+        errorTile.sprite = SpriteManager.CreateErrorSprite();
         errorTile.name = "ErrorTile";
-        errorTile.color = Color.red;
+        errorTile.color = Color.white;
 
         tilemaps = new Tilemap[world.Depth];
         tilemapRenderers = new TilemapRenderer[world.Depth];
