@@ -26,7 +26,7 @@ public class Path_AStar
         this.path = path;
     }
 
-    public Path_AStar(World world, Tile tileStart, Pathfinder.GoalEvaluator isGoal, Pathfinder.PathfindingHeuristic costEstimate)
+    public Path_AStar(World world, Tile tileStart, Pathfinder.GoalEvaluator isGoal, Pathfinder.PathfindingHeuristic costEstimate, float maxPathTime = float.MaxValue)
     {
         float startTime = Time.realtimeSinceStartup;
 
@@ -92,6 +92,7 @@ public class Path_AStar
             if (isGoal(current.data))
             {
                 Duration = Time.realtimeSinceStartup - startTime;
+                PathTime = g_score[current];
                 Reconstruct_path(came_From, current);
                 return;
             }
@@ -116,6 +117,12 @@ public class Path_AStar
                     continue;
                 }
 
+                if (tentative_g_score > maxPathTime)
+                {
+                    // We have reached the maximum path time, and not found a path. No need to add this to the open set.
+                    continue;
+                }
+
                 came_From[neighbor] = current;
                 g_score[neighbor] = tentative_g_score;
                 f_score[neighbor] = g_score[neighbor] + costEstimate(neighbor.data);
@@ -131,11 +138,16 @@ public class Path_AStar
 
         // We don't have a failure state, maybe? It's just that the
         // path list will be null.
+
+        PathTime = float.MaxValue;
         Duration = Time.realtimeSinceStartup - startTime;
     }
 
     /// Contains the time it took to find the path
     public float Duration { get; private set; }
+
+    /// Distance for the minimum path found
+    public float PathTime { get; protected set; }
 
     public Tile Dequeue()
     {
