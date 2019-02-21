@@ -8,8 +8,8 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Mono.CSharp;
 using MoonSharp.Interpreter;
@@ -100,7 +100,9 @@ public class CSharpFunctions : IFunctions
                     UnityDebugger.Debugger.LogError(
                         "CSharp",
                         string.Format("[{0}] CSharp compile errors ({1}): {2}", scriptName, CompilationResult.Errors.Count, CompilationResult.GetErrorsLog()));
-                } else if (CompilationResult.HasWarnings) {
+                }
+                else if (CompilationResult.HasWarnings)
+                {
                     UnityDebugger.Debugger.LogWarning(
                         "CSharp",
                         string.Format("[{0}] CSharp warning ({1}): {2}", scriptName, CompilationResult.Warnings.Count, CompilationResult.GetWarningsLog()));
@@ -114,8 +116,8 @@ public class CSharpFunctions : IFunctions
         catch (Exception ex)
         {
             UnityDebugger.Debugger.LogError(
-                        "CSharp",
-                        string.Format("[{0}] Problem loading functions from CSharp script: {1}", scriptName, ex.ToString()));
+                "CSharp",
+                string.Format("[{0}] Problem loading functions from CSharp script: {1}", scriptName, ex.ToString()));
         }
 
         return true;

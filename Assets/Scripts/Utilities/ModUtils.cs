@@ -134,7 +134,8 @@ public static class ModUtils
         if (file.StartsWith("~"))
         {
             return file.Replace("~", ModUtils.HomeDirPath());
-        } else
+        }
+        else
         {
             return Application.streamingAssetsPath + file;
         }
@@ -146,6 +147,7 @@ public static class ModUtils
         {
             string drive = System.Environment.GetEnvironmentVariable("HOMEDRIVE");
             string path = System.Environment.GetEnvironmentVariable("HOMEPATH");
+
             // home path already includes the backslash so we can just return them
             return drive + path;
         }

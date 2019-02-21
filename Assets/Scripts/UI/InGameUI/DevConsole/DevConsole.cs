@@ -302,6 +302,7 @@ namespace DeveloperConsole
                 {
                     ShowHelpMethod(commandToCall);
                 }
+
                 return;
             }
 
@@ -625,10 +626,11 @@ namespace DeveloperConsole
             }
 
             // Each first word is in green the other is in white
-            string result = "";
+            string result = string.Empty;
             string[] split = description.Parameters.Split();
 
-            for (int i = 0; i < split.Length - 1; i += 2) {
+            for (int i = 0; i < split.Length - 1; i += 2)
+            {
                 result += " <color=teal>" + split[i] + "</color> <color=white>" + split[i + 1] + "</color>";
             }
 
@@ -963,7 +965,7 @@ namespace DeveloperConsole
             if (selectedCandidate != -1)
             {
                 autoComplete.gameObject.SetActive(true);
-                autoCompleteTextElement.text = "";
+                autoCompleteTextElement.text = string.Empty;
 
                 // Recreate from possible candidates
                 for (int i = 0; i < possibleCandidates.Count; i++)
