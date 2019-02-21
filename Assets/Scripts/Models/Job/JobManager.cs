@@ -106,7 +106,7 @@ public class JobManager
                     {
                         DebugLog("{0} Job Assigned {1} at {2}", character.ID, job, job.tile);
 
-                        //TODO: Don't just return the first job, return the best one!
+                        // TODO: Don't just return the first job, return the best one!
                         if (OnJobModified != null)
                         {
                             OnJobModified(job);
