@@ -31,11 +31,11 @@ public class JobManager
 
     public delegate void JobChanged(Job job);
 
-    public event JobChanged OnJobCreated;
+    public event JobChanged JobCreated;
 
-    public event JobChanged OnJobModified;
+    public event JobChanged JobModified;
 
-    public event JobChanged OnJobRemoved;
+    public event JobChanged JobRemoved;
 
     /// <summary>
     /// Add a job to the JobQueue.
@@ -62,9 +62,9 @@ public class JobManager
             return;
         }
 
-        if (OnJobCreated != null)
+        if (JobCreated != null)
         {
-            OnJobCreated(job);
+            JobCreated(job);
         }
     }
 
@@ -107,9 +107,9 @@ public class JobManager
                         DebugLog("{0} Job Assigned {1} at {2}", character.ID, job, job.tile);
 
                         // TODO: Don't just return the first job, return the best one!
-                        if (OnJobModified != null)
+                        if (JobModified != null)
                         {
-                            OnJobModified(job);
+                            JobModified(job);
                         }
 
                         return job;
@@ -125,9 +125,9 @@ public class JobManager
     {
         jobQueue[job.Category].Remove(job);
 
-        if (OnJobRemoved != null)
+        if (JobRemoved != null)
         {
-            OnJobCreated(job);
+            JobRemoved(job);
         }
     }
 
@@ -153,9 +153,9 @@ public class JobManager
             string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
             DebugLog(" - missingInventory {0}", missing);
             job.SuspendWaitingForInventory(missing);
-            if (OnJobModified != null)
+            if (JobModified != null)
             {
-                OnJobModified(job);
+                JobModified(job);
             }
 
             return false;
@@ -166,9 +166,9 @@ public class JobManager
             // No one can reach the job.
             DebugLog("JobQueue", "- Job can't be reached");
             job.Suspend();
-            if (OnJobModified != null)
+            if (JobModified != null)
             {
-                OnJobModified(job);
+                JobModified(job);
             }
 
             return false;
@@ -185,15 +185,13 @@ public class JobManager
         return true;
     }
 
-    [System.Diagnostics.Conditional("FSM_DEBUG_LOG")]
     private void DebugLog(string message, params object[] par)
     {
-        UnityDebugger.Debugger.LogFormat("FSM", message, par);
+        UnityDebugger.Debugger.LogFormat("JobManager", message, par);
     }
 
-    [System.Diagnostics.Conditional("FSM_DEBUG_LOG")]
     private void DebugLogError(string message, params object[] par)
     {
-        UnityDebugger.Debugger.LogErrorFormat("FSM", message, par);
+        UnityDebugger.Debugger.LogErrorFormat("JobManager", message, par);
     }
 }
