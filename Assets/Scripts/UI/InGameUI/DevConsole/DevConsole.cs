@@ -105,10 +105,10 @@ namespace DeveloperConsole
         private ScrollRect autoComplete;
 
         /// <summary>
-        /// Holds possible candidates.
+        /// The autocomplete text element to write to.
         /// </summary>
         [SerializeField]
-        private GameObject contentAutoComplete;
+        private Text autoCompleteTextElement;
 
         /// <summary>
         /// The scrolling rect for the main console logger.
@@ -351,6 +351,8 @@ namespace DeveloperConsole
                             }
                         }
 
+                        // only add valid commands
+                        instance.macroHistory.Add(command);
                         commandToCall.ExecuteCommand(args);
                     }
                 }
@@ -708,10 +710,6 @@ namespace DeveloperConsole
                 // Add Text to log, history then execute
                 Log("$ " + inputText);
                 history.Add(inputText);
-                if (recordingMacro)
-                {
-                    macroHistory.Add(inputText);
-                }
 
                 Execute(inputText);
             }
@@ -965,27 +963,18 @@ namespace DeveloperConsole
             if (selectedCandidate != -1)
             {
                 autoComplete.gameObject.SetActive(true);
-
-                // Delete current children
-                foreach (Transform child in contentAutoComplete.transform)
-                {
-                    Destroy(child.gameObject);
-                }
+                autoCompleteTextElement.text = "";
 
                 // Recreate from possible candidates
                 for (int i = 0; i < possibleCandidates.Count; i++)
                 {
-                    GameObject go = Instantiate(Resources.Load<GameObject>("UI/Console/DevConsole_AutoCompleteOption"));
-                    go.transform.SetParent(contentAutoComplete.transform);
-
-                    // Quick way to add component / text
                     if (i != selectedCandidate)
                     {
-                        go.GetComponent<Text>().text = "<color=white>" + possibleCandidates[i] + "</color>";
+                        autoCompleteTextElement.text += "<color=white>" + possibleCandidates[i] + "</color>\n";
                     }
                     else
                     {
-                        go.GetComponent<Text>().text = "<color=yellow>" + possibleCandidates[i] + "</color>";
+                        autoCompleteTextElement.text += "<color=yellow>" + possibleCandidates[i] + "</color>\n";
                     }
                 }
             }

@@ -142,9 +142,17 @@ public static class ModUtils
 
     public static string HomeDirPath()
     {
-        string envHome = SystemInfo.operatingSystemFamily == OperatingSystemFamily.Windows ? "HOMEPATH" : "HOME";
-        string home = System.Environment.GetEnvironmentVariable(envHome);
-        return home;
+        if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.Windows)
+        {
+            string drive = System.Environment.GetEnvironmentVariable("HOMEDRIVE");
+            string path = System.Environment.GetEnvironmentVariable("HOMEPATH");
+            // home path already includes the backslash so we can just return them
+            return drive + path;
+        }
+        else
+        {
+            return System.Environment.GetEnvironmentVariable("HOME");
+        }
     }
 
     public static int Min(int a, int b)
