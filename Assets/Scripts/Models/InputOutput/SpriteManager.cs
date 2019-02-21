@@ -47,7 +47,7 @@ public static class SpriteManager
     /// <summary>
     /// Creates a sprite with an error texture.
     /// </summary>
-    /// <returns>The error sprite</returns>
+    /// <returns>The error sprite.</returns>
     public static Sprite CreateErrorSprite()
     {
         return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
