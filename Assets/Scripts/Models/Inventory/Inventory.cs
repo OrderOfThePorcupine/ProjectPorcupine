@@ -242,6 +242,7 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
             yield return new ContextMenuAction
             {
                 LocalizationKey = "install_order",
+                LocalizationParameter = LocalizationName,
                 RequireCharacterSelected = false,
                 Action = (cm, c) => WorldController.Instance.BuildModeController.SetMode_BuildFurniture(Type, true)
             };
