@@ -322,14 +322,18 @@ namespace ProjectPorcupine.Pathfinding
                 // Tile is either adjacent on the same level, or directly above/below, and if above, is empty
                 return tile => (
                     (tile.X >= minX && tile.X <= maxX &&
-                    tile.Y >= minY && tile.Y <= maxY &&
-                    tile.Z == goalTile.Z &&
-                    goalTile.IsClippingCorner(tile) == false) ||
-                    ((tile.Z >= minZ && tile.Z <= maxZ &&
-                    tile.X == goalTile.X &&
-                    tile.Y == goalTile.Y) &&
-                    (tile.Z >= goalTile.Z ||
-                    tile.Type == TileType.Empty)));
+                        tile.Y >= minY && tile.Y <= maxY &&
+                        tile.Z == goalTile.Z &&
+                        goalTile.IsClippingCorner(tile) == false) ||
+                    ((tile.Z == minZ &&
+                        tile.X == goalTile.X &&
+                        tile.Y == goalTile.Y) &&
+                        tile.Type == TileType.Empty) || // Ceiling is empty
+                    ((tile.Z == maxZ &&
+                        tile.X == goalTile.X &&
+                        tile.Y == goalTile.Y) &&
+                        goalTile.Type == TileType.Empty)   // Tile where the character stand is empty
+                        );
             }
             else
             {

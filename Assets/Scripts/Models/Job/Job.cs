@@ -116,6 +116,7 @@ public class Job : ISelectable, IPrototypable
         this.Category = PrototypeManager.JobCategory.Get(category);
         this.adjacent = adjacent;
         this.Description = "job_error_missing_desc";
+        this.IsActive = true;
 
         jobWorkedLua = new List<string>();
         jobCompletedLua = new List<string>();
