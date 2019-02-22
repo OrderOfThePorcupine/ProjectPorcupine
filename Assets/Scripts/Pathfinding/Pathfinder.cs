@@ -332,8 +332,7 @@ namespace ProjectPorcupine.Pathfinding
                     ((tile.Z == maxZ &&
                         tile.X == goalTile.X &&
                         tile.Y == goalTile.Y) &&
-                        goalTile.Type == TileType.Empty)   // Tile where the character stand is empty
-                        );
+                        goalTile.Type == TileType.Empty));   // Tile where the character stand is empty
             }
             else
             {
