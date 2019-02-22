@@ -372,6 +372,7 @@ public class InventoryManager
                     remove.Add(func);
                 }
             }
+
             foreach (InventoryOfTypeCreated func in remove)
             {
                 inventoryTypeCreated[inventory.Type].Remove(func);

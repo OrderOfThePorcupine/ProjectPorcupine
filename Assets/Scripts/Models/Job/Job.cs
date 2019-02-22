@@ -404,6 +404,7 @@ public class Job : ISelectable, IPrototypable
             IsActive = true;
             return true;
         }
+
         return false;
     }
 
