@@ -27,7 +27,7 @@ public class InventoryManager
         Inventories = new Dictionary<string, List<Inventory>>();
     }
 
-    public delegate void InventoryOfTypeCreated(Inventory inventory);
+    public delegate bool InventoryOfTypeCreated(Inventory inventory);
 
     public event Action<Inventory> InventoryCreated;
 
@@ -364,9 +364,17 @@ public class InventoryManager
     {
         if (inventoryTypeCreated.ContainsKey(inventory.Type))
         {
+            List<InventoryOfTypeCreated> remove = new List<InventoryOfTypeCreated>();
             foreach (InventoryOfTypeCreated func in inventoryTypeCreated[inventory.Type])
             {
-                func(inventory);
+                if (func(inventory))
+                {
+                    remove.Add(func);
+                }
+            }
+            foreach (InventoryOfTypeCreated func in remove)
+            {
+                inventoryTypeCreated[inventory.Type].Remove(func);
             }
         }
     }

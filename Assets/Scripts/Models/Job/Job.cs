@@ -380,7 +380,7 @@ public class Job : ISelectable, IPrototypable
     {
         if (missing == "*")
         {
-            World.Current.InventoryManager.InventoryCreated += CheckIfInventorySufficient;
+            World.Current.InventoryManager.InventoryCreated += InventoryAvailable;
         }
         else
         {
@@ -390,9 +390,21 @@ public class Job : ISelectable, IPrototypable
         Suspend();
     }
 
-    public void CheckIfInventorySufficient(Inventory inventory)
+    public void InventoryAvailable(Inventory inventory)
     {
         IsActive = true;
+        World.Current.InventoryManager.InventoryCreated -= InventoryAvailable;
+    }
+
+    public bool CheckIfInventorySufficient(Inventory inventory)
+    {
+        RequestedItem item = GetFirstDesiredItem();
+        if (item.Type == inventory.Type)
+        {
+            IsActive = true;
+            return true;
+        }
+        return false;
     }
 
     public void CancelJob()
