@@ -88,6 +88,12 @@ public class Path_AStar
         {
             Path_Node<Tile> current = openSet.Dequeue();
 
+            if (f_score[current] > maxPathTime)
+            {
+                // We have reached the maximum path time, and not found a path. No need to add this to the open set.
+                continue;
+            }
+
             // Check to see if we are there.
             if (isGoal(current.data))
             {
@@ -114,12 +120,6 @@ public class Path_AStar
 
                 if (openSet.Contains(neighbor) && tentative_g_score >= g_score[neighbor])
                 {
-                    continue;
-                }
-
-                if (tentative_g_score > maxPathTime)
-                {
-                    // We have reached the maximum path time, and not found a path. No need to add this to the open set.
                     continue;
                 }
 

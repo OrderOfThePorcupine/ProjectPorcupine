@@ -175,7 +175,6 @@ public class JobManager
         if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
         {
             string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            UnityDebugger.Debugger.LogFormat("JobManager", " - missingInventory {0}", missing);
             job.SuspendWaitingForInventory(missing);
             if (JobModified != null)
             {
@@ -188,7 +187,6 @@ public class JobManager
             job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
         {
             // No one can reach the job.
-            UnityDebugger.Debugger.LogFormat("JobManager", "JobQueue", "- Job can't be reached");
             job.Suspend();
             if (JobModified != null)
             {
@@ -196,14 +194,6 @@ public class JobManager
             }
 
             return false;
-        }
-        else
-        {
-            UnityDebugger.Debugger.LogFormat("JobManager", " - {0}", job.acceptsAny ? "Any" : "All");
-            foreach (RequestedItem item in job.RequestedItems.Values)
-            {
-                UnityDebugger.Debugger.LogFormat("JobManager", "   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
-            }
         }
 
         return true;
