@@ -21,7 +21,7 @@ public class MouseOverFurnitureTypeText : MouseOver
     {
         if (tile != null && tile.Furniture != null)
         {
-            return LocalizationTable.GetLocalization("furniture", LocalizationTable.GetLocalization(tile.Furniture.LocalizationCode));
+            return LocalizationTable.GetLocalization("furniture", LocalizationTable.GetLocalization(tile.Furniture.LocalizationName));
         }
         else
         {

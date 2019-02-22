@@ -224,7 +224,7 @@ public class TimeManager
     {
         IUpdatable[] updatablesCopy = new IUpdatable[fastUpdatables.Count];
         fastUpdatables.CopyTo(updatablesCopy, 0);
-        for (int i = 0; i < fastUpdatables.Count; i++)
+        for (int i = 0; i < updatablesCopy.Length; i++)
         {
             updatablesCopy[i].EveryFrameUpdate(deltaTime);
         }

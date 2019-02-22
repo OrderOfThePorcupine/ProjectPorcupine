@@ -257,6 +257,11 @@ public class Parameter
     public void FromJson(JToken parameterToken)
     {
         JObject parameterJObject = (JObject)parameterToken;
+        if (parameterJObject == null)
+        {
+            return;
+        }
+
         foreach (JProperty parameterProperty in parameterJObject.Properties())
         {
             string key = parameterProperty.Name;

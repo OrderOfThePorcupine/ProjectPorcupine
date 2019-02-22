@@ -14,14 +14,14 @@ using ProjectPorcupine.PowerNetwork;
 
 public class PowerGridTest
 {
-    private Grid grid;
+    private UtilityGrid grid;
     private HashSet<IPluggable> connections;
 
     [SetUp]
     public void Init()
     {
-        grid = new Grid();
-        Type powerGridType = typeof(Grid);
+        grid = new UtilityGrid();
+        Type powerGridType = typeof(UtilityGrid);
         FieldInfo field = powerGridType.GetField("connections", BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.IsNotNull(field);
         connections = field.GetValue(grid) as HashSet<IPluggable>;

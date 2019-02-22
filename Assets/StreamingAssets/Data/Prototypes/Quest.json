@@ -1,0 +1,110 @@
+{
+  "Quest": {
+    "Mining Drone Beta Test Program": {
+      "Description": "Participate in the Beta Program of brand new mining Drones!",
+      "Goals": [
+        {
+          "Description": "Build 2 Mining Drone Station",
+          "IsCompletedLuaFunction": "Quest_Have_Furniture_Built",
+          "Parameters": {
+            "type": "mining_drone_station",
+            "amount": "2"
+          }
+        }
+      ],
+      "Rewards": [
+        {
+          "Description": "Receive 50 free Raw Iron",
+          "OnRewardLuaFunction": "Quest_Spawn_Inventory",
+          "Parameters": {
+            "type": "raw_iron",
+            "amount": "50"
+          }
+        }
+      ]
+    },
+    "Process Raw Iron": {
+      "Description": "Get ready to produce steel",
+      "Goals": [
+        {
+          "Description": "Build 1 Metal Smelter Station",
+          "IsCompletedLuaFunction": "Quest_Have_Furniture_Built",
+          "Parameters": {
+            "type": "metal_smelter",
+            "amount": "1"
+          }
+        }
+      ],
+      "Rewards": [
+        {
+          "Description": "Receive 50 free Raw Iron",
+          "OnRewardLuaFunction": "Quest_Spawn_Inventory",
+          "Parameters": {
+            "type": "raw_iron",
+            "amount": "50"
+          }
+        }
+      ],
+      "RequiredQuests": [
+        "Mining Drone Beta Test Program"
+      ]
+    },
+    "Survival basics - Fresh": {
+      "Description": "Build 2 Oxygen Generator and the power for it",
+      "Goals": [
+        {
+          "Description": "Build 2 Power Generator",
+          "IsCompletedLuaFunction": "Quest_Have_Furniture_Built",
+          "Parameters": {
+            "type": "fission_reactor",
+            "amount": "2"
+          }
+        },
+        {
+          "Description": "Build 2 Oxygen Generator",
+          "IsCompletedLuaFunction": "Quest_Have_Furniture_Built",
+          "Parameters": {
+            "type": "oxygen_generator",
+            "amount": "2"
+          }
+        }
+      ],
+      "Rewards": [
+        {
+          "Description": "Receive 10 free Power Cell",
+          "OnRewardLuaFunction": "Quest_Spawn_Inventory",
+          "Parameters": {
+            "type": "power_cell",
+            "amount": "10"
+          }
+        }
+      ]
+    },
+    "Survival basics - Hot Topic": {
+      "Description": "Build 1 Heater",
+      "Goals": [
+        {
+          "Description": "Build 1 Heater",
+          "IsCompletedLuaFunction": "Quest_Have_Furniture_Built",
+          "Parameters": {
+            "type": "heater",
+            "amount": "1"
+          }
+        }
+      ],
+      "Rewards": [
+        {
+          "Description": "Receive 10 free Power Cell",
+          "OnRewardLuaFunction": "Quest_Spawn_Inventory",
+          "Parameters": {
+            "type": "power_cell",
+            "amount": "10"
+          }
+        }
+      ],
+      "RequiredQuests": [
+        "Survival basics - Fresh"
+      ]
+    }
+  }
+}

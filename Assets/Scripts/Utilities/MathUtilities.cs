@@ -73,4 +73,26 @@ public static class MathUtilities
 
         return value.CompareTo(max) > 0 ? max : value;
     }
+
+    /// <summary>
+    /// Pass in two variables and get both min and max.
+    /// More efficient then two calls.
+    /// </summary>
+    /// <param name="x"> The first of two inputs. </param>
+    /// <param name="y"> The second of two inputs. </param>
+    /// <param name="min"> The minimum value. </param>
+    /// <param name="max"> The maximum value. </param>
+    public static void MinAndMax<T>(T x, T y, out T min, out T max) where T : System.IComparable<T>
+    {
+        if (x.CompareTo(y) > 0)
+        {
+            max = x;
+            min = y;
+        }
+        else
+        {
+            max = y;
+            min = x;
+        }
+    }
 }

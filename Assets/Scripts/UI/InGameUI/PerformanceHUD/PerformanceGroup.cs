@@ -6,8 +6,10 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Collections.Generic;
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// A group of performance components.
@@ -17,17 +19,17 @@ public class PerformanceGroup : IPrototypable
     /// <summary>
     /// What classes to show in each group.
     /// </summary>
-    public List<UIClassData> classData = new List<UIClassData>();
+    public List<UIComponent> componentData = new List<UIComponent>();
 
     /// <summary>
     /// Constructor with parameters.
     /// </summary>
     /// <param name="name"> The name of the group. </param>
     /// <param name="classData"> Class data for the group. </param>
-    public PerformanceGroup(string name, List<UIClassData> classData)
+    public PerformanceGroup(string name, List<UIComponent> classData)
     {
         this.Type = name;
-        this.classData = classData;
+        this.componentData = classData;
     }
 
     /// <summary>
@@ -66,9 +68,27 @@ public class PerformanceGroup : IPrototypable
 
                 if (string.IsNullOrEmpty(className) == false)
                 {
-                    classData.Add(new UIClassData(reader.GetAttribute("ClassName"), reader != null && reader.ReadToDescendant("Params") ? Parameter.ReadXml(reader) : new Parameter()));
+                    componentData.Add(new UIComponent(reader.GetAttribute("ClassName"), reader != null && reader.ReadToDescendant("Params") ? Parameter.ReadXml(reader) : new Parameter()));
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JProperty.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+
+        foreach (var item in innerJson["Components"])
+        {
+            UIComponent component = new UIComponent();
+            component.ReadJson(item);
+
+            componentData.Add(component);
         }
     }
 }

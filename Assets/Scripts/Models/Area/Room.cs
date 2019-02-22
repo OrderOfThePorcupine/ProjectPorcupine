@@ -256,7 +256,7 @@ namespace ProjectPorcupine.Rooms
                     {
                         if (tile2 != null && tile2.Furniture != null)
                         {
-                            if (tile2.Furniture.RoomEnclosure)
+                            if (tile2.Furniture.EnclosesRoom)
                             {
                                 // We have found an enclosing furniture, which means it is on our border
                                 boundaryTiles.Add(tile2);

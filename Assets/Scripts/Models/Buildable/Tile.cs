@@ -600,12 +600,12 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
 
     public string GetName()
     {
-        return type.LocalizationCode;
+        return type.LocalizationName;
     }
 
     public string GetDescription()
     {
-        return type.UnlocalizedDescription;
+        return type.LocalizationDescription;
     }
 
     public string GetJobDescription()

@@ -6,9 +6,11 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// Holds the category and its options (and name).
@@ -64,6 +66,27 @@ public class SettingsCategory : IPrototypable
         if (string.IsNullOrEmpty(currentHeading) == false)
         {
             headings.Add(currentHeading, options);
+        }
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value["Headings"];
+        foreach (JProperty heading in innerJson)
+        {
+            string headingName = heading.Name;
+            List<SettingsOption> options = new List<SettingsOption>();
+            foreach (JToken optionToken in heading.Value)
+            {
+                options.Add(new SettingsOption(optionToken));
+            }
+
+            headings.Add(headingName, options);
         }
     }
 }

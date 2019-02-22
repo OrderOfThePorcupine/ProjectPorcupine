@@ -431,7 +431,7 @@ namespace ProjectPorcupine.Entities
 
             foreach (Need n in Needs)
             {
-                yield return LocalizationTable.GetLocalization(n.LocalizationID, n.DisplayAmount);
+                yield return LocalizationTable.GetLocalization(n.LocalizationName, n.DisplayAmount);
             }
 
             foreach (string stat in Stats.Keys)
@@ -490,7 +490,7 @@ namespace ProjectPorcupine.Entities
 
         public void FixedFrequencyUpdate(float deltaTime)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException("Not supported by this class");
         }
 
         private States.State FindInitiatingState()

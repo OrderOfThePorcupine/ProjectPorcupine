@@ -6,11 +6,13 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 [MoonSharpUserData]
@@ -140,6 +142,18 @@ public class BuildableJobs
     public void ReadOutputSpotOffset(XmlReader reader)
     {
         OutputSpotOffset = ReadVector(reader);
+    }
+
+    public void ReadOffsets(JToken jobToken)
+    {
+        if (jobToken == null)
+        {
+            return;
+        }
+
+        WorkSpotOffset = ReadVector(jobToken["WorkSpotOffset"]);
+        InputSpotOffset = ReadVector(jobToken["InputSpotOffset"]);
+        OutputSpotOffset = ReadVector(jobToken["OutputSpotOffset"]);
     }
 
     /// <summary>
@@ -283,5 +297,20 @@ public class BuildableJobs
         return new Vector2(
             int.Parse(reader.GetAttribute("X")),
             int.Parse(reader.GetAttribute("Y")));
+    }
+
+    private Vector2 ReadVector(JToken vectorToken)
+    {
+        Vector2 vector = new Vector2();
+
+        if (vectorToken != null)
+        {
+            int x = PrototypeReader.ReadJson(0, vectorToken["X"]);
+            int y = PrototypeReader.ReadJson(0, vectorToken["Y"]);
+            vector.x = x;
+            vector.y = y;
+        }
+
+        return vector;
     }
 }

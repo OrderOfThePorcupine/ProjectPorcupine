@@ -1,0 +1,1553 @@
+{
+  "Furniture": {
+    "steel_wall": {
+      "TypeTags": [
+        "Wall"
+      ],
+      "MovementCost": 0,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_steel_wall",
+      "LocalizationDescription": "furn_steel_wall_desc",
+      "Health": 1000.0,
+      "LinksToNeighbours": "wall",
+      "EnclosesRoom": true,
+      "DragType": "path",
+      "Components": {
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "steel_wall_"
+          }
+        }
+      },
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 5
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 3
+          }
+        }
+      }
+    },
+    "door": {
+      "TypeTags": [
+        "Door"
+      ],
+      "MovementCost": 1.0,
+      "PathfindingModifier": 1.5,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_door",
+      "LocalizationDescription": "furn_door_desc",
+      "Health": 500.0,
+      "EnclosesRoom": true,
+      "CanReplaceFurniture": [
+        "Wall"
+      ],
+      "DragType": "single",
+      "IsEnterableAction": "IsEnterable_Door",
+      "Components": {
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "door_horizontal_0"
+          },
+          "SpriteName": {
+            "FromFunction": "Door_GetSpriteName"
+          }
+        }
+      },
+      "Parameters": {
+        "openness": "0",
+        "is_opening": "0",
+        "thermal_diffusivity": "0.2"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        }
+      },
+      "Animations": {
+        "horizontal": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "door_horizontal_0",
+            "door_horizontal_1",
+            "door_horizontal_2",
+            "door_horizontal_3",
+            "door_horizontal_4",
+            "door_horizontal_5",
+            "door_horizontal_5",
+            "door_horizontal_5"
+          ]
+        },
+        "vertical": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "door_vertical_0",
+            "door_vertical_1",
+            "door_vertical_2",
+            "door_vertical_3",
+            "door_vertical_4",
+            "door_vertical_5",
+            "door_vertical_5",
+            "door_vertical_5"
+          ]
+        }
+      },
+      "EventActions": {
+        "OnFastUpdate": [
+          "OnUpdate_Door"
+        ],
+        "OnUpdate": [
+          "OnUpdate_Leak_Door"
+        ]
+      }
+    },
+    "airlock_door": {
+      "TypeTags": [
+        "Door",
+        "Pressure Door"
+      ],
+      "MovementCost": 1.0,
+      "PathfindingModifier": 3.0,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_airlock_door",
+      "LocalizationDescription": "furn_airlock_door_desc",
+      "Health": 1.0,
+      "EnclosesRoom": true,
+      "CanReplaceFurniture": [
+        "Wall",
+        "Door"
+      ],
+      "DragType": "single",
+      "IsEnterableAction": "IsEnterable_AirlockDoor",
+      "Components": {
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "airlock_door_horizontal_0"
+          },
+          "SpriteName": {
+            "FromFunction": "Door_GetSpriteName"
+          }
+        }
+      },
+      "Parameters": {
+        "openness": "0",
+        "is_opening": "0",
+        "thermal_diffusivity": "0.15",
+        "pressure_locked": "0"
+      },
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "AirlockDoor_Toggle_Pressure_Lock",
+          "LocalizationKey": "toggle_pressure_lock"
+        }
+      ],
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 10
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 7
+          }
+        }
+      },
+      "Animations": {
+        "horizontal": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "airlock_door_horizontal_0",
+            "airlock_door_horizontal_1",
+            "airlock_door_horizontal_2",
+            "airlock_door_horizontal_3",
+            "airlock_door_horizontal_4",
+            "airlock_door_horizontal_5",
+            "airlock_door_horizontal_5",
+            "airlock_door_horizontal_5"
+          ]
+        },
+        "vertical": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "airlock_door_vertical_0",
+            "airlock_door_vertical_1",
+            "airlock_door_vertical_2",
+            "airlock_door_vertical_3",
+            "airlock_door_vertical_4",
+            "airlock_door_vertical_5",
+            "airlock_door_vertical_5",
+            "airlock_door_vertical_5"
+          ]
+        }
+      },
+      "EventActions": {
+        "OnFastUpdate": [
+          "OnUpdate_AirlockDoor"
+        ],
+        "OnUpdate": [
+          "OnUpdate_Leak_Airlock"
+        ]
+      }
+    },
+    "stockpile": {
+      "TypeTags": [
+        "Storage"
+      ],
+      "MovementCost": 1.0,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_stockpile",
+      "LocalizationDescription": "furn_stockpile_desc",
+      "Health": 1.0,
+      "LinksToNeighbours": "stockpile",
+      "DragType": "area",
+      "Components": {
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "stockpile_"
+          }
+        }
+      },
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "Stockpile_SetNewFilter",
+          "LocalizationKey": "set_filter"
+        }
+      ],
+      "OrderActions": {
+        "Build": {
+          "Inventory": {}
+        },
+        "Deconstruct": {
+          "Inventory": {}
+        }
+      },
+      "EventActions": {
+        "OnUpdate": [
+          "Stockpile_UpdateAction"
+        ]
+      }
+    },
+    "oxygen_generator": {
+      "TypeTags": [
+        "Generator"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 2,
+      "Height": 2,
+      "LocalizationName": "furn_oxygen_generator",
+      "LocalizationDescription": "furn_oxygen_generator_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "Visuals": {
+          "UseAnimation": [
+            {
+              "Name": "idle",
+              "RunConditions": {
+                "pow_is_running": "IsFalse"
+              }
+            },
+            {
+              "Name": "running",
+              "RunConditions": {
+                "pow_is_running": "IsTrue"
+              }
+            }
+          ]
+        },
+        "PowerConnection": {
+          "ParameterDefinitions": {},
+          "Requires": {
+            "Rate": 1.0,
+            "CanUseVariableEfficiency": true
+          }
+        },
+        "FluidConnection": {
+          "ParameterDefinitions": {},
+          "Requires": {
+            "Rate": 1.0
+          },
+          "FluidType": "water"
+        },
+        "GasConnection": {
+          "Provides": [
+            {
+              "Gas": "O2",
+              "Rate": 0.032,
+              "MaxLimit": 0.2
+            },
+            {
+              "Gas": "N2",
+              "Rate": 0.128,
+              "MaxLimit": 0.8
+            }
+          ],
+          "Efficiency": {
+            "FromParameter": "pow_efficiency"
+          }
+        }
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 2.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "idle": {
+          "Delay": 1.0,
+          "Loops": false,
+          "Frames": [
+            "oxygen_generator"
+          ]
+        },
+        "running": {
+          "Delay": 8.0,
+          "Frames": [
+            "oxygen_generator_running_1",
+            "oxygen_generator_running_2",
+            "oxygen_generator_running_3"
+          ]
+        }
+      }
+    },
+    "mining_drone_station": {
+      "TypeTags": [
+        "Workstation"
+      ],
+      "MovementCost": 1.0,
+      "PathfindingWeight": 2.0,
+      "Width": 3,
+      "Height": 2,
+      "LocalizationName": "furn_mining_drone_station",
+      "LocalizationDescription": "furn_mining_drone_station_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Jobs": {
+        "WorkSpotOffset": {
+          "X": 1.0,
+          "Y": -1.0
+        }
+      },
+      "Components": {
+        "PowerConnection": {
+          "Requires": {
+            "Rate": 1.0
+          }
+        }
+      },
+      "Parameters": {
+        "mine_type": "Raw Iron"
+      },
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "MiningDroneStation_Change_to_Raw_Iron",
+          "LocalizationKey": "change_to_raw_iron"
+        },
+        {
+          "LuaFunction": "MiningDroneStation_Change_to_Raw_Copper",
+          "LocalizationKey": "change_to_raw_copper"
+        }
+      ],
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "EventActions": {
+        "OnUpdate": [
+          "MiningDroneStation_UpdateAction"
+        ]
+      }
+    },
+    "fission_reactor": {
+      "TypeTags": [
+        "Generator"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 2,
+      "Height": 2,
+      "LocalizationName": "furn_fission_reactor",
+      "LocalizationDescription": "furn_fission_reactor_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "GetProgressInfoNameAction": "PowerGenerator_FuelInfo",
+      "Components": {
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "fission_reactor_1"
+          },
+          "UseAnimation": [
+            {
+              "Name": "idle",
+              "RunConditions": {
+                "workshop_is_running": "IsFalse"
+              }
+            },
+            {
+              "Name": "running",
+              "RunConditions": {
+                "workshop_is_running": "IsTrue"
+              }
+            }
+          ]
+        },
+        "Workshop": {
+          "ParameterDefinitions": {},
+          "ProductionChain": [
+            {
+              "Name": "Power generation",
+              "ProcessingTime": 60.0,
+              "Input": [
+                {
+                  "ObjectType": "power_cell",
+                  "Amount": 1
+                }
+              ]
+            }
+          ],
+          "RunConditions": {
+            "pow_out_needed": "IsTrue"
+          },
+          "HaulConditions": {
+            "pow_out_needed": "IsTrue"
+          }
+        },
+        "PowerConnection": {
+          "ParameterDefinitions": {},
+          "Provides": {
+            "Rate": 5.0,
+            "CanUseVariableEfficiency": true
+          },
+          "RunConditions": {
+            "workshop_is_running": "IsTrue"
+          }
+        }
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "idle": {
+          "Delay": 1.0,
+          "Loops": false,
+          "Frames": [
+            "fission_reactor_1"
+          ]
+        },
+        "running": {
+          "Delay": 6.0,
+          "Frames": [
+            "fission_reactor_2",
+            "fission_reactor_3",
+            "fission_reactor_4"
+          ]
+        }
+      }
+    },
+    "water_generator": {
+      "TypeTags": [
+        "Generator"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 2,
+      "Height": 1,
+      "LocalizationName": "furn_water_generator",
+      "LocalizationDescription": "furn_water_generator_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "GetProgressInfoNameAction": "WaterGenerator_StatusInfo",
+      "Components": {
+        "Workshop": {
+          "ParameterDefinitions": {},
+          "ProductionChain": [
+            {
+              "Name": "Ice melting",
+              "ProcessingTime": 60.0,
+              "Input": [
+                {
+                  "ObjectType": "ice",
+                  "Amount": 1,
+                  "HasHopper": true
+                }
+              ]
+            }
+          ]
+        },
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "water_generator_off"
+          },
+          "UseAnimation": [
+            {
+              "Name": "idle",
+              "RunConditions": {
+                "cur_processed_inv": "IsZero"
+              }
+            },
+            {
+              "Name": "running",
+              "RunConditions": {
+                "cur_processed_inv": "IsGreaterThanZero"
+              }
+            }
+          ]
+        },
+        "FluidConnection": {
+          "Provides": {
+            "Rate": 5.0
+          },
+          "RunConditions": {
+            "cur_processed_inv": "IsGreaterThanZero"
+          },
+          "FluidType": "water"
+        }
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "idle": {
+          "Delay": 1.0,
+          "Loops": false,
+          "Frames": [
+            "water_generator_off"
+          ]
+        },
+        "running": {
+          "Delay": 1.0,
+          "Loops": false,
+          "Frames": [
+            "water_generator_on"
+          ]
+        }
+      }
+    },
+    "water_tank": {
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_tank",
+      "LocalizationDescription": "furn_tank_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "water_tank_0"
+          },
+          "UseAnimation": [
+            {
+              "Name": "filling",
+              "ValueBasedParameterName": "fluid_storage_index"
+            }
+          ]
+        },
+        "FluidConnection": {
+          "ParameterDefinitions": {},
+          "Provides": {
+            "Rate": 10.0,
+            "Capacity": 50.0,
+            "CapacityThresholds": 5
+          },
+          "Requires": {
+            "Rate": 5.0
+          }
+        }
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "filling": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "water_tank_0",
+            "water_tank_25",
+            "water_tank_50",
+            "water_tank_75",
+            "water_tank_100"
+          ]
+        }
+      }
+    },
+    "cloning_pod": {
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 2,
+      "Height": 2,
+      "LocalizationName": "furn_cloning_pod",
+      "LocalizationDescription": "furn_cloning_pod_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "PowerConnection": {
+          "Requires": {
+            "Rate": 1.0
+          }
+        }
+      },
+      "Parameters": {
+        "animationTimer": "1",
+        "animationStep": "0"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 10.0,
+          "Inventory": {
+            "steel_plate": 5
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 8.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Uninstall": {
+          "JobTime": 8.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "idle": {
+          "Delay": 1.0,
+          "Loops": false,
+          "Frames": [
+            "cloning_pod"
+          ]
+        },
+        "running": {
+          "Delay": 1.0,
+          "Frames": [
+            "cloning_pod_0",
+            "cloning_pod_1"
+          ]
+        }
+      },
+      "EventActions": {
+        "OnUpdate": [
+          "CloningPod_UpdateAction"
+        ]
+      }
+    },
+    "metal_smelter": {
+      "TypeTags": [
+        "Processor"
+      ],
+      "MovementCost": 1.0,
+      "PathfindingModifier": 1.5,
+      "PathfindingWeight": 2.0,
+      "Width": 3,
+      "Height": 3,
+      "LocalizationName": "furn_metal_smelter",
+      "LocalizationDescription": "furn_metal_smelter_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Jobs": {
+        "WorkSpotOffset": {
+          "X": 1.0,
+          "Y": 0.0
+        }
+      },
+      "Components": {
+        "PowerConnection": {
+          "Requires": {
+            "Rate": 2.0,
+            "CanUseVariableEfficiency": true
+          },
+          "RunConditions": {
+            "cur_processed_inv": "IsGreaterThanZero"
+          }
+        },
+        "GasConnection": {
+          "Requires": [
+            {
+              "Gas": "O2",
+              "MinLimit": 0.1,
+              "MaxLimit": 1.0
+            }
+          ]
+        },
+        "Workshop": {
+          "ParameterDefinitions": {},
+          "ProductionChain": [
+            {
+              "Name": "Copper smelting",
+              "ProcessingTime": 3.0,
+              "Input": [
+                {
+                  "ObjectType": "raw_copper",
+                  "Amount": 2,
+                  "HasHopper": true
+                }
+              ],
+              "Output": [
+                {
+                  "ObjectType": "copper_plate",
+                  "Amount": 1,
+                  "SlotPosX": 2
+                }
+              ]
+            },
+            {
+              "Name": "Iron smelting",
+              "ProcessingTime": 4.0,
+              "Input": [
+                {
+                  "ObjectType": "raw_iron",
+                  "Amount": 2,
+                  "HasHopper": true
+                }
+              ],
+              "Output": [
+                {
+                  "ObjectType": "steel_plate",
+                  "Amount": 1,
+                  "SlotPosX": 2
+                }
+              ]
+            }
+          ],
+          "Efficiency": {
+            "FromParameter": "pow_efficiency"
+          }
+        },
+        "Visuals": {
+          "UseAnimation": [
+            {
+              "Name": "idle",
+              "RunConditions": {
+                "cur_processed_inv": "IsZero"
+              }
+            },
+            {
+              "Name": "running",
+              "RunConditions": {
+                "cur_processed_inv": "IsGreaterThanZero"
+              }
+            }
+          ]
+        }
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 5
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "idle": {
+          "Delay": 2.0,
+          "Loops": false,
+          "Frames": [
+            "metal_smelter"
+          ]
+        },
+        "running": {
+          "Delay": 6.0,
+          "Frames": [
+            "metal_smelter_running_1",
+            "metal_smelter_running_2",
+            "metal_smelter_running_3",
+            "metal_smelter_running_4",
+            "metal_smelter_running_5"
+          ]
+        }
+      }
+    },
+    "heater": {
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_heater",
+      "LocalizationDescription": "furn_heater_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "PowerConnection": {
+          "Requires": {
+            "Rate": 4.0
+          }
+        }
+      },
+      "Parameters": {
+        "base_heating": "50",
+        "pressure_threshold": "0.5"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "EventActions": {
+        "OnInstall": [
+          "Heater_InstallAction"
+        ],
+        "OnUninstall": [
+          "Heater_UninstallAction"
+        ]
+      }
+    },
+    "power_cell_press": {
+      "MovementCost": 1.0,
+      "PathfindingModifier": 1.5,
+      "PathfindingWeight": 2.0,
+      "Width": 2,
+      "Height": 2,
+      "LocalizationName": "furn_power_cell_press",
+      "LocalizationDescription": "furn_power_cell_press_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "GetProgressInfoNameAction": "PowerCellPress_StatusInfo",
+      "Components": {
+        "Workshop": {
+          "ParameterDefinitions": {},
+          "ProductionChain": [
+            {
+              "Name": "Power Cell Pressing",
+              "ProcessingTime": 5.0,
+              "Input": [
+                {
+                  "ObjectType": "raw_uranium",
+                  "Amount": 3,
+                  "HasHopper": true
+                },
+                {
+                  "ObjectType": "steel_plate",
+                  "Amount": 2,
+                  "SlotPosX": 1,
+                  "HasHopper": true
+                }
+              ],
+              "Output": [
+                {
+                  "ObjectType": "power_cell",
+                  "Amount": 1,
+                  "SlotPosX": 2,
+                  "SlotPosY": 1
+                }
+              ]
+            }
+          ],
+          "Efficiency": {
+            "FromParameter": "pow_efficiency"
+          }
+        },
+        "PowerConnection": {
+          "Requires": {
+            "Rate": 2.0,
+            "CanUseVariableEfficiency": true
+          }
+        }
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      }
+    },
+    "small_landing_pad": {
+      "TypeTags": [
+        "OutdoorOnly",
+        "LandingPad"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 3,
+      "Height": 3,
+      "LocalizationName": "furn_small_landing_pad",
+      "LocalizationDescription": "furn_small_landing_pad_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "LandingPad_Test_CallTradeShip",
+          "LocalizationKey": "call_trade_ship_test",
+          "DevModeOnly": true
+        }
+      ],
+      "OrderActions": {
+        "Build": {
+          "JobTime": 5.0,
+          "Inventory": {
+            "steel_plate": 20
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 3.0,
+          "Inventory": {
+            "steel_plate": 10
+          }
+        },
+        "Uninstall": {
+          "JobTime": 3.0,
+          "Inventory": {}
+        }
+      }
+    },
+    "oxygen_compressor": {
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 2,
+      "Height": 2,
+      "LocalizationName": "furn_oxygen_compressor",
+      "LocalizationDescription": "furn_oxygen_compressor_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Parameters": {
+        "max_gas_content": "5",
+        "gas_content": "0",
+        "give_threshold": "0.005",
+        "take_threshold": "0.01",
+        "flow_rate": "0.1"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 2.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "running": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "oxygen_compressor",
+            "oxygen_compressor_0",
+            "oxygen_compressor_1",
+            "oxygen_compressor_2",
+            "oxygen_compressor_3",
+            "oxygen_compressor_4",
+            "oxygen_compressor_5",
+            "oxygen_compressor_6",
+            "oxygen_compressor_7",
+            "oxygen_compressor_8"
+          ]
+        }
+      },
+      "EventActions": {
+        "OnUpdate": [
+          "OxygenCompressor_OnUpdate"
+        ],
+        "OnPowerOff": [
+          "OxygenCompressor_OnPowerOff"
+        ]
+      }
+    },
+    "solar_panel": {
+      "TypeTags": [
+        "Generator",
+        "OutdoorOnly"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingModifier": 1.5,
+      "PathfindingWeight": 2.0,
+      "Width": 2,
+      "Height": 3,
+      "LocalizationName": "furn_solar_panel",
+      "LocalizationDescription": "furn_solar_panel_desc",
+      "CanRotate": true,
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "PowerConnection": {
+          "Provides": {
+            "Rate": 3.0
+          }
+        }
+      },
+      "Parameters": {
+        "base_output": "3",
+        "efficiency": "1"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "TileTypeBuildPermissions": [
+        "Ladder"
+      ]
+    },
+    "air_pump": {
+      "MovementCost": 1.0,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_air_pump",
+      "LocalizationDescription": "furn_air_pump_desc",
+      "Health": 1.0,
+      "LinksToNeighbours": "wall",
+      "EnclosesRoom": true,
+      "CanReplaceFurniture": [
+        "Wall"
+      ],
+      "DragType": "single",
+      "Components": {
+        "PowerConnection": {
+          "Requires": {
+            "Rate": 1.0
+          }
+        },
+        "Visuals": {
+          "DefaultSpriteName": {
+            "Value": "air_pump"
+          },
+          "SpriteName": {
+            "FromFunction": "AirPump_GetSpriteName"
+          }
+        }
+      },
+      "Parameters": {
+        "gas_throughput": "1",
+        "source_pressure_limit": "0",
+        "target_pressure_limit": "1",
+        "flow_direction_up": "1",
+        "active": "true"
+      },
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "AirPump_FlipDirection",
+          "LocalizationKey": "flip_direction"
+        }
+      ],
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "EventActions": {
+        "OnUpdate": [
+          "AirPump_OnUpdate"
+        ]
+      }
+    },
+    "vent": {
+      "MovementCost": 1.0,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_vent",
+      "LocalizationDescription": "furn_vent_desc",
+      "Health": 1.0,
+      "EnclosesRoom": true,
+      "CanReplaceFurniture": [
+        "Wall"
+      ],
+      "DragType": "single",
+      "Parameters": {
+        "gas_throughput": "0.5",
+        "openness": "1",
+        "thermal_diffusivity": "1"
+      },
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "Vent_Open",
+          "LocalizationKey": "open_vent"
+        },
+        {
+          "LuaFunction": "Vent_Close",
+          "LocalizationKey": "close_vent"
+        }
+      ],
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "horizontal": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "vent_EW_closed",
+            "vent_EW_opened"
+          ]
+        },
+        "vertical": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "vent_NS_closed",
+            "vent_NS_opened"
+          ]
+        }
+      },
+      "EventActions": {
+        "OnUpdate": [
+          "Vent_OnUpdate"
+        ],
+        "OnChange": [
+          "Vent_SetOrientationState"
+        ],
+        "OnInstall": [
+          "Vent_SetOrientationState"
+        ]
+      }
+    },
+    "simple_bed": {
+      "TypeTags": [
+        "Bed"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingModifier": 1.0,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 2,
+      "LocalizationName": "furn_simple_bed",
+      "LocalizationDescription": "furn_simple_bed_desc",
+      "CanRotate": true,
+      "Health": 1.0,
+      "DragType": "single",
+      "Parameters": {
+        "comfort": "0.5"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      }
+    },
+    "accumulator": {
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_accumulator",
+      "LocalizationDescription": "furn_accumulator_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "Visuals": {
+          "UseAnimation": [
+            {
+              "Name": "accumulate",
+              "ValueBasedParameterName": "pow_accumulator_index"
+            }
+          ]
+        },
+        "PowerConnection": {
+          "ParameterDefinitions": {},
+          "Provides": {
+            "Rate": 10.0,
+            "Capacity": 50.0,
+            "CapacityThresholds": 5
+          },
+          "Requires": {
+            "Rate": 5.0
+          }
+        }
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 2.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "Animations": {
+        "accumulate": {
+          "Delay": 1.0,
+          "Loops": false,
+          "ValueBased": true,
+          "Frames": [
+            "accumulator_0",
+            "accumulator_25",
+            "accumulator_50",
+            "accumulator_75",
+            "accumulator_100"
+          ]
+        }
+      }
+    },
+    "mine": {
+      "TypeTags": [
+        "Ore",
+        "Non-buildable",
+        "Non-deconstructible"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingModifier": 1.5,
+      "PathfindingWeight": 2.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_mine",
+      "LocalizationDescription": "furn_mine_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "Visuals": {
+          "SpriteName": {
+            "FromFunction": "OreMine_GetSpriteName"
+          }
+        }
+      },
+      "Parameters": {
+        "ore_type": "raw_iron"
+      },
+      "ContextMenuActions": [
+        {
+          "LuaFunction": "OreMine_CreateMiningJob",
+          "LocalizationKey": "mine_ore"
+        }
+      ]
+    },
+    "berth": {
+      "MovementCost": 1.0,
+      "PathfindingModifier": 1.0,
+      "PathfindingWeight": 1.0,
+      "Width": 3,
+      "Height": 1,
+      "LocalizationName": "furn_berth",
+      "LocalizationDescription": "furn_berth_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Parameters": {
+        "occupied": "0"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "steel_plate": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "EventActions": {
+        "OnUpdate": [
+          "Berth_TestSummoning"
+        ]
+      }
+    },
+    "rtg": {
+      "TypeTags": [
+        "Temperature"
+      ],
+      "MovementCost": 2.0,
+      "PathfindingWeight": 2.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_rtg",
+      "LocalizationDescription": "furn_rtg_desc",
+      "Health": 1.0,
+      "DragType": "single",
+      "Components": {
+        "PowerConnection": {
+          "Provides": {
+            "Rate": 2.0
+          }
+        }
+      },
+      "Parameters": {
+        "base_heating": "500",
+        "pressure_threshold": "0.2"
+      },
+      "OrderActions": {
+        "Build": {
+          "JobTime": 2.0,
+          "Inventory": {
+            "steel_plate": 2,
+            "raw_uranium": 2
+          }
+        },
+        "Deconstruct": {
+          "JobTime": 1.0,
+          "Inventory": {
+            "raw_uranium": 1
+          }
+        },
+        "Uninstall": {
+          "JobTime": 1.0,
+          "Inventory": {}
+        }
+      },
+      "EventActions": {
+        "OnInstall": [
+          "Rtg_InstallAction"
+        ],
+        "OnUninstall": [
+          "Rtg_UninstallAction"
+        ],
+        "OnUpdateTemperature": [
+          "Rtg_UpdateTemperature"
+        ]
+      }
+    },
+    "astro_wall": {
+      "TypeTags": [
+        "Wall",
+        "Non-buildable",
+        "Non-deconstructible",
+        "DoesntNeedFloor"
+      ],
+      "MovementCost": 1.0,
+      "PathfindingWeight": 1.0,
+      "Width": 1,
+      "Height": 1,
+      "LocalizationName": "furn_astro_wall",
+      "LocalizationDescription": "furn_astro_wall_desc",
+      "Health": 1.0,
+      "LinksToNeighbours": "astro_wall",
+      "EnclosesRoom": true,
+      "DragType": "single",
+      "Components": {
+        "Visuals": {
+          "OverlaySpriteName": {
+            "FromParameter": "source_type"
+          }
+        }
+      },
+      "Parameters": {
+        "ore_type": "None"
+      },
+      "OrderActions": {
+        "Mine": {
+          "JobTime": 1.0,
+          "JobTimeFunction": "OreMine_CreateMiningJob",
+          "Inventory": {}
+        }
+      }
+    }
+  }
+}

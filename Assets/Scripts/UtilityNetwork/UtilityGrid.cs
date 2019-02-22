@@ -14,11 +14,11 @@ using UnityEngine;
 
 namespace ProjectPorcupine.PowerNetwork
 {
-    public class Grid
+    public class UtilityGrid
     {
         private readonly HashSet<IPluggable> connections;
 
-        public Grid()
+        public UtilityGrid()
         {
             connections = new HashSet<IPluggable>();
             UtilityType = string.Empty;
@@ -69,13 +69,13 @@ namespace ProjectPorcupine.PowerNetwork
 
             if (UtilityType != string.Empty && UtilityType != connection.UtilityType)
             {
-                UnityDebugger.Debugger.LogWarning("Grid", "UtilityType isn't null and doesn't match, no plugin");
+                UnityDebugger.Debugger.LogWarning("UtilityGrid", "UtilityType isn't null and doesn't match, no plugin");
                 return false;
             }
 
             if (SubType != string.Empty && connection.SubType != string.Empty && SubType != connection.SubType)
             {
-                UnityDebugger.Debugger.LogWarning("Grid", "Neither SubType is empty, and they don't match, no plugin");
+                UnityDebugger.Debugger.LogWarning("UtilityGrid", "Neither SubType is empty, and they don't match, no plugin");
                 return false;
             }
 
@@ -96,7 +96,7 @@ namespace ProjectPorcupine.PowerNetwork
 
             if (!CanPlugIn(connection))
             {
-                UnityDebugger.Debugger.LogWarning("Grid", "Can't Plugin");
+                UnityDebugger.Debugger.LogWarning("UtilityGrid", "Can't Plugin");
                 return false;
             }
 
@@ -119,9 +119,9 @@ namespace ProjectPorcupine.PowerNetwork
         }
 
         /// <summary>
-        /// Determines whether the connection is plugged into this Grid.
+        /// Determines whether the connection is plugged into this UtilityGrid.
         /// </summary>
-        /// <returns><c>true</c> if the connection is plugged into this Grid; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if the connection is plugged into this UtilityGrid; otherwise, <c>false</c>.</returns>
         public bool IsPluggedIn(IPluggable connection)
         {
             if (connection == null)
@@ -133,7 +133,7 @@ namespace ProjectPorcupine.PowerNetwork
         }
 
         /// <summary>
-        /// Unplug the specified IPluggable from this Grid.
+        /// Unplug the specified IPluggable from this UtilityGrid.
         /// </summary>
         /// <param name="connection">IPluggable to be unplugged.</param>
         public void Unplug(IPluggable connection)
@@ -261,16 +261,16 @@ namespace ProjectPorcupine.PowerNetwork
         }
 
         /// <summary>
-        /// Merge the specified Grid with this Grid.
+        /// Merge the specified UtilityGrid with this UtilityGrid.
         /// </summary>
         /// <param name="otherGrid">Other grid to be merged.</param>
-        public void Merge(Grid otherGrid)
+        public void Merge(UtilityGrid otherGrid)
         {
             connections.UnionWith(otherGrid.connections);
         }
 
         /// <summary>
-        /// Split this Grid into multiple grids.
+        /// Split this UtilityGrid into multiple grids.
         /// </summary>
         public void Split()
         {

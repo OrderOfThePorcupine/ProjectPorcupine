@@ -10,6 +10,7 @@
 using System;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Localization;
 
 /// <summary>
@@ -79,5 +80,17 @@ public class OverlayDescriptor : IPrototypable
 
         xmlReader.Read();
         LuaFunctionName = xmlReader.ReadContentAsString();
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+        ColorMap = PrototypeReader.ReadJson(ColorMap, innerJson["ColorMap"]);
+        LuaFunctionName = PrototypeReader.ReadJson(LuaFunctionName, innerJson["LuaFunctionName"]);
     }
 }

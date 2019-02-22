@@ -72,28 +72,28 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        public bool Initialized 
-        { 
-            get 
-            { 
-                return initialized; 
-            } 
+        public bool Initialized
+        {
+            get
+            {
+                return initialized;
+            }
         }
 
-        public virtual bool RequiresSlowUpdate 
-        { 
-            get 
-            { 
-                return false; 
-            } 
+        public virtual bool RequiresSlowUpdate
+        {
+            get
+            {
+                return false;
+            }
         }
 
-        public virtual bool RequiresFastUpdate 
-        { 
-            get 
-            { 
-                return false; 
-            } 
+        public virtual bool RequiresFastUpdate
+        {
+            get
+            {
+                return false;
+            }
         }
 
         [XmlIgnore]
@@ -143,13 +143,41 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 Type t = componentTypes[componentTypeName];
                 BuildableComponent component = (BuildableComponent)jtoken["Component"].ToObject(t);
-                //// need to set name explicitly (not part of deserialization as it's passed in)
+
+                // need to set name explicitly (not part of deserialization as it's passed in)
                 component.Type = componentTypeName;
                 return component;
             }
             else
             {
                 UnityDebugger.Debugger.LogErrorFormat(ComponentLogChannel, "There is no deserializer for component '{0}'", componentTypeName);
+                return null;
+            }
+        }
+
+        // TODO: This may be functionally identical to Deserialize(JToken), needs reviewed to see if uses of FromJson can be replaced by Deserialize(JToken)
+        public static BuildableComponent FromJson(JToken componentToken)
+        {
+            if (componentTypes == null)
+            {
+                componentTypes = FindComponentsInAssembly();
+            }
+
+            JProperty componentProperty = (JProperty)componentToken;
+            string componentTypeName = componentProperty.Name;
+            if (componentTypes.ContainsKey(componentTypeName))
+            {
+                Type t = componentTypes[componentTypeName];
+                t.GetType(); 
+
+                BuildableComponent component = (BuildableComponent)componentProperty.Value.ToObject(t);
+
+                // need to set name explicitly (not part of deserialization as it's passed in)
+                component.Type = componentProperty.Name;
+                return component;
+            }
+            else
+            {
                 return null;
             }
         }
@@ -336,7 +364,7 @@ namespace ProjectPorcupine.Buildable.Components
 
             public Conditions RunConditions { get; set; }
         }
-        
+
         [Serializable]
         [JsonObject(MemberSerialization.OptOut)]
         public class ParameterCondition
@@ -397,7 +425,7 @@ namespace ProjectPorcupine.Buildable.Components
             public int CapacityThresholds { get; set; }
 
             [XmlAttribute("canUseVariableEffiency")]
-            public bool CanUseVariableEfficiency { get; set; }            
+            public bool CanUseVariableEfficiency { get; set; }
         }
 
         [Serializable]

@@ -8,6 +8,7 @@
 #endregion
 using System;
 using ProjectPorcupine.Entities;
+using ProjectPorcupine.Mouse;
 
 public class ContextMenuAction
 {
@@ -24,9 +25,9 @@ public class ContextMenuAction
         {
             if (RequireCharacterSelected)
             {
-                if (mouseController.IsCharacterSelected())
+                if (mouseController.Selection != null && mouseController.Selection.IsCharacterSelected())
                 {
-                    ISelectable actualSelection = mouseController.mySelection.GetSelectedStuff();
+                    ISelectable actualSelection = mouseController.Selection.GetSelectedStuff();
                     Action(this, actualSelection as Character);
                 }
             }

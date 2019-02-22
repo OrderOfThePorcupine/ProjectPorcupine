@@ -94,8 +94,8 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
         tileTypeBuildPermissions = new HashSet<string>(other.tileTypeBuildPermissions);
 
-        LocalizationCode = other.LocalizationCode;
-        UnlocalizedDescription = other.UnlocalizedDescription;
+        LocalizationName = other.LocalizationName;
+        LocalizationDescription = other.LocalizationDescription;
     }
 
     /// <summary>
@@ -162,12 +162,12 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     /// <summary>
     /// Gets the code used for Localization of the utility.
     /// </summary>
-    public string LocalizationCode { get; private set; }
+    public string LocalizationName { get; private set; }
 
     /// <summary>
     /// Gets the description of the utility. This is used by localization.
     /// </summary>
-    public string UnlocalizedDescription { get; private set; }
+    public string LocalizationDescription { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether this utility is next to any utility of the same type.
@@ -206,7 +206,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     /// Gets or sets the grid used by this utility.
     /// </summary>
     /// <value>The grid used by this utility.</value>
-    public Grid Grid { get; set; }
+    public UtilityGrid Grid { get; set; }
 
     /// <summary>
     /// Used to place utility in a certain position.
@@ -260,7 +260,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         else
         {
             // If we're skipping the update, we need a temporary grid for furniture in the same tile to connect to.
-            obj.Grid = new Grid();
+            obj.Grid = new UtilityGrid();
             World.Current.PowerNetwork.RegisterGrid(obj.Grid);
             obj.SeekConnection();
         }
@@ -342,11 +342,11 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
                     break;
                 case "LocalizationCode":
                     reader.Read();
-                    LocalizationCode = reader.ReadContentAsString();
+                    LocalizationName = reader.ReadContentAsString();
                     break;
                 case "UnlocalizedDescription":
                     reader.Read();
-                    UnlocalizedDescription = reader.ReadContentAsString();
+                    LocalizationDescription = reader.ReadContentAsString();
                     break;
                 case "OrderAction":
                     OrderAction orderAction = OrderAction.Deserialize(reader);
@@ -357,6 +357,30 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
                     break;
             }
+        }
+    }
+
+    /// <summary>
+    /// Reads the prototype from the specified JObject.
+    /// </summary>
+    /// <param name="jsonProto">The JProperty containing the prototype.</param>
+    public void ReadJsonPrototype(JProperty jsonProto)
+    {
+        Type = jsonProto.Name;
+        JToken innerJson = jsonProto.Value;
+
+        typeTags = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TypeTags"]));
+        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+
+        tileTypeBuildPermissions = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["tileTypeBuildPermissions"]));
+
+        orderActions = PrototypeReader.ReadOrderActions(innerJson["OrderActions"]);
+        contextMenuLuaActions = PrototypeReader.ReadContextMenuActions(innerJson["ContextMenuActions"]);
+        EventActions.ReadJson(innerJson["EventActions"]);
+        if (innerJson["Parameters"] != null)
+        {
+            Parameters.FromJson(innerJson["Parameters"]);
         }
     }
 
@@ -424,9 +448,9 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         Deconstruct deconstructOrder = GetOrderAction<Deconstruct>();
         if (deconstructOrder != null)
         {
-            foreach (OrderAction.InventoryInfo inv in deconstructOrder.Inventory)
+            foreach (KeyValuePair<string, int> inv in deconstructOrder.Inventory)
             {
-                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Type, inv.Amount));
+                World.Current.InventoryManager.PlaceInventoryAround(Tile, new Inventory(inv.Key, inv.Value));
             }
         }
 
@@ -444,7 +468,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
                 if (neighborUtility.Grid == this.Grid)
                 {
-                    neighborUtility.Grid = new Grid();
+                    neighborUtility.Grid = new UtilityGrid();
                 }
 
                 neighborUtility.UpdateGrid(neighborUtility);
@@ -481,7 +505,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     /// <returns>LocalizationCode for the name of the utility.</returns>
     public string GetName()
     {
-        return LocalizationCode; // this.Name;
+        return LocalizationName; // this.Name;
     }
 
     /// <summary>
@@ -490,7 +514,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     /// <returns>Description of the utility.</returns>
     public string GetDescription()
     {
-        return UnlocalizedDescription;
+        return LocalizationDescription;
     }
 
     public IEnumerable<string> GetAdditionalInfo()
@@ -594,8 +618,8 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
     /// Updates the grids of this utility sharing the grids along the network of connected utilities.
     /// </summary>
     /// <param name="utilityToUpdate">Utility to update.</param>
-    /// <param name="newGrid">If not null this will force neighboring utilities to use the specified Instance of Grid.</param>
-    public void UpdateGrid(Utility utilityToUpdate, Grid newGrid = null)
+    /// <param name="newGrid">If not null this will force neighboring utilities to use the specified Instance of UtilityGrid.</param>
+    public void UpdateGrid(Utility utilityToUpdate, UtilityGrid newGrid = null)
     {
         if (gridUpdatedThisFrame)
         {
@@ -604,7 +628,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
         gridUpdatedThisFrame = true;
         TimeManager.Instance.RunNextFrame(() => gridUpdatedThisFrame = false);
-        Grid oldGrid = utilityToUpdate.Grid;
+        UtilityGrid oldGrid = utilityToUpdate.Grid;
 
         World.Current.PowerNetwork.RemoveGrid(utilityToUpdate.Grid);
 
@@ -625,7 +649,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
             if (utilityToUpdate.Grid == null)
             {
-                utilityToUpdate.Grid = new Grid();
+                utilityToUpdate.Grid = new UtilityGrid();
             }
         }
         else

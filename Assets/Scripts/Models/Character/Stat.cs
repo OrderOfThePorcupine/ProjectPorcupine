@@ -6,7 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 namespace ProjectPorcupine.Entities
 {
@@ -32,6 +34,17 @@ namespace ProjectPorcupine.Entities
         {
             Type = parentReader.GetAttribute("type");
             Name = parentReader.GetAttribute("name");
+        }
+
+        /// <summary>
+        /// Reads the prototype from the specified JObject.
+        /// </summary>
+        /// <param name="jsonProto">The JProperty containing the prototype.</param>
+        public void ReadJsonPrototype(JProperty jsonProto)
+        {
+            Type = jsonProto.Name;
+            JToken innerJson = jsonProto.Value;
+            Name = PrototypeReader.ReadJson(Name, innerJson["Name"]);
         }
 
         public Stat Clone()

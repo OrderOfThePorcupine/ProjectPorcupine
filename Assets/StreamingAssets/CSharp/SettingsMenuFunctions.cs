@@ -102,33 +102,33 @@ public class GenericInputField : BaseSettingsElement
 
         switch (verification)
         {
-            case "PositiveInteger":
-                fieldElement.onValidateInput += ValidateInputForPositiveNumber;
-                break;
-            case "Integer":
-                fieldElement.contentType = InputField.ContentType.IntegerNumber;
-                break;
-            case "Alphanumeric":
-                fieldElement.contentType = InputField.ContentType.Alphanumeric;
-                break;
-            case "Decimal":
-                fieldElement.contentType = InputField.ContentType.DecimalNumber;
-                break;
-            case "Pin":
-                fieldElement.contentType = InputField.ContentType.Pin;
-                break;
-            case "Password":
-                fieldElement.contentType = InputField.ContentType.Password;
-                break;
-            case "Name":
-                fieldElement.contentType = InputField.ContentType.Name;
-                break;
-            case "EmailAddress":
-                fieldElement.contentType = InputField.ContentType.EmailAddress;
-                break;
-            case "Autocorrected":
-                fieldElement.contentType = InputField.ContentType.Autocorrected;
-                break;
+        case "PositiveInteger":
+            fieldElement.onValidateInput += ValidateInputForPositiveNumber;
+            break;
+        case "Integer":
+            fieldElement.contentType = InputField.ContentType.IntegerNumber;
+            break;
+        case "Alphanumeric":
+            fieldElement.contentType = InputField.ContentType.Alphanumeric;
+            break;
+        case "Decimal":
+            fieldElement.contentType = InputField.ContentType.DecimalNumber;
+            break;
+        case "Pin":
+            fieldElement.contentType = InputField.ContentType.Pin;
+            break;
+        case "Password":
+            fieldElement.contentType = InputField.ContentType.Password;
+            break;
+        case "Name":
+            fieldElement.contentType = InputField.ContentType.Name;
+            break;
+        case "EmailAddress":
+            fieldElement.contentType = InputField.ContentType.EmailAddress;
+            break;
+        case "Autocorrected":
+            fieldElement.contentType = InputField.ContentType.Autocorrected;
+            break;
         }
 
         return element;
@@ -297,7 +297,194 @@ public class GenericComboBox : BaseSettingsElement
     }
 }
 
+// This class is just to help you create your own dropdown class
+public class GenericMultiSelect : BaseSettingsElement
+{
+    protected Toggle toggleElement;
+    protected bool[] values;
+    protected int current = 0;
+    protected Dropdown dropdownElement;
+    protected string type = "Switch";
+
+    public GameObject MultiSelectHelperFromText(string[] options)
+    {
+        GameObject element = GetBasicElement();
+
+        dropdownElement = CreateDropdownFromText(options, 0);
+        dropdownElement.transform.SetParent(element.transform);
+        dropdownElement.onValueChanged.AddListener(
+            (int v) =>
+            {
+                if (v != current)
+                {
+                    current = v;
+                    toggleElement.isOn = values[current];
+                }
+            });
+
+        GameObject innerElement = GetInnerElement();
+        innerElement.transform.SetParent(element.transform);
+
+        return element;
+    }
+
+    public GameObject MultiSelectHelperFromOptionData(Dropdown.OptionData[] options)
+    {
+        GameObject element = GetBasicElement();
+
+        dropdownElement = CreateDropdownFromOptionData(options, 0);
+        dropdownElement.transform.SetParent(element.transform);
+        dropdownElement.onValueChanged.AddListener(
+            (int v) =>
+            {
+                if (v != current)
+                {
+                    current = v;
+                    toggleElement.isOn = values[current];
+                }
+            });
+
+        GameObject innerElement = GetInnerElement();
+        innerElement.transform.SetParent(element.transform);
+
+        return element;
+    }
+
+    public GameObject MultiSelectEmpty()
+    {
+        GameObject element = GetBasicElement();
+
+        dropdownElement = CreateEmptyDropdown();
+        dropdownElement.transform.SetParent(element.transform);
+        dropdownElement.onValueChanged.AddListener(
+            (int v) =>
+            {
+                if (v != current)
+                {
+                    current = v;
+                    toggleElement.isOn = values[current];
+                }
+            });
+
+        GameObject innerElement = GetInnerElement();
+        innerElement.transform.SetParent(element.transform);
+
+        return element;
+    }
+
+    public GameObject GetInnerElement()
+    {
+        GameObject innerElement = GetHorizontalBaseElement(type, 120, 60, TextAnchor.MiddleLeft);
+
+        values = CastFromStringToArray(getValue());
+
+        Text text = CreateText("tooltip_options_toggle", true);
+        text.transform.SetParent(innerElement.transform);
+
+        toggleElement = CreateToggle(type);
+        toggleElement.transform.SetParent(innerElement.transform);
+
+        toggleElement.isOn = values[current];
+        toggleElement.onValueChanged.AddListener(
+            (bool v) =>
+            {
+                if (v != values[current])
+                {
+                    valueChanged = true;
+                    values[current] = v;
+                }
+            });
+
+        LayoutElement layout = toggleElement.gameObject.AddComponent<LayoutElement>();
+        layout.ignoreLayout = true;
+
+        RectTransform rTransform = toggleElement.GetComponent<RectTransform>();
+        rTransform.sizeDelta = type == "Switch" ? new Vector2(60, 30) : new Vector2(40, 40);
+        rTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        rTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        rTransform.localPosition = new Vector3(45, 0, 0);
+
+        return innerElement;
+    }
+
+    public GameObject GetBasicElement()
+    {
+        GameObject element = GetVerticalBaseElement("MultiSelectDropdown", 220, 30, TextAnchor.MiddleCenter, 10);
+
+        CreateText(option.name, true, TextAnchor.LowerCenter).transform.SetParent(element.transform);
+
+        return element;
+    }
+
+    public override GameObject InitializeElement()
+    {
+        return GetBasicElement();
+    }
+
+    public override void CancelSetting()
+    {
+    }
+
+    public override void ApplySetting()
+    {
+        Settings.SetSetting(option.key, CastFromArrayToString(values));
+    }
+
+    protected bool[] CastFromStringToArray(string str)
+    {
+        bool[] array = new bool[(str.Length+1)/2];
+
+        for (int i = 0; i < str.Length; i++)
+        {
+            if (str[i] != ',' || i == str.Length - 1)
+            {
+                array[(i + 1) / 2] = str[i] == '1';
+            }
+        }
+
+        return array;
+    }
+
+    protected string CastFromArrayToString(bool[] array)
+    {
+        string str = "";
+        for (int i = 0; i < array.Length; i++)
+        {
+            str += (array[i] ? 1 : 0).ToString() + (array.Length - 1 == i ? "" : ",");
+        }
+
+        return str;
+    }
+
+    public string getValue()
+    {
+        string temp;
+        return Settings.GetSetting(option.key, out temp) ? temp : option.defaultValue;
+    }
+}
+
 #region CustomLogic
+
+public class TooltipOptionsMultiSelect : GenericMultiSelect
+{
+    public override GameObject InitializeElement()
+    {
+        GameObject go = MultiSelectHelperFromText(WorldController.Instance.MouseController.GetAllModes());
+        return go;
+    }
+
+    public override void ApplySetting()
+    {
+        base.ApplySetting();
+        WorldController.Instance.MouseController.RefreshSettings();
+    }
+
+    public override void CancelSetting()
+    {
+        base.CancelSetting();
+        WorldController.Instance.MouseController.RefreshSettings();
+    }
+}
 
 public class LocalizationComboBox : GenericComboBox
 {
@@ -314,7 +501,6 @@ public class LocalizationComboBox : GenericComboBox
                     selectedValue = v;
                 }
             });
-        dropdownElement.value = getValue();
 
         return go;
     }
@@ -322,7 +508,7 @@ public class LocalizationComboBox : GenericComboBox
     public override void CancelSetting()
     {
         base.CancelSetting();
-        if (LocalizationTable.currentLanguage != LocalizationTable.GetLanguages()[getValue()])
+        if (LocalizationTable.currentLanguage != LocalizationTable.GetLanguages()[selectedValue])
         {
             LocalizationTable.SetLocalization(getValue());
         }
@@ -340,16 +526,17 @@ public class LocalizationComboBox : GenericComboBox
 
     public new int getValue()
     {
-        // Tbh this never gets called (like legit never) or rather ever gets used
-        // But this is here cause if you ever need to call it for some reason it can come as a number or a string...
-        // So this handles both
-        string lang;
-        lang = (Settings.GetSetting<string>(option.key, out lang) ? lang : option.defaultValue).Replace("en_US", "English (US)");
-        int value = -1;
+        string lang = (Settings.GetSetting<string>(option.key, out lang) ? lang : option.defaultValue).Replace("en_US", "English (US)");
+        int value = 0;
+        string[] languages = LocalizationTable.GetLanguages();
 
-        if (int.TryParse(lang, out value) == false)
+        for (int i = 0; i < languages.Length; i++)
         {
-            value = dropdownElement.options.FindIndex(x => x.text == lang);
+            if (languages[i] == lang)
+            {
+                value = i;
+                break;
+            }
         }
 
         return (value >= 0) ? value : 0;
@@ -465,15 +652,15 @@ public class AnisotropicFilteringComboBox : GenericComboBox
     {
         switch (value)
         {
-            case 0:
-                QualitySettings.anisotropicFiltering = AnisotropicFiltering.Disable;
-                break;
-            case 1:
-                QualitySettings.anisotropicFiltering = AnisotropicFiltering.Enable;
-                break;
-            case 2:
-                QualitySettings.anisotropicFiltering = AnisotropicFiltering.ForceEnable;
-                break;
+        case 0:
+            QualitySettings.anisotropicFiltering = AnisotropicFiltering.Disable;
+            break;
+        case 1:
+            QualitySettings.anisotropicFiltering = AnisotropicFiltering.Enable;
+            break;
+        case 2:
+            QualitySettings.anisotropicFiltering = AnisotropicFiltering.ForceEnable;
+            break;
         }
     }
 
@@ -515,18 +702,18 @@ public class AAComboBox : GenericComboBox
     {
         switch (value)
         {
-            case 0:
-                QualitySettings.antiAliasing = 0;
-                break;
-            case 1:
-                QualitySettings.antiAliasing = 2;
-                break;
-            case 2:
-                QualitySettings.antiAliasing = 4;
-                break;
-            case 3:
-                QualitySettings.antiAliasing = 8;
-                break;
+        case 0:
+            QualitySettings.antiAliasing = 0;
+            break;
+        case 1:
+            QualitySettings.antiAliasing = 2;
+            break;
+        case 2:
+            QualitySettings.antiAliasing = 4;
+            break;
+        case 3:
+            QualitySettings.antiAliasing = 8;
+            break;
         }
     }
 
@@ -568,21 +755,21 @@ public class ShadowComboBox : GenericComboBox
     {
         switch (value)
         {
-            case 0:
-                QualitySettings.shadowResolution = ShadowResolution.VeryHigh;
-                break;
-            case 1:
-                QualitySettings.shadowResolution = ShadowResolution.High;
-                break;
-            case 2:
-                QualitySettings.shadowResolution = ShadowResolution.Medium;
-                break;
-            case 3:
-                QualitySettings.shadowResolution = ShadowResolution.Low;
-                break;
-            case 4:
-                QualitySettings.shadowResolution = ShadowResolution.Low;
-                break;
+        case 0:
+            QualitySettings.shadowResolution = ShadowResolution.VeryHigh;
+            break;
+        case 1:
+            QualitySettings.shadowResolution = ShadowResolution.High;
+            break;
+        case 2:
+            QualitySettings.shadowResolution = ShadowResolution.Medium;
+            break;
+        case 3:
+            QualitySettings.shadowResolution = ShadowResolution.Low;
+            break;
+        case 4:
+            QualitySettings.shadowResolution = ShadowResolution.Low;
+            break;
         }
     }
 
@@ -870,30 +1057,38 @@ public class DeveloperConsoleSlider : GenericSlider
 
 public class UIScaleSlider : GenericSlider
 {
-    private UIRescaler rescaler;
+    private UIRescaler[] rescalers;
 
     public override GameObject InitializeElement()
     {
         GameObject go = base.InitializeElement();
-        rescaler = GameObject.Find("Canvas").GetComponent<UIRescaler>();
+        rescalers = new UIRescaler[2];
+        rescalers[0] = GameObject.Find("Canvas").GetComponent<UIRescaler>();
+        rescalers[1] = GameObject.Find("Cursor_Canvas").GetComponent<UIRescaler>();
         return go;
     }
 
     public override void ApplySetting()
     {
         base.ApplySetting();
-        if (rescaler != null)
+        for (int i = 0; i < rescalers.Length; i++)
         {
-            rescaler.AdjustScale();
+            if (rescalers[i] != null)
+            {
+                rescalers[i].AdjustScale();
+            }
         }
     }
 
     public override void CancelSetting()
     {
         base.CancelSetting();
-        if (rescaler != null)
+        for (int i = 0; i < rescalers.Length; i++)
         {
-            rescaler.AdjustScale();
+            if (rescalers[i] != null)
+            {
+                rescalers[i].AdjustScale();
+            }
         }
     }
 }

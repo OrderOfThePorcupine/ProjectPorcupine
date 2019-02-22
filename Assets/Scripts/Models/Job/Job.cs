@@ -6,11 +6,13 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using MoonSharp.Interpreter;
+using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.Localization;
@@ -94,7 +96,7 @@ public class Job : ISelectable, IPrototypable
     {
         this.tile = tile;
         this.JobTileType = jobTileType;
-        this.Type = jobTileType.LocalizationCode;
+        this.Type = jobTileType.LocalizationName;
         this.OnJobCompleted += jobCompleted;
         this.jobTimeRequired = this.JobTime = jobTime;
         this.jobRepeats = jobRepeats;
@@ -479,7 +481,6 @@ public class Job : ISelectable, IPrototypable
 
     public void DropPriority()
     {
-        // TODO: This casting to and from enums are a bit weird. We should decide on ONE priority system.
         this.Priority = (Job.JobPriority)Mathf.Min((int)Job.JobPriority.Low, (int)Priority + 1);
     }
 
@@ -557,6 +558,11 @@ public class Job : ISelectable, IPrototypable
     }
 
     public void ReadXmlPrototype(XmlReader reader)
+    {
+    }
+
+    // TODO: Why does this implement IPrototypable? It isn't a prototype.
+    public void ReadJsonPrototype(JProperty jsonProto)
     {
     }
 
