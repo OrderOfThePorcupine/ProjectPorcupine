@@ -6,7 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
+#undef DEBUG
 using System.Collections.Generic;
 using Priority_Queue;
 
@@ -69,11 +69,13 @@ public class PathfindingPriorityQueue<T>
     /// <param name="priority">The priority of the data.</param>
     public void Enqueue(T data, float priority)
     {
+        #if DEBUG
         if (mapDataToWrappedNode.ContainsKey(data))
         {
             UnityDebugger.Debugger.LogError("PathfindingPriorityQueue", "Priority Queue can't re-enqueue a node that's already enqueued.");
             return;
         }
+        #endif
 
         if (underlyingQueue.Count == underlyingQueue.MaxSize)
         {
