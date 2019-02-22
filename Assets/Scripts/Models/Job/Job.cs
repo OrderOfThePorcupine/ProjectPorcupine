@@ -150,6 +150,7 @@ public class Job : ISelectable, IPrototypable
         this.Description = other.Description;
         this.acceptsAny = other.acceptsAny;
         this.OrderName = other.OrderName;
+        this.IsActive = true; // A copied job should always start out as active.
 
         jobWorkedLua = new List<string>(other.jobWorkedLua);
         jobCompletedLua = new List<string>(other.jobWorkedLua);
