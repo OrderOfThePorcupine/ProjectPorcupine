@@ -42,11 +42,9 @@ public struct DriverInfo
 
 public class SoundController
 {
-    private Dictionary<SoundClip, float> cooldowns;
     private VECTOR up;
     private VECTOR forward;
     private VECTOR zero;
-    private VECTOR ignore;
 
     // Use this for initialization
     public SoundController(World world = null)
@@ -61,7 +59,6 @@ public class SoundController
         zero = GetVectorFrom(Vector3.zero);
         forward = GetVectorFrom(Vector3.forward);
         up = GetVectorFrom(Vector3.up);
-        cooldowns = new Dictionary<SoundClip, float>();
     }
 
     public enum AudioChannel
@@ -72,50 +69,27 @@ public class SoundController
     // Update is called once per frame
     public void Update(float deltaTime)
     {
-        foreach (SoundClip key in cooldowns.Keys.ToList())
-        {
-            cooldowns[key] -= deltaTime;
-            if (cooldowns[key] <= 0f)
-            {
-                cooldowns.Remove(key);
-            }
-        }
     }
 
     public void OnButtonSFX()
     {
         SoundClip clip = AudioManager.GetAudio("Sound", "MenuClick");
-        if (cooldowns.ContainsKey(clip) && cooldowns[clip] > 0)
-        {
-            return;
-        }
 
-        cooldowns[clip] = 0.1f;
-        PlaySound(clip.Get(), "UI");
+        PlaySound(clip, "UI");
     }
 
     public void OnFurnitureCreated(Furniture furniture)
     {
         SoundClip clip = AudioManager.GetAudio("Sound", furniture.Type + "_OnCreated");
-        if (cooldowns.ContainsKey(clip) && cooldowns[clip] > 0)
-        {
-            return;
-        }
 
-        cooldowns[clip] = 0.1f;
-        PlaySoundAt(clip.Get(), furniture.Tile, "gameSounds");
+        PlaySoundAt(clip, furniture.Tile, "gameSounds");
     }
 
     public void OnTileTypeChanged(Tile tileData)
     {
         SoundClip clip = AudioManager.GetAudio("Sound", "Floor_OnCreated");
-        if (cooldowns.ContainsKey(clip) && cooldowns[clip] > 0)
-        {
-            return;
-        }
 
-        cooldowns[clip] = 0.1f;
-        PlaySoundAt(clip.Get(), tileData, "gameSounds", 1);
+        PlaySoundAt(clip, tileData, "gameSounds", 1);
     }
 
     /// <summary>
@@ -126,7 +100,7 @@ public class SoundController
     /// <param name="chanGroup">Chan group to play the sound on.</param>
     /// <param name="freqRange">Frequency range in semitones.</param>
     /// <param name="volRange">Volume range in decibels.</param>
-    public void PlaySound(Sound clip, string chanGroup = "master", float freqRange = 0f, float volRange = 0f)
+    public void PlaySound(SoundClip clip, string chanGroup = "master", float freqRange = 0f, float volRange = 0f)
     {
         PlaySoundAt(clip, null, chanGroup, freqRange, volRange);
     }
@@ -140,8 +114,14 @@ public class SoundController
     /// <param name="chanGroup">Chan group to play the sound on.</param>
     /// <param name="freqRange">Frequency range in semitones.</param>
     /// <param name="volRange">Volume range in decibels.</param>
-    public void PlaySoundAt(Sound clip, Tile tile, string chanGroup = "master", float freqRange = 0f, float volRange = 0f)
+    public void PlaySoundAt(SoundClip clip, Tile tile, string chanGroup = "master", float freqRange = 0f, float volRange = 0f, float cooldownTime = 0.1f)
     {
+        if (clip == null || !clip.CanPlay())
+        {
+            return;
+        }
+
+        clip.SetCooldown(cooldownTime);
         if (!AudioManager.channelGroups.ContainsKey(chanGroup))
         {
             chanGroup = "master";
@@ -151,7 +131,7 @@ public class SoundController
 
         FMOD.System soundSystem = AudioManager.SoundSystem;
         Channel channel;
-        soundSystem.playSound(clip, channelGroup, true, out channel);
+        soundSystem.playSound(clip.Get(), channelGroup, true, out channel);
         if (tile != null)
         {
             VECTOR tilePos = GetVectorFrom(tile);

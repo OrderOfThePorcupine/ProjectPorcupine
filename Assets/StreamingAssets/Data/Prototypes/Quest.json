@@ -53,7 +53,7 @@
       "Description": "Build 2 Oxygen Generator and the power for it",
       "Goals": [
         {
-          "Description": "Build 2 Power Generator",
+          "Description": "Build 2 Fission Reactors",
           "IsCompletedLuaFunction": "Quest_Have_Furniture_Built",
           "Parameters": {
             "type": "fission_reactor",

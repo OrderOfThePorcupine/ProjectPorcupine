@@ -1,0 +1,9 @@
+{
+  "JobCategory": {
+    "need":{"localizationName":"job_category_construct", "hidden":true},
+	"construct":{"localizationName":"job_category_construct"},
+	"workshop":{"localizationName":"job_category_workshop"},
+	"mining":{"localizationName":"job_category_mining"},
+	"hauling":{"localizationName":"job_category_hauling"},
+  },
+}

@@ -15,6 +15,8 @@ public class SoundClip
     private readonly List<Sound> clips;
     private int place;
 
+    private float coolDown;
+
     public SoundClip()
     {
         clips = new List<Sound>();
@@ -37,6 +39,16 @@ public class SoundClip
     public void Add(Sound clip)
     {
         clips.Add(clip);
+    }
+
+    public bool CanPlay()
+    {
+        return Time.time >= coolDown;
+    }
+
+    public void SetCooldown(float time)
+    {
+        coolDown = time + Time.time;
     }
 
     /// <summary>

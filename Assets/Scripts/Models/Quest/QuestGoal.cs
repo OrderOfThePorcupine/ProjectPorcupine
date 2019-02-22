@@ -6,8 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 
@@ -21,24 +19,6 @@ public class QuestGoal
     public Parameter Parameters { get; set; }
 
     public bool IsCompleted { get; set; }
-
-    public void ReadXmlPrototype(XmlReader reader_parent)
-    {
-        Description = reader_parent.GetAttribute("Description");
-        IsCompletedLuaFunction = reader_parent.GetAttribute("IsCompletedLuaFunction");
-
-        XmlReader reader = reader_parent.ReadSubtree();
-
-        while (reader.Read())
-        {
-            switch (reader.Name)
-            {
-                case "Params":
-                    Parameters = Parameter.ReadXml(reader);
-                    break;
-            }
-        }
-    }
 
     public void ReadJsonPrototype(JToken token)
     {

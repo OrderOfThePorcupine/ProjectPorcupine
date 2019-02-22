@@ -7,17 +7,17 @@
 // ====================================================
 #endregion
 using System;
-using System.Xml.Serialization;
 
 namespace ProjectPorcupine.OrderActions
 {
     [Serializable]
-    [XmlRoot("OrderAction")]
     [OrderActionName("Mine")]
     public class Mine : OrderAction
     {
         public Mine()
         {
+            Category = PrototypeManager.JobCategory.Get("mining");
+            Priority = Job.JobPriority.Medium;
         }
 
         private Mine(Mine other) : base(other)
@@ -32,6 +32,8 @@ namespace ProjectPorcupine.OrderActions
         public override Job CreateJob(Tile tile, string type)
         {
             Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            job.Priority = Priority;
+            job.Category = Category;
 
             return job;
         }

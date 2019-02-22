@@ -1,0 +1,378 @@
+[
+   {
+      "name": "stockpile_ESWse",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NEWne",
+      "x": 0,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NE",
+      "x": 0,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NS",
+      "x": 0,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_ES",
+      "x": 0,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_",
+      "x": 0,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_ESWsw",
+      "x": 1,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NEWnw",
+      "x": 1,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWnw",
+      "x": 1,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESW",
+      "x": 1,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_EW",
+      "x": 1,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_S",
+      "x": 1,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NSWnw",
+      "x": 2,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NSWsw",
+      "x": 2,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NW",
+      "x": 2,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWnesw",
+      "x": 2,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_SW",
+      "x": 2,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_E",
+      "x": 2,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESne",
+      "x": 3,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESse",
+      "x": 3,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWnenw",
+      "x": 3,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NEW",
+      "x": 3,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NSW",
+      "x": 3,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_N",
+      "x": 3,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWse",
+      "x": 4,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWnesesw",
+      "x": 4,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWnese",
+      "x": 4,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_ESW",
+      "x": 4,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NES",
+      "x": 4,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_W",
+      "x": 4,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWsw",
+      "x": 5,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWseswnw",
+      "x": 5,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWswnw",
+      "x": 5,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NEne",
+      "x": 5,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESnese",
+      "x": 5,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_ESse",
+      "x": 5,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWne",
+      "x": 6,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWneswnw",
+      "x": 6,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWsesw",
+      "x": 6,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NEWnenw",
+      "x": 6,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWneseswnw",
+      "x": 6,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_ESWsesw",
+      "x": 6,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWnesenw",
+      "x": 7,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NESWsenw",
+      "x": 7,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NWnw",
+      "x": 7,
+      "y": 3,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_NSWswnw",
+      "x": 7,
+      "y": 4,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   },
+   {
+      "name": "stockpile_SWsw",
+      "x": 7,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 32
+   }
+]

@@ -8,7 +8,6 @@
 #endregion
 
 using System;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 
@@ -269,13 +268,6 @@ namespace Scheduler
             }
 
             Cooldown = newCooldown;
-        }
-
-        public void ReadXmlPrototype(XmlReader reader)
-        {
-            this.Name = reader.GetAttribute("name");
-            this.LuaFunctionName = reader.GetAttribute("onFire");
-            this.EventType = EventType.Lua;
         }
 
         /// <summary>

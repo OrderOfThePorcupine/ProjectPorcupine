@@ -22,7 +22,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
     private Dictionary<BuildableComponent.Requirements, Vector3> statusIndicatorOffsets;
 
     // Use this for initialization
-    public FurnitureSpriteController(World world) : base(world, "Furniture")
+    public FurnitureSpriteController(World world) : base(world, "Furniture", world.Volume / 2)
     {
         // Instantiate our dictionary that tracks which GameObject is rendering which Tile data.
         childObjectMap = new Dictionary<Furniture, FurnitureChildObjects>();
@@ -77,7 +77,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         bool explicitSpriteUsed;
         string spriteName = furniture.GetSpriteName(out explicitSpriteUsed);
 
-        if (string.IsNullOrEmpty(furniture.LinksToNeighbours) || explicitSpriteUsed)
+        if (explicitSpriteUsed || string.IsNullOrEmpty(furniture.LinksToNeighbours))
         {
             return SpriteManager.GetSprite("Furniture", spriteName);
         }
@@ -294,16 +294,27 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
     {
         if (statuses.StatusIndicators != null && statuses.StatusIndicators.Count > 0)
         {
-            foreach (BuildableComponent.Requirements req in Enum.GetValues(typeof(BuildableComponent.Requirements)).Cast<BuildableComponent.Requirements>()
-                .Where(x => x != BuildableComponent.Requirements.None && statuses.StatusIndicators.ContainsKey(x)))
+            // TODO: Cache the Enum.GetValues call?
+            foreach (BuildableComponent.Requirements req in Enum.GetValues(typeof(BuildableComponent.Requirements)).Cast<BuildableComponent.Requirements>())
             {
+                if (req == BuildableComponent.Requirements.None)
+                {
+                    continue;
+                }
+
+                GameObject go;
+                if (statuses.StatusIndicators.TryGetValue(req, out go) == false)
+                {
+                    continue;
+                }
+
                 if ((furniture.Requirements & req) == 0)
                 {
-                    statuses.StatusIndicators[req].SetActive(false);
+                    go.SetActive(false);
                 }
                 else
                 {
-                    statuses.StatusIndicators[req].SetActive(true);
+                    go.SetActive(true);
                 }
             }
         }
@@ -324,6 +335,7 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
     {
         if (suffix.Contains(coord1) && suffix.Contains(coord2))
         {
+            // FIXME: Doing ToLower here sucks!
             return GetSuffixForNeighbour(furn, x, y, z, coord1.ToLower() + coord2.ToLower());
         }
 

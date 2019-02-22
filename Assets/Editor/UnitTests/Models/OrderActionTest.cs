@@ -6,11 +6,10 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using ProjectPorcupine.OrderActions;
 
@@ -19,23 +18,33 @@ public class OrderActionTest
     [Test]
     public void TestOrderActionCreation()
     {
-        string inputXML = @"<OrderAction type='Build' >
-            <Job time='1' />
-            <Inventory type='Steel Plate' amount='5' />
-            <Inventory type='Copper Plate' amount='2' />
-                           </OrderAction>";
+        string inputJSON = @"{""Build"": {
+          ""JobTime"": 1.0,
+          ""Inventory"": {
+            ""Steel Plate"": 5,
+            ""Copper Plate"": 2
+          }
+        }}";
 
-        XmlReader reader = new XmlTextReader(new StringReader(inputXML));
-        reader.Read();
+        Build expected = new Build();
+        expected.JobTime = 1.0f;
+        expected.Inventory = new Dictionary<string, int>()
+        {
+            { "Steel Plate", 5 },
+            { "Copper Plate", 2 }
+        };
 
-        OrderAction component = ProjectPorcupine.OrderActions.OrderAction.Deserialize(reader);
-
+        JProperty protoJson = (JProperty)JToken.ReadFrom(new JsonTextReader(new StringReader(inputJSON))).First;
+        OrderAction component = ProjectPorcupine.OrderActions.OrderAction.FromJson(protoJson);
         Assert.NotNull(component);
         Assert.AreEqual("Build", component.Type);
+        Assert.AreEqual(expected.Inventory["Steel Plate"], component.Inventory["Steel Plate"]);
+        Assert.AreEqual(expected.Inventory["Copper Plate"], component.Inventory["Copper Plate"]);
+        Assert.AreEqual(expected.JobTime, component.JobTime);
     }
 
     [Test]
-    public void TestBuildXmlSerialization()
+    public void TestBuildSerialization()
     {
         Build buildOrder = new Build();
 
@@ -46,26 +55,16 @@ public class OrderActionTest
             { "Copper Plate", 2 }
         };
 
-        // serialize
-        StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new XmlSerializer(typeof(OrderAction), new Type[] { typeof(Build) });
-
-        serializer.Serialize(writer, buildOrder);
-
-        StringReader sr = new StringReader(writer.ToString());
-
-        // if you want to dump file to disk for visual check, uncomment this
-        ////File.WriteAllText("Build.xml", writer.ToString());
-
-        // deserialize
-        Build deserializedBuildOrder = (Build)serializer.Deserialize(sr);
-
-        Assert.NotNull(deserializedBuildOrder);
-        Assert.IsTrue(deserializedBuildOrder.Inventory.ContainsKey("Steel Plate"));
+        string serialized = JsonConvert.SerializeObject(buildOrder);
+        Build deserialized = JsonConvert.DeserializeObject<Build>(serialized);
+        Assert.NotNull(deserialized);
+        Assert.AreEqual(deserialized.Inventory["Steel Plate"], buildOrder.Inventory["Steel Plate"]);
+        Assert.AreEqual(deserialized.Inventory["Copper Plate"], buildOrder.Inventory["Copper Plate"]);
+        Assert.IsTrue(deserialized.JobTime == buildOrder.JobTime);
     }
 
     [Test]
-    public void TestDeconstructXmlSerialization()
+    public void TestDeconstructSerialization()
     {
         Deconstruct deconstructOrder = new Deconstruct();
 
@@ -76,21 +75,11 @@ public class OrderActionTest
             { "Copper Plate", 2 }
         };
 
-        // serialize
-        StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new XmlSerializer(typeof(OrderAction), new Type[] { typeof(Deconstruct) });
-
-        serializer.Serialize(writer, deconstructOrder);
-
-        StringReader sr = new StringReader(writer.ToString());
-
-        // if you want to dump file to disk for visual check, uncomment this
-        ////File.WriteAllText("Deconstruct.xml", writer.ToString());
-
-        // deserialize
-        Deconstruct deserializedDeconstructOrder = (Deconstruct)serializer.Deserialize(sr);
-
-        Assert.NotNull(deserializedDeconstructOrder);
-        Assert.IsTrue(deserializedDeconstructOrder.Inventory.ContainsKey("Copper Plate"));
+        string serialized = JsonConvert.SerializeObject(deconstructOrder);
+        Deconstruct deserialized = JsonConvert.DeserializeObject<Deconstruct>(serialized);
+        Assert.NotNull(deserialized);
+        Assert.IsTrue(deserialized.JobTime == deconstructOrder.JobTime);
+        Assert.AreEqual(deserialized.Inventory["Steel Plate"], deconstructOrder.Inventory["Steel Plate"]);
+        Assert.AreEqual(deserialized.Inventory["Copper Plate"], deconstructOrder.Inventory["Copper Plate"]);
     }
 }

@@ -69,6 +69,11 @@ public class AutosaveManager
                 autosaveCounter = Math.Max(autosaveCounter, autosaveNumber);
             }
         }
+        else
+        {
+            UnityDebugger.Debugger.Log("AutosaveManager", "Creating directory for autosaves.");
+            Directory.CreateDirectory(GameController.Instance.FileSaveBasePath());
+        }
     }
 
     /// <summary>

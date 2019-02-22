@@ -10,25 +10,76 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class TileSpriteController : BaseSpriteController<Tile>
 {
+    public Tilemap[] tilemaps;
+    public TilemapRenderer[] tilemapRenderers;
+    public UnityEngine.Tilemaps.Tile errorTile;
+
+    public Dictionary<string, TileBase> TileLookup;
+
     // Use this for initialization
-    public TileSpriteController(World world) : base(world, "Tiles")
+    public TileSpriteController(World world) : base(world, "Tiles", world.Volume)
     {
         world.OnTileChanged += OnChanged;
         world.OnTileTypeChanged += OnChanged;
 
-        for (int x = 0; x < world.Width; x++)
+        TileLookup = new Dictionary<string, TileBase>();
+        foreach (var tiletype in PrototypeManager.TileType.Values)
         {
+            UnityEngine.Tilemaps.Tile tile = ScriptableObject.CreateInstance<UnityEngine.Tilemaps.Tile>();
+            Sprite sprite = SpriteManager.GetSprite("Tile", tiletype.Type);
+            tile.sprite = sprite;
+            tile.name = tiletype.Type;
+            TileLookup[tiletype.Type] = tile;
+        }
+
+        TileLookup[TileType.Empty.Type] = null;
+
+        objectParent.AddComponent<Grid>();
+        
+        errorTile = ScriptableObject.CreateInstance<UnityEngine.Tilemaps.Tile>();
+        errorTile.sprite = SpriteManager.CreateErrorSprite();
+        errorTile.name = "ErrorTile";
+        errorTile.color = Color.white;
+
+        tilemaps = new Tilemap[world.Depth];
+        tilemapRenderers = new TilemapRenderer[world.Depth];
+        for (int z = 0; z < world.Depth; z++)
+        {
+            GameObject go = new GameObject("Tile layer " + (z + 1));
+            go.transform.SetParent(objectParent.transform);
+            go.transform.position -= new Vector3(.5f, .5f, -z);
+
+            tilemaps[z] = go.AddComponent<Tilemap>();
+            tilemaps[z].orientation = Tilemap.Orientation.XY;
+            tilemapRenderers[z] = go.AddComponent<TilemapRenderer>();
+            tilemapRenderers[z].sortingLayerID = SortingLayer.NameToID("Tiles");
+            tilemapRenderers[z].sortingOrder = -z;
+
+            TileBase[] tiles = new TileBase[world.Width * world.Height];
+            BoundsInt bounds = new BoundsInt(0, 0, 0, world.Width, world.Height, 1);
+
             for (int y = 0; y < world.Height; y++)
             {
-                for (int z = 0; z < world.Depth; z++)
+                for (int x = 0; x < world.Width; x++)
                 {
-                    Tile tile = world.GetTileAt(x, y, z);
-                    OnCreated(tile);
+                    Tile worldTile = world.GetTileAt(x, y, z);
+
+                    TileBase tilemapTile;
+                    if (TileLookup.TryGetValue(worldTile.Type.Type, out tilemapTile) == false)
+                    {
+                        tilemapTile = errorTile;
+                        UnityDebugger.Debugger.LogWarningFormat("TileSpriteController", "Could not find graphics tile for type {0}", worldTile.Type.Type);
+                    }
+
+                    tiles[x + (y * world.Width)] = tilemapTile;
                 }
             }
+
+            tilemaps[z].SetTilesBlock(bounds, tiles);
         }
     }
 
@@ -41,70 +92,26 @@ public class TileSpriteController : BaseSpriteController<Tile>
 
     protected override void OnCreated(Tile tile)
     {
-        // This creates a new GameObject and adds it to our scene.
-        GameObject tile_go = new GameObject();
-
-        // Add our tile/GO pair to the dictionary.
-        objectGameObjectMap.Add(tile, tile_go);
-
-        tile_go.name = "Tile_" + tile.X + "_" + tile.Y + "_" + tile.Z;
-        tile_go.transform.position = new Vector3(tile.X, tile.Y, tile.Z);
-        tile_go.transform.SetParent(objectParent.transform, true);
-
-        // Add a Sprite Renderer
-        // Add a default sprite for empty tiles.
-        SpriteRenderer sr = tile_go.AddComponent<SpriteRenderer>();
-        sr.sprite = SpriteManager.GetSprite("Tile", "empty");
-        sr.sortingLayerName = "Tiles";
-
         OnChanged(tile);
     }
 
     // This function should be called automatically whenever a tile's data gets changed.
     protected override void OnChanged(Tile tile)
     {
-        if (objectGameObjectMap.ContainsKey(tile) == false)
-        {
-            UnityDebugger.Debugger.LogError("TileSpriteController", "tileGameObjectMap doesn't contain the tile_data -- did you forget to add the tile to the dictionary? Or maybe forget to unregister a callback?");
-            return;
-        }
-
-        GameObject tile_go = objectGameObjectMap[tile];
-
-        if (tile_go == null)
-        {
-            UnityDebugger.Debugger.LogError("TileSpriteController", "tileGameObjectMap's returned GameObject is null -- did you forget to add the tile to the dictionary? Or maybe forget to unregister a callback?");
-            return;
-        }
-
-        // TODO Evaluate this criteria and naming schema!
-        if (DoesTileSpriteExist(tile.Type.Type + "_heavy") && (tile.WalkCount >= 30))
-        {
-            if (tile.ForceTileUpdate || tile.WalkCount == 30)
-            {
-                ChangeTileSprite(tile_go, tile.Type.Type + "_heavy");
-            }
-        }
-        else if (DoesTileSpriteExist(tile.Type.Type + "_low") && (tile.WalkCount >= 10))
-        {
-            if (tile.ForceTileUpdate || tile.WalkCount == 10)
-            {
-                ChangeTileSprite(tile_go, tile.Type.Type + "_low");
-            }
-        }
-        else
-        {
-            ChangeTileSprite(tile_go, tile.Type.Type);
-        }
-
         if (tile.Type == TileType.Empty)
         {
-            tile_go.SetActive(false);
+            tilemaps[tile.Z].SetTile(new Vector3Int(tile.X, tile.Y, 0), null);
+            return;
         }
-        else
+
+        TileBase tilemapTile;
+        if (TileLookup.TryGetValue(tile.Type.Type, out tilemapTile) == false)
         {
-            tile_go.SetActive(true);
+            tilemapTile = errorTile;
+            UnityDebugger.Debugger.LogWarningFormat("TileSpriteController", "Could not find graphics tile for type {0}", tile.Type.Type);
         }
+
+        tilemaps[tile.Z].SetTile(new Vector3Int(tile.X, tile.Y, 0), tilemapTile);
     }
 
     protected override void OnRemoved(Tile tile)

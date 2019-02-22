@@ -7,15 +7,12 @@
 // ====================================================
 #endregion
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
 using ProjectPorcupine.Jobs;
 
 namespace ProjectPorcupine.OrderActions
 {
     [Serializable]
-    [XmlRoot("OrderAction")]
     [OrderActionName("ChangeTileType")]
     public class ChangeTileType : OrderAction
     {
@@ -45,7 +42,8 @@ namespace ProjectPorcupine.OrderActions
                 Tile.ChangeTileTypeJobComplete,
                 JobTime,
                 Inventory.Select(it => new RequestedItem(it.Key, it.Value)).ToArray(),
-                Job.JobPriority.High,
+                Job.JobPriority.High, 
+                "construct",
                 jobRepeats: false,
                 adjacent: true);
                 job.Description = "job_build_" + type + "_desc";

@@ -6,7 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,14 +35,11 @@ public class BuildModeController : IMouseHandler
 
     public BuildModeController()
     {
-        Instance = this;
         CurrentPreviewRotation = 0f;
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureLeft", KeyboardMappedInputType.KeyUp, RotateFurnitireLeft);
         KeyboardManager.Instance.RegisterInputAction("RotateFurnitureRight", KeyboardMappedInputType.KeyUp, RotateFurnitireRight);
         furnitureParent = new GameObject("Furniture Preview Sprites");
     }
-
-    public static BuildModeController Instance { get; protected set; }
 
     public float CurrentPreviewRotation { get; private set; }
 
@@ -57,7 +53,7 @@ public class BuildModeController : IMouseHandler
     {
         get
         {
-            return MouseHandlerCallbacks.HANDLE_DRAG_FINISHED | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION;
+            return MouseHandlerCallbacks.HANDLE_DRAG_FINISHED | MouseHandlerCallbacks.HANDLE_DRAG_VISUAL | MouseHandlerCallbacks.HANDLE_TOOLTIP | MouseHandlerCallbacks.HANDLE_PLACING_POSITION | MouseHandlerCallbacks.HANDLE_CLICK;
         }
     }
 
@@ -224,7 +220,7 @@ public class BuildModeController : IMouseHandler
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + furnitureType + "'");
-                    job = new Job(tile, furnitureType, World.Current.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High)
+                    job = new Job(tile, furnitureType, World.Current.FurnitureManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High, "construct")
                     {
                         adjacent = true,
                         Description = "job_build_" + furnitureType + "_desc"
@@ -268,7 +264,7 @@ public class BuildModeController : IMouseHandler
                         }
                     }
 
-                    World.Current.jobQueue.Enqueue(job);
+                    World.Current.jobManager.Enqueue(job);
 
                     // Let our workspot tile know it is reserved for us
                     World.Current.ReserveTileAsWorkSpot((Furniture)job.buildablePrototype, job.tile);
@@ -296,6 +292,7 @@ public class BuildModeController : IMouseHandler
                 if (orderAction != null)
                 {
                     job = orderAction.CreateJob(tile, utilityType);
+                    job.adjacent = true;
 
                     // this is here so OrderAction can be used for utility as well as furniture
                     job.OnJobCompleted += (theJob) => World.Current.UtilityManager.ConstructJobCompleted(theJob);
@@ -303,7 +300,7 @@ public class BuildModeController : IMouseHandler
                 else
                 {
                     UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + utilityType + "'");
-                    job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High)
+                    job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High, "construct")
                     {
                         Description = "job_build_" + utilityType + "_desc"
                     };
@@ -324,7 +321,7 @@ public class BuildModeController : IMouseHandler
                     offsetTile.PendingBuildJobs.Add(job);
                     job.OnJobStopped += (theJob) => offsetTile.PendingBuildJobs.Remove(job);
 
-                    World.Current.jobQueue.Enqueue(job);
+                    World.Current.jobManager.Enqueue(job);
                 }
             }
         }
@@ -354,7 +351,7 @@ public class BuildModeController : IMouseHandler
                     else
                     {
                         buildingJob.OnJobStopped += (theJob) => theJob.tile.PendingBuildJobs.Remove(theJob);
-                        WorldController.Instance.World.jobQueue.Enqueue(buildingJob);
+                        WorldController.Instance.World.jobManager.Enqueue(buildingJob);
                     }
                 }
                 else
@@ -518,7 +515,7 @@ public class BuildModeController : IMouseHandler
                     StringBuilder sb = new StringBuilder();
                     foreach (KeyValuePair<string, int> item in buildOrder.Inventory)
                     {
-                        sb.Append(string.Format("{0}x {1}", item.Value * validPostionCount, LocalizationTable.GetLocalization(item.Key)));
+                        sb.Append(string.Format("{0}x {1}", item.Value * validPostionCount, PrototypeManager.Inventory.Get(item.Key).LocalizedName));
                         if (buildOrder.Inventory.Count > 1)
                         {
                             sb.AppendLine();
@@ -679,7 +676,10 @@ public class BuildModeController : IMouseHandler
     /// </summary>
     public void HandleClick(Vector2 position, int mouseKey)
     {
-        throw new InvalidOperationException("Not supported by this class");
+        if (mouseKey == 2)
+        {
+            WorldController.Instance.MouseController.ClearMouseMode(true);
+        }
     }
 
     #region HelperFunctions

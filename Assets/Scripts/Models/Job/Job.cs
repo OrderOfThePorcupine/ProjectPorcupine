@@ -10,7 +10,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
@@ -64,7 +63,13 @@ public class Job : ISelectable, IPrototypable
     {
     }
 
-    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false)
+    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, string category, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false) :
+        this(tile, type, jobComplete, jobTime, requestedItems, jobPriority, PrototypeManager.JobCategory.Get(category), jobRepeats, need, critical, adjacent)
+    {
+        // This is identical to the next structure, except the category is a string. Intended primarily for Lua
+    }
+
+    public Job(Tile tile, string type, Action<Job> jobComplete, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, JobCategory category, bool jobRepeats = false, bool need = false, bool critical = false, bool adjacent = false)
     {
         this.tile = tile;
         this.Type = type;
@@ -74,7 +79,9 @@ public class Job : ISelectable, IPrototypable
         this.IsNeed = need;
         this.Critical = critical;
         this.Priority = jobPriority;
+        this.Category = category;
         this.adjacent = adjacent;
+        this.IsActive = true;
         this.Description = "job_error_missing_desc";
 
         jobWorkedLua = new List<string>();
@@ -90,9 +97,14 @@ public class Job : ISelectable, IPrototypable
                 this.RequestedItems[item.Type] = item.Clone();
             }
         }
+
+        if (this.Category == null)
+        {
+            UnityDebugger.Debugger.LogError("Invalid category detected.");
+        }
     }
 
-    public Job(Tile tile, TileType jobTileType, Action<Job> jobCompleted, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, bool jobRepeats = false, bool adjacent = false)
+    public Job(Tile tile, TileType jobTileType, Action<Job> jobCompleted, float jobTime, RequestedItem[] requestedItems, Job.JobPriority jobPriority, string category, bool jobRepeats = false, bool adjacent = false)
     {
         this.tile = tile;
         this.JobTileType = jobTileType;
@@ -101,8 +113,10 @@ public class Job : ISelectable, IPrototypable
         this.jobTimeRequired = this.JobTime = jobTime;
         this.jobRepeats = jobRepeats;
         this.Priority = jobPriority;
+        this.Category = PrototypeManager.JobCategory.Get(category);
         this.adjacent = adjacent;
         this.Description = "job_error_missing_desc";
+        this.IsActive = true;
 
         jobWorkedLua = new List<string>();
         jobCompletedLua = new List<string>();
@@ -115,6 +129,11 @@ public class Job : ISelectable, IPrototypable
             {
                 this.RequestedItems[item.Type] = item.Clone();
             }
+        }
+
+        if (this.Category == null)
+        {
+            UnityDebugger.Debugger.LogError("Invalid category detected.");
         }
     }
 
@@ -126,10 +145,12 @@ public class Job : ISelectable, IPrototypable
         this.OnJobCompleted = other.OnJobCompleted;
         this.JobTime = other.JobTime;
         this.Priority = other.Priority;
+        this.Category = other.Category;
         this.adjacent = other.adjacent;
         this.Description = other.Description;
         this.acceptsAny = other.acceptsAny;
         this.OrderName = other.OrderName;
+        this.IsActive = true; // A copied job should always start out as active.
 
         jobWorkedLua = new List<string>(other.jobWorkedLua);
         jobCompletedLua = new List<string>(other.jobWorkedLua);
@@ -167,6 +188,8 @@ public class Job : ISelectable, IPrototypable
     public Dictionary<string, Inventory> DeliveredItems { get; set; }
 
     public string Description { get; set; }
+
+    public bool IsActive { get; protected set; }
 
     /// <summary>
     /// Name of order that created this job. This should prevent multiple same orders on same things if not allowed.
@@ -208,7 +231,13 @@ public class Job : ISelectable, IPrototypable
     public JobPriority Priority
     {
         get;
-        protected set;
+        set;
+    }
+
+    public JobCategory Category
+    {
+        get;
+        set;
     }
 
     public bool IsSelected
@@ -225,11 +254,11 @@ public class Job : ISelectable, IPrototypable
         }
     }
 
-    public List<Character> CharsCantReach
+    public int CharsCantReachCount
     {
         get
         {
-            return charsCantReach;
+            return charsCantReach.Count;
         }
     }
 
@@ -320,6 +349,8 @@ public class Job : ISelectable, IPrototypable
                 OnJobCompleted(this);
             }
 
+            World.Current.jobManager.Remove(this);
+
             if (jobRepeats != true)
             {
                 // Let everyone know that the job is officially concluded
@@ -334,6 +365,49 @@ public class Job : ISelectable, IPrototypable
                 JobTime += jobTimeRequired;
             }
         }
+    }
+
+    public void Suspend()
+    {
+        IsActive = false;
+    }
+
+    public void SuspendCantReach()
+    {
+        World.Current.RoomManager.Removed += (room) => ClearCharCantReach();
+        Suspend();
+    }
+
+    public void SuspendWaitingForInventory(string missing)
+    {
+        if (missing == "*")
+        {
+            World.Current.InventoryManager.InventoryCreated += InventoryAvailable;
+        }
+        else
+        {
+            World.Current.InventoryManager.RegisterInventoryTypeCreated(CheckIfInventorySufficient, missing);
+        }
+
+        Suspend();
+    }
+
+    public void InventoryAvailable(Inventory inventory)
+    {
+        IsActive = true;
+        World.Current.InventoryManager.InventoryCreated -= InventoryAvailable;
+    }
+
+    public bool CheckIfInventorySufficient(Inventory inventory)
+    {
+        RequestedItem item = GetFirstDesiredItem();
+        if (item.Type == inventory.Type)
+        {
+            IsActive = true;
+            return true;
+        }
+
+        return false;
     }
 
     public void CancelJob()
@@ -353,9 +427,8 @@ public class Job : ISelectable, IPrototypable
             }
         }
 
-        // Remove the job out of both job queues.
-        // World.Current.jobWaitingQueue.Remove(this);
-        World.Current.jobQueue.Remove(this);
+        // Remove the job out of job queue.
+        World.Current.jobManager.Remove(this);
     }
 
     /// <summary>
@@ -484,6 +557,11 @@ public class Job : ISelectable, IPrototypable
         this.Priority = (Job.JobPriority)Mathf.Min((int)Job.JobPriority.Low, (int)Priority + 1);
     }
 
+    public void RaisePriority()
+    {
+        this.Priority = (Job.JobPriority)Mathf.Max((int)Job.JobPriority.High, (int)Priority - 1);
+    }
+
     public string GetName()
     {
         try
@@ -520,10 +598,15 @@ public class Job : ISelectable, IPrototypable
     /// </summary>
     public void AddCharCantReach(Character character)
     {
-        if (!CharsCantReach.Contains(character))
+        if (!charsCantReach.Contains(character))
         {
             charsCantReach.Add(character);
         }
+    }
+
+    public bool CanCharacterReach(Character character)
+    {
+        return charsCantReach.Contains(character);
     }
 
     /// <summary>
@@ -549,16 +632,13 @@ public class Job : ISelectable, IPrototypable
     /// </summary>
     public void ClearCharCantReach()
     {
-        charsCantReach = new List<Character>();
+        charsCantReach.Clear();
+        IsActive = true;
     }
 
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
-    }
-
-    public void ReadXmlPrototype(XmlReader reader)
-    {
     }
 
     // TODO: Why does this implement IPrototypable? It isn't a prototype.

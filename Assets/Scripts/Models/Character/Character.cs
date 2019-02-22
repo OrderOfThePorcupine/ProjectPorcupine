@@ -6,9 +6,9 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+#pragma warning disable 0649
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Localization;
@@ -22,6 +22,14 @@ namespace ProjectPorcupine.Entities
         EAST,
         SOUTH,
         WEST
+    }
+
+    public enum CharacterJobPriority
+    {
+        Urgent,
+        High,
+        Medium,
+        Low,
     }
 
     /// <summary>
@@ -42,26 +50,12 @@ namespace ProjectPorcupine.Entities
         /// Current tile the character is standing on.
         private Tile currTile;
 
-        /// The next tile in the pathfinding sequence (the one we are about to enter).
-        private Tile nextTile;
-
-        /// Goes from 0 to 1 as we move from CurrTile to nextTile.
-        private float movementPercentage;
-
-        /// Holds the path to reach DestTile.
-        private List<Tile> movementPath;
-
         /// Tiles per second.
         private float speed;
         private float baseSpeed = 5f;
 
         /// Used for health system.
         private HealthSystem health;
-
-        /// Tile where job should be carried out, if different from MyJob.tile.
-        private Tile jobTile;
-
-        private bool selected = false;
 
         private Color characterColor;
         private Color characterUniformColor;
@@ -109,8 +103,14 @@ namespace ProjectPorcupine.Entities
         /// The item we are carrying (not gear/equipment).
         public Inventory Inventory { get; set; }
 
+        // Priorities for jobs for the character
+        public Dictionary<JobCategory, CharacterJobPriority> Priorities { get; private set; }
+
         /// Holds all character animations.
         public Animation.CharacterAnimation Animation { get; set; }
+
+        /// Path character will be walking on
+        public List<Tile> Path { get; set; }
 
         /// Is the character walking or idle.
         public bool IsWalking { get; set; }
@@ -221,23 +221,7 @@ namespace ProjectPorcupine.Entities
             }
         }
 
-        public bool IsSelected
-        {
-            get
-            {
-                return selected;
-            }
-
-            set
-            {
-                if (value == false)
-                {
-                    VisualPath.Instance.RemoveVisualPoints(ID);
-                }
-
-                selected = value;
-            }
-        }
+        public bool IsSelected { get; set; }
 
         /// <summary>
         /// Gets the Health of this object.
@@ -259,14 +243,16 @@ namespace ProjectPorcupine.Entities
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = "Poke " + GetName(),
+                LocalizationKey = "Poke",
+                LocalizationParameter = GetName(),
                 RequireCharacterSelected = false,
                 Action = (cm, c) => { UnityDebugger.Debugger.Log("Character", GetDescription()); health.CurrentHealth -= 5; }
             };
 
             yield return new ContextMenuAction
             {
-                LocalizationKey = "Heal +5",
+                LocalizationKey = "heal",
+                LocalizationParameter = "+5",
                 RequireCharacterSelected = false,
                 Action = (cm, c) => { health.CurrentHealth += 5; }
             };
@@ -351,7 +337,7 @@ namespace ProjectPorcupine.Entities
                 }
                 else
                 {
-                    Job job = World.Current.jobQueue.GetJob(this);
+                    Job job = World.Current.jobManager.GetJob(this);
                     if (job != null)
                     {
                         SetState(new States.JobState(this, job));
@@ -493,6 +479,30 @@ namespace ProjectPorcupine.Entities
             throw new InvalidOperationException("Not supported by this class");
         }
 
+        public CharacterJobPriority GetPriority(JobCategory category)
+        {
+            return Priorities[category];
+        }
+
+        public void SetPriority(JobCategory category, CharacterJobPriority priority)
+        {
+            Priorities[category] = priority;
+        }
+
+        public List<JobCategory> CategoriesOfPriority(CharacterJobPriority priority)
+        {
+            List<JobCategory> ret = new List<JobCategory>();
+            foreach (KeyValuePair<JobCategory, CharacterJobPriority> row in Priorities)
+            {
+                if (row.Value == priority)
+                {
+                    ret.Add(row.Key);
+                }
+            }
+
+            return ret;
+        }
+
         private States.State FindInitiatingState()
         {
             if (state == null)
@@ -514,6 +524,17 @@ namespace ProjectPorcupine.Entities
             LoadNeeds();
             LoadStats();
             UseStats();
+            LoadPriorities();
+        }
+
+        private void LoadPriorities()
+        {
+            Priorities = new Dictionary<JobCategory, CharacterJobPriority>();
+
+            foreach (JobCategory category in PrototypeManager.JobCategory.Values)
+            {
+                Priorities[category] = CharacterJobPriority.High; // TODO: Set these in a meaningful way and store them!
+            }
         }
 
         private void LoadNeeds()
@@ -550,11 +571,18 @@ namespace ProjectPorcupine.Entities
         /// </summary>
         private void UseStats()
         {
-            // The speed is equal to (baseSpeed +/-30% of baseSpeed depending on Dexterity)
-            speed = baseSpeed + (0.3f * baseSpeed * ((float)Stats["Dexterity"].Value - 10) / 10);
+            try
+            {
+                // The speed is equal to (baseSpeed +/-30% of baseSpeed depending on Dexterity)
+                speed = baseSpeed + (0.3f * baseSpeed * ((float)Stats["Dexterity"].Value - 10) / 10);
 
-            // Base character max health on their constitution.
-            health = new HealthSystem(50 + ((float)Stats["Constitution"].Value * 5));
+                // Base character max health on their constitution.
+                health = new HealthSystem(50 + ((float)Stats["Constitution"].Value * 5));
+            }
+            catch (KeyNotFoundException)
+            {
+                UnityDebugger.Debugger.LogError("Stat keys not found. If not testing, this is really bad!");
+            }
         }
     }
 }

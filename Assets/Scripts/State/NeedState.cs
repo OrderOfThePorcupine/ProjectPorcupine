@@ -31,7 +31,7 @@ namespace ProjectPorcupine.Entities.States
             {
                 if (World.Current.FurnitureManager.CountWithType(biggestNeed.RestoreNeedFurn.Type) > 0)
                 {
-                    Job job = new Job(null, biggestNeed.RestoreNeedFurn.Type, biggestNeed.CompleteJobNorm, biggestNeed.RestoreNeedTime, null, Job.JobPriority.High, false, true, false);
+                    Job job = new Job(null, biggestNeed.RestoreNeedFurn.Type, biggestNeed.CompleteJobNorm, biggestNeed.RestoreNeedTime, null, Job.JobPriority.Medium, "need", false, true, false);
                     character.QueueState(new JobState(character, job));
                 }
             }
@@ -39,7 +39,7 @@ namespace ProjectPorcupine.Entities.States
             // We must do something immediately, drop what we are doing.
             if (needPercent == 100 && biggestNeed != null && biggestNeed.CompleteOnFail)
             {
-                Job job = new Job(character.CurrTile, null, biggestNeed.CompleteJobCrit, biggestNeed.RestoreNeedTime * 10, null, Job.JobPriority.High, false, true, true);
+                Job job = new Job(character.CurrTile, null, biggestNeed.CompleteJobCrit, biggestNeed.RestoreNeedTime * 10, null, Job.JobPriority.High, "need", false, true, true);
                 character.InterruptState();
                 character.ClearStateQueue();
                 character.SetState(new JobState(character, job));

@@ -7,14 +7,10 @@
 // ====================================================
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
 
 /// <summary>
 /// A class that holds prototypes to be used later.
@@ -22,8 +18,6 @@ using UnityEngine;
 public class PrototypeMap<T> where T : IPrototypable, new()
 {
     private readonly Dictionary<string, T> prototypes;
-    private string listTag;
-    private string elementTag;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrototypeMap`1"/> class.
@@ -31,18 +25,6 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     public PrototypeMap()
     {
         this.prototypes = new Dictionary<string, T>();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PrototypeMap`1"/> class.
-    /// </summary>
-    /// <param name="listTag">Name used for the XML tag that holds all the prototypes.</param>
-    /// <param name="elementTag">Name used for the XML tag that hold each prototype.</param>
-    public PrototypeMap(string listTag, string elementTag)
-    {
-        this.prototypes = new Dictionary<string, T>();
-        this.listTag = listTag;
-        this.elementTag = elementTag;
     }
 
     /// <summary>
@@ -143,35 +125,6 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     }
 
     /// <summary>
-    /// Loads all the prototypes from the specified text.
-    /// </summary>
-    /// <param name="xmlText">Xml text to parse.</param>
-    public void LoadPrototypes(string xmlText)
-    {
-        XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
-
-        if (reader.ReadToDescendant(listTag))
-        {
-            if (reader.ReadToDescendant(elementTag))
-            {
-                do
-                {
-                    LoadPrototype(reader);
-                }
-                while (reader.ReadToNextSibling(elementTag));
-            }
-            else
-            {
-                UnityDebugger.Debugger.LogError("PrototypeMap", "The '" + listTag + "' prototype definition file doesn't have any '" + elementTag + "' elements.");
-            }
-        }
-        else
-        {
-            UnityDebugger.Debugger.LogError("PrototypeMap", "Did not find a '" + listTag + "' element in the prototype definition file.");
-        }
-    }
-
-    /// <summary>
     /// Loads all the prototypes from the specified JProperty.
     /// </summary>
     /// <param name="protoToken">JProperty to parse.</param>
@@ -205,25 +158,5 @@ public class PrototypeMap<T> where T : IPrototypable, new()
                 Set(prototype);
             }
         }
-    }
-
-    /// <summary>
-    /// Loads a single prototype.
-    /// </summary>
-    /// <param name="reader">The Xml Reader.</param>
-    private void LoadPrototype(XmlReader reader)
-    {
-        T prototype = new T();
-        try
-        {
-            prototype.ReadXmlPrototype(reader);
-        }
-        catch (Exception e)
-        {
-            // Leaving this for Unitys console because UberLogger doesn't show multiline messages correctly.
-            UnityDebugger.Debugger.LogError("PrototypeMap", "Error reading '" + elementTag + "' prototype for: " + listTag + Environment.NewLine + "Exception: " + e.Message + Environment.NewLine + "StackTrace: " + e.StackTrace);
-        }
-
-        Set(prototype);
     }
 }

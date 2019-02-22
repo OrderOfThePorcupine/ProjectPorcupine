@@ -6,6 +6,7 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+#pragma warning disable 0649
 using System.IO;
 using System.Threading;
 using MoonSharp.Interpreter;
@@ -86,11 +87,11 @@ public class WorldController : MonoBehaviour
             UnityDebugger.Debugger.LogError("WorldController", "There should never be two world controllers.");
         }
 
-        new FunctionsManager();
-        new PrototypeManager();
-        new CharacterNameManager();
-        new SpriteManager();
-        new AudioManager();
+        FunctionsManager.Initialize();
+        PrototypeManager.Initialize();
+        CharacterNameManager.Initialize();
+        SpriteManager.Initialize();
+        AudioManager.Initialize();
 
         // FIXME: Do something real here. This is just to show how to register a C# event prototype for the Scheduler.
         PrototypeManager.ScheduledEvent.Add(
@@ -119,7 +120,6 @@ public class WorldController : MonoBehaviour
     public void Start()
     {
         // Create GameObject so we can have access to a transform which has a position of "Vector3.zero".
-        new GameObject("VisualPath", typeof(VisualPath));
         GameObject go;
 
         TileSpriteController = new TileSpriteController(World);

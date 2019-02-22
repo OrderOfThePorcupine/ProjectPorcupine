@@ -1,7 +1,4 @@
 #! /bin/sh
-# copied from: http://blog.stablekernel.com/continuous-integration-for-unity-5-using-travisci
-
-project="Project Porcupine"
 
 echo "Attempting to build $project for Windows"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
@@ -10,8 +7,15 @@ echo "Attempting to build $project for Windows"
     -silent-crashes \
     -logFile $(pwd)/unity.log \
     -projectPath $(pwd) \
-    -buildWindowsPlayer "$(pwd)/Build/windows/$project.exe" \
+    -buildWindowsPlayer "$(pwd)/Build/windows/ProjectPorcupine.exe" \
     -quit
+
+if [ $? = 0 ] ; then
+  echo "Building Windows exe completed successfully."
+else
+  echo "Building Windows exe failed. Exited with $?."
+  exit $?
+fi
 
 echo "Attempting to build $project for OS X"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
@@ -20,8 +24,15 @@ echo "Attempting to build $project for OS X"
     -silent-crashes \
     -logFile $(pwd)/unity.log \
     -projectPath $(pwd) \
-    -buildOSXUniversalPlayer "$(pwd)/Build/osx/$project.app" \
+    -buildOSXUniversalPlayer "$(pwd)/Build/osx/ProjectPorcupine.app" \
     -quit
+
+if [ $? = 0 ] ; then
+  echo "Building Mac exe completed successfully."
+else
+  echo "Building Mac exe failed. Exited with $?."
+  exit $?
+fi
 
 echo "Attempting to build $project for Linux"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
@@ -30,13 +41,18 @@ echo "Attempting to build $project for Linux"
     -silent-crashes \
     -logFile $(pwd)/unity.log \
     -projectPath $(pwd) \
-    -buildLinuxUniversalPlayer "$(pwd)/Build/linux/$project.exe" \
+    -buildLinuxUniversalPlayer "$(pwd)/Build/linux/ProjectPorcupine.exe" \
     -quit
 
-echo 'Logs from build'
-cat $(pwd)/unity.log
+if [ $? = 0 ] ; then
+  echo "Building Linux exe completed successfully."
+else
+  echo "Building Linux exe failed. Exited with $?."
+  echo $LOG_FILE
+  exit $?
+fi
 
-echo 'Attempting to zip builds for week $BUILD_VERSION'
+echo "Attempting to zip builds for week $BUILD_VERSION"
 cd $(pwd)/Build/
 echo 'Attempting to zip linux'
 zip -q -r Linux-$BUILD_VERSION.zip linux/
@@ -46,5 +62,7 @@ echo 'Attempting to zip windows'
 zip -q -r Windows-$BUILD_VERSION.zip windows/
 cd -
 
-# create the config file for Bintray through ERB (an ruby cli-tool)
-erb ./Scripts/bintray.json.erb > ./Scripts/bintray.json
+echo "All builds done creating config file"
+
+# Create the config file for Bintray
+./Scripts/generate-bintray-json.sh > ./Scripts/bintray.json

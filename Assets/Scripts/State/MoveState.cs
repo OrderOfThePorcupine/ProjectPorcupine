@@ -17,7 +17,6 @@ namespace ProjectPorcupine.Entities.States
     public class MoveState : State
     {
         private Pathfinder.GoalEvaluator hasReachedDestination;
-        private List<Tile> path;
 
         private float movementPercentage;
         private float distToTravel;
@@ -28,7 +27,7 @@ namespace ProjectPorcupine.Entities.States
             : base("Move", character, nextState)
         {
             hasReachedDestination = goalEvaluator;
-            this.path = path;
+            character.Path = path;
 
             DebugLog("created with path length: {0}", path.Count);
         }
@@ -63,7 +62,7 @@ namespace ProjectPorcupine.Entities.States
                 movementPercentage = 0f;
 
                 // Arrived at the destination or run out of path.
-                if (hasReachedDestination(character.CurrTile) || path.Count == 0)
+                if (hasReachedDestination(character.CurrTile) || character.Path.Count == 0)
                 {
                     Finished();
                     return;
@@ -107,23 +106,18 @@ namespace ProjectPorcupine.Entities.States
 
             character.IsWalking = true;
 
-            if (character.IsSelected)
-            {
-                VisualPath.Instance.SetVisualPoints(character.ID, new List<Tile>(path));
-            }
-
-            if (path == null || path.Count == 0)
+            if (character.Path == null || character.Path.Count == 0)
             {
                 Finished();
                 return;
             }
 
             // The starting tile might be included, so we need to get rid of it
-            while (path[0].Equals(character.CurrTile))
+            while (character.Path[0].Equals(character.CurrTile))
             {
-                path.RemoveAt(0);
+                character.Path.RemoveAt(0);
 
-                if (path.Count == 0)
+                if (character.Path.Count == 0)
                 {
                     DebugLog(" - Ran out of path to walk");
 
@@ -145,15 +139,13 @@ namespace ProjectPorcupine.Entities.States
             base.Exit();
 
             character.IsWalking = false;
-
-            VisualPath.Instance.RemoveVisualPoints(character.ID);
         }
 
         public override void Interrupt()
         {
-            if (path != null)
+            if (character.Path != null)
             {
-                Tile goal = path.Last();
+                Tile goal = character.Path.Last();
                 if (goal.Inventory != null)
                 {
                     goal.Inventory.ReleaseClaim(character);
@@ -165,8 +157,8 @@ namespace ProjectPorcupine.Entities.States
 
         private void AdvanceNextTile()
         {
-            nextTile = path[0];
-            path.RemoveAt(0);
+            nextTile = character.Path[0];
+            character.Path.RemoveAt(0);
 
             character.FaceTile(nextTile);
         }

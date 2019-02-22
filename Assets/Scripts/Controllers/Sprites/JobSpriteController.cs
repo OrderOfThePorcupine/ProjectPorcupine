@@ -19,13 +19,13 @@ public class JobSpriteController : BaseSpriteController<Job>
 
     // Use this for initialization
     public JobSpriteController(World world, FurnitureSpriteController furnitureSpriteController, UtilitySpriteController utilitySpriteController)
-        : base(world, "Jobs")
+        : base(world, "Jobs", 200)
     {
         fsc = furnitureSpriteController;
         usc = utilitySpriteController;
-        world.jobQueue.OnJobCreated += OnCreated;
+        world.jobManager.JobCreated += OnCreated;
 
-        foreach (Job job in world.jobQueue.PeekAllJobs())
+        foreach (Job job in world.jobManager.PeekAllJobs())
         {
             OnCreated(job);
         }
@@ -41,9 +41,9 @@ public class JobSpriteController : BaseSpriteController<Job>
 
     public override void RemoveAll()
     {
-        world.jobQueue.OnJobCreated -= OnCreated;
+        world.jobManager.JobCreated -= OnCreated;
 
-        foreach (Job job in world.jobQueue.PeekAllJobs())
+        foreach (Job job in world.jobManager.PeekAllJobs())
         {
             job.OnJobCompleted -= OnRemoved;
             job.OnJobStopped -= OnRemoved;

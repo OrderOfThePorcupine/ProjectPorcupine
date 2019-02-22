@@ -223,6 +223,7 @@ function Stockpile_UpdateAction( furniture, deltaTime )
     		0,
     		itemsDesired,
     		Job.JobPriority.Low,
+			"hauling",
     		false
   	)
   	job.Description = "job_stockpile_moving_desc"
@@ -279,6 +280,7 @@ function MiningDroneStation_UpdateAction( furniture, deltaTime )
 		1,
 		nil,
 		Job.JobPriority.Medium,
+		"hauling",
 		true	-- This job repeats until the destination tile is full.
 	)
 
@@ -296,11 +298,11 @@ function MiningDroneStation_JobComplete(job)
 end
 
 function MiningDroneStation_Change_to_Raw_Iron(furniture, character)
-	furniture.Parameters["mine_type"].SetValue("Raw Iron")
+	furniture.Parameters["mine_type"].SetValue("raw_iron")
 end
 
 function MiningDroneStation_Change_to_Raw_Copper(furniture, character)
-	furniture.Parameters["mine_type"].SetValue("Raw Copper")
+	furniture.Parameters["mine_type"].SetValue("raw_copper")
 end
 
 function MetalSmelter_UpdateAction(furniture, deltaTime)
@@ -344,7 +346,7 @@ function MetalSmelter_UpdateAction(furniture, deltaTime)
     if(inputSpot.Inventory ~= nil and inputSpot.Inventory.StackSize < inputSpot.Inventory.MaxStackSize) then
         desiredStackSize = inputSpot.Inventory.MaxStackSize - inputSpot.Inventory.StackSize
     end
-    local itemsDesired = { RequestedItem.__new("Raw Iron", desiredStackSize) }
+    local itemsDesired = { RequestedItem.__new("raw_iron", desiredStackSize) }
     ModUtils.ULog("MetalSmelter: Creating job for " .. desiredStackSize .. " raw iron.")
 
     local job = Job.__new(
@@ -354,6 +356,7 @@ function MetalSmelter_UpdateAction(furniture, deltaTime)
         0.4,
         itemsDesired,
         Job.JobPriority.Medium,
+		"hauling",
         false
     )
 
@@ -387,6 +390,7 @@ function CloningPod_UpdateAction(furniture, deltaTime)
         10,
         nil,
         Job.JobPriority.Medium,
+		"workshop",
         false
     )
 
@@ -639,6 +643,7 @@ function OreMine_CreateMiningJob(furniture, character)
         0,
         nil,
         Job.JobPriority.High,
+		"mining",
         false,
         false,
         false,

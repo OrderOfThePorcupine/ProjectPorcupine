@@ -9,10 +9,8 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Xml;
 
 using ICSharpCode.SharpZipLib.Zip;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -101,26 +99,33 @@ namespace ProjectPorcupine.Localization
                 UnityDebugger.Debugger.Log("LocalizationDownloader", "There is an update for localization files!");
                 yield return DownloadLocalizationFromWeb(onLocalizationDownloadedCallback);
 
-                // Because config.xml exists in the new downloaded localization, we have to add the version element to it.
-                try
-                {
-                    string configPath = Path.Combine(LocalizationFolderPath, "config.xml");
-                    XmlDocument document = new XmlDocument();
-                    document.Load(configPath);
-                    XmlNode node = document.SelectSingleNode("//config");
+                UpdateConfigFile(latestCommitHash);
+            }
+        }
 
-                    XmlElement versionElement = document.CreateElement("version");
-                    versionElement.SetAttribute("hash", latestCommitHash);
-                    node.InsertBefore(versionElement, document.SelectSingleNode("//languages"));
-                    document.Save(configPath);
-                }
-                catch (Exception e)
+        private static void UpdateConfigFile(string latestCommitHash)
+        {
+            string configPath = Path.Combine(LocalizationFolderPath, "config.json");
+
+            // Because config.json exists in the new downloaded localization, we have to add the version element to it.
+            try
+            {
+                if ((LocalizationTable.hash != latestCommitHash || LocalizationTable.hash == string.Empty) && latestCommitHash != string.Empty)
                 {
-                    // Not a big deal:
-                    // Next time the LocalizationDownloader will force an update.
-                    UnityDebugger.Debugger.LogWarning("LocalizationDownloader", "Writing version in config.xml file failed: " + e.Message);
-                    throw;
+                    LocalizationTable.SaveConfigFile(latestCommitHash, configPath);
                 }
+            }
+            catch (Exception e)
+            {
+                // Not a big deal:
+                // Next time the LocalizationDownloader will force an update.
+                UnityDebugger.Debugger.LogWarning("LocalizationDownloader", "Writing version in config.json file failed: " + e.Message);
+                if (File.Exists(configPath))
+                {
+                    File.Delete(configPath);
+                }
+
+                throw;
             }
         }
 
@@ -270,7 +275,7 @@ namespace ProjectPorcupine.Localization
                 // If there are files without that extension then:
                 // a) someone made a change to localization system and didn't update this
                 // b) We are in a wrong directory, so let's hope we didn't delete anything important.
-                if (file.Extension != ".lang" && file.Extension != ".meta" && file.Extension != ".ver" && file.Extension != ".md" && file.Name != "config.xml")
+                if (file.Extension != ".lang" && file.Extension != ".meta" && file.Extension != ".ver" && file.Extension != ".md" && file.Name != "config.json" && file.Name != "config.xml")
                 {
                     UnityDebugger.Debugger.LogError("LocalizationDownloader", "SOMETHING WENT HORRIBLY WRONG AT DOWNLOADING LOCALIZATION!");
                     throw new Exception("SOMETHING WENT HORRIBLY WRONG AT DOWNLOADING LOCALIZATION!");
@@ -291,60 +296,11 @@ namespace ProjectPorcupine.Localization
         }
 
         /// <summary>
-        /// Reads Application.streamingAssetsPath/Localization/config.xml making sure that Localization folder exists.
+        /// Reads Application.streamingAssetsPath/Localization/config.json making sure that Localization folder exists.
         /// </summary>
         private static string GetLocalizationVersionFromConfig()
         {
-            string localizationConfigFilePath = Path.Combine(LocalizationFolderPath, "config.xml");
-
-            string currentLocalizationVersion = null;
-            try
-            {
-                XmlReader reader = XmlReader.Create(localizationConfigFilePath);
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "version")
-                    {
-                        if (reader.HasAttributes)
-                        {
-                            currentLocalizationVersion = reader.GetAttribute("hash");
-                            break;
-                        }
-                    }
-                }
-
-                reader.Close();
-            }
-            catch (FileNotFoundException)
-            {
-                // It's fine - we will create that file later.
-                UnityDebugger.Debugger.Log("LocalizationDownloader", localizationConfigFilePath + " file not found, forcing an update.");
-            }
-            catch (DirectoryNotFoundException)
-            {
-                // This is probably first launch of the game.
-                UnityDebugger.Debugger.Log("LocalizationDownloader", LocalizationFolderPath + " folder not found, creating...");
-
-                try
-                {
-                    Directory.CreateDirectory(LocalizationFolderPath);
-                }
-                catch (Exception e)
-                {
-                    // If any exception happen here then we don't have a Localization folder in place
-                    // so we can just throw - we won't do anything good here.
-                    throw e;
-                }
-            }
-            catch (Exception e)
-            {
-                // i.e. UnauthorizedAccessException, NotSupportedException or UnauthorizedAccessException.
-                // Those should never happen and if they do something is really fucked up so we should
-                // probably start a fire, call 911 or at least throw an exception.
-                throw e;
-            }
-
-            return currentLocalizationVersion;
+            return LocalizationTable.hash;
         }
 
         /// <summary>

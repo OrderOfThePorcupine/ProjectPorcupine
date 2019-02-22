@@ -1,0 +1,43 @@
+[
+   {
+      "name": "vent",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 64
+   },
+   {
+      "name": "vent_EW_opened",
+      "x": 0,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 64
+   },
+   {
+      "name": "vent_NS_opened",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 64
+   },
+   {
+      "name": "vent_EW_closed",
+      "x": 1,
+      "y": 1,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 64
+   },
+   {
+      "name": "vent_NS_closed",
+      "x": 1,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "pixelPerUnit": 64
+   }
+]
+

@@ -11,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using System.Threading;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace ProjectPorcupine.Localization
@@ -25,8 +27,13 @@ namespace ProjectPorcupine.Localization
         // Default is English.
         public static string currentLanguage = DefaultLanguage;
 
+        // The hash for the current localization code
+        public static string hash = string.Empty;    // Set to something to ensure will be downloaded if not available.
+
         // Used by the LocalizationLoader to ensure that the localization files are only loaded once.
         public static bool initialized = false;
+
+        public static JToken protoJson;
 
         private static readonly string DefaultLanguage = "en_US";
 
@@ -77,22 +84,34 @@ namespace ProjectPorcupine.Localization
         public static string GetLocalization(string key, FallbackMode fallbackMode, string language, params object[] additionalValues)
         {
             string value;
+
+            if (additionalValues != null)
+            {
+                for (int i = 0; i < additionalValues.Length; i++)
+                {
+                    if (additionalValues[i] is string)
+                    {
+                        additionalValues[i] = GetLocalization(additionalValues[i].ToString(), fallbackMode, language);
+                    }
+                }
+            }
+
             if (localizationTable.ContainsKey(language) && localizationTable[language].TryGetValue(key, out value))
             {
-                return string.Format(value, additionalValues);
+                try
+                {
+                    return string.Format(value, additionalValues);
+                }
+                catch (FormatException)
+                {
+                    Debug.LogWarning("Bad localization for " + key + ". Arguments found: " + additionalValues.Length);
+                }
             }
 
-            // If the key is improperly formatted then try to fix it and retry the lookup.
-            if (key.Contains(" ") || key.Any(c => char.IsUpper(c)))
-            {
-                key = key.Replace(' ', '_').ToLower();
-                GetLocalization(key, fallbackMode, language, additionalValues);
-            }
-
-            if (!missingKeysLogged.Contains(key))
+            if (!missingKeysLogged.Contains(key) && key != string.Empty && IsNumber(key))
             {
                 missingKeysLogged.Add(key);
-                UnityDebugger.Debugger.Log("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
+                UnityDebugger.Debugger.LogWarning("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
             }
 
             switch (fallbackMode)
@@ -110,7 +129,7 @@ namespace ProjectPorcupine.Localization
         {
             if (localizationConfigurations.ContainsKey(code) == false)
             {
-                UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config.xml");
+                UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config file.");
                 return code;
             }
 
@@ -137,6 +156,19 @@ namespace ProjectPorcupine.Localization
             }
         }
 
+        public static void SaveConfigFile(string latestCommitHash, string filePath)
+        {
+            protoJson["version"] = latestCommitHash;
+            hash = latestCommitHash;
+            StreamWriter sw = new StreamWriter(filePath);
+            JsonWriter writer = new JsonTextWriter(sw);
+
+            // Launch saving operation in a separate thread.
+            // This reduces lag while saving by a little bit.
+            Thread t = new Thread(new ThreadStart(delegate { SaveJsonToHdd(protoJson, writer); }));
+            t.Start();
+        }
+
         /// <summary>
         /// Gets all languages present in library.
         /// </summary>
@@ -148,32 +180,53 @@ namespace ProjectPorcupine.Localization
         public static void LoadConfigFile(string pathToConfigFile)
         {
             localizationConfigurations = new Dictionary<string, LocalizationData>();
-
-            if (File.Exists(pathToConfigFile) == false)
+            try
             {
-                UnityDebugger.Debugger.LogError("LocalizationTable", "No config file found at: " + pathToConfigFile);
-                configExists = false;
-                return;
-            }
-
-            XmlReader reader = XmlReader.Create(pathToConfigFile);
-            while (reader.Read())
-            {
-                if (reader.NodeType == XmlNodeType.Element && reader.Name == "language")
+                if (File.Exists(pathToConfigFile) == false)
                 {
-                    if (reader.HasAttributes)
+                    UnityDebugger.Debugger.LogError("LocalizationTable", "No config file found at: " + pathToConfigFile);
+                    configExists = false;
+                    return;
+                }
+
+                StreamReader reader = File.OpenText(pathToConfigFile);
+                protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+                reader.Close();
+
+                hash = protoJson["version"].ToString();
+
+                if (protoJson["languages"] != null)
+                {
+                    foreach (JToken item in protoJson["languages"])
                     {
-                        string code = reader.GetAttribute("code");
-                        string localName = reader.GetAttribute("name");
-                        bool rtl = (reader.GetAttribute("rtl") == "true") ? true : false;
+                        string code = item["code"].ToString();
+                        string localName = code;
+                        bool rtl = false;
+                        try
+                        {
+                            rtl = bool.Parse(item["rtl"].ToString());
+                        }
+                        catch (NullReferenceException)
+                        {
+                        }
+
+                        try
+                        {
+                            localName = item["name"].ToString();
+                        }
+                        catch (NullReferenceException)
+                        {
+                        }
 
                         localizationConfigurations.Add(code, new LocalizationData(code, localName, rtl));
                     }
                 }
             }
-
-            reader.Close();
-        }
+            catch (Exception e)
+            {
+                UnityDebugger.Debugger.LogWarning("LocalizationTable", e);
+            }
+            }
 
         /// <summary>
         /// Reverses the order of characters in a string. Used for Right to Left languages, since UI doesn't do so automatically.
@@ -229,6 +282,26 @@ namespace ProjectPorcupine.Localization
         }
 
         /// <summary>
+        /// Checks to see if an object is a number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static bool IsNumber(object value)
+        {
+            return value is sbyte
+                    || value is byte
+                    || value is short
+                    || value is ushort
+                    || value is int
+                    || value is uint
+                    || value is long
+                    || value is ulong
+                    || value is float
+                    || value is double
+                    || value is decimal;
+        }
+
+        /// <summary>
         /// Load a localization file from the harddrive with a defined localization code.
         /// </summary>
         /// <param name="path">The path to the file.</param>
@@ -244,7 +317,7 @@ namespace ProjectPorcupine.Localization
 
                 if (configExists && localizationConfigurations.ContainsKey(localizationCode) == false)
                 {
-                    UnityDebugger.Debugger.LogError("LocalizationTable", "Language: " + localizationCode + " not defined in localization/config.xml");
+                    UnityDebugger.Debugger.LogError("LocalizationTable", "Language: " + localizationCode + " not defined in localization/config.json");
                 }
 
                 // Only the current and default languages translations will be loaded in memory.
@@ -258,7 +331,7 @@ namespace ProjectPorcupine.Localization
                     }
                     else
                     {
-                        rightToLeftLanguage = localizationConfigurations[localizationCode].IsRightToLeft;
+                        rightToLeftLanguage = localizationConfigurations[localizationCode].isRightToLeft;
                     }
 
                     string[] lines = File.ReadAllLines(path);
@@ -292,6 +365,19 @@ namespace ProjectPorcupine.Localization
             {
                 UnityDebugger.Debugger.LogError("LocalizationTable", new Exception(string.Format("There is no localization file for {0}", localizationCode), exception).ToString());
             }
+        }
+
+        private static void SaveJsonToHdd(JToken json, JsonWriter writer)
+        {
+            JsonSerializer serializer = new JsonSerializer()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            };
+            serializer.Serialize(writer, json);
+
+            writer.Flush();
+            writer.Close();
         }
     }
 }

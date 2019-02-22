@@ -11,8 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace ProjectPorcupine.OrderActions
@@ -34,41 +32,21 @@ namespace ProjectPorcupine.OrderActions
             Inventory = other.Inventory;
             Type = other.Type;
             JobTime = other.JobTime;
+            Category = other.Category;
+            Priority = other.Priority;
         }
 
-        [XmlIgnore]
         public string Type { get; set; }
 
         public float JobTime { get; set; }
 
         public string JobTimeFunction { get; set; }
 
+        public virtual JobCategory Category { get; protected set; }
+
+        public virtual Job.JobPriority Priority { get; protected set; }
+
         public Dictionary<string, int> Inventory { get; set; }
-
-        public static OrderAction Deserialize(XmlReader xmlReader)
-        {
-            if (orderActionTypes == null)
-            {
-                orderActionTypes = FindOrderActionsInAssembly();
-            }
-
-            string orderActionType = xmlReader.GetAttribute("type");
-            if (orderActionTypes.ContainsKey(orderActionType))
-            {
-                xmlReader = xmlReader.ReadSubtree();
-                Type t = orderActionTypes[orderActionType];
-                XmlSerializer serializer = new XmlSerializer(t);
-                OrderAction orderAction = (OrderAction)serializer.Deserialize(xmlReader);
-                //// need to set name explicitly (not part of deserialization as it's passed in)
-                orderAction.Initialize(orderActionType);
-                return orderAction;
-            }
-            else
-            {
-                UnityDebugger.Debugger.Log(OrderActionsLogChannel, string.Format("There is no deserializer for OrderAction '{0}'", orderActionType));
-                return null;
-            }
-        }
 
         public static OrderAction FromJson(JProperty orderActionProp)
         {
@@ -81,10 +59,20 @@ namespace ProjectPorcupine.OrderActions
 
             if (orderActionTypes.ContainsKey(orderActionType))
             {
+                JToken innerJson = orderActionProp.Value;
                 Type t = orderActionTypes[orderActionType];
 
                 OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
                 orderAction.Type = orderActionProp.Name;
+                string prevCategory = string.Empty;
+                if (orderAction.Category != null)
+                {
+                    prevCategory = orderAction.Category.Type;
+                }
+
+                string tempCategory = PrototypeReader.ReadJson(prevCategory, innerJson["JobCategory"]);
+                orderAction.Category = PrototypeManager.JobCategory.Get(tempCategory);
+                orderAction.Priority = (Job.JobPriority)PrototypeReader.ReadJson((int)orderAction.Priority, innerJson["JobPriority"]);
                 return orderAction;
             }
             else

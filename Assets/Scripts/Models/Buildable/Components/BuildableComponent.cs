@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Serialization;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -60,10 +58,8 @@ namespace ProjectPorcupine.Buildable.Components
             IsFalse
         }
 
-        [XmlIgnore]
         public string Type { get; set; }
 
-        [XmlIgnore]
         public Requirements Needs
         {
             get
@@ -96,38 +92,11 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         protected Furniture ParentFurniture { get; set; }
 
-        [XmlIgnore]
         protected Parameter FurnitureParams
         {
             get { return ParentFurniture.Parameters; }
-        }
-
-        public static BuildableComponent Deserialize(XmlReader xmlReader)
-        {
-            if (componentTypes == null)
-            {
-                componentTypes = FindComponentsInAssembly();
-            }
-
-            string componentTypeName = xmlReader.GetAttribute("type");
-            if (componentTypes.ContainsKey(componentTypeName))
-            {
-                xmlReader = xmlReader.ReadSubtree();
-                Type t = componentTypes[componentTypeName];
-                XmlSerializer serializer = new XmlSerializer(t);
-                BuildableComponent component = (BuildableComponent)serializer.Deserialize(xmlReader);
-                //// need to set name explicitly (not part of deserialization as it's passed in)
-                component.Type = componentTypeName;
-                return component;
-            }
-            else
-            {
-                UnityDebugger.Debugger.LogErrorFormat(ComponentLogChannel, "There is no deserializer for component '{0}'", componentTypeName);
-                return null;
-            }
         }
 
         public static BuildableComponent Deserialize(JToken jtoken)
@@ -155,8 +124,7 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        // TODO: This may be functionally identical to Deserialize(JToken), needs reviewed to see if uses of FromJson can be replaced by Deserialize(JToken)
-        public static BuildableComponent FromJson(JToken componentToken)
+       public static BuildableComponent FromJson(JToken componentToken)
         {
             if (componentTypes == null)
             {
@@ -174,6 +142,7 @@ namespace ProjectPorcupine.Buildable.Components
 
                 // need to set name explicitly (not part of deserialization as it's passed in)
                 component.Type = componentProperty.Name;
+
                 return component;
             }
             else
@@ -200,6 +169,12 @@ namespace ProjectPorcupine.Buildable.Components
             Initialize();
             initialized = true;
         }
+
+        /// <summary>
+        /// Determines if the configuration. Checked immediately after parsing the JSON config files.
+        /// </summary>
+        /// <returns>true if valid.</returns>
+        public abstract bool IsValid();
 
         public virtual bool CanFunction()
         {
@@ -237,7 +212,7 @@ namespace ProjectPorcupine.Buildable.Components
         {
             return new ContextMenuAction
             {
-                LocalizationKey = componentContextMenuAction.Name, // TODO: localization here
+                LocalizationKey = componentContextMenuAction.Name, 
                 RequireCharacterSelected = false,
                 Action = (cma, c) => InvokeContextMenuAction(componentContextMenuAction.Function, componentContextMenuAction.Name)
             };
@@ -356,11 +331,9 @@ namespace ProjectPorcupine.Buildable.Components
         [JsonObject(MemberSerialization.OptOut)]
         public class UseAnimation
         {
-            [XmlAttribute("name")]
             public string Name { get; set; }
 
-            [XmlAttribute("valuebasedParamerName")]
-            public string ValueBasedParamerName { get; set; }
+            public string ValueBasedParameterName { get; set; }
 
             public Conditions RunConditions { get; set; }
         }
@@ -369,10 +342,8 @@ namespace ProjectPorcupine.Buildable.Components
         [JsonObject(MemberSerialization.OptOut)]
         public class ParameterCondition
         {
-            [XmlAttribute("name")]
             public string ParameterName { get; set; }
 
-            [XmlAttribute("condition")]
             [JsonConverter(typeof(StringEnumConverter))]
             public ConditionType Condition { get; set; }
         }
@@ -390,10 +361,8 @@ namespace ProjectPorcupine.Buildable.Components
                 this.ParameterName = paramName;
             }
 
-            [XmlAttribute("name")]
             public string ParameterName { get; set; }
 
-            [XmlAttribute("type")]
             public string Type { get; set; }
         }
 
@@ -401,13 +370,10 @@ namespace ProjectPorcupine.Buildable.Components
         [JsonObject(MemberSerialization.OptOut)]
         public class SourceDataInfo
         {
-            [XmlAttribute("value")]
             public string Value { get; set; }
 
-            [XmlAttribute("fromParameter")]
             public string FromParameter { get; set; }
 
-            [XmlAttribute("fromFunction")]
             public string FromFunction { get; set; }
         }
 
@@ -415,16 +381,12 @@ namespace ProjectPorcupine.Buildable.Components
         [JsonObject(MemberSerialization.OptOut)]
         public class Info
         {
-            [XmlAttribute("rate")]
             public float Rate { get; set; }
 
-            [XmlAttribute("capacity")]
             public float Capacity { get; set; }
 
-            [XmlAttribute("capacityThresholds")]
             public int CapacityThresholds { get; set; }
 
-            [XmlAttribute("canUseVariableEffiency")]
             public bool CanUseVariableEfficiency { get; set; }
         }
 
@@ -432,7 +394,6 @@ namespace ProjectPorcupine.Buildable.Components
         [JsonObject(MemberSerialization.OptOut)]
         public class Conditions
         {
-            [XmlElement("Param")]
             public List<ParameterCondition> ParamConditions { get; set; }
         }
     }

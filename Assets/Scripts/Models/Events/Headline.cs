@@ -7,7 +7,6 @@
 // ====================================================
 #endregion
 
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 /// <summary>
@@ -45,16 +44,6 @@ public class Headline : IPrototypable
     /// </summary>
     /// <value>The headline text.</value>
     public string Text { get; private set; }
-
-    /// <summary>
-    /// Reads the prototype from the specified XML reader.
-    /// </summary>
-    /// <param name="Reader">The XML reader to read from.</param>
-    public void ReadXmlPrototype(XmlReader reader)
-    {
-        reader.Read();
-        Text = reader.ReadContentAsString();
-    }
 
     /// <summary>
     /// Reads the prototype from the specified JObject.

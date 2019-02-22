@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
 using ProjectPorcupine.Jobs;
 
@@ -18,7 +17,6 @@ namespace ProjectPorcupine.Buildable.Components
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    [XmlRoot("Component")]
     [BuildableComponentName("Workshop")]
     public class Workshop : BuildableComponent
     {        
@@ -35,7 +33,6 @@ namespace ProjectPorcupine.Buildable.Components
             Efficiency = other.Efficiency;
         }
 
-        [XmlElement("ParameterDefinitions")]
         [JsonProperty("ParameterDefinitions")]
         public WorkShopParameterDefinitions ParamsDefinitions { get; set; }
 
@@ -66,7 +63,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
         
-        [XmlIgnore]
         public Parameter IsRunning
         {
             get
@@ -104,19 +100,15 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlElement("ProductionChain")]
         [JsonProperty("ProductionChain")]
         public List<ProductionChain> PossibleProductions { get; set; }
 
-        [XmlElement("RunConditions")]
         [JsonProperty("RunConditions")]
         public Conditions RunConditions { get; set; }
 
-        [XmlElement("HaulConditions")]
         [JsonProperty("HaulConditions")]
         public Conditions HaulConditions { get; set; }
 
-        [XmlElement("Efficiency")]
         [JsonProperty("Efficiency")]
         public SourceDataInfo Efficiency { get; set; }
 
@@ -128,7 +120,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }   
                 
-        [XmlIgnore]
         private List<ComponentContextMenu> WorkshopMenuActions { get; set; }
         
         public override BuildableComponent Clone()
@@ -172,6 +163,11 @@ namespace ProjectPorcupine.Buildable.Components
             {
                 yield return null;
             }
+        }
+
+        public override bool IsValid()
+        {
+            return true;
         }
 
         public override bool CanFunction()
@@ -268,13 +264,12 @@ namespace ProjectPorcupine.Buildable.Components
                     CurrentProcessingTime.ChangeFloatValue(deltaTime * efficiency);
                     IsRunning.SetValue(true);
 
-                    if (CurrentProcessingTime.ToFloat() >=
-                        MaxProcessingTime.ToFloat())
+                    if (CurrentProcessingTime.ToFloat() >= MaxProcessingTime.ToFloat())
                     {
                         List<TileObjectTypeAmount> outPlacement = CheckForInventoryAtOutput(prodChain);
 
                         // if output placement was found for all products, place them
-                        if (outPlacement.Count == prodChain.Output.Count)
+                        if (outPlacement.Count == 0 || outPlacement.Count == prodChain.Output.Count)
                         {
                             PlaceInventories(outPlacement);
                             //// processing done, can fetch input for another processing
@@ -478,7 +473,8 @@ namespace ProjectPorcupine.Buildable.Components
                                      null,
                                      0.4f,
                                      new RequestedItem[] { new RequestedItem(desiredInv, desiredAmount, desiredAmount) },
-                                     Job.JobPriority.Medium,
+                                     Job.JobPriority.High, 
+                                     "hauling",
                                      false,
                                      false,
                                      false);
@@ -500,30 +496,33 @@ namespace ProjectPorcupine.Buildable.Components
 
             // processing is done, try to spit the output
             // check if output can be placed in world
-            foreach (Item outObjType in prodChain.Output)
+            if (prodChain != null && prodChain.Output != null)
             {
-                int amount = outObjType.Amount;
-
-                // check ouput slots for products:                        
-                Tile outputTile = World.Current.GetTileAt(
-                    ParentFurniture.Tile.X + outObjType.SlotPosX,
-                    ParentFurniture.Tile.Y + outObjType.SlotPosY,
-                    ParentFurniture.Tile.Z);
-
-                bool tileHasOtherFurniture = outputTile.Furniture != null && outputTile.Furniture != ParentFurniture;
-
-                if (!tileHasOtherFurniture &&
-                    (outputTile.Inventory == null ||
-                    (outputTile.Inventory.Type == outObjType.ObjectType && outputTile.Inventory.StackSize + amount <= outputTile.Inventory.MaxStackSize)))
+                foreach (Item outObjType in prodChain.Output)
                 {
-                    // out product can be placed here
-                    outPlacement.Add(new TileObjectTypeAmount()
+                    int amount = outObjType.Amount;
+
+                    // check ouput slots for products:                        
+                    Tile outputTile = World.Current.GetTileAt(
+                        ParentFurniture.Tile.X + outObjType.SlotPosX,
+                        ParentFurniture.Tile.Y + outObjType.SlotPosY,
+                        ParentFurniture.Tile.Z);
+
+                    bool tileHasOtherFurniture = outputTile.Furniture != null && outputTile.Furniture != ParentFurniture;
+
+                    if (!tileHasOtherFurniture &&
+                        (outputTile.Inventory == null ||
+                        (outputTile.Inventory.Type == outObjType.ObjectType && outputTile.Inventory.StackSize + amount <= outputTile.Inventory.MaxStackSize)))
                     {
-                        Tile = outputTile,
-                        IsEmpty = outputTile.Inventory == null,
-                        ObjectType = outObjType.ObjectType,
-                        Amount = outObjType.Amount
-                    });
+                        // out product can be placed here
+                        outPlacement.Add(new TileObjectTypeAmount()
+                        {
+                            Tile = outputTile,
+                            IsEmpty = outputTile.Inventory == null,
+                            ObjectType = outObjType.ObjectType,
+                            Amount = outObjType.Amount
+                        });
+                    }
                 }
             }
 
@@ -560,15 +559,14 @@ namespace ProjectPorcupine.Buildable.Components
         [JsonObject(MemberSerialization.OptOut)]
         public class Item
         {
-            [XmlAttribute("objectType")]
             public string ObjectType { get; set; }
-            [XmlAttribute("amount")]
+
             public int Amount { get; set; }
-            [XmlAttribute("slotPosX")]
+
             public int SlotPosX { get; set; }
-            [XmlAttribute("slotPosY")]
+
             public int SlotPosY { get; set; }
-            [XmlAttribute("hasHopper")]
+
             public bool HasHopper { get; set; }
         }
 
@@ -576,9 +574,8 @@ namespace ProjectPorcupine.Buildable.Components
         [JsonObject(MemberSerialization.OptOut)]
         public class ProductionChain
         {
-            [XmlAttribute("name")]
             public string Name { get; set; }
-            [XmlAttribute("processingTime")]
+
             public float ProcessingTime { get; set; }
 
             public List<Item> Input { get; set; }

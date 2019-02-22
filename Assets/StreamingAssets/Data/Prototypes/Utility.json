@@ -6,27 +6,17 @@
       "TypeTags": [
         "Power"
       ],
-      "ContextMenuActions": [
-        {
-          "LuaFunction": "UtilityContextTest1",
-          "LocalizationKey": "Test Context 1"
-        },
-        {
-          "LuaFunction": "UtilityContextTest2",
-          "LocalizationKey": "Test Context 2"
-        }
-      ],
       "OrderActions": {
         "Build": {
           "JobTime": 1.0,
           "Inventory": {
-            "copper_wire": 2
+            "copper_plate": 1
           }
         },
         "Deconstruct": {
           "JobTime": 1.0,
           "Inventory": {
-            "copper_wire": 1
+            "copper_plate": 1
           }
         }
       }

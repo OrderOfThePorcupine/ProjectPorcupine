@@ -8,7 +8,6 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json;
 
@@ -16,7 +15,6 @@ namespace ProjectPorcupine.Buildable.Components
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    [XmlRoot("Component")]
     [BuildableComponentName("Visuals")]
     public class Visuals : BuildableComponent
     {
@@ -32,23 +30,18 @@ namespace ProjectPorcupine.Buildable.Components
             UsedAnimations = other.UsedAnimations;
         }
 
-        [XmlElement("DefaultSpriteName")]
         [JsonProperty("DefaultSpriteName")]
         public SourceDataInfo DefaultSpriteName { get; set; }
 
-        [XmlElement("SpriteName")]
         [JsonProperty("SpriteName")]
         public SourceDataInfo SpriteName { get; set; }
 
-        [XmlElement("OverlaySpriteName")]
         [JsonProperty("OverlaySpriteName")]
         public SourceDataInfo OverlaySpriteName { get; set; }
 
-        [XmlElement("UseAnimation")]
         [JsonProperty("UseAnimation")]
         public List<UseAnimation> UsedAnimations { get; set; }
         
-        [XmlIgnore]
         public string CurrentAnimationName { get; private set; }
 
         public override bool RequiresSlowUpdate
@@ -59,7 +52,6 @@ namespace ProjectPorcupine.Buildable.Components
             }
         }
 
-        [XmlIgnore]
         private string DefaultAnimationName { get; set; }
 
         public override BuildableComponent Clone()
@@ -71,14 +63,14 @@ namespace ProjectPorcupine.Buildable.Components
         {
             if (UsedAnimations != null && ParentFurniture.Animations != null && UsedAnimations.Count > 0)
             {
-                foreach (var anim in UsedAnimations)
+                foreach (UseAnimation anim in UsedAnimations)
                 {
-                    if (!string.IsNullOrEmpty(anim.ValueBasedParamerName))
+                    if (!string.IsNullOrEmpty(anim.ValueBasedParameterName))
                     {
                         // is value based animation
                         if (ParentFurniture.Animations != null)
                         {
-                            int frmIdx = FurnitureParams[anim.ValueBasedParamerName].ToInt();
+                            int frmIdx = FurnitureParams[anim.ValueBasedParameterName].ToInt();
                             ParentFurniture.Animations.SetFrameIndex(frmIdx);
                         }
                     }
@@ -98,6 +90,22 @@ namespace ProjectPorcupine.Buildable.Components
         {
             // default sprite (used for showing sprite in menu)
             protoFurniture.DefaultSpriteName = RetrieveStringFor(DefaultSpriteName, protoFurniture);
+        }
+
+        public override bool IsValid()
+        {
+            if (UsedAnimations != null)
+            {
+                foreach (UseAnimation anim in UsedAnimations)
+                {
+                    if (anim.RunConditions == null && string.IsNullOrEmpty(anim.ValueBasedParameterName))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         protected override void Initialize()

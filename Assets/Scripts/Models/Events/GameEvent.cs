@@ -8,7 +8,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -150,32 +149,6 @@ public class GameEvent : IPrototypable
     public GameEvent Clone()
     {
         return new GameEvent(this);
-    }
-
-    /// <summary>
-    /// Reads the prototype from the specified XML reader.
-    /// </summary>
-    /// <param name="reader">The XML reader to read from.</param>
-    public void ReadXmlPrototype(XmlReader reader)
-    {
-        Name = reader.GetAttribute("Name");
-
-        while (reader.Read())
-        {
-            switch (reader.Name)
-            {
-                case "Repeats":
-                    MaxRepeats = int.Parse(reader.GetAttribute("MaxRepeats"));
-                    Repeat = true;
-                    break;
-                case "Precondition":
-                    preconditions.Add(reader.GetAttribute("FunctionName"));
-                    break;
-                case "OnExecute":
-                    executionActions.Add(reader.GetAttribute("FunctionName"));
-                    break;
-            }
-        }
     }
 
     /// <summary>

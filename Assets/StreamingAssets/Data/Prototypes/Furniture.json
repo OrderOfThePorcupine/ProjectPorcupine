@@ -387,7 +387,7 @@
         }
       },
       "Parameters": {
-        "mine_type": "Raw Iron"
+        "mine_type": "raw_iron"
       },
       "ContextMenuActions": [
         {
@@ -460,7 +460,7 @@
           "ParameterDefinitions": {},
           "ProductionChain": [
             {
-              "Name": "Power generation",
+              "Name": "power_generation",
               "ProcessingTime": 60.0,
               "Input": [
                 {
@@ -542,7 +542,7 @@
           "ParameterDefinitions": {},
           "ProductionChain": [
             {
-              "Name": "Ice melting",
+              "Name": "ice_melting",
               "ProcessingTime": 60.0,
               "Input": [
                 {
@@ -623,8 +623,8 @@
       "PathfindingWeight": 2.0,
       "Width": 1,
       "Height": 1,
-      "LocalizationName": "furn_tank",
-      "LocalizationDescription": "furn_tank_desc",
+      "LocalizationName": "furn_water_tank",
+      "LocalizationDescription": "furn_water_tank_desc",
       "Health": 1.0,
       "DragType": "single",
       "Components": {
@@ -786,7 +786,7 @@
           "ParameterDefinitions": {},
           "ProductionChain": [
             {
-              "Name": "Copper smelting",
+              "Name": "copper_smelting",
               "ProcessingTime": 3.0,
               "Input": [
                 {
@@ -804,7 +804,7 @@
               ]
             },
             {
-              "Name": "Iron smelting",
+              "Name": "iron_smelting",
               "ProcessingTime": 4.0,
               "Input": [
                 {
@@ -944,7 +944,7 @@
           "ParameterDefinitions": {},
           "ProductionChain": [
             {
-              "Name": "Power Cell Pressing",
+              "Name": "power_cell_pressing",
               "ProcessingTime": 5.0,
               "Input": [
                 {

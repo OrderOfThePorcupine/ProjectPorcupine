@@ -16,7 +16,7 @@ public sealed class InventorySpriteController : BaseSpriteController<Inventory>
     private GameObject inventoryUIPrefab;
 
     // Use this for initialization
-    public InventorySpriteController(World world, GameObject inventoryUI) : base(world, "Inventory")
+    public InventorySpriteController(World world, GameObject inventoryUI) : base(world, "Inventory", 500)
     {
         inventoryUIPrefab = inventoryUI;
 

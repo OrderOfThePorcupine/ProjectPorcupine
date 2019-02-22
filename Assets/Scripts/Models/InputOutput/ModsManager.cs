@@ -23,20 +23,24 @@ public class ModsManager
 
     public ModsManager()
     {
-        mods = GetModsFiles();
-
-        LoadSharedFiles();
-
         if (SceneController.IsAtIntroScene())
         {
-            LoadIntroFiles();
+            SetUp(Type.Intro);
         }
         else if (SceneController.IsAtMainScene())
         {
-            LoadMainSceneFiles();
+            SetUp(Type.MainScene);
         }
+    }
 
-        LoadPrototypes();
+    public ModsManager(Type type)
+    {
+        SetUp(type);
+    }
+
+    public enum Type
+    {
+        Intro, MainScene
     }
 
     /// <summary>
@@ -67,11 +71,76 @@ public class ModsManager
     }
 
     /// <summary>
+    /// Sets up all of the prototype managers, useful in doing unit tests and always run as a part of normal code.
+    /// </summary>
+    public void SetupPrototypeHandlers()
+    {
+        HandlePrototypes("Tile", PrototypeManager.TileType.LoadJsonPrototypes);
+        HandlePrototypes("Furniture", PrototypeManager.Furniture.LoadJsonPrototypes);
+        HandlePrototypes("Utility", PrototypeManager.Utility.LoadJsonPrototypes);
+        HandlePrototypes("RoomBehavior", PrototypeManager.RoomBehavior.LoadJsonPrototypes);
+        HandlePrototypes("Inventory", PrototypeManager.Inventory.LoadJsonPrototypes);
+        HandlePrototypes("Need", PrototypeManager.Need.LoadJsonPrototypes);
+        HandlePrototypes("Trader", PrototypeManager.Trader.LoadJsonPrototypes);
+        HandlePrototypes("Currency", PrototypeManager.Currency.LoadJsonPrototypes);
+        HandlePrototypes("GameEvent", PrototypeManager.GameEvent.LoadJsonPrototypes);
+        HandlePrototypes("ScheduledEvent", PrototypeManager.ScheduledEvent.LoadJsonPrototypes);
+        HandlePrototypes("Stat", PrototypeManager.Stat.LoadJsonPrototypes);
+        HandlePrototypes("Quest", PrototypeManager.Quest.LoadJsonPrototypes);
+        HandlePrototypes("Headline", PrototypeManager.Headline.LoadJsonPrototypes);
+        HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
+        HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
+        HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
+    }
+
+    /// <summary>
+    /// Takes in a ditionary of tag names and JTokens, which is then parsed by the prototype managers.
+    /// </summary>
+    /// <param name="tagNameToProperty"></param>
+    public void LoadPrototypesFromJTokens(Dictionary<string, JToken> tagNameToProperty)
+    {
+        foreach (KeyValuePair<string, List<Action<JProperty>>> prototypeHandler in prototypeHandlers)
+        {
+            foreach (Action<JProperty> handler in prototypeHandler.Value)
+            {
+                if (tagNameToProperty.ContainsKey(prototypeHandler.Key))
+                {
+                    foreach (JToken prototypeGroup in tagNameToProperty[prototypeHandler.Key])
+                    {
+                        handler((JProperty)prototypeGroup);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Return the path to the mod folder.
     /// </summary>
     private static string GetPathToModsFolder()
     {
         return Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Mods");
+    }
+
+    /// <summary>
+    /// Common initialization to make testing easier.
+    /// </summary>
+    private void SetUp(Type type)
+    {
+        mods = GetModsFiles();
+
+        LoadSharedFiles();
+
+        if (type == Type.Intro)
+        {
+            LoadIntroFiles();
+        }
+        else if (type == Type.MainScene)
+        {
+            LoadMainSceneFiles();
+        }
+
+        LoadPrototypes();
     }
 
     private void LoadMainSceneFiles()
@@ -89,21 +158,7 @@ public class ModsManager
         LoadFunctions("FurnitureFunctions.cs", "Furniture");
         LoadFunctions("OverlayFunctions.cs", "Overlay");
 
-        HandlePrototypes("Tile", PrototypeManager.TileType.LoadJsonPrototypes);
-        HandlePrototypes("Furniture", PrototypeManager.Furniture.LoadJsonPrototypes);
-        HandlePrototypes("Utility", PrototypeManager.Utility.LoadJsonPrototypes);
-        HandlePrototypes("RoomBehavior", PrototypeManager.RoomBehavior.LoadJsonPrototypes);
-        HandlePrototypes("Inventory", PrototypeManager.Inventory.LoadJsonPrototypes);
-        HandlePrototypes("Need", PrototypeManager.Need.LoadJsonPrototypes);
-        HandlePrototypes("Trader", PrototypeManager.Trader.LoadJsonPrototypes);
-        HandlePrototypes("Currency", PrototypeManager.Currency.LoadJsonPrototypes);
-        HandlePrototypes("GameEvent", PrototypeManager.GameEvent.LoadJsonPrototypes);
-        HandlePrototypes("ScheduledEvent", PrototypeManager.ScheduledEvent.LoadJsonPrototypes);
-        HandlePrototypes("Stat", PrototypeManager.Stat.LoadJsonPrototypes);
-        HandlePrototypes("Quest", PrototypeManager.Quest.LoadJsonPrototypes);
-        HandlePrototypes("Headline", PrototypeManager.Headline.LoadJsonPrototypes);
-        HandlePrototypes("Overlay", PrototypeManager.Overlay.LoadJsonPrototypes);
-        HandlePrototypes("Ship", PrototypeManager.Ship.LoadJsonPrototypes);
+        SetupPrototypeHandlers();
 
         LoadCharacterNames("CharacterNames.txt");
 
@@ -113,6 +168,7 @@ public class ModsManager
 
     private void LoadIntroFiles()
     {
+        LoadDirectoryAssets("Audio", AudioManager.LoadAudioFiles);
         LoadDirectoryAssets("MainMenu/Images", SpriteManager.LoadSpriteFiles);
         LoadDirectoryAssets("MainMenu/Audio", AudioManager.LoadAudioFiles);
     }
@@ -128,6 +184,7 @@ public class ModsManager
         HandlePrototypes("ConsoleCommand", PrototypeManager.DevConsole.LoadJsonPrototypes);
         HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
         HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
+        HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
@@ -188,29 +245,23 @@ public class ModsManager
 
     private void LoadPrototypes()
     {
-        // Get list of files in Prototype directory
         string prototypesDirectoryPath = Path.Combine(Path.Combine(Application.streamingAssetsPath, "Data"), "Prototypes");
-
         DirectoryInfo prototypeDir = new DirectoryInfo(prototypesDirectoryPath);
-
         FileInfo[] prototypeFiles = prototypeDir.GetFiles("*.json").ToArray();
+        Dictionary<string, JToken> tagNameToProperty = new Dictionary<string, JToken>();
 
         for (int i = 0; i < prototypeFiles.Length; i++)
         {
             FileInfo file = prototypeFiles[i];
+            UnityDebugger.Debugger.Log("ModsManager", "Loading " + file.FullName);
             StreamReader reader = File.OpenText(file.FullName);
             JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
             string tagName = ((JProperty)protoJson.First).Name;
 
-            // This *should* handle tags spread across multiple files, multiple tags in a single file, and multiple handlers per type.
-            foreach (JToken prototypeGroup in protoJson)
-            {
-                foreach (Action<JProperty> handler in prototypeHandlers[tagName])
-                {
-                    handler((JProperty)prototypeGroup);
-                }
-            }
+            tagNameToProperty.Add(tagName, protoJson);
         }
+
+        LoadPrototypesFromJTokens(tagNameToProperty);
     }
 
     /// <summary>
@@ -290,7 +341,7 @@ public class ModsManager
         }
         else
         {
-            UnityDebugger.Debugger.LogError("Directory at " + directoryPath + " not found");
+            UnityDebugger.Debugger.LogWarning("Directory at " + directoryPath + " not found");
         }
 
         foreach (DirectoryInfo mod in mods)

@@ -19,6 +19,8 @@ public class ContextMenuAction
 
     public string LocalizationKey { get; set; }
 
+    public string LocalizationParameter { get; set; }
+
     public void OnClick(MouseController mouseController)
     {
         if (Action != null)

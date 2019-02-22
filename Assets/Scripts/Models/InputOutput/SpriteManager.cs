@@ -6,10 +6,12 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -17,24 +19,38 @@ using UnityEngine;
 /// That is going to be the job of the individual ________SpriteController scripts.
 /// Our job is simply to load all sprites from disk and keep the organized.
 /// </summary>
-public class SpriteManager
+public static class SpriteManager
 {
-    // A sprite image with a "ph_" as a prefix will be loaded as a placeholder if the normal spite image is missing.
-    // This is used to easily identity spires that needs improvement.
-    private const string PlaceHolderPrefix = "ph_";
-
     private static Texture2D noResourceTexture;
+    
+    private static Dictionary<string, Dictionary<string, Sprite>> sprites;
 
-    private static Dictionary<string, Sprite> sprites;
+    private static bool isInitialized;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SpriteManager"/> class.
     /// </summary>
-    public SpriteManager()
+    public static void Initialize()
     {
-        sprites = new Dictionary<string, Sprite>();
+        if (isInitialized)
+        {
+            return;
+        }
 
-        CreateNoTexture();
+        sprites = new Dictionary<string, Dictionary<string, Sprite>>();
+
+        CreateEmptyTexture();
+
+        isInitialized = true;
+    }
+
+    /// <summary>
+    /// Creates a sprite with an error texture.
+    /// </summary>
+    /// <returns>The error sprite.</returns>
+    public static Sprite CreateErrorSprite()
+    {
+        return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
     }
 
     /// <summary>
@@ -45,26 +61,19 @@ public class SpriteManager
     /// <param name="spriteName">Sprite name.</param>
     public static Sprite GetSprite(string categoryName, string spriteName)
     {
-        Sprite sprite = null;
-
-        string spriteNamePlaceHolder = categoryName + "/" + PlaceHolderPrefix + spriteName;
-        spriteName = categoryName + "/" + spriteName;
-
-        if (sprites.ContainsKey(spriteName))
+        Dictionary<string, Sprite> categorySprites;
+        Sprite sprite;
+        if (sprites.TryGetValue(categoryName, out categorySprites))
         {
-            sprite = sprites[spriteName];
+            if (categorySprites.TryGetValue(spriteName, out sprite))
+            {
+                return sprite;
+            }
         }
-        else if (sprites.ContainsKey(spriteNamePlaceHolder))
-        {
-            sprite = sprites[spriteNamePlaceHolder];
-        }
-        else
-        {
-            sprite = Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
-            UnityDebugger.Debugger.LogWarningFormat("SpriteManager", "No sprite: {0}, using fallback sprite.", spriteName);
-        }
-
-        return sprite;
+        
+        // Return a pink square as a error indication
+        UnityDebugger.Debugger.LogWarningFormat("SpriteManager", "No sprite: {0}, using fallback sprite.", spriteName);
+        return CreateErrorSprite();
     }
 
     /// <summary>
@@ -74,14 +83,16 @@ public class SpriteManager
     /// <param name="categoryName">Category name.</param>
     public static Sprite GetRandomSprite(string categoryName)
     {
+        Dictionary<string, Sprite> spritesFromCategory;
         Sprite sprite = null;
 
-        Dictionary<string, Sprite> spritesFromCategory = sprites.Where(p => p.Key.StartsWith(categoryName)).ToDictionary(p => p.Key, p => p.Value);
-
-        if (spritesFromCategory.Count > 0)
+        if (sprites.TryGetValue(categoryName, out spritesFromCategory))
         {
-            System.Random rand = new System.Random();
-            sprite = spritesFromCategory.ElementAt(rand.Next(0, spritesFromCategory.Count)).Value;
+            if (spritesFromCategory.Count > 0)
+            {
+                System.Random rand = new System.Random();
+                sprite = spritesFromCategory.ElementAt(rand.Next(0, spritesFromCategory.Count)).Value;
+            }
         }
 
         return sprite;
@@ -95,9 +106,15 @@ public class SpriteManager
     /// <param name="spriteName">Sprite name.</param>
     public static bool HasSprite(string categoryName, string spriteName)
     {
-        string spriteNamePlaceHolder = categoryName + "/" + PlaceHolderPrefix + spriteName;
-        spriteName = categoryName + "/" + spriteName;
-        return sprites.ContainsKey(spriteName) || sprites.ContainsKey(spriteNamePlaceHolder);
+        Dictionary<string, Sprite> categorySprites;
+        if (sprites.TryGetValue(categoryName, out categorySprites))
+        {
+            return categorySprites.ContainsKey(spriteName);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -120,7 +137,7 @@ public class SpriteManager
             // Is this an image file?
             // Unity's LoadImage seems to support only png and jpg
             // NOTE: We **could** try to check file extensions, but why not just
-            // have Unity **attemp** to load the image, and if it doesn't work,
+            // have Unity **attempt** to load the image, and if it doesn't work,
             // then I guess it wasn't an image! An advantage of this, is that we
             // don't have to worry about oddball filenames, nor do we have to worry
             // about what happens if Unity adds support for more image format
@@ -138,10 +155,10 @@ public class SpriteManager
     /// <param name="filePath">File path.</param>
     private static void LoadImage(string spriteCategory, string filePath)
     {
-        // TODO:  LoadImage is returning TRUE for things like .meta and .xml files.  What??!
+        // TODO:  LoadImage is returning TRUE for things like .meta and .json files.  What??!
         //      So as a temporary fix, let's just bail if we have something we KNOW should not
         //      be an image.
-        if (filePath.Contains(".xml") || filePath.Contains(".meta") || filePath.Contains(".db"))
+        if (filePath.Contains(".json") || filePath.Contains(".meta") || filePath.Contains(".db"))
         {
             return;
         }
@@ -158,34 +175,35 @@ public class SpriteManager
             // Image was successfully loaded.
             imageTexture.filterMode = FilterMode.Point;
 
-            // So let's see if there's a matching XML file for this image.
+            // So let's see if there's a matching JSON file for this image.
             string baseSpriteName = Path.GetFileNameWithoutExtension(filePath);
             string basePath = Path.GetDirectoryName(filePath);
 
             // NOTE: The extension must be in lower case!
-            string xmlPath = Path.Combine(basePath, baseSpriteName + ".xml");
+            string jsonPath = Path.Combine(basePath, baseSpriteName + ".json");
 
-            if (File.Exists(xmlPath))
+            if (File.Exists(jsonPath))
             {
-                string xmlText = File.ReadAllText(xmlPath);
+                StreamReader reader = File.OpenText(jsonPath);
 
-                // Loop through the xml file finding all the <sprite> tags
+                JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+                reader.Close();
+
+                JArray array = (JArray)protoJson;
+
+                // Loop through the json file for each object
                 // and calling LoadSprite once for each of them.
-                XmlTextReader reader = new XmlTextReader(new StringReader(xmlText));
-
-                // Set our cursor on the first Sprite we find.
-                if (reader.ReadToDescendant("Sprites") && reader.ReadToDescendant("Sprite"))
+                foreach (JObject obj in array)
                 {
-                    do
+                    try
                     {
-                        ReadSpriteFromXml(spriteCategory, reader, imageTexture);
+                        ReadSpriteFromJson(spriteCategory, obj, imageTexture);
                     }
-                    while (reader.ReadToNextSibling("Sprite"));
-                }
-                else
-                {
-                    UnityDebugger.Debugger.LogError("SpriteManager", "Could not find a <Sprites> tag.");
-                    return;
+                    catch (Exception e)
+                    {
+                        UnityDebugger.Debugger.LogWarning("SpriteManager", obj);
+                        throw new Exception("Error in file " + jsonPath, e);
+                    }
                 }
             }
             else
@@ -195,54 +213,36 @@ public class SpriteManager
                 LoadSprite(spriteCategory, baseSpriteName, imageTexture, new Rect(0, 0, imageTexture.width, imageTexture.height), 64, new Vector2(0.5f, 0.5f));
             }
 
-            // Attempt to load/parse the XML file to get information on the sprite(s)
+            // Attempt to load/parse the data file to get information on the sprite(s)
         }
 
         // Else, the file wasn't actually a image file, so just move on.
     }
 
     /// <summary>
-    /// Reads the sprite from xml for the image.
+    /// Reads the sprite from data file for the image.
     /// </summary>
     /// <param name="spriteCategory">Sprite category.</param>
-    /// <param name="reader">The Xml Reader.</param>
+    /// <param name="obj">The Json Object Reader.</param>
     /// <param name="imageTexture">Image texture.</param>
-    private static void ReadSpriteFromXml(string spriteCategory, XmlReader reader, Texture2D imageTexture)
+    private static void ReadSpriteFromJson(string spriteCategory, JObject obj, Texture2D imageTexture)
     {
-        string name = reader.GetAttribute("name");
-        int x = int.Parse(reader.GetAttribute("x"));
-        int y = int.Parse(reader.GetAttribute("y"));
-        int w = int.Parse(reader.GetAttribute("w"));
-        int h = int.Parse(reader.GetAttribute("h"));
+        string name = PrototypeReader.ReadJson(string.Empty, obj["name"]);
+        int x = PrototypeReader.ReadJson(0, obj["x"]);
+        int y = PrototypeReader.ReadJson(0, obj["y"]);
+        int w = PrototypeReader.ReadJson(1, obj["w"]);
+        int h = PrototypeReader.ReadJson(1, obj["h"]);
 
-        float pivotX = ReadPivot(reader, "pivotX");
-        float pivotY = ReadPivot(reader, "pivotY");
-
-        int pixelPerUnit = int.Parse(reader.GetAttribute("pixelPerUnit"));
-
-        LoadSprite(spriteCategory, name, imageTexture, new Rect(x * pixelPerUnit, y * pixelPerUnit, w * pixelPerUnit, h * pixelPerUnit), pixelPerUnit, new Vector2(pivotX, pivotY));
-    }
-
-    /// <summary>
-    /// Reads the x or y pivot from the XML reader.
-    /// </summary>
-    /// <returns>The pivot.</returns>
-    /// <param name="reader">The Xml Reader.</param>
-    /// <param name="pivotName">The pivot attribute name.</param>
-    private static float ReadPivot(XmlReader reader, string pivotName)
-    {
-        string pivotAttribute = reader.GetAttribute(pivotName);
-        float pivot;
-        if (float.TryParse(pivotAttribute, out pivot) == false)
+        float pivotX = PrototypeReader.ReadJson(0.5f, obj["pivotX"]);
+        float pivotY = PrototypeReader.ReadJson(0.5f, obj["pivotY"]);
+        if (pivotX < 0 || pivotX > 1 || pivotY < 0 || pivotY > 1)
         {
-            // If pivot point didn't exist default to 0.5f
-            pivot = 0.5f;
+            UnityDebugger.Debugger.LogWarning("SpriteManager", "Pivot for object " + name + " has pivots of " + pivotX + "," + pivotY);
         }
 
-        // Clamp pivot between 0..1
-        pivot = Mathf.Clamp01(pivot);
+        int pixelPerUnit = int.Parse(obj["pixelPerUnit"].ToString());
 
-        return pivot;
+        LoadSprite(spriteCategory, name, imageTexture, new Rect(x * pixelPerUnit, y * pixelPerUnit, w * pixelPerUnit, h * pixelPerUnit), pixelPerUnit, new Vector2(pivotX, pivotY));
     }
 
     /// <summary>
@@ -256,17 +256,24 @@ public class SpriteManager
     /// <param name="pivotPoint">Pivot point.</param>
     private static void LoadSprite(string spriteCategory, string spriteName, Texture2D imageTexture, Rect spriteCoordinates, int pixelsPerUnit, Vector2 pivotPoint)
     {
-        spriteName = spriteCategory + "/" + spriteName;
-
         Sprite s = Sprite.Create(imageTexture, spriteCoordinates, pivotPoint, pixelsPerUnit);
 
-        sprites[spriteName] = s;
+        Dictionary<string, Sprite> categorySprites;
+        if (sprites.TryGetValue(spriteCategory, out categorySprites) == false)
+        {
+            // If this category didn't exist until now, we create it
+            categorySprites = new Dictionary<string, Sprite>();
+            sprites[spriteCategory] = categorySprites;
+        }
+
+        // Add the sprite to the category
+        categorySprites[spriteName] = s;
     }
 
     /// <summary>
     /// Creates the no resource texture.
     /// </summary>
-    private void CreateNoTexture()
+    private static void CreateEmptyTexture()
     {
         // Generate a 32x32 magenta image
         noResourceTexture = new Texture2D(32, 32, TextureFormat.ARGB32, false);

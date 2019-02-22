@@ -7,8 +7,6 @@
 // ====================================================
 #endregion
 
-using System;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Localization;
@@ -57,30 +55,6 @@ public class OverlayDescriptor : IPrototypable
     /// Name of function returning int (index of color) given a tile t.
     /// </summary>
     public string LuaFunctionName { get; private set; }
-
-    /// <summary>
-    /// Creates an OverlayDescriptor form a xml subtree with node \<Overlay></Overlay>\.
-    /// </summary>
-    /// <param name="xmlReader">The subtree pointing to Overlay.</param>
-    public void ReadXmlPrototype(XmlReader xmlReader)
-    {
-        Type = xmlReader.GetAttribute("type");
-
-        if (xmlReader.GetAttribute("colorMap") != null)
-        {
-            try
-            {
-                ColorMap = (ColorMapOption)Enum.Parse(typeof(ColorMapOption), xmlReader.GetAttribute("colorMap"));
-            }
-            catch (ArgumentException e)
-            {
-                UnityDebugger.Debugger.LogErrorFormat("OverlayMap", "Invalid color map!\n{0}", e.Message);
-            }
-        }
-
-        xmlReader.Read();
-        LuaFunctionName = xmlReader.ReadContentAsString();
-    }
 
     /// <summary>
     /// Reads the prototype from the specified JObject.

@@ -10,10 +10,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
+using ProjectPorcupine.Localization;
 
 // Inventory are things that are lying on the floor/stockpile, like a bunch of metal bars
 // or potentially a non-installed copy of furniture (e.g. a cabinet still in the box from Ikea).
@@ -75,6 +75,14 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
     public string LocalizationName { get; private set; }
 
     public string LocalizationDescription { get; private set; }
+
+    public string LocalizedName
+    {
+        get
+        {
+            return LocalizationTable.GetLocalization(LocalizationName);
+        }
+    }
 
     public Tile Tile { get; set; }
 
@@ -149,7 +157,7 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         claims.RemoveAll(claim => claim.character == character);
         if (noneAvailable && AvailableInventory > 0)
         {
-            World.Current.jobQueue.ReevaluateWaitingQueue(this);
+            World.Current.InventoryManager.InventoryAvailable(this);
         }
     }
 
@@ -229,20 +237,14 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
 
     public IEnumerable<ContextMenuAction> GetContextMenuActions(ContextMenu contextMenu)
     {
-        yield return new ContextMenuAction
-        {
-            LocalizationKey = "Sample Item Context action",
-            RequireCharacterSelected = true,
-            Action = (cm, c) => UnityDebugger.Debugger.Log("Inventory", "Sample menu action")
-        };
-
         if (PrototypeManager.Furniture.Has(this.Type))
         {
             yield return new ContextMenuAction
             {
                 LocalizationKey = "install_order",
+                LocalizationParameter = LocalizationName,
                 RequireCharacterSelected = false,
-                Action = (cm, c) => BuildModeController.Instance.SetMode_BuildFurniture(Type, true)
+                Action = (cm, c) => WorldController.Instance.BuildModeController.SetMode_BuildFurniture(Type, true)
             };
         }
     }
@@ -263,16 +265,6 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         return string.Format("{0} [{1}/{2}]", Type, StackSize, MaxStackSize);
     }
 
-    public void ReadXmlPrototype(XmlReader reader_parent)
-    {
-        Type = reader_parent.GetAttribute("type");
-        MaxStackSize = int.Parse(reader_parent.GetAttribute("maxStackSize") ?? "50");
-        BasePrice = float.Parse(reader_parent.GetAttribute("basePrice") ?? "1");
-        Category = reader_parent.GetAttribute("category");
-        LocalizationName = reader_parent.GetAttribute("localizationName");
-        LocalizationDescription = reader_parent.GetAttribute("localizationDesc");
-    }
-
     /// <summary>
     /// Reads the prototype from the specified JObject.
     /// </summary>
@@ -285,8 +277,8 @@ public class Inventory : ISelectable, IContextActionProvider, IPrototypable
         MaxStackSize = PrototypeReader.ReadJson(50, innerJson["MaxStackSize"]);
         BasePrice = PrototypeReader.ReadJson(1f, innerJson["BasePrice"]);
         Category = PrototypeReader.ReadJson(Category, innerJson["Category"]);
-        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
-        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+        LocalizationName = PrototypeReader.ReadJson("inv_" + Type, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson("inv_" + Type + "_desc", innerJson["LocalizationDescription"]);
     }
 
     private void ImportPrototypeSettings(int defaulMaxStackSize, float defaultBasePrice, string defaultCategory)

@@ -59,7 +59,7 @@ namespace ProjectPorcupine.Localization
             }
 
             // Load the localization config file first
-            LocalizationTable.LoadConfigFile(Path.Combine(filePath, "config.xml"));
+            LocalizationTable.LoadConfigFile(Path.Combine(filePath, "config.json"));
 
             // Loop through all files.
             // TODO: Think over the extension ".lang", might change that in the future.
@@ -84,12 +84,11 @@ namespace ProjectPorcupine.Localization
                 return;
             }
 
+            // Loads the localization table in to memory, checking for version.
+            UpdateLocalizationTable();
+
             // Update localization from the internet.
             StartCoroutine(LocalizationDownloader.CheckIfCurrentLocalizationIsUpToDate(delegate { UpdateLocalizationTable(); }));
-
-            // Even though it's ran again in start, UpdateLocalizationTable still needs ran here to actually have the chose language
-            // show on start, I don't really know why.
-            UpdateLocalizationTable();
         }
 
         private void Start()

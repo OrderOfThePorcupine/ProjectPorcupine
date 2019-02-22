@@ -6,6 +6,12 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
+// Since we modify some of the variables outside of this compilation unit
+// The 'field' is not assigned to and will always have it's default value
+// Will be true, thus we can disable this warning briefly.
+#pragma warning disable 0649
+
 using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
@@ -179,6 +185,15 @@ public class SettingsMenu : MonoBehaviour
 
     public void Cancel()
     {
+        // If we have made no changes we can freely exit
+        if (changesTracker.Count == 0)
+        {
+            currentCategory = string.Empty;
+            GameController.Instance.IsModal = false;
+            mainRoot.SetActive(false);
+            return;
+        }
+
         // Open a dialog box to double check
         DialogBoxPromptOrInfo check;
 
@@ -192,6 +207,10 @@ public class SettingsMenu : MonoBehaviour
         }
         else
         {
+            // We can't display cancel box so just automatically cancel
+            changesTracker.Clear();
+            currentCategory = string.Empty;
+            GameController.Instance.IsModal = false;
             mainRoot.SetActive(false);
             return;
         }

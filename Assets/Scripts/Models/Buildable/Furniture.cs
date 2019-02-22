@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using Animation;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
@@ -17,7 +16,6 @@ using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Buildable.Components;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
-using ProjectPorcupine.Localization;
 using ProjectPorcupine.OrderActions;
 using ProjectPorcupine.PowerNetwork;
 using UnityEngine;
@@ -671,150 +669,6 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
     #region Read Prototype
     /// <summary>
-    /// Reads the prototype furniture from XML.
-    /// </summary>
-    /// <param name="readerParent">The XML reader to read from.</param>
-    public void ReadXmlPrototype(XmlReader readerParent)
-    {
-        Type = readerParent.GetAttribute("type");
-
-        XmlReader reader = readerParent.ReadSubtree();
-
-        while (reader.Read())
-        {
-            switch (reader.Name)
-            {
-                case "TypeTag":
-                    reader.Read();
-                    typeTags.Add(reader.ReadContentAsString());
-                    break;
-                case "MovementCost":
-                    reader.Read();
-                    MovementCost = reader.ReadContentAsFloat();
-                    break;
-                case "PathfindingModifier":
-                    reader.Read();
-                    PathfindingModifier = reader.ReadContentAsFloat();
-                    break;
-                case "PathfindingWeight":
-                    reader.Read();
-                    PathfindingWeight = reader.ReadContentAsFloat();
-                    break;
-                case "Width":
-                    reader.Read();
-                    Width = reader.ReadContentAsInt();
-                    break;
-                case "Height":
-                    reader.Read();
-                    Height = reader.ReadContentAsInt();
-                    break;
-                case "Health":
-                    reader.Read();
-                    health = new HealthSystem(reader.ReadContentAsFloat(), false, true, false, false);
-                    break;
-                case "LinksToNeighbours":
-                    reader.Read();
-                    LinksToNeighbours = reader.ReadContentAsString();
-                    break;
-                case "EnclosesRooms":
-                    reader.Read();
-                    EnclosesRoom = reader.ReadContentAsBoolean();
-                    break;
-                case "CanReplaceFurniture":
-                    replaceableFurniture.Add(reader.GetAttribute("typeTag").ToString());
-                    break;
-                case "CanRotate":
-                    reader.Read();
-                    CanRotate = reader.ReadContentAsBoolean();
-                    break;
-                case "DragType":
-                    reader.Read();
-                    DragType = reader.ReadContentAsString();
-                    break;
-                case "CanBeBuiltOn":
-                    tileTypeBuildPermissions.Add(reader.GetAttribute("tileType"));
-                    break;
-                case "Animations":
-                    XmlReader animationReader = reader.ReadSubtree();
-                    ReadAnimationXml(animationReader);
-                    break;
-                case "Action":
-                    XmlReader subtree = reader.ReadSubtree();
-                    EventActions.ReadXml(subtree);
-                    subtree.Close();
-                    break;
-                case "ContextMenuAction":
-                    contextMenuLuaActions.Add(new ContextMenuLuaAction
-                    {
-                        LuaFunction = reader.GetAttribute("FunctionName"),
-                        LocalizationKey = reader.GetAttribute("LocalizationKey"),
-                        RequireCharacterSelected = bool.Parse(reader.GetAttribute("RequireCharacterSelected")),
-                        DevModeOnly = bool.Parse(reader.GetAttribute("DevModeOnly") ?? "false")
-                    });
-                    break;
-                case "IsEnterable":
-                    isEnterableAction = reader.GetAttribute("FunctionName");
-                    break;
-                case "GetProgressInfo":
-                    getProgressInfoNameAction = reader.GetAttribute("functionName");
-                    break;
-                case "JobWorkSpotOffset":
-                    Jobs.ReadWorkSpotOffset(reader);
-                    break;
-                case "JobInputSpotOffset":
-                    Jobs.ReadInputSpotOffset(reader);
-                    break;
-                case "JobOutputSpotOffset":
-                    Jobs.ReadOutputSpotOffset(reader);
-                    break;
-                case "Params":
-                    ReadXmlParams(reader);  // Read in the Param tag
-                    break;
-                case "LocalizationCode":
-                    reader.Read();
-                    LocalizationName = reader.ReadContentAsString();
-                    break;
-                case "UnlocalizedDescription":
-                    reader.Read();
-                    LocalizationDescription = reader.ReadContentAsString();
-                    break;
-                case "Component":
-                    BuildableComponent component = BuildableComponent.Deserialize(reader);
-                    if (component != null)
-                    {
-                        component.InitializePrototype(this);
-                        components.Add(component);
-                    }
-
-                    break;
-                case "OrderAction":
-                    OrderAction orderAction = OrderAction.Deserialize(reader);
-                    if (orderAction != null)
-                    {
-                        orderActions[orderAction.Type] = orderAction;
-                    }
-
-                    break;
-            }
-        }
-
-        if (orderActions.ContainsKey("Uninstall"))
-        {
-            Inventory asInventory = Inventory.CreatePrototype(Type, 1, 0f, "crated_furniture", LocalizationName, LocalizationDescription);
-            PrototypeManager.Inventory.Add(asInventory);
-        }
-    }
-
-    /// <summary>
-    /// Reads the XML for parameters that this furniture has and assign it to the furniture.
-    /// </summary>
-    /// <param name="reader">The reader to read the parameters from.</param>
-    public void ReadXmlParams(XmlReader reader)
-    {
-        Parameters = Parameter.ReadXml(reader);
-    }
-
-    /// <summary>
     /// Reads the prototype from the specified JObject.
     /// </summary>
     /// <param name="jsonProto">The JProperty containing the prototype.</param>
@@ -844,8 +698,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         DragType = PrototypeReader.ReadJson(DragType, innerJson["DragType"]);
         isEnterableAction = PrototypeReader.ReadJson(isEnterableAction, innerJson["IsEnterableAction"]);
         getProgressInfoNameAction = PrototypeReader.ReadJson(getProgressInfoNameAction, innerJson["GetProgressInfoNameAction"]);
-        LocalizationName = PrototypeReader.ReadJson(LocalizationName, innerJson["LocalizationName"]);
-        LocalizationDescription = PrototypeReader.ReadJson(LocalizationDescription, innerJson["LocalizationDescription"]);
+        LocalizationName = PrototypeReader.ReadJson("furn_" + Type, innerJson["LocalizationName"]);
+        LocalizationDescription = PrototypeReader.ReadJson("furn_" + Type + "_desc", innerJson["LocalizationDescription"]);
 
         typeTags = new HashSet<string>(PrototypeReader.ReadJsonArray<string>(innerJson["TypeTags"]));
 
@@ -876,6 +730,11 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
                 {
                     component.InitializePrototype(this);
                     components.Add(component);
+
+                    if (component.IsValid() == false)
+                    {
+                        UnityDebugger.Debugger.LogError("BuildableComponent", "Error parsing " + component.GetType() + " for " + Type);
+                    }
                 }
             }
         }
@@ -952,7 +811,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             Job job = uninstallOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Uninstall();
-            World.Current.jobQueue.Enqueue(job);
+            World.Current.jobManager.Enqueue(job);
         }
     }
 
@@ -1054,7 +913,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             Job job = deconstructOrder.CreateJob(Tile, Type);
             job.OnJobCompleted += (inJob) => Deconstruct();
-            World.Current.jobQueue.Enqueue(job);
+            World.Current.jobManager.Enqueue(job);
         }
     }
 
@@ -1296,7 +1155,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = LocalizationTable.GetLocalization("deconstruct_furniture", LocalizationName),
+                LocalizationKey = "deconstruct_furniture",
+                LocalizationParameter = LocalizationName,
                 RequireCharacterSelected = false,
                 Action = (ca, c) => SetDeconstructJob()
             };
@@ -1306,7 +1166,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         {
             yield return new ContextMenuAction
             {
-                LocalizationKey = LocalizationTable.GetLocalization("uninstall_furniture", LocalizationName),
+                LocalizationKey = "uninstall_furniture",
+                LocalizationParameter = LocalizationName,
                 RequireCharacterSelected = false,
                 Action = (ca, c) => SetUninstallJob()
             };
@@ -1318,7 +1179,8 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             {
                 yield return new ContextMenuAction
                 {
-                    LocalizationKey = LocalizationTable.GetLocalization("prioritize_furniture", LocalizationName),
+                    LocalizationKey = "prioritize",
+                    LocalizationParameter = LocalizationName,
                     RequireCharacterSelected = true,
                     Action = (ca, c) => c.PrioritizeJob(Jobs[0])
                 };
@@ -1484,38 +1346,4 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     }
 
     #endregion
-
-    /// <summary>
-    /// Reads and creates FurnitureAnimation from the prototype xml.
-    /// </summary>
-    private void ReadAnimationXml(XmlReader animationReader)
-    {
-        Animations = new FurnitureAnimation();
-        while (animationReader.Read())
-        {
-            if (animationReader.Name == "Animation")
-            {
-                string state = animationReader.GetAttribute("state");
-                float fps = 1;
-                float.TryParse(animationReader.GetAttribute("fps"), out fps);
-                bool looping = true;
-                bool.TryParse(animationReader.GetAttribute("looping"), out looping);
-                bool valueBased = false;
-                bool.TryParse(animationReader.GetAttribute("valuebased"), out valueBased);
-
-                // read frames
-                XmlReader frameReader = animationReader.ReadSubtree();
-                List<string> framesSpriteNames = new List<string>();
-                while (frameReader.Read())
-                {
-                    if (frameReader.Name == "Frame")
-                    {
-                        framesSpriteNames.Add(frameReader.GetAttribute("name"));
-                    }
-                }
-
-                Animations.AddAnimation(state, framesSpriteNames, fps, looping, valueBased);
-            }
-        }
-    }
 }

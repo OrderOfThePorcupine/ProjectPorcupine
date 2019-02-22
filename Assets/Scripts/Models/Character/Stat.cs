@@ -7,7 +7,6 @@
 // ====================================================
 #endregion
 
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 namespace ProjectPorcupine.Entities
@@ -29,12 +28,6 @@ namespace ProjectPorcupine.Entities
         public string Name { get; set; }
 
         public int Value { get; set; }
-
-        public void ReadXmlPrototype(XmlReader parentReader)
-        {
-            Type = parentReader.GetAttribute("type");
-            Name = parentReader.GetAttribute("name");
-        }
 
         /// <summary>
         /// Reads the prototype from the specified JObject.

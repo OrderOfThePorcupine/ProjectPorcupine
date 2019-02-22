@@ -36,7 +36,7 @@ public class World
     // class for managing job queues (plural!) that might also
     // be semi-static or self initializing or some damn thing.
     // For now, this is just a PUBLIC member of World
-    public JobQueue jobQueue;
+    public JobManager jobManager;
 
     // A three-dimensional array to hold our tile data.
     private Tile[,,] tiles;
@@ -57,7 +57,7 @@ public class World
             Seed = SceneController.Seed;
         }
 
-        Debug.LogWarning("World Seed: " + Seed);
+        UnityDebugger.Debugger.Log("World", "World Seed: " + Seed);
         WorldGenerator.Instance.Generate(this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
@@ -98,6 +98,14 @@ public class World
 
     // The tile depth of the world
     public int Depth { get; protected set; }
+
+    public int Volume
+    {
+        get
+        {
+            return Width * Height * Depth;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the world seed.
@@ -458,7 +466,7 @@ public class World
         UtilityManager = new UtilityManager();
         CharacterManager = new CharacterManager();
         InventoryManager = new InventoryManager();
-        jobQueue = new JobQueue();
+        jobManager = new JobManager();
         GameEventManager = new GameEventManager();
         PowerNetwork = new PowerNetwork();
         FluidNetwork = new FluidNetwork();

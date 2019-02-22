@@ -6,8 +6,6 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 public interface IPrototypable
@@ -16,12 +14,6 @@ public interface IPrototypable
     /// Gets the Type of the prototype.
     /// </summary>
     string Type { get; }
-
-    /// <summary>
-    /// Reads the prototype from the specified XML reader.
-    /// </summary>
-    /// <param name="readerParent">The XML reader to read from.</param>
-    void ReadXmlPrototype(XmlReader reader);
 
     /// <summary>
     /// Reads the prototype from the specified JObject.

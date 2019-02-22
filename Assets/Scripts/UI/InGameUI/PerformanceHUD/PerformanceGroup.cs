@@ -8,7 +8,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Xml;
 using Newtonsoft.Json.Linq;
 
 /// <summary>
@@ -44,35 +43,6 @@ public class PerformanceGroup : IPrototypable
     /// In JSON its the 'Name' of the component group.
     /// </summary>
     public string Type { get; set; }
-
-    /// <summary>
-    /// Reads from the reader provided.
-    /// </summary>
-    public void ReadXmlPrototype(XmlReader parentReader)
-    {
-        Type = parentReader.GetAttribute("Name");
-
-        if (Type == null)
-        {
-            throw new System.Exception("Type ('Name') doesn't exist in component group.");
-        }
-
-        XmlReader reader = parentReader.ReadSubtree();
-
-        while (reader.Read())
-        {
-            if (reader.Name == "Component")
-            {
-                reader.MoveToContent();
-                string className = reader.GetAttribute("ClassName");
-
-                if (string.IsNullOrEmpty(className) == false)
-                {
-                    componentData.Add(new UIComponent(reader.GetAttribute("ClassName"), reader != null && reader.ReadToDescendant("Params") ? Parameter.ReadXml(reader) : new Parameter()));
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// Reads the prototype from the specified JProperty.

@@ -8,7 +8,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 
@@ -140,57 +139,6 @@ namespace ProjectPorcupine.Entities
                 if (EventActions != null)
                 {
                     EventActions.Trigger("OnModerateNeed", this, deltaTime);
-                }
-            }
-        }
-
-        public void ReadXmlPrototype(XmlReader parentReader)
-        {
-            Type = parentReader.GetAttribute("type");
-
-            XmlReader reader = parentReader.ReadSubtree();
-
-            while (reader.Read())
-            {
-                switch (reader.Name)
-                {
-                    case "RestoreNeedFurnitureType":
-                        reader.Read();
-                        RestoreNeedFurn = PrototypeManager.Furniture.Get(reader.ReadContentAsString());
-                        break;
-                    case "RestoreNeedTime":
-                        reader.Read();
-                        RestoreNeedTime = reader.ReadContentAsFloat();
-                        break;
-                    case "Damage":
-                        reader.Read();
-                        Damage = reader.ReadContentAsFloat();
-                        break;
-                    case "CompleteOnFail":
-                        reader.Read();
-                        CompleteOnFail = reader.ReadContentAsBoolean();
-                        break;
-                    case "HighToLow":
-                        reader.Read();
-                        highToLow = reader.ReadContentAsBoolean();
-                        break;
-                    case "GrowthRate":
-                        reader.Read();
-                        GrowthRate = reader.ReadContentAsFloat();
-                        break;
-                    case "RestoreNeedAmount":
-                        reader.Read();
-                        RestoreNeedAmount = reader.ReadContentAsFloat();
-                        break;
-                    case "Localization":
-                        reader.Read();
-                        LocalizationName = reader.ReadContentAsString();
-                        break;
-                    case "Action":
-                        XmlReader subtree = reader.ReadSubtree();
-                        EventActions.ReadXml(subtree);
-                        subtree.Close();
-                        break;
                 }
             }
         }

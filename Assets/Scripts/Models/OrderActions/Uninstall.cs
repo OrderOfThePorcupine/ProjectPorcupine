@@ -7,18 +7,17 @@
 // ====================================================
 #endregion
 using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
 
 namespace ProjectPorcupine.OrderActions
 {
     [Serializable]
-    [XmlRoot("OrderAction")]
     [OrderActionName("Uninstall")]
     public class Uninstall : OrderAction
     {
         public Uninstall()
         {
+            Category = PrototypeManager.JobCategory.Get("construct");
+            Priority = Job.JobPriority.High;
         }
 
         private Uninstall(Uninstall other) : base(other)
@@ -32,7 +31,15 @@ namespace ProjectPorcupine.OrderActions
 
         public override Job CreateJob(Tile tile, string type)
         {
-            Job job = CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            Job job = null;
+            if (tile != null)
+            {
+                CheckJobFromFunction(JobTimeFunction, tile.Furniture);
+            }
+            else
+            {
+                UnityDebugger.Debugger.LogError("Deconstruct", "Invalid tile detected. If this wasn't a test, you have an issue.");
+            }
 
             if (job == null)
             {
@@ -42,7 +49,8 @@ namespace ProjectPorcupine.OrderActions
                 null,
                 JobTime,
                 null,
-                Job.JobPriority.High);
+                Priority,
+                Category);
                 job.Description = "job_uninstall_" + type + "_desc";
                 job.adjacent = true;
                 job.OrderName = Type;

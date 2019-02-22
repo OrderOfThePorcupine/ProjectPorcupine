@@ -10,9 +10,9 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace DeveloperConsole.Core
 {
@@ -62,32 +62,6 @@ namespace DeveloperConsole.Core
             catch (Exception e)
             {
                 DevConsole.LogError(e.Message);
-            }
-        }
-
-        /// <summary>
-        /// Reads from the reader provided.
-        /// </summary>
-        public void ReadXmlPrototype(XmlReader reader)
-        {
-            Title = reader.GetAttribute("Title");
-            FunctionName = reader.GetAttribute("FunctionName");
-            Description = reader.GetAttribute("Description");
-            DetailedDescription = reader.GetAttribute("DetailedDescription");
-            Parameters = reader.GetAttribute("Parameters");
-            ParseParameterToTypeInfo();
-            Tags = reader.GetAttribute("Tags").Split(',').Select(x => x.Trim()).ToArray();
-            DefaultValue = reader.GetAttribute("DefaultValue");
-
-            // This is an optional checker basically
-            if (Tags == null)
-            {
-                Tags = new string[0];
-            }
-
-            if (DefaultValue == null)
-            {
-                DefaultValue = string.Empty;
             }
         }
 
@@ -168,32 +142,25 @@ namespace DeveloperConsole.Core
                 {
                     string[] parameterSections = parameterTypes[i].Split(';');
 
-                    // This is just to have a safety, that may trigger in some cases??  Better than nothing I guess
-                    // Could try to remove, but in most cases won't be part of DevConsole, till you open, or it starts.
-                    try
+                    // First try to load var with System
+                    types[i] = System.Type.GetType("System." + parameterSections[1], false, true);
+                    
+                    // If that doesn't resolve try with UnityEngine
+                    if (types[i] == null)
                     {
-                        // We just split, since its a decently appropriate solution.
-                        types[i] = System.Type.GetType((parameterSections[1].Contains('.') ? parameterSections[1] : "System." + parameterSections[1]) + parameterSections[0], true, true);
+                        types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ", UnityEngine", false, true);
                     }
-                    catch (Exception e)
+
+                    if (types[i] == null)
                     {
-                        // Also replace the string splitting and containing
-                        // with a more efficient algo.
-                        // Slight hack fix later @ TODO
-                        // Try with UnityEngine.X, UnityEngine.Core
-                        try
-                        {
-                            types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ", UnityEngine.CoreModule", true, true);
-                        }
-                        catch (Exception inner)
-                        {
-                            // This means invalid type, so we set it to object.
-                            // This in most cases is fine, just means that when you call it, 
-                            // it won't work (unless the type is object)
-                            types[i] = typeof(object);
-                            UnityDebugger.Debugger.LogError("DevConsole", typeof(UnityEngine.Vector3).Assembly.FullName + "; " + typeof(UnityEngine.Vector3).AssemblyQualifiedName);
-                            UnityDebugger.Debugger.LogError("DevConsole", e.Message + "\n" + inner.Message);
-                        }
+                        types[i] = System.Type.GetType("UnityEngine." + parameterSections[1] + ", UnityEngine.CoreModule", false, true);
+                    }
+
+                    // If that doesn't work fallback to object and throw a warning
+                    if (types[i] == null)
+                    {
+                        types[i] = typeof(object);
+                        UnityDebugger.Debugger.LogWarning("DevConsole", "VariableType " + parameterSections[1] + " is not found in the System or UnityEngine namespaces, type is now object");
                     }
                 }
             }

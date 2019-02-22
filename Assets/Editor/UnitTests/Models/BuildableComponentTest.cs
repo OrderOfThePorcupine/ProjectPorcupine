@@ -8,8 +8,6 @@
 #endregion
 using System;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -17,30 +15,6 @@ using ProjectPorcupine.Buildable.Components;
 
 public class BuildableComponentTest
 {
-    [Test]
-    public void TestComponentCreationFromXml()
-    {
-        string inputXML = @"<Component type='Workshop' >
-        <ProductionChain name = 'Power Cell Pressing' processingTime = '5' >
-         <Input>
-             <Item objectType = 'Uranium' amount = '3' slotPosX = '0' slotPosY = '0' />
-                    <Item objectType = 'Steel Plate' amount = '2' slotPosX = '1' slotPosY = '0' />
-                       </Input>
-                       <Output>
-                           <Item objectType = 'Power Cell' amount = '1' slotPosX = '2' slotPosY = '1' />
-                              </Output>
-                          </ProductionChain>
-                        </Component> ";
-
-        XmlReader reader = new XmlTextReader(new StringReader(inputXML));
-        reader.Read();
-
-        BuildableComponent component = ProjectPorcupine.Buildable.Components.BuildableComponent.Deserialize(reader);
-
-        Assert.NotNull(component);
-        Assert.AreEqual("Workshop", component.Type);
-    }
-
     [Test]
     public void TestComponentCreationFromJson()
     {
@@ -76,8 +50,6 @@ public class BuildableComponentTest
                 }
             }";
 
-        inputJson = inputJson.Replace("'", "\"");
-
         JToken reader = JToken.Parse(inputJson);
 
         BuildableComponent component = ProjectPorcupine.Buildable.Components.BuildableComponent.Deserialize(reader);
@@ -85,30 +57,6 @@ public class BuildableComponentTest
         Assert.NotNull(component);
         Assert.AreEqual("Workshop", component.Type);
         Assert.AreEqual(4f, (component as Workshop).PossibleProductions[0].ProcessingTime);
-    }
-
-    [Test]
-    public void TestWorkshopXmlSerialization()
-    {
-        Workshop workshop = CreateWorkshop();
-
-        // serialize
-        StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new XmlSerializer(typeof(BuildableComponent), new Type[] { typeof(Workshop) });
-
-        serializer.Serialize(writer, workshop);
-
-        StringReader sr = new StringReader(writer.ToString());
-
-        // if you want to dump file to disk for visual check, uncomment this
-        ////File.WriteAllText("Workshop.xml", writer.ToString());
-
-        // deserialize
-        Workshop deserializedWorkshop = (Workshop)serializer.Deserialize(sr);
-
-        Assert.NotNull(deserializedWorkshop);
-        Assert.AreEqual("Raw Iron", deserializedWorkshop.PossibleProductions[0].Input[0].ObjectType);
-        Assert.IsNotNull(deserializedWorkshop.RunConditions);
     }
 
     [Test]
@@ -128,31 +76,6 @@ public class BuildableComponentTest
 
         Assert.NotNull(deserializedWorkshop);
         Assert.AreEqual("Raw Iron", deserializedWorkshop.PossibleProductions[0].Input[0].ObjectType);
-    }
-
-    [Test]
-    public void TestGasConnectionXmlSerialization()
-    {
-        GasConnection gasConnection = CreateGasConnection();
-
-        // serialize
-        StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new XmlSerializer(typeof(BuildableComponent), new Type[] { typeof(GasConnection) });
-
-        serializer.Serialize(writer, gasConnection);
-
-        StringReader sr = new StringReader(writer.ToString());
-
-        // if you want to dump file to disk for visual check, uncomment this
-        ////File.WriteAllText("GasConnection.xml", writer.ToString());
-
-        // deserialize
-        GasConnection deserializedGasConnection = (GasConnection)serializer.Deserialize(sr);
-
-        Assert.NotNull(deserializedGasConnection);
-
-        Assert.AreEqual(2, deserializedGasConnection.Provides.Count);
-        Assert.AreEqual("O2", deserializedGasConnection.Provides[0].Gas);
     }
 
     [Test]
@@ -177,32 +100,6 @@ public class BuildableComponentTest
     }
 
     [Test]
-    public void TestPowerConnectionXmlSerialization()
-    {
-        PowerConnection accumulator = CreatePowerConnection();
-
-        // serialize
-        StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new XmlSerializer(typeof(BuildableComponent), new Type[] { typeof(PowerConnection) });
-
-        serializer.Serialize(writer, accumulator);
-
-        StringReader sr = new StringReader(writer.ToString());
-
-        // if you want to dump file to disk for visual check, uncomment this
-        ////File.WriteAllText("PowerConnection.xml", writer.ToString());
-
-        // deserialize
-        PowerConnection deserializedPowerConnection = (PowerConnection)serializer.Deserialize(sr);
-
-        Assert.NotNull(deserializedPowerConnection);
-
-        Assert.AreEqual(10f, deserializedPowerConnection.Provides.Rate);
-        Assert.AreEqual("cur_processed_inv", deserializedPowerConnection.RunConditions.ParamConditions[0].ParameterName);
-        Assert.AreEqual(1, deserializedPowerConnection.RunConditions.ParamConditions.Count);
-    }
-
-    [Test]
     public void TestPowerConnectionJsonSerialization()
     {
         PowerConnection accumulator = CreatePowerConnection();
@@ -224,28 +121,6 @@ public class BuildableComponentTest
     }
 
     [Test]
-    public void TestVisualsXmlSerialization()
-    {
-        Visuals visuals = CreateVisuals();
-
-        // serialize
-        StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new XmlSerializer(typeof(BuildableComponent), new Type[] { typeof(Visuals) });
-
-        serializer.Serialize(writer, visuals);
-
-        StringReader sr = new StringReader(writer.ToString());
-
-        // if you want to dump file to disk for visual check, uncomment this
-        ////File.WriteAllText("Animator.xml", writer.ToString());
-
-        // deserialize
-        Visuals deserializedAnimator = (Visuals)serializer.Deserialize(sr);
-
-        Assert.NotNull(deserializedAnimator);
-    }
-
-    [Test]
     public void TestVisualsJsonSerialization()
     {
         Visuals visuals = CreateVisuals();
@@ -260,6 +135,39 @@ public class BuildableComponentTest
         Visuals deserializedAnimator = JsonConvert.DeserializeObject<Visuals>(visualsJson);
 
         Assert.NotNull(deserializedAnimator);
+    }
+
+    [Test] 
+    public void TestForInvalidVisualUseAnimation()
+    {
+        string inputJson = @"
+        {
+            'water_tank': {
+                'LocalizationName': 'furn_water_tank',
+                'LocalizationDescription': 'furn_water_tank_desc',
+                'Health': 1.0,
+                'DragType': 'single',
+                'Components': {
+                    'Visuals': {
+                        'DefaultSpriteName': {
+                            'Value': 'water_tank_0'
+                        },
+                    'UseAnimation': [
+                            {
+                                'Name': 'filling',
+                                'ValueBasedTypo': 'fluid_storage_index'
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        ";
+
+        JToken reader = JToken.Parse(inputJson);
+        Furniture furniture = new Furniture();
+        UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Error, "Error parsing ProjectPorcupine.Buildable.Components.Visuals for water_tank");
+        furniture.ReadJsonPrototype((JProperty)reader.First);
     }
 
     private static string SerializeObjectToJson(object obj)
