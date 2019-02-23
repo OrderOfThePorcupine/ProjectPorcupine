@@ -786,6 +786,24 @@
           "ParameterDefinitions": {},
           "ProductionChain": [
             {
+              "Name": "iron_smelting",
+              "ProcessingTime": 4.0,
+              "Input": [
+                {
+                  "ObjectType": "raw_iron",
+                  "Amount": 2,
+                  "HasHopper": true
+                }
+              ],
+              "Output": [
+                {
+                  "ObjectType": "steel_plate",
+                  "Amount": 1,
+                  "SlotPosX": 2
+                }
+              ]
+            },
+            {
               "Name": "copper_smelting",
               "ProcessingTime": 3.0,
               "Input": [
@@ -803,24 +821,6 @@
                 }
               ]
             },
-            {
-              "Name": "iron_smelting",
-              "ProcessingTime": 4.0,
-              "Input": [
-                {
-                  "ObjectType": "raw_iron",
-                  "Amount": 2,
-                  "HasHopper": true
-                }
-              ],
-              "Output": [
-                {
-                  "ObjectType": "steel_plate",
-                  "Amount": 1,
-                  "SlotPosX": 2
-                }
-              ]
-            }
           ],
           "Efficiency": {
             "FromParameter": "pow_efficiency"
