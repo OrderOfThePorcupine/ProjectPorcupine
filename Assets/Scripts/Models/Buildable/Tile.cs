@@ -702,18 +702,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         return string.Format("[{0} {1}, {2}, {3}]", Type, X, Y, Z);
     }
 
-    private void ReportTileChanged()
-    {
-        // Call the callback and let things know we've changed.
-        if (TileChanged != null)
-        {
-            TileChanged(this);
-        }
-
-        ForceTileUpdate = false;
-    }
-
-    private void UpdatePathfindingCost()
+    public void UpdatePathfindingCost()
     {
         float newCost;
 
@@ -734,5 +723,16 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         }
 
         PathfindingCost = newCost;
+    }
+
+    private void ReportTileChanged()
+    {
+        // Call the callback and let things know we've changed.
+        if (TileChanged != null)
+        {
+            TileChanged(this);
+        }
+
+        ForceTileUpdate = false;
     }
 }
