@@ -797,7 +797,9 @@ namespace ProjectPorcupine.Mouse
                     }
                     else if (mouseKey == 1)
                     {
-                        Tile t = WorldController.Instance.GetTileAtWorldCoord(position);
+                        Vector3 mousePosition = position;
+                        mousePosition.z = WorldController.Instance.CameraController.CurrentLayer;
+                        Tile t = WorldController.Instance.GetTileAtWorldCoord(mousePosition);
                         if (WorldController.Instance.MouseController.contextMenu != null && t != null)
                         {
                             if (WorldController.Instance.MouseController.IsPanning)
