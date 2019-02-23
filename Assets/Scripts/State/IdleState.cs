@@ -34,7 +34,7 @@ namespace ProjectPorcupine.Entities.States
             if (timeSpentIdle >= totalIdleTime)
             {
                 Tile[] neighbors = character.CurrTile.GetNeighbours();
-                Tile endTile = neighbors[Random.Range(0, 4)];
+                Tile endTile = neighbors[Random.Range(0, neighbors.Length)];
                 List<Tile> path = new List<Tile>() { character.CurrTile, endTile };
 
                 if (endTile.MovementCost != 0)

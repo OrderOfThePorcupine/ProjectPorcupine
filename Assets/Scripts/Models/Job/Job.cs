@@ -20,7 +20,7 @@ using UnityEngine;
 
 [MoonSharpUserData]
 [System.Diagnostics.DebuggerDisplay("Job {JobObjectType}")]
-public class Job : ISelectable, IPrototypable
+public class Job : ISelectable
 {
     // This class holds info for a queued up job, which can include
     // things like placing furniture, moving stored inventory,
@@ -639,19 +639,5 @@ public class Job : ISelectable, IPrototypable
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
-    }
-
-    // TODO: Why does this implement IPrototypable? It isn't a prototype.
-    public void ReadJsonPrototype(JProperty jsonProto)
-    {
-    }
-
-    public void FSMLogRequirements()
-    {
-        UnityDebugger.Debugger.Log("FSM", string.Format(" - {0} {1}", Type, acceptsAny ? "Any" : "All"));
-        foreach (RequestedItem item in RequestedItems.Values)
-        {
-            UnityDebugger.Debugger.Log("FSM", string.Format("   - {0}, min: {1}, max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested));
-        }
     }
 }
