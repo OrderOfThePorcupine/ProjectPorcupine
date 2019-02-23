@@ -13,7 +13,6 @@ using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
-using ProjectPorcupine.Localization;
 using ProjectPorcupine.Pathfinding;
 using ProjectPorcupine.Rooms;
 using UnityEngine;
@@ -46,6 +45,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         Utilities = new Dictionary<string, Utility>();
         ReservedAsWorkSpotBy = new HashSet<Furniture>();
         PendingBuildJobs = new HashSet<Job>();
+        UpdatePathfindingCost();
     }
 
     // The function we callback any time our tile's data changes
@@ -86,27 +86,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     /// The final cost is equal to the Tile's BaseMovementCost * Tile's PathfindingWeight * Furniture's PathfindingWeight * Furniture's MovementCost +
     /// Tile's PathfindingModifier + Furniture's PathfindingModifier.
     /// </summary>
-    public float PathfindingCost
-    {
-        get
-        {
-            // If Tile's BaseMovementCost, PathFindingWeight or Furniture's MovementCost, PathFindingWeight = 0 (i.e. impassable) we should always return 0 (stay impassable)
-            if (Type.BaseMovementCost.AreEqual(0) || Type.PathfindingWeight.AreEqual(0) || (Furniture != null && (Furniture.MovementCost.AreEqual(0) || Furniture.PathfindingWeight.AreEqual(0))))
-            {
-                return 0f;
-            }
-
-            if (Furniture != null)
-            {
-                return (Furniture.PathfindingWeight * Furniture.MovementCost * Type.PathfindingWeight * Type.BaseMovementCost) +
-                Furniture.PathfindingModifier + Type.PathfindingModifier;
-            }
-            else
-            {
-                return (Type.PathfindingWeight * Type.BaseMovementCost) + Type.PathfindingModifier;
-            }
-        }
-    }
+    public float PathfindingCost { get; protected set; }
 
     // FIXME: This seems like a terrible way to flag if a job is pending
     // on a tile.  This is going to be prone to errors in set/clear.
@@ -181,6 +161,8 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         {
             TileTypeChanged(this);
         }
+
+        UpdatePathfindingCost();
     }
 
     public bool UnplaceFurniture()
@@ -198,6 +180,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
             {
                 Tile tile = World.Current.GetTileAt(x_off, y_off, Z);
                 tile.Furniture = null;
+                UpdatePathfindingCost();
             }
         }
 
@@ -223,6 +206,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
             {
                 Tile t = World.Current.GetTileAt(x_off, y_off, Z);
                 t.Furniture = objInstance;
+                UpdatePathfindingCost();
             }
         }
 
@@ -727,5 +711,28 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         }
 
         ForceTileUpdate = false;
+    }
+
+    private void UpdatePathfindingCost()
+    {
+        float newCost;
+
+        // If Tile's BaseMovementCost, PathFindingWeight or Furniture's MovementCost, PathFindingWeight = 0 (i.e. impassable) we should always return 0 (stay impassable)
+        if (Type.BaseMovementCost.AreEqual(0) || Type.PathfindingWeight.AreEqual(0) || (Furniture != null && (Furniture.MovementCost.AreEqual(0) || Furniture.PathfindingWeight.AreEqual(0))))
+        {
+            newCost = 0f;
+        }
+
+        if (Furniture != null)
+        {
+            newCost = (Furniture.PathfindingWeight * Furniture.MovementCost * Type.PathfindingWeight * Type.BaseMovementCost) +
+            Furniture.PathfindingModifier + Type.PathfindingModifier;
+        }
+        else
+        {
+            newCost = (Type.PathfindingWeight * Type.BaseMovementCost) + Type.PathfindingModifier;
+        }
+
+        PathfindingCost = newCost;
     }
 }
