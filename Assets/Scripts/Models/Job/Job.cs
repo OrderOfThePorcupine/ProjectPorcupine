@@ -640,5 +640,4 @@ public class Job : ISelectable
     {
         yield break;
     }
-
 }
