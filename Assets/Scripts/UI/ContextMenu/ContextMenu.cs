@@ -13,7 +13,7 @@ using UnityEngine;
 
 public class ContextMenu : MonoBehaviour
 {
-    public GameObject ContextualMenuItemPrefab;
+    public ContextMenuItem ContextualMenuItemPrefab;
 
     public bool Opened
     {
@@ -72,10 +72,7 @@ public class ContextMenu : MonoBehaviour
             if ((contextMenuAction.RequireCharacterSelected && characterSelected) ||
                 !contextMenuAction.RequireCharacterSelected)
             {
-                GameObject go = (GameObject)Instantiate(ContextualMenuItemPrefab);
-                go.transform.SetParent(gameObject.transform);
-
-                ContextMenuItem contextMenuItem = go.GetComponent<ContextMenuItem>();
+                ContextMenuItem contextMenuItem = Instantiate(ContextualMenuItemPrefab, gameObject.transform,false);
                 contextMenuItem.ContextMenu = this;
                 contextMenuItem.Action = contextMenuAction;
                 contextMenuItem.BuildInterface();
