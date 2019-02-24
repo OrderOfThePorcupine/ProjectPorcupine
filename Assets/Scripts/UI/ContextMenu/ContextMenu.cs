@@ -72,7 +72,7 @@ public class ContextMenu : MonoBehaviour
             if ((contextMenuAction.RequireCharacterSelected && characterSelected) ||
                 !contextMenuAction.RequireCharacterSelected)
             {
-                ContextMenuItem contextMenuItem = Instantiate(ContextualMenuItemPrefab, gameObject.transform,false);
+                ContextMenuItem contextMenuItem = Instantiate(ContextualMenuItemPrefab, gameObject.transform, false);
                 contextMenuItem.ContextMenu = this;
                 contextMenuItem.Action = contextMenuAction;
                 contextMenuItem.BuildInterface();
