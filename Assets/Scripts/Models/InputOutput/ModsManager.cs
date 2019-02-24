@@ -185,12 +185,16 @@ public class ModsManager
         HandlePrototypes("Category", PrototypeManager.SettingsCategories.LoadJsonPrototypes);
         HandlePrototypes("ComponentGroup", PrototypeManager.PerformanceHUD.LoadJsonPrototypes);
         HandlePrototypes("JobCategory", PrototypeManager.JobCategory.LoadJsonPrototypes);
+        HandlePrototypes("DialogBox", PrototypeManager.DialogBox.LoadJsonPrototypes);
 
         LoadFunctions("SettingsMenuFunctions.cs", "SettingsMenu");
         LoadFunctions("SettingsMenuCommands.lua", "SettingsMenu");
 
         LoadFunctions("PerformanceHUDFunctions.cs", "PerformanceHUD");
         LoadFunctions("PerformanceHUDCommands.lua", "PerformanceHUD");
+
+        LoadFunctions("DialogBoxFunctions.cs", "DialogBox");
+        LoadFunctions("DialogBoxCommands.lua", "DialogBox");
     }
 
     /// <summary>

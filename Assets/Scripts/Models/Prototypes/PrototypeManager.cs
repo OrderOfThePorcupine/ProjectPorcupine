@@ -132,6 +132,12 @@ public static class PrototypeManager
     public static PrototypeMap<JobCategory> JobCategory { get; private set; }
 
     /// <summary>
+    /// Gets the tile type prototype map.
+    /// </summary>
+    /// <value>The furniture prototype map.</value>
+    public static PrototypeMap<DialogBoxPrototype> DialogBox { get; private set; }
+
+    /// <summary>
     /// Initializes the <see cref="PrototypeManager"/> static class files.
     /// </summary>
     public static void Initialize()
@@ -160,6 +166,7 @@ public static class PrototypeManager
         DevConsole = new PrototypeMap<DeveloperConsole.Core.InvokeCommand>();
         SettingsCategories = new PrototypeMap<SettingsCategory>();
         PerformanceHUD = new PrototypeMap<PerformanceGroup>();
+        DialogBox = new PrototypeMap<DialogBoxPrototype>();
 
         isInitialized = true;
     }

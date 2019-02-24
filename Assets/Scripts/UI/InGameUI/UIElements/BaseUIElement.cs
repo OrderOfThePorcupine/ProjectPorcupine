@@ -155,6 +155,16 @@ public abstract class BaseUIElement
         return text;
     }
 
+    protected Button CreateButton(string type)
+    {
+        if (loadedResources.ContainsKey(type) == false)
+        {
+            loadedResources[type] = Resources.Load<GameObject>("UI/Elements/" + type);
+        }
+
+        return GameObject.Instantiate(loadedResources[type]).GetComponent<Button>();
+    }
+
     protected Toggle CreateToggle(string type)
     {
         if (loadedResources.ContainsKey(type) == false)

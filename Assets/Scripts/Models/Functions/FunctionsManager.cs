@@ -123,6 +123,15 @@ public static class FunctionsManager
     }
 
     /// <summary>
+    /// Gets the DialogBox Functions.
+    /// </summary>
+    /// <value>The DialogBox Functions.</value>
+    public static Functions DialogBox
+    {
+        get { return Get("DialogBox"); }
+    }
+
+    /// <summary>
     /// Get the Functions for the specified name.
     /// </summary>
     /// <param name="name">The functions key.</param>
@@ -163,7 +172,7 @@ public static class FunctionsManager
         actions.Add("ScheduledEvent", new Functions());
         actions.Add("Overlay", new Functions());
         actions.Add("DevConsole", new Functions());
-        actions.Add("ModDialogBox", new Functions());
+        actions.Add("DialogBox", new Functions());
         actions.Add("SettingsMenu", new Functions());
         actions.Add("PerformanceHUD", new Functions());
 

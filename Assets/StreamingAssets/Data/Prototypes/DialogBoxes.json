@@ -1,0 +1,17 @@
+{
+  "DialogBox": {
+    "Options": {
+      "Title": "Options",
+      "ClassName": "DialogBoxOptions",
+      // Identical to "Position": { "x": "50%", "y": "50%" }
+      "Position": "Center",
+      "Dimensions": {
+        "top": "25%",
+        "bottom": "25%",
+        "left": "10%",
+        "right": "10%"
+      }
+      // same as "Dimensions": { "height": "50%", "width": "20%" }
+    }
+  }
+}
