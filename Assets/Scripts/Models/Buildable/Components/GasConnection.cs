@@ -61,6 +61,8 @@ namespace ProjectPorcupine.Buildable.Components
             if (Requires != null && Requires.Count > 0 && ParentFurniture.Tile.Room != null)
             {
                 Room room = ParentFurniture.Tile.Room;
+
+                // Gas connections do not function outside.
                 if (room.IsOutsideRoom())
                 {
                     return false;
