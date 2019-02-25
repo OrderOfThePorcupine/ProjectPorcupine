@@ -96,7 +96,8 @@ namespace ProjectPorcupine.Localization
                 }
             }
 
-            if (localizationTable.ContainsKey(language) && localizationTable[language].TryGetValue(key, out value))
+            Dictionary<string, string> languageTable;
+            if (localizationTable.TryGetValue(language, out languageTable) && languageTable.TryGetValue(key, out value))
             {
                 try
                 {
@@ -108,9 +109,9 @@ namespace ProjectPorcupine.Localization
                 }
             }
 
-            if (!missingKeysLogged.Contains(key) && key != string.Empty && IsNumber(key))
+            // If add returns true the key was not present in the HashSet (i.e we just added it and wasn't there before)
+            if (key != string.Empty && IsNumber(key) && missingKeysLogged.Add(key))
             {
-                missingKeysLogged.Add(key);
                 UnityDebugger.Debugger.LogWarning("LocalizationTable", string.Format("Translation for {0} in {1} language failed: Key not in dictionary.", key, language));
             }
 
@@ -127,13 +128,14 @@ namespace ProjectPorcupine.Localization
 
         public static string GetLocalizaitonCodeLocalization(string code)
         {
-            if (localizationConfigurations.ContainsKey(code) == false)
+            LocalizationData localizationData;
+            if (localizationConfigurations.TryGetValue(code, out localizationData) == false )
             {
                 UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config file.");
                 return code;
             }
 
-            return localizationConfigurations[code].LocalName;
+            return localizationData.LocalName;
         }
 
         public static void SetLocalization(int lang)
@@ -310,13 +312,17 @@ namespace ProjectPorcupine.Localization
         {
             try
             {
-                if (localizationTable.ContainsKey(localizationCode) == false)
+                Dictionary<string, string> localeTable;
+                if (localizationTable.TryGetValue(localizationCode, out localeTable) == false)
                 {
-                    localizationTable[localizationCode] = new Dictionary<string, string>();
+                    localeTable = new Dictionary<string, string>();
+                    localizationTable[localizationCode] = localeTable;
                 }
 
-                if (configExists && localizationConfigurations.ContainsKey(localizationCode) == false)
+                LocalizationData localizationConfig = null;
+                if (configExists && localizationConfigurations.TryGetValue(localizationCode, out localizationConfig) == false)
                 {
+                    localizationConfig = null;
                     UnityDebugger.Debugger.LogError("LocalizationTable", "Language: " + localizationCode + " not defined in localization/config.json");
                 }
 
@@ -324,14 +330,14 @@ namespace ProjectPorcupine.Localization
                 if (localizationCode == DefaultLanguage || localizationCode == currentLanguage)
                 {
                     bool rightToLeftLanguage;
-                    if (localizationConfigurations.ContainsKey(localizationCode) == false)
+                    if (localizationConfig == null)
                     {
                         UnityDebugger.Debugger.LogWarning("LocalizationTable", "Assuming " + localizationCode + " is LTR");
                         rightToLeftLanguage = false;
                     }
                     else
                     {
-                        rightToLeftLanguage = localizationConfigurations[localizationCode].isRightToLeft;
+                        rightToLeftLanguage = localizationConfig.isRightToLeft;
                     }
 
                     string[] lines = File.ReadAllLines(path);
@@ -357,7 +363,7 @@ namespace ProjectPorcupine.Localization
                             keyValuePair[1] = ReverseString(keyValuePair[1]);
                         }
 
-                        localizationTable[localizationCode][keyValuePair[0]] = keyValuePair[1];
+                        localeTable[keyValuePair[0]] = keyValuePair[1];
                     }
                 }
             }

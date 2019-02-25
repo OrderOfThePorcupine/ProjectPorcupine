@@ -206,14 +206,13 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
     protected override void OnChanged(Furniture furn)
     {
         // Make sure the furniture's graphics are correct.
-        if (objectGameObjectMap.ContainsKey(furn) == false)
+        GameObject furn_go;
+        if (objectGameObjectMap.TryGetValue(furn, out furn_go) == false)
         {
             UnityDebugger.Debugger.LogError("FurnitureSpriteController", "OnFurnitureChanged -- trying to change visuals for furniture not in our map.");
             return;
         }
-
-        GameObject furn_go = objectGameObjectMap[furn];
-
+        
         if (furn.HasTypeTag("Door"))
         {
             // Check to see if we actually have a wall north/south, and if so
@@ -254,7 +253,8 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
 
     protected override void OnRemoved(Furniture furn)
     {
-        if (objectGameObjectMap.ContainsKey(furn) == false)
+        GameObject furn_go;
+        if (objectGameObjectMap.TryGetValue(furn, out furn_go) == false)
         {
             UnityDebugger.Debugger.LogError("FurnitureSpriteController", "OnFurnitureRemoved -- trying to change visuals for furniture not in our map.");
             return;
@@ -263,15 +263,9 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         furn.Changed -= OnChanged;
         furn.Removed -= OnRemoved;
         furn.IsOperatingChanged -= OnIsOperatingChanged;
-        GameObject furn_go = objectGameObjectMap[furn];
         objectGameObjectMap.Remove(furn);
         GameObject.Destroy(furn_go);
-
-        if (childObjectMap.ContainsKey(furn) == false)
-        {
-            return;
-        }
-
+        
         childObjectMap.Remove(furn);
     }
 
@@ -282,12 +276,13 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
             return;
         }
 
-        if (childObjectMap.ContainsKey(furniture) == false)
+        FurnitureChildObjects childObjects;
+        if (childObjectMap.TryGetValue(furniture, out childObjects) == false)
         {
             return;
         }
-
-        UpdateIconObjectsVisibility(furniture, childObjectMap[furniture]);
+        
+        UpdateIconObjectsVisibility(furniture, childObjects);
     }
 
     private void UpdateIconObjectsVisibility(Furniture furniture, FurnitureChildObjects statuses)

@@ -133,12 +133,13 @@ public static class FunctionsManager
             return null;
         }
 
-        if (actions.ContainsKey(name))
+        Functions functions;
+        if (actions.TryGetValue(name, out functions) == false)
         {
-            return actions[name];
+            return null;
         }
 
-        return null;
+        return functions;
     }
 
     /// <summary>

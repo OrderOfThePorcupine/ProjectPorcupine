@@ -84,10 +84,11 @@ public class DialogBoxManager : MonoBehaviour
     /// <param name="dialogName">The name of the dialog (a.k.a. the title of the dialog).</param>
     public DialogBox ShowDialogBoxByName(string dialogName)
     {
-        if (DialogBoxes.ContainsKey(dialogName))
+        DialogBox dialog;
+        if (DialogBoxes.TryGetValue(dialogName, out dialog))
         {
-            DialogBoxes[dialogName].ShowDialog();
-            return DialogBoxes[dialogName];
+            dialog.ShowDialog();
+            return dialog;
         }
         else
         {

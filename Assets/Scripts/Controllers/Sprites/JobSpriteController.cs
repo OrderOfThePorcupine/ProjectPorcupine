@@ -69,6 +69,9 @@ public class JobSpriteController : BaseSpriteController<Job>
             return;
         }
 
+        // This is weird why do we have this here?
+        // OnCreated should not be called twice for a given job?
+        // This seems like there is a bug hiding somewhere
         if (objectGameObjectMap.ContainsKey(job))
         {
             return;

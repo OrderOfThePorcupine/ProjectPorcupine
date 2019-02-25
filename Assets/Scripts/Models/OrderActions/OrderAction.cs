@@ -57,10 +57,10 @@ namespace ProjectPorcupine.OrderActions
 
             string orderActionType = orderActionProp.Name;
 
-            if (orderActionTypes.ContainsKey(orderActionType))
+            Type t;
+            if (orderActionTypes.TryGetValue(orderActionType, out t))
             {
                 JToken innerJson = orderActionProp.Value;
-                Type t = orderActionTypes[orderActionType];
 
                 OrderAction orderAction = (OrderAction)orderActionProp.Value.ToObject(t);
                 orderAction.Type = orderActionProp.Name;

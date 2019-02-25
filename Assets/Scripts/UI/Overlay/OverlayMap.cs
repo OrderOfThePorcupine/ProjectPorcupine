@@ -468,14 +468,14 @@ public class OverlayMap : MonoBehaviour
         {
             UnityDebugger.Debugger.LogError("OverlayMap", "No color map texture setted!");
         }
-        
-        if (!overlayColorMapLookup.ContainsKey(currentOverlay))
+
+        Dictionary<int, Color> colorMapLookup;
+        if (overlayColorMapLookup.TryGetValue(currentOverlay, out colorMapLookup) == false)
         {
-            overlayColorMapLookup.Add(currentOverlay, new Dictionary<int, Color>());
+            colorMapLookup = new Dictionary<int, Color>();
+            overlayColorMapLookup.Add(currentOverlay, colorMapLookup);
         }
-
-        Dictionary<int, Color> colorMapLookup = overlayColorMapLookup[currentOverlay];
-
+        
         // Size in pixels of overlay texture and create texture.
         int textureWidth = sizeX;
         int textureHeight = sizeY;
@@ -490,12 +490,13 @@ public class OverlayMap : MonoBehaviour
 
                 int sampleX = ((int)v % 256) * colorMapWidth;
 
-                if (!colorMapLookup.ContainsKey(sampleX))
+                Color pixel;
+                if (colorMapLookup.TryGetValue(sampleX, out pixel) == false)
                 {
-                    colorMapLookup.Add(sampleX, colorMapTexture.GetPixel(sampleX, 0));
+                    pixel = colorMapTexture.GetPixel(sampleX, 0);
+                    colorMapLookup.Add(sampleX, pixel);
                 }
-
-                Color pixel = colorMapLookup[sampleX];
+                
                 int tilePixelIndex = (y * sizeX) + x;
                 pixels[tilePixelIndex] = pixel;
             }

@@ -132,13 +132,13 @@ public sealed class InventorySpriteController : BaseSpriteController<Inventory>
     protected override void OnChanged(Inventory inventory)
     {
         // Make sure the furniture's graphics are correct.
-        if (objectGameObjectMap.ContainsKey(inventory) == false)
+        GameObject inventoryGameObject;
+        if (objectGameObjectMap.TryGetValue(inventory, out inventoryGameObject) == false)
         {
             UnityDebugger.Debugger.LogError("InventorySpriteController", "OnCharacterChanged -- trying to change visuals for inventory not in our map.");
             return;
         }
-
-        GameObject inventoryGameObject = objectGameObjectMap[inventory];
+        
         if (inventory.StackSize > 0)
         {
             Text text = inventoryGameObject.GetComponentInChildren<Text>();
