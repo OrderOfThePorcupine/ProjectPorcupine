@@ -50,13 +50,13 @@ public class World
     public World(int width, int height, int depth)
     {
         // Creates an empty world.
-        SetupWorld(width, height, depth);
         Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
         if (SceneController.NewWorldSize != Vector3.zero)
         {
             Seed = SceneController.Seed;
         }
 
+        PreinitializeWorld(width, height, depth);
         UnityDebugger.Debugger.Log("World", "World Seed: " + Seed);
         WorldGenerator.Instance.Generate(this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
@@ -356,7 +356,8 @@ public class World
         Height = (int)worldJson["Height"];
         Depth = (int)worldJson["Depth"];
 
-        SetupWorld(Width, Height, Depth);
+        PreinitializeWorld(Width, Height, Depth);
+        SetupWorld();
 
         RoomManager.FromJson(worldJson["Rooms"]);
         TilesFromJson(worldJson["Tiles"]);
@@ -442,10 +443,7 @@ public class World
         }
     }
 
-    private void SetupWorld(int width, int height, int depth)
-    {
-        // Set the current world to be this world.
-        // TODO: Do we need to do any cleanup of the old world?
+    private void PreinitializeWorld(int width, int height, int depth) {
         Current = this;
 
         Width = width;
@@ -453,6 +451,12 @@ public class World
         Depth = depth;
 
         tiles = new Tile[Width, Height, Depth];
+    }
+
+    private void SetupWorld()
+    {
+        // Set the current world to be this world.
+        // TODO: Do we need to do any cleanup of the old world?
 
         RoomManager = new RoomManager();
         RoomManager.Adding += (room) => roomGraph = null;
