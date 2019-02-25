@@ -14,12 +14,6 @@ public class GameMenu : MonoBehaviour
 {
     private new MenuAnimation animation;
 
-    protected virtual void Start()
-    {
-        animation = GetComponent<MenuAnimation>();
-        gameObject.SetActive(false);
-    }
-
     public virtual void Open()
     {
         WorldController.Instance.SoundController.OnButtonSFX();
@@ -30,5 +24,11 @@ public class GameMenu : MonoBehaviour
     {
         WorldController.Instance.SoundController.OnButtonSFX();
         animation.Hide();
+    }
+
+    protected virtual void Start()
+    {
+        animation = GetComponent<MenuAnimation>();
+        gameObject.SetActive(false);
     }
 }

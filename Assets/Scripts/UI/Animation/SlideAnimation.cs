@@ -20,6 +20,19 @@ namespace ProjectPorcupine.UI.Animation
         private PositionTween slideIn;
         private PositionTween slideOut;
 
+        public override void Show()
+        {
+            base.Show();
+            slideOut.Stop();
+            slideIn.Start();
+        }
+
+        public override void Hide()
+        {
+            slideIn.Stop();
+            slideOut.Start();
+        }
+
         private void Start()
         {
             RectTransform rect = gameObject.GetComponent<RectTransform>();
@@ -51,19 +64,6 @@ namespace ProjectPorcupine.UI.Animation
                 default:
                     throw new System.Exception("Direction not found.");
             }
-        }
-
-        public override void Show()
-        {
-            base.Show();
-            slideOut.Stop();
-            slideIn.Start();
-        }
-
-        public override void Hide()
-        {
-            slideIn.Stop();
-            slideOut.Start();
         }
     }
 }
