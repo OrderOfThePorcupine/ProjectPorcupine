@@ -26,8 +26,8 @@ public class DialogBoxHandler
 
     public DialogBoxHandler(GameObject parent, GameObject baseTemplate)
     {
-        root = new GameObject("Dialog Boxes");
-        root.transform.SetParent(parent.transform);
+        root = new GameObject("Dialog Boxes", typeof(RectTransform));
+        root.transform.SetParent(parent.transform, false);
         root.transform.SetAsLastSibling();
         baseDialogTemplate = baseTemplate;
         LoadDialogs();
@@ -50,10 +50,9 @@ public class DialogBoxHandler
     private void FinalizeDialogBox(BaseDialogBox box)
     {
         GameObject go = box.InitializeElement();
-        GameObject baseDialog = GameObject.Instantiate(baseDialogTemplate, Vector3.zero, Quaternion.identity);
-        GameObject contentChild = baseDialog.transform.GetChild(1).gameObject;
+        GameObject baseDialog = GameObject.Instantiate(baseDialogTemplate, Vector3.one, Quaternion.identity, root.transform);
+        GameObject contentChild = baseDialog.transform.GetChild(0).gameObject;
         go.transform.SetParent(contentChild.transform);
-        baseDialog.transform.SetParent(root.transform);
         RectTransform transform = baseDialog.GetComponent<RectTransform>();
 
         // since top/left/right/bottom are responsible for both the size
@@ -61,10 +60,10 @@ public class DialogBoxHandler
         // effectively it is; L => -x, R => x, T => -y, B => y (=> is \propTo)
         // i.e. as x gets larger L gets smaller and R gets larger
         // thus shifts towards right while maintaining the size.
-        float left = (box.prototype.size.left - (0.5f - box.prototype.position.x)) * Screen.width;
-        float right = (box.prototype.size.right + (0.5f - box.prototype.position.x)) * Screen.width;
-        float top = (box.prototype.size.top - (0.5f - box.prototype.position.y)) * Screen.height;
-        float bottom = (box.prototype.size.bottom + (0.5f - box.prototype.position.y)) * Screen.height;
+        float left = Screen.width - (box.prototype.size.left - (0.5f - box.prototype.position.x)) * Screen.width;
+        float right = Screen.width - (box.prototype.size.right + (0.5f - box.prototype.position.x)) * Screen.width;
+        float top = Screen.height - (box.prototype.size.top - (0.5f - box.prototype.position.y)) * Screen.height;
+        float bottom = Screen.height - (box.prototype.size.bottom + (0.5f - box.prototype.position.y)) * Screen.height;
 
         transform.offsetMin = new Vector2(left, bottom);
         transform.offsetMax = new Vector2(-right, -top);
@@ -80,9 +79,9 @@ public class DialogBoxHandler
         {
             DialogBoxPrototype prototype = prototypes[i];
             BaseDialogBox dialog = FunctionsManager.DialogBox.CreateInstance<BaseDialogBox>(prototype.classData.Type, true);
-            dialog.InitializeLUA();
             dialog.prototype = prototype;
             dialog.parameterData = prototype.classData.Parameters;
+            dialog.InitializeLUA();
             dialogBoxes.Add(prototype.Type, dialog);
         }
         UnityDebugger.Debugger.Log("DialogBox", "Loaded " + prototypes.Count + " Dialogs");

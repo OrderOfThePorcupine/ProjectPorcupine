@@ -29,7 +29,7 @@ public struct BoxedDimensions {
         this.left = left;
     }
 
-    private static float? ParsePercentage(JToken val, ref string err)
+    public static float? ParsePercentage(JToken val, ref string err)
     {
         if (val.Type == JTokenType.String)
         {
@@ -37,12 +37,12 @@ public struct BoxedDimensions {
             string res = val.ToObject<string>();
             float flt;
             if (string.IsNullOrEmpty(res) || res[res.Length - 1] != '%' ||
-                !float.TryParse(res, out flt))
+                !float.TryParse(res.Substring(0, res.Length - 1), out flt))
             {
                 err += "Was expecting a percentage (i.e. 20%) got: " + res + "\n";
                 return null;
             }
-            return flt;
+            return flt / 100f;
         }
         else if (val.Type == JTokenType.Float)
         {

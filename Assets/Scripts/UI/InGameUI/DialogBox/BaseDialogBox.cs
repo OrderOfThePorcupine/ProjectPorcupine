@@ -43,7 +43,7 @@ public abstract class BaseDialogBox : BaseUIElement
     // Was the game controller modal before this dialog
     public bool wasModal;
 
-    private void CloseDialog()
+    protected void CloseDialog()
     {
         OnClose(result);
         OnClose = null;

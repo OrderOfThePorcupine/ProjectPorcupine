@@ -27,7 +27,7 @@ public class DialogBoxPrompt : BaseDialogBox
             obj.transform.SetParent(element.transform);
             string copy = button;
             obj.onClick.AddListener(() => {
-                result["ExitButton"] = copy;
+                result["ExitButton"] = new Parameter(copy);
                 CloseDialog();
                 GameObject.Destroy(element.transform.parent.parent.gameObject);
             });

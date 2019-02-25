@@ -1,21 +1,28 @@
 {
   "DialogBox": {
-    "Options": {
-      "ClassName": "DialogBoxOptions",
+    // "Options": {
+    //   "ClassName": "DialogBoxOptions",
+    //   "Position": { "x": "50%", "y": "50%" },
+    //   "Dimensions": {
+    //     "top": "25%",
+    //     "bottom": "25%",
+    //     "left": "10%",
+    //     "right": "10%"
+    //   },
+    //   "Parameters": {
+    //     "Title": "Options"
+    //   }
+    //   // same as "Dimensions": { "height": "50%", "width": "20%" }
+    // },
+    "Prompt": {
+      "ClassName": "DialogBoxPrompt",
       "Position": { "x": "50%", "y": "50%" },
       "Dimensions": {
-        "top": "25%",
-        "bottom": "25%",
+        "top": "10%",
+        "bottom": "10%",
         "left": "10%",
         "right": "10%"
       },
-      "Parameters": {
-        "Title": "Options"
-      }
-      // same as "Dimensions": { "height": "50%", "width": "20%" }
-    },
-    "Prompt": {
-
     }
   }
 }

@@ -155,11 +155,16 @@ public abstract class BaseUIElement
         return text;
     }
 
-    protected Button CreateButton(string text)
+    protected Button CreateButton(string text, bool localize = true)
     {
         if (loadedResources.ContainsKey("Button") == false)
         {
             loadedResources["Button"] = Resources.Load<GameObject>("UI/Elements/Button");
+        }
+
+        if (localize)
+        {
+            text = LocalizationTable.GetLocalization(text);
         }
 
         Button button = GameObject.Instantiate(loadedResources["Button"]).GetComponent<Button>();

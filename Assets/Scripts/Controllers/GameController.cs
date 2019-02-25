@@ -20,6 +20,8 @@ public class GameController : MonoBehaviour
 
     public SoundController SoundController { get; private set; }
 
+    public DialogBoxHandler DialogBoxManager { get; private set; }
+
     // If true, a modal dialog box is open, so normal inputs should be ignored.
     public bool IsModal { get; set; }
 
@@ -54,6 +56,7 @@ public class GameController : MonoBehaviour
         EnableDontDestroyOnLoad();
 
         SoundController = new SoundController();
+        DialogBoxManager = new DialogBoxHandler(GameObject.Find("Canvas"), Resources.Load<GameObject>("UI/DialogBoxes/DialogBox"));
 
         IsModal = false;
         IsPaused = false;

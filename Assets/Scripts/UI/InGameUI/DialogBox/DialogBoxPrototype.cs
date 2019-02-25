@@ -47,7 +47,16 @@ public class DialogBoxPrototype : IPrototypable
     public void ReadJsonPrototype(JProperty jsonProto)
     {
         Type = jsonProto.Name;
-        position = new Vector2(jsonProto.Value["Position"]["x"].Value<float>(), jsonProto.Value["Position"]["y"].Value<float>());
+        string err = "";
+        float? x = BoxedDimensions.ParsePercentage(jsonProto.Value["Position"]["x"], ref err);
+        float? y = BoxedDimensions.ParsePercentage(jsonProto.Value["Position"]["y"], ref err);
+
+        if (!string.IsNullOrEmpty(err))
+        {
+            UnityDebugger.Debugger.LogError("DialogBox", "Error occurred in parsing position: " + err);
+        }
+
+        position = new Vector2(x ?? 0f, y ?? 0f);
         size = BoxedDimensions.ReadJsonPrototype(jsonProto.Value["Dimensions"]);
         classData = new UIComponent();
         classData.ReadJson(jsonProto.Value);

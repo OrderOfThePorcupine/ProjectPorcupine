@@ -202,21 +202,7 @@ public class SettingsMenu : MonoBehaviour
 
         // Open a dialog box to double check
         /*
-            var data = new Dictionary<string, object>()
-            {
-                { "Prompt", "confirm_settings_menu_close" },
-                { "ExitButton", new string[] { "Yes", "No" } }
-            };
-            WorldController.Instance.DialogBoxManager.ShowDialogBox("prompt", data, (Parameter res) => {
-                if (res["ExitButton"].ToString() == "Yes")
-                {
-                    // cancel code
-                }
-                else
-                {
-                    // stay code
-                }
-            });
+
 
             // compared to
             check = WorldController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
@@ -235,55 +221,39 @@ public class SettingsMenu : MonoBehaviour
             check.ShowDialog();
         */
 
-        DialogBoxPromptOrInfo check;
-
-        if (WorldController.Instance != null)
+        var data = new Dictionary<string, object>()
         {
-            check = WorldController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
-        }
-        else if (MainMenuController.Instance != null)
-        {
-            check = MainMenuController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
-        }
-        else
-        {
-            // We can't display cancel box so just automatically cancel
-            Exit();
-            return;
-        }
-
-        check.SetPrompt("confirm_settings_menu_close");
-        check.SetButtons(new DialogBoxResult[] { DialogBoxResult.Yes, DialogBoxResult.No });
-        check.Closed =
-            () =>
+            // Todo: Localize
+            { "Title", "Are you sure" },
+            { "Prompt", "confirm_settings_menu_close" },
+            { "Buttons", new string[] { "button_yes", "button_no" } }
+        };
+        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (Parameter res) => {
+            if (res["ExitButton"].ToString() == "Yes")
             {
-                switch (check.Result)
+                // cancel code
+                if (options.ContainsKey(currentCategory))
                 {
-                    case DialogBoxResult.Yes:
-                        // CANCEL
-                        if (options.ContainsKey(currentCategory))
-                        {
-                            changesTracker.AddRange(options[currentCategory].Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
-                        }
-
-                        Settings.LoadSettings();
-
-                        for (int i = 0; i < changesTracker.Count; i++)
-                        {
-                            changesTracker[i].CancelSetting();
-                            changesTracker[i].CancelSettingLUA();
-                        }
-
-                        GameController.Instance.SoundController.OnButtonSFX();
-                        Exit();
-                        break;
-                    case DialogBoxResult.No:
-                        GameController.Instance.SoundController.OnButtonSFX();
-                        break;
+                    changesTracker.AddRange(options[currentCategory].Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
                 }
-            };
 
-        check.ShowDialog();
+                Settings.LoadSettings();
+
+                for (int i = 0; i < changesTracker.Count; i++)
+                {
+                    changesTracker[i].CancelSetting();
+                    changesTracker[i].CancelSettingLUA();
+                }
+
+                GameController.Instance.SoundController.OnButtonSFX();
+                Exit();
+            }
+            else
+            {
+                GameController.Instance.SoundController.OnButtonSFX();
+                // stay code
+            }
+        });
     }
 
     public void Default()

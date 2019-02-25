@@ -73,7 +73,6 @@ public class DialogBoxManager : MonoBehaviour
             dialogBoxQuests = tempGoObj.GetComponent<DialogBoxQuests>();
             DialogBoxes["Quests"] = dialogBoxQuests;
             AddQuestList();
-            LoadModdedDialogBoxes();
             AddMainMenuItems();
         }
     }
@@ -154,35 +153,5 @@ public class DialogBoxManager : MonoBehaviour
         buttonQuestGameObject.name = "ToggleQuestPinButton";
         buttonQuestGameObject.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, 0, 0);
         return buttonQuestGameObject.GetComponent<Toggle>();
-    }
-
-    /// <summary>
-    /// Loads every Dialog Box in the /StreamingAssets/UI/DialogBoxes/ Folder.
-    /// </summary>
-    private void LoadModdedDialogBoxes()
-    {
-        UnityDebugger.Debugger.Log("ModDialogBox", "Loading xml dialog boxes");
-        string dialogBoxPath = Path.Combine(Application.streamingAssetsPath, "UI");
-        dialogBoxPath = Path.Combine(dialogBoxPath, "DialogBoxes");
-        DirectoryInfo dialogBoxPathInfo = new DirectoryInfo(dialogBoxPath);
-
-        foreach (FileInfo fileInfo in dialogBoxPathInfo.GetFiles())
-        {
-            switch (fileInfo.Extension)
-            {
-                case ".xml":
-                    UnityDebugger.Debugger.Log("ModDialogBox", "Found xml element:" + fileInfo.Name);
-                    GameObject dialogBoxPrefab = CreateDialogGO("DB_MOD", "Modded Dialog Box");
-                    ModDialogBox modDialogBox = dialogBoxPrefab.GetComponent<ModDialogBox>();
-                    modDialogBox.LoadFromXML(fileInfo);
-                    dialogBoxPrefab.name = modDialogBox.Title;
-                    DialogBoxes[modDialogBox.Title] = modDialogBox;
-                    break;
-                case ".lua":
-                    UnityDebugger.Debugger.Log("ModDialogBox", "Found lua element:" + fileInfo.Name);
-                    WorldController.Instance.ModsManager.LoadFunctionsInFile(fileInfo, "ModDialogBox");
-                    break;
-            }
-        }
     }
 }
