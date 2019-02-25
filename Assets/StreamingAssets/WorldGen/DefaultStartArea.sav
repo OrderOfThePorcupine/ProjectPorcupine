@@ -1884,7 +1884,7 @@
       "X": 10,
       "Y": 12,
       "Z": 0,
-      "Type": "vent",
+      "Type": "air_pump",
       "Rotation": 0.0
     },
     {
@@ -1957,7 +1957,7 @@
       "X": 10,
       "Y": 2,
       "Z": 0,
-      "Type": "vent",
+      "Type": "air_pump",
       "Rotation": 0.0
     },
     {
@@ -2466,5 +2466,14 @@
       "Type": "power_cable"
     }
   ],
-  "RoomBehaviors": []
+  "RoomBehaviors": [
+    {
+      "Room": 2,
+      "Behavior": "airlock"
+    },
+    {
+      "Room": 4,
+      "Behavior": "airlock"
+    }
+  ]
 }
