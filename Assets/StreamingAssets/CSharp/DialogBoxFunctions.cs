@@ -5,42 +5,33 @@ using ProjectPorcupine.Localization;
 using UnityEngine.UI;
 using UnityEngine;
 
-/// <summary>
-/// A generic toggle.
-/// </summary>
-public class DialogBoxOptions : BaseDialogBox
+public class DialogBoxPrompt : BaseDialogBox
 {
     public override GameObject InitializeElement()
     {
-        GameObject element = GetVerticalBaseElement("Box", 120, 60, TextAnchor.MiddleCenter);
+        result = new Parameter();
+        GameObject element = GetVerticalBaseElement("Box", 120, 60, TextAnchor.UpperCenter);
+        string title = GetStringParam("Title");
+        string prompt = GetStringParam("Prompt");
+        string[] buttons = GetStringArray("Buttons");
 
-        Text text = CreateText(option.name, true);
+        Text text = CreateText(title, true, TextAnchor.UpperCenter);
         text.transform.SetParent(element.transform);
 
-        toggleElement = CreateToggle(type);
-        toggleElement.transform.SetParent(element.transform);
+        text = CreateText(prompt, true, TextAnchor.UpperCenter);
+        text.transform.SetParent(element.transform);
 
-        isOn = getValue();
-        toggleElement.isOn = isOn;
-
-        toggleElement.onValueChanged.AddListener(
-            (bool v) =>
-            {
-                if (v != isOn)
-                {
-                    valueChanged = true;
-                    isOn = v;
-                }
+        foreach (string button in buttons)
+        {
+            Button obj = CreateButton(button.Trim());
+            obj.transform.SetParent(element.transform);
+            string copy = button;
+            obj.onClick.AddListener(() => {
+                result["ExitButton"] = copy;
+                CloseDialog();
+                GameObject.Destroy(element.transform.parent.parent.gameObject);
             });
-
-        LayoutElement layout = toggleElement.gameObject.AddComponent<LayoutElement>();
-        layout.ignoreLayout = true;
-
-        RectTransform rTransform = toggleElement.GetComponent<RectTransform>();
-        rTransform.sizeDelta = type == "Switch" ? new Vector2(60, 30) : new Vector2(40, 40);
-        rTransform.anchorMax = new Vector2(0.5f, 0.5f);
-        rTransform.anchorMin = new Vector2(0.5f, 0.5f);
-        rTransform.localPosition = new Vector3(45, 0, 0);
+        }
 
         return element;
     }

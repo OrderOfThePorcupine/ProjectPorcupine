@@ -109,7 +109,6 @@ public struct BoxedDimensions {
                     right = ParsePercentage(property.Value, ref err);
                     break;
                 case "width":
-                case "x":
                     res = ParsePercentage(property.Value, ref err);
                     if (res.HasValue)
                     {
@@ -121,7 +120,6 @@ public struct BoxedDimensions {
                     }
                     break;
                 case "height":
-                case "y":
                     res = ParsePercentage(property.Value, ref err);
                     if (res.HasValue)
                     {
@@ -146,7 +144,7 @@ public struct BoxedDimensions {
         // Check if we have initialised all values
         if (!string.IsNullOrEmpty(err))
         {
-            UnityDebugger.Debugger.LogError("DialogBox", "Incorrect Dimensions/Position: \n" + err);
+            UnityDebugger.Debugger.LogError("DialogBox", "Incorrect Dimensions: \n" + err);
         }
 
         return new BoxedDimensions(top ?? 0f, bottom ?? 0f, right ?? 0f, left ?? 0f);

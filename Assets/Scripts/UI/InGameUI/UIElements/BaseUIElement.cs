@@ -155,14 +155,16 @@ public abstract class BaseUIElement
         return text;
     }
 
-    protected Button CreateButton(string type)
+    protected Button CreateButton(string text)
     {
-        if (loadedResources.ContainsKey(type) == false)
+        if (loadedResources.ContainsKey("Button") == false)
         {
-            loadedResources[type] = Resources.Load<GameObject>("UI/Elements/" + type);
+            loadedResources["Button"] = Resources.Load<GameObject>("UI/Elements/Button");
         }
 
-        return GameObject.Instantiate(loadedResources[type]).GetComponent<Button>();
+        Button button = GameObject.Instantiate(loadedResources["Button"]).GetComponent<Button>();
+        button.GetComponentInChildren<Text>().text = text;
+        return button;
     }
 
     protected Toggle CreateToggle(string type)

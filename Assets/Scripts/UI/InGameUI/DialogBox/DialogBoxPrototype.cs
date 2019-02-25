@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 /// <summary>
 /// A base UI element.
@@ -18,11 +19,6 @@ using Newtonsoft.Json.Linq;
 public class DialogBoxPrototype : IPrototypable
 {
     public delegate void OnCloseAction(Parameter result);
-
-    /// <summary>
-    /// The title of the dialog box.
-    /// </summary>
-    public string title;
 
     /// <summary>
     /// Data about this class
@@ -37,7 +33,7 @@ public class DialogBoxPrototype : IPrototypable
     /// <summary>
     /// The position of the dialog box.
     /// </summary>
-    public BoxedDimensions position;
+    public Vector2 position;
 
     /// <summary>
     /// The name of the dialog box
@@ -51,8 +47,7 @@ public class DialogBoxPrototype : IPrototypable
     public void ReadJsonPrototype(JProperty jsonProto)
     {
         Type = jsonProto.Name;
-        title = (string)jsonProto.Value["Title"];
-        position = BoxedDimensions.ReadJsonPrototype(jsonProto.Value["Position"]);
+        position = new Vector2(jsonProto.Value["Position"]["x"].Value<float>(), jsonProto.Value["Position"]["y"].Value<float>());
         size = BoxedDimensions.ReadJsonPrototype(jsonProto.Value["Dimensions"]);
         classData = new UIComponent();
         classData.ReadJson(jsonProto.Value);

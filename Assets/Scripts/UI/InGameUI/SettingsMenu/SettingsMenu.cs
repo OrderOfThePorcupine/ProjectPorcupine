@@ -183,18 +183,58 @@ public class SettingsMenu : MonoBehaviour
         mainRoot.SetActive(false);
     }
 
+    private void Exit()
+    {
+        currentCategory = string.Empty;
+        GameController.Instance.IsModal = false;
+        mainRoot.SetActive(false);
+        changesTracker.Clear();
+    }
+
     public void Cancel()
     {
         // If we have made no changes we can freely exit
         if (changesTracker.Count == 0)
         {
-            currentCategory = string.Empty;
-            GameController.Instance.IsModal = false;
-            mainRoot.SetActive(false);
+            Exit();
             return;
         }
 
         // Open a dialog box to double check
+        /*
+            var data = new Dictionary<string, object>()
+            {
+                { "Prompt", "confirm_settings_menu_close" },
+                { "ExitButton", new string[] { "Yes", "No" } }
+            };
+            WorldController.Instance.DialogBoxManager.ShowDialogBox("prompt", data, (Parameter res) => {
+                if (res["ExitButton"].ToString() == "Yes")
+                {
+                    // cancel code
+                }
+                else
+                {
+                    // stay code
+                }
+            });
+
+            // compared to
+            check = WorldController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
+            check.SetPrompt("confirm_settings_menu_close");
+            check.SetButtons(new DialogBoxResult[] { DialogBoxResult.Yes, DialogBoxResult.No });
+            check.Closed = () => {
+                if (check.Result == DialogBoxResult.Yes)
+                {
+                    // cancel code
+                }
+                else
+                {
+                    // stay
+                }
+            }
+            check.ShowDialog();
+        */
+
         DialogBoxPromptOrInfo check;
 
         if (WorldController.Instance != null)
@@ -208,10 +248,7 @@ public class SettingsMenu : MonoBehaviour
         else
         {
             // We can't display cancel box so just automatically cancel
-            changesTracker.Clear();
-            currentCategory = string.Empty;
-            GameController.Instance.IsModal = false;
-            mainRoot.SetActive(false);
+            Exit();
             return;
         }
 
@@ -237,13 +274,8 @@ public class SettingsMenu : MonoBehaviour
                             changesTracker[i].CancelSettingLUA();
                         }
 
-                        changesTracker.Clear();
-                        currentCategory = string.Empty;
-
-                        GameController.Instance.IsModal = false;
                         GameController.Instance.SoundController.OnButtonSFX();
-                        mainRoot.SetActive(false);
-
+                        Exit();
                         break;
                     case DialogBoxResult.No:
                         GameController.Instance.SoundController.OnButtonSFX();
