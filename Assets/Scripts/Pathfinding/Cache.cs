@@ -146,6 +146,5 @@ namespace ProjectPorcupine.Pathfinding
                 return oldValue;
             }
         }
-
     }
 }
