@@ -14,7 +14,7 @@ public class MenuLeft : MonoBehaviour
     // This is the parent of the menus.
     private Transform parent;
 
-    public GameObject CurrentlyOpen { get; private set; }
+    private GameObject CurrentlyOpen { get; set; }
 
     // Use this for initialization
     public void Start()
@@ -28,16 +28,18 @@ public class MenuLeft : MonoBehaviour
         GameMenuManager.Instance.AddMenuItem("menu_orders", () => OnMenuButtonClicked(orderMenu), 1);
     }
 
-    public void OpenMenuCurrentMenu()
+    public void OpenMenu(GameObject menu)
     {
-        CurrentlyOpen.GetComponent<SlideAnimation>().Show();
+        // So that we don't have two menus open at the same time
+        CloseCurrentMenu();
+
+        menu.GetComponent<SlideAnimation>().Show();
 
         WorldController.Instance.SoundController.OnButtonSFX();
+        
+        WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
 
-        if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
-        {
-            WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
-        }
+        CurrentlyOpen = menu;
     }
 
     public void CloseCurrentMenu()
@@ -45,15 +47,14 @@ public class MenuLeft : MonoBehaviour
         if (CurrentlyOpen != null)
         {
             CurrentlyOpen.GetComponent<SlideAnimation>().Hide();
-
-            if (CurrentlyOpen.name == "ConstructionMenu" || CurrentlyOpen.name == "OrderMenu")
-            {
-                WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
-                WorldController.Instance.BuildModeController.Building = false;
-            }
+            
+            WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
+            WorldController.Instance.BuildModeController.Building = false;
 
             WorldController.Instance.SoundController.OnButtonSFX();
         }
+
+        CurrentlyOpen = null;
     }
 
     // Use this function to add all the menus.
@@ -73,12 +74,11 @@ public class MenuLeft : MonoBehaviour
     {
         if (CurrentlyOpen == menu)
         {
-            CurrentlyOpen = null;
+            CloseCurrentMenu();
         }
         else
         {
-            CurrentlyOpen = menu;
-            OpenMenuCurrentMenu();
+            OpenMenu(menu);
         }
     }
 }

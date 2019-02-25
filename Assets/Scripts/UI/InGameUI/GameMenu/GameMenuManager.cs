@@ -129,10 +129,7 @@ public class GameMenuManager : IEnumerable<GameMenuItem>
     /// <returns>Each menu item.</returns>
     IEnumerator<GameMenuItem> IEnumerable<GameMenuItem>.GetEnumerator()
     {
-        foreach (GameMenuItem menuItem in menuItems)
-        {
-            yield return menuItem;
-        }
+        return menuItems.GetEnumerator();
     }
 
     /// <summary>
@@ -150,12 +147,13 @@ public class GameMenuManager : IEnumerable<GameMenuItem>
     /// <param name="position">The position of the menu item just added.</param>
     private void AddFromItemsToAdd(string key, int position)
     {
-        if (itemsToAdd.ContainsKey(key) && itemsToAdd[key].Count > 0)
+        List<GameMenuItem> items;
+        if (itemsToAdd.TryGetValue(key, out items))
         {
-            for (int i = itemsToAdd[key].Count - 1; i >= 0; i--)
+            for (int i = items.Count - 1; i >= 0; i--)
             {
-                GameMenuItem menuItem = itemsToAdd[key][i];
-                itemsToAdd[key].RemoveAt(i);
+                GameMenuItem menuItem = items[i];
+                items.RemoveAt(i);
                 AddMenuItem(menuItem, position + 1);
             }
         }

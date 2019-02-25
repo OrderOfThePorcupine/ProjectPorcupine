@@ -73,7 +73,9 @@ public class DialogBoxManager : MonoBehaviour
             dialogBoxQuests = tempGoObj.GetComponent<DialogBoxQuests>();
             DialogBoxes["Quests"] = dialogBoxQuests;
             AddQuestList();
+
             LoadModdedDialogBoxes();
+
             AddMainMenuItems();
         }
     }
@@ -114,7 +116,7 @@ public class DialogBoxManager : MonoBehaviour
     {
         GameMenuManager.Instance.AddMenuItem(
             "menu_work",
-            () => dialogBoxJobList.ShowDialog(),
+            () => dialogBoxJobList.ToggleDialog(),
             "menu_construction");
 
         GameMenuManager.Instance.AddMenuItem(
@@ -124,15 +126,12 @@ public class DialogBoxManager : MonoBehaviour
 
         GameMenuManager.Instance.AddMenuItem(
             "menu_quests",
-            () => dialogBoxQuests.ShowDialog(),
+            () => dialogBoxQuests.ToggleDialog(),
             "menu_world");
 
         GameMenuManager.Instance.AddMenuItem(
             "menu_options",
-            () =>
-            {
-                dialogBoxOptions.ShowDialog();
-            },
+            () => dialogBoxOptions.ToggleDialog(),
             "menu_quests");
     }
 
