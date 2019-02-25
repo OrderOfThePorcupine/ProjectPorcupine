@@ -12,7 +12,7 @@ using ProjectPorcupine.Localization;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class OrderMenu : MonoBehaviour
+public class OrderMenu : GameMenu
 {
     private const string LocalizationDeconstruct = "menu_deconstruct_furniture";
     private const string LocalizationMine = "menu_mine";
@@ -50,7 +50,7 @@ public class OrderMenu : MonoBehaviour
         }
     }
 
-    private void Start()
+    protected override void Start()
     {
         Text title = GetComponentInChildren<Text>();
         title.text = LocalizationTable.GetLocalization("menu_orders");
@@ -68,6 +68,8 @@ public class OrderMenu : MonoBehaviour
         InputField filterField = GetComponentInChildren<InputField>();
         filterField.onValueChanged.AddListener(delegate { FilterTextChanged(filterField.text); });
         KeyboardManager.Instance.RegisterModalInputField(filterField);
+
+        base.Start();
     }    
 
     private void RenderDeconstructButton()

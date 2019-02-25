@@ -13,7 +13,7 @@ using ProjectPorcupine.Rooms;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ConstructionMenu : MonoBehaviour
+public class ConstructionMenu : GameMenu
 {
     private const string LocalizationDeconstruct = "deconstruct_furniture";
 
@@ -74,7 +74,7 @@ public class ConstructionMenu : MonoBehaviour
         }
     }
 
-    private void Start()
+    protected override void Start()
     {
         Text title = GetComponentInChildren<Text>();
         title.text = LocalizationTable.GetLocalization("menu_construction");
@@ -94,6 +94,8 @@ public class ConstructionMenu : MonoBehaviour
         InputField filterField = GetComponentInChildren<InputField>();
         filterField.onValueChanged.AddListener(delegate { FilterTextChanged(filterField.text); });
         KeyboardManager.Instance.RegisterModalInputField(filterField);
+
+        base.Start();
     }
 
     private void RenderFurnitureButtons()
