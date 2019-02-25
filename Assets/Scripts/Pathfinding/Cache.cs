@@ -12,39 +12,43 @@ using System;
 
 namespace ProjectPorcupine.Pathfinding
 {
-    // This class will only work with reference types. If this should support value types it needs to use Nullable<T>
-    public class CircularBuffer<T> where T : class
-    {
-        private T[] buffer;
-        private int index;
-
-        public CircularBuffer(int size)
-        {
-            buffer = new T[size];
-            index = 0;
-        }
-
-        public T Enqueue(T newValue)
-        {
-            // Remove all references to this value and then add the value
-            IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                if (comparer.Equals(buffer[i], newValue))
-                {
-                    buffer[i] = default(T);
-                }
-            }
-
-            index = (index + 1) % buffer.Length;
-            T oldValue = buffer[index];
-            buffer[index] = newValue;
-            return oldValue;
-        }
-    }
-
     public class Cache
     {
+        /// <summary>
+        /// A fixed size circular buffer used by the pathfinding cache.
+        /// </summary>
+        /// <remarks>This class will only work with reference types. If this should support value types it needs to use Nullable<T>.</remarks>
+        /// <typeparam name="T">The type stored.</typeparam>
+        public class CircularBuffer<T> where T : class
+        {
+            private T[] buffer;
+            private int index;
+
+            public CircularBuffer(int size)
+            {
+                buffer = new T[size];
+                index = 0;
+            }
+
+            public T Enqueue(T newValue)
+            {
+                // Remove all references to this value and then add the value
+                IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    if (comparer.Equals(buffer[i], newValue))
+                    {
+                        buffer[i] = default(T);
+                    }
+                }
+
+                index = (index + 1) % buffer.Length;
+                T oldValue = buffer[index];
+                buffer[index] = newValue;
+                return oldValue;
+            }
+        }
+
         private const int MaxCacheSize = 20;
         
         private CircularBuffer<CacheKey> oldPaths;

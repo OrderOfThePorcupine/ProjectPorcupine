@@ -129,7 +129,7 @@ namespace ProjectPorcupine.Localization
         public static string GetLocalizaitonCodeLocalization(string code)
         {
             LocalizationData localizationData;
-            if (localizationConfigurations.TryGetValue(code, out localizationData) == false )
+            if (localizationConfigurations.TryGetValue(code, out localizationData) == false)
             {
                 UnityDebugger.Debugger.Log("LocalizationTable", "name of " + code + " is not present in config file.");
                 return code;
