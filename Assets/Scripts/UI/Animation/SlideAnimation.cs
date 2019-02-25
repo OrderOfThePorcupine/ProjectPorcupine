@@ -62,7 +62,7 @@ namespace ProjectPorcupine.UI.Animation
                 case SlideDirection.Up:
                     return new Vector2(x, y + height);
                 default:
-                    throw new System.Exception(string.Format("{0} not found.", direction));
+                    throw new System.InvalidOperationException(string.Format("{0} not found.", direction));
             }
         }
     }
