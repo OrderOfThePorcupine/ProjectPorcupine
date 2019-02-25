@@ -185,6 +185,13 @@ public class SettingsMenu : MonoBehaviour
 
     public void Cancel()
     {
+        // Add all changes made that haven't been applied or tracked yet
+        Dictionary<string, BaseSettingsElement[]> opts;
+        if (options.TryGetValue(currentCategory, out opts))
+        {
+            changesTracker.AddRange(opts.Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
+        }
+
         // If we have made no changes we can freely exit
         if (changesTracker.Count == 0)
         {
