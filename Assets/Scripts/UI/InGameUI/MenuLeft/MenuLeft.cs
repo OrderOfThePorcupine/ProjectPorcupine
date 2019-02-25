@@ -21,21 +21,16 @@ public class MenuLeft : MonoBehaviour
     {
         parent = this.gameObject.transform;
 
-        AddMenu("ConstructionMenu", "ConstructionMenu", typeof(ConstructionMenu));
-        AddMenu("OrderMenu", "ConstructionMenu", typeof(OrderMenu));
+        GameObject constructionMenu = AddMenu("ConstructionMenu", "ConstructionMenu", typeof(ConstructionMenu));
+        GameObject orderMenu = AddMenu("OrderMenu", "ConstructionMenu", typeof(OrderMenu));
 
-        GameMenuManager.Instance.AddMenuItem("menu_construction", OnButtonConstruction, 0);
-        GameMenuManager.Instance.AddMenuItem("menu_orders", OnButtonOrder, 1);
+        GameMenuManager.Instance.AddMenuItem("menu_construction", () => OnMenuButtonClicked(constructionMenu), 0);
+        GameMenuManager.Instance.AddMenuItem("menu_orders", () => OnMenuButtonClicked(orderMenu), 1);
     }
 
-    public void OpenMenu(string menuName)
+    public void OpenMenuCurrentMenu()
     {
-        GameObject menu = parent.Find(menuName).gameObject;
-
-        CloseMenu();
-
-        menu.GetComponent<SlideAnimation>().Show();
-        CurrentlyOpen = menu;
+        CurrentlyOpen.GetComponent<SlideAnimation>().Show();
 
         WorldController.Instance.SoundController.OnButtonSFX();
 
@@ -45,7 +40,7 @@ public class MenuLeft : MonoBehaviour
         }
     }
 
-    public void CloseMenu()
+    public void CloseCurrentMenu()
     {
         if (CurrentlyOpen != null)
         {
@@ -58,13 +53,11 @@ public class MenuLeft : MonoBehaviour
             }
 
             WorldController.Instance.SoundController.OnButtonSFX();
-
-            CurrentlyOpen = null;
         }
     }
 
     // Use this function to add all the menus.
-    private void AddMenu(string menuName, string prefabName, System.Type useComponent)
+    private GameObject AddMenu(string menuName, string prefabName, System.Type useComponent)
     {
         GameObject tempGoObj;
         tempGoObj = (GameObject)Instantiate(Resources.Load("UI/MenuLeft/" + prefabName));
@@ -72,29 +65,20 @@ public class MenuLeft : MonoBehaviour
         tempGoObj.transform.SetParent(parent, false);
 
         tempGoObj.AddComponent(useComponent);
+
+        return tempGoObj;
     }
 
-    private void OnButtonConstruction()
+    private void OnMenuButtonClicked(GameObject menu)
     {
-        if (CurrentlyOpen != null && CurrentlyOpen.gameObject.name == "ConstructionMenu")
+        if (CurrentlyOpen == menu)
         {
-            CloseMenu();
+            CurrentlyOpen = null;
         }
         else
         {
-            OpenMenu("ConstructionMenu");
-        }
-    }
-
-    private void OnButtonOrder()
-    {
-        if (CurrentlyOpen != null && CurrentlyOpen.gameObject.name == "OrderMenu")
-        {
-            CloseMenu();
-        }
-        else
-        {
-            OpenMenu("OrderMenu");
+            CurrentlyOpen = menu;
+            OpenMenuCurrentMenu();
         }
     }
 }

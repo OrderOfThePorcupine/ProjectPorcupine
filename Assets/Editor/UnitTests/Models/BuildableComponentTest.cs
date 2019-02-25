@@ -170,6 +170,42 @@ public class BuildableComponentTest
         furniture.ReadJsonPrototype((JProperty)reader.First);
     }
 
+    [Test]
+    public void TestForVisualUseAnimationRunConditions()
+    {
+        string inputJson = @"
+        {
+            'water_tank': {
+                'LocalizationName': 'furn_water_tank',
+                'LocalizationDescription': 'furn_water_tank_desc',
+                'Health': 1.0,
+                'DragType': 'single',
+                'Components': {
+                    'Visuals': {
+                      'DefaultSpriteName': {
+                        'Value': 'water_generator_off'
+                      },
+                      'UseAnimation': [
+                        {
+                          'Name': 'idle',
+                          'RunConditions': {
+                            'cur_processed_inv': 'IsZero'
+                          }
+                        }
+                      ]
+                    },
+                }
+            }
+        }
+        ";
+
+        JToken reader = JToken.Parse(inputJson);
+        Furniture furniture = new Furniture();
+        furniture.ReadJsonPrototype((JProperty)reader.First);
+        Assert.IsNotNull(furniture.GetComponent<Visuals>("Visuals").UsedAnimations[0].RunConditions.ParamConditions);
+        UnityEngine.Debug.Log(furniture.GetComponent<Visuals>("Visuals").UsedAnimations[0].RunConditions.ParamConditions);
+    }
+
     private static string SerializeObjectToJson(object obj)
     {
         return JsonConvert.SerializeObject(

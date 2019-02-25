@@ -116,6 +116,7 @@ namespace ProjectPorcupine.Buildable.Components
         public Info Requires { get; set; }
 
         [JsonProperty("RunConditions")]
+        [JsonConverter(typeof(ConditionsJsonConvertor))]
         public Conditions RunConditions { get; set; }
         
         public float StoredAmount

@@ -57,24 +57,29 @@ namespace ProjectPorcupine.Buildable.Components
 
         public override bool CanFunction()
         {
-            bool canFunction = true;
-
             // check if all requirements are fullfilled
-            if (Requires != null && Requires.Count > 0)
+            if (Requires != null && Requires.Count > 0 && ParentFurniture.Tile.Room != null)
             {
                 Room room = ParentFurniture.Tile.Room;
+
+                // Gas connections do not function outside.
+                if (room.IsOutsideRoom())
+                {
+                    return false;
+                }
+
                 foreach (GasInfo reqGas in Requires)
                 {
                     // get actual gas pressure so it matches what gas really is, not the prettified version for display
                     float curGasPressure = room.GetGasPressure(reqGas.Gas);
                     if (curGasPressure < reqGas.MinLimit || curGasPressure > reqGas.MaxLimit)
                     {
-                        canFunction = false;
+                        return false;
                     }
                 }
             }
 
-            return canFunction;
+            return true;
         }
 
         public override void FixedFrequencyUpdate(float deltaTime)

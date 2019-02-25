@@ -786,6 +786,24 @@
           "ParameterDefinitions": {},
           "ProductionChain": [
             {
+              "Name": "iron_smelting",
+              "ProcessingTime": 4.0,
+              "Input": [
+                {
+                  "ObjectType": "raw_iron",
+                  "Amount": 2,
+                  "HasHopper": true
+                }
+              ],
+              "Output": [
+                {
+                  "ObjectType": "steel_plate",
+                  "Amount": 1,
+                  "SlotPosX": 2
+                }
+              ]
+            },
+            {
               "Name": "copper_smelting",
               "ProcessingTime": 3.0,
               "Input": [
@@ -803,24 +821,6 @@
                 }
               ]
             },
-            {
-              "Name": "iron_smelting",
-              "ProcessingTime": 4.0,
-              "Input": [
-                {
-                  "ObjectType": "raw_iron",
-                  "Amount": 2,
-                  "HasHopper": true
-                }
-              ],
-              "Output": [
-                {
-                  "ObjectType": "steel_plate",
-                  "Amount": 1,
-                  "SlotPosX": 2
-                }
-              ]
-            }
           ],
           "Efficiency": {
             "FromParameter": "pow_efficiency"
@@ -1149,7 +1149,7 @@
       ]
     },
     "air_pump": {
-      "MovementCost": 1.0,
+      "MovementCost": 0.0,
       "PathfindingWeight": 1.0,
       "Width": 1,
       "Height": 1,
@@ -1215,7 +1215,7 @@
       }
     },
     "vent": {
-      "MovementCost": 1.0,
+      "MovementCost": 0.0,
       "PathfindingWeight": 1.0,
       "Width": 1,
       "Height": 1,
@@ -1521,7 +1521,7 @@
         "Non-deconstructible",
         "DoesntNeedFloor"
       ],
-      "MovementCost": 1.0,
+      "MovementCost": 0.0,
       "PathfindingWeight": 1.0,
       "Width": 1,
       "Height": 1,
