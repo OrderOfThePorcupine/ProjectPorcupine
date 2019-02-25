@@ -76,6 +76,8 @@ public class ConstructionMenu : GameMenu
 
     protected override void Start()
     {
+        base.Start();
+
         Text title = GetComponentInChildren<Text>();
         title.text = LocalizationTable.GetLocalization("menu_construction");
 
@@ -94,8 +96,6 @@ public class ConstructionMenu : GameMenu
         InputField filterField = GetComponentInChildren<InputField>();
         filterField.onValueChanged.AddListener(delegate { FilterTextChanged(filterField.text); });
         KeyboardManager.Instance.RegisterModalInputField(filterField);
-
-        base.Start();
     }
 
     private void RenderFurnitureButtons()

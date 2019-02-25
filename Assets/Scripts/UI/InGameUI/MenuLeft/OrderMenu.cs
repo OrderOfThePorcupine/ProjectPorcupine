@@ -52,6 +52,8 @@ public class OrderMenu : GameMenu
 
     protected override void Start()
     {
+        base.Start();
+
         Text title = GetComponentInChildren<Text>();
         title.text = LocalizationTable.GetLocalization("menu_orders");
 
@@ -68,8 +70,6 @@ public class OrderMenu : GameMenu
         InputField filterField = GetComponentInChildren<InputField>();
         filterField.onValueChanged.AddListener(delegate { FilterTextChanged(filterField.text); });
         KeyboardManager.Instance.RegisterModalInputField(filterField);
-
-        base.Start();
     }    
 
     private void RenderDeconstructButton()
