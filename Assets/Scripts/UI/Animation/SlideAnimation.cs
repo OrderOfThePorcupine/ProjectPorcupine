@@ -11,37 +11,59 @@ using UnityEngine;
 
 namespace ProjectPorcupine.UI.Animation
 {
-    public class SlideAnimation : MonoBehaviour
+    public class SlideAnimation : MenuAnimation
     {
+        [SerializeField]
+        [Tooltip("Slide in direction.")]
+        private SlideDirection direction;
+
         private PositionTween slideIn;
         private PositionTween slideOut;
-        private Vector2 outPosition;
-        private Vector2 inPosition;
 
-        public void Show()
+        private void Start()
         {
-            gameObject.SetActive(true);
-            slideOut.Stop();
-            slideIn.Start();
-        }
-
-        public void Hide()
-        {
-            slideIn.Stop();
-            slideOut.Start();
-        }
-
-        private void Awake()
-        {
-            RectTransform rect = GetComponent<RectTransform>();
-            ///Calculates only left to right position.
-            ///TODO: Add All Slide modes(LeftToRight, RightToLeft etc).
-            outPosition = new Vector2(rect.anchoredPosition.x - rect.sizeDelta.x, rect.anchoredPosition.y);
-            inPosition = rect.anchoredPosition;
+            RectTransform rect = gameObject.GetComponent<RectTransform>();
+            Vector2 outPosition = OutPosition(rect, direction);
+            Vector2 inPosition = rect.anchoredPosition;
             rect.anchoredPosition = outPosition;
 
             slideIn = new PositionTween(rect, inPosition);
             slideOut = new PositionTween(rect, outPosition, () => gameObject.SetActive(false));
+        }
+
+        private Vector2 OutPosition(RectTransform rect, SlideDirection direction)
+        {
+            float x = rect.anchoredPosition.x;
+            float y = rect.anchoredPosition.y;
+            float width = rect.sizeDelta.x;
+            float height = rect.sizeDelta.y;
+
+            switch (direction)
+            {
+                case SlideDirection.Right:
+                    return new Vector2(x - width, y);
+                case SlideDirection.Left:
+                    return new Vector2(x + width, y);
+                case SlideDirection.Down:
+                    return new Vector2(x, y - height);
+                case SlideDirection.Up:
+                    return new Vector2(x, y + height);
+                default:
+                    throw new System.Exception("Direction not found.");
+            }
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            slideOut.Stop();
+            slideIn.Start();
+        }
+
+        public override void Hide()
+        {
+            slideIn.Stop();
+            slideOut.Start();
         }
     }
 }
