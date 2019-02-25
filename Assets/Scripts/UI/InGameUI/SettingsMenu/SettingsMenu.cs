@@ -174,13 +174,16 @@ public class SettingsMenu : MonoBehaviour
     public void Save()
     {
         Apply();
-
         Settings.SaveSettings();
-        changesTracker.Clear();
+        Exit();
+    }
 
+    private void Exit()
+    {
+        currentCategory = string.Empty;
         GameController.Instance.IsModal = false;
-        GameController.Instance.SoundController.OnButtonSFX();
         mainRoot.SetActive(false);
+        changesTracker.Clear();
     }
 
     public void Cancel()
@@ -195,9 +198,7 @@ public class SettingsMenu : MonoBehaviour
         // If we have made no changes we can freely exit
         if (changesTracker.Count == 0)
         {
-            currentCategory = string.Empty;
-            GameController.Instance.IsModal = false;
-            mainRoot.SetActive(false);
+            Exit();
             return;
         }
 
@@ -214,11 +215,7 @@ public class SettingsMenu : MonoBehaviour
         }
         else
         {
-            // We can't display cancel box so just automatically cancel
-            changesTracker.Clear();
-            currentCategory = string.Empty;
-            GameController.Instance.IsModal = false;
-            mainRoot.SetActive(false);
+            Exit();
             return;
         }
 
@@ -231,11 +228,6 @@ public class SettingsMenu : MonoBehaviour
                 {
                     case DialogBoxResult.Yes:
                         // CANCEL
-                        if (options.ContainsKey(currentCategory))
-                        {
-                            changesTracker.AddRange(options[currentCategory].Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
-                        }
-
                         Settings.LoadSettings();
 
                         for (int i = 0; i < changesTracker.Count; i++)
@@ -244,13 +236,8 @@ public class SettingsMenu : MonoBehaviour
                             changesTracker[i].CancelSettingLUA();
                         }
 
-                        changesTracker.Clear();
-                        currentCategory = string.Empty;
-
-                        GameController.Instance.IsModal = false;
+                        Exit();
                         GameController.Instance.SoundController.OnButtonSFX();
-                        mainRoot.SetActive(false);
-
                         break;
                     case DialogBoxResult.No:
                         GameController.Instance.SoundController.OnButtonSFX();
