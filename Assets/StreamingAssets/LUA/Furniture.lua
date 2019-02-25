@@ -61,7 +61,7 @@ function IsEnterable_AirlockDoor( furniture )
         local pressureEqual = true;
         local count = 0
         for k, tile in pairs(neighbors) do
-            if (tile.Room != nil) then
+            if (tile.Room ~= nil) then
                 count = count + 1
                 adjacentRooms[count] = tile.Room
             end
@@ -172,7 +172,7 @@ function Stockpile_UpdateAction( furniture, deltaTime )
     -- -- A good gets picked up (at which point we reset the job)
     -- -- The UI's filter of allowed items gets changed
 
-    if( furniture.Tile.Inventory != nil and furniture.Tile.Inventory.StackSize >= furniture.Tile.Inventory.MaxStackSize ) then
+    if( furniture.Tile.Inventory ~= nil and furniture.Tile.Inventory.StackSize >= furniture.Tile.Inventory.MaxStackSize ) then
         -- We are full!
         furniture.Jobs.CancelAll()
         return
@@ -188,7 +188,7 @@ function Stockpile_UpdateAction( furniture, deltaTime )
     -- Two possibilities: Either we have SOME inventory, or we have NO inventory.
 
     -- Third possibility: Something is WHACK
-    if( furniture.Tile.Inventory != nil and furniture.Tile.Inventory.StackSize == 0 ) then
+    if( furniture.Tile.Inventory ~= nil and furniture.Tile.Inventory.StackSize == 0 ) then
         furniture.Jobs.CancelAll()
         return "Stockpile has a zero-size stack. This is clearly WRONG!"
     end
@@ -255,7 +255,7 @@ function MiningDroneStation_UpdateAction( furniture, deltaTime )
 
 	if (furniture.Jobs.Count > 0) then
 		-- Check to see if the Metal Plate destination tile is full.
-		if (outputSpot.Inventory != nil and outputSpot.Inventory.StackSize >= outputSpot.Inventory.MaxStackSize) then
+		if (outputSpot.Inventory ~= nil and outputSpot.Inventory.StackSize >= outputSpot.Inventory.MaxStackSize) then
 			-- We should stop this job, because it's impossible to make any more items.
 			furniture.Jobs.CancelAll()
 		end
@@ -263,12 +263,12 @@ function MiningDroneStation_UpdateAction( furniture, deltaTime )
 	end
 
 	-- If we get here, then we have no Current job. Check to see if our destination is full.
-	if (outputSpot.Inventory != nil and outputSpot.Inventory.StackSize >= outputSpot.Inventory.MaxStackSize) then
+	if (outputSpot.Inventory ~= nil and outputSpot.Inventory.StackSize >= outputSpot.Inventory.MaxStackSize) then
 		-- We are full! Don't make a job!
 		return
 	end
 
-	if (outputSpot.Inventory != nil and outputSpot.Inventory.Type != furniture.Parameters["mine_type"].ToString()) then
+	if (outputSpot.Inventory ~= nil and outputSpot.Inventory.Type ~= furniture.Parameters["mine_type"].ToString()) then
 		return
 	end
 
@@ -416,7 +416,7 @@ function PowerGenerator_FuelInfo(furniture)
 	local invProc = furniture.Parameters["cur_processed_inv"].ToInt()
 
 	local perc = 0
-	if (maxBurn != 0 and invProc > 0) then
+	if (maxBurn ~= 0 and invProc > 0) then
 		perc = 100 - (curBurn * 100 / maxBurn)
 		if (perc <= 0) then
 			perc = 0
@@ -501,7 +501,7 @@ function AirPump_OnUpdate(furniture, deltaTime)
         -- Maybe in future this could be cached. it only changes when the direction changes
         local sourceRoom = nil
         local targetRoom = nil
-        if (north.Room != nil and south.Room != nil) then
+        if (north.Room ~= nil and south.Room ~= nil) then
             if (furniture.Parameters["flow_direction_up"].ToFloat() > 0) then
                 sourceRoom = south.Room
                 targetRoom = north.Room
@@ -509,7 +509,7 @@ function AirPump_OnUpdate(furniture, deltaTime)
                 sourceRoom = north.Room
                 targetRoom = south.Room
             end
-        elseif (west.Room != nil and east.Room != nil) then
+        elseif (west.Room ~= nil and east.Room ~= nil) then
             if (furniture.Parameters["flow_direction_up"].ToFloat() > 0) then
                 sourceRoom = west.Room
                 targetRoom = east.Room
@@ -544,13 +544,13 @@ function AirPump_GetSpriteName(furniture)
     local east = World.Current.GetTileAt(t.X + 1, t.Y, t.Z)
 
     suffix = ""
-    if (north.Room != nil and south.Room != nil) then
+    if (north.Room ~= nil and south.Room ~= nil) then
         if (furniture.Parameters["flow_direction_up"].ToFloat() > 0) then
            suffix = "_SN"
         else
            suffix = "_NS"
         end
-    elseif (west.Room != nil and east.Room != nil) then
+    elseif (west.Room ~= nil and east.Room ~= nil) then
         if (furniture.Parameters["flow_direction_up"].ToFloat() > 0) then
             suffix = "_WE"
         else
@@ -572,9 +572,9 @@ function Vent_SetOrientationState(furniture)
     end
     
     local tile = furniture.Tile
-    if (tile.North().Room != nil and tile.South().Room != nil) then
+    if (tile.North().Room ~= nil and tile.South().Room ~= nil) then
         furniture.SetAnimationState("vertical")
-    elseif (tile.West().Room != nil and tile.East().Room != nil) then
+    elseif (tile.West().Room ~= nil and tile.East().Room ~= nil) then
         furniture.SetAnimationState("horizontal")
     end
 end
