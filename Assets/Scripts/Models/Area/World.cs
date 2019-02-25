@@ -443,21 +443,21 @@ public class World
         }
     }
 
-    private void PreinitializeWorld(int width, int height, int depth) {
-        Current = this;
-
+    private void PreinitializeWorld(int width, int height, int depth) 
+    {
         Width = width;
         Height = height;
         Depth = depth;
-
-        tiles = new Tile[Width, Height, Depth];
     }
 
     private void SetupWorld()
     {
         // Set the current world to be this world.
-        // TODO: Do we need to do any cleanup of the old world?
+        Current = this;
 
+        tiles = new Tile[Width, Height, Depth];
+
+        // TODO: Do we need to do any cleanup of the old world?
         RoomManager = new RoomManager();
         RoomManager.Adding += (room) => roomGraph = null;
         RoomManager.Removing += (room) => roomGraph = null;
