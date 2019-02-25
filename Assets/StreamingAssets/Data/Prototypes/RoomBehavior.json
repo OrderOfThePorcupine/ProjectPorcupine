@@ -4,7 +4,7 @@
 	  "Requirements": [
 	    {
 		  "Furniture":{ 
-			"Type": "pump_air",
+			"Type": "air_pump",
 			"Count": 1
 		  }
 		},
