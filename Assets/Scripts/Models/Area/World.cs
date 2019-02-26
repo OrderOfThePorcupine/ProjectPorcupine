@@ -61,8 +61,6 @@ public class World
         WorldGenerator.Instance.Generate(this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
-        tileGraph = new Path_TileGraph(this);
-        roomGraph = new Path_RoomGraph(this);
 
         // Make one character.
         CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
