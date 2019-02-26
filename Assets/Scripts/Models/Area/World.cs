@@ -60,7 +60,6 @@ public class World
         WorldGenerator.Instance.Generate(width, height, depth, this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
-
         // Make one character.
         CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
     }
