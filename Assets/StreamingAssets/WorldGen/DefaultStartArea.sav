@@ -1590,126 +1590,180 @@
       "Y": 7,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 1,
       "Y": 8,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 1,
       "Y": 6,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 2,
       "Y": 9,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 2,
       "Y": 5,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 3,
       "Y": 9,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 3,
       "Y": 5,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 4,
       "Y": 9,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 4,
       "Y": 5,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 5,
       "Y": 9,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 5,
       "Y": 5,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 13,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 12,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 11,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 10,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 9,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 8,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
@@ -1726,77 +1780,110 @@
       "Y": 6,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 5,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 4,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 3,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 2,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 1,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 6,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 7,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 7,
       "Y": 10,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 7,
       "Y": 4,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 7,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 8,
@@ -1843,77 +1930,110 @@
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 9,
       "Y": 10,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 9,
       "Y": 4,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 9,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 13,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 12,
       "Z": 0,
       "Type": "air_pump",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "gas_throughput": "1"
+      }
     },
     {
       "X": 10,
       "Y": 11,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 10,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 9,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 8,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
@@ -1930,63 +2050,90 @@
       "Y": 6,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 5,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 4,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 3,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 2,
       "Z": 0,
       "Type": "air_pump",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "gas_throughput": "1"
+      }
     },
     {
       "X": 10,
       "Y": 1,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 10,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 11,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 11,
       "Y": 11,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 11,
@@ -2023,98 +2170,140 @@
       "Y": 3,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 11,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 12,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 12,
       "Y": 11,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 12,
       "Y": 3,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 12,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 13,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 13,
       "Y": 11,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 13,
       "Y": 5,
       "Z": 0,
       "Type": "rtg",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "base_heating": "500"
+      }
     },
     {
       "X": 13,
       "Y": 4,
       "Z": 0,
       "Type": "rtg",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "base_heating": "500"
+      }
     },
     {
       "X": 13,
       "Y": 3,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 13,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 14,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 14,
       "Y": 11,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 14,
@@ -2131,42 +2320,60 @@
       "Y": 5,
       "Z": 0,
       "Type": "rtg",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "base_heating": "500"
+      }
     },
     {
       "X": 14,
       "Y": 4,
       "Z": 0,
       "Type": "rtg",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "base_heating": "500"
+      }
     },
     {
       "X": 14,
       "Y": 3,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 14,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 15,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 15,
       "Y": 11,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 15,
@@ -2194,56 +2401,80 @@
       "Y": 5,
       "Z": 0,
       "Type": "rtg",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "base_heating": "500"
+      }
     },
     {
       "X": 15,
       "Y": 4,
       "Z": 0,
       "Type": "rtg",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "base_heating": "500"
+      }
     },
     {
       "X": 15,
       "Y": 3,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 15,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
       "Y": 13,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
       "Y": 12,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
       "Y": 10,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
@@ -2271,77 +2502,110 @@
       "Y": 4,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
       "Y": 2,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
       "Y": 1,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 16,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 17,
       "Y": 14,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 17,
       "Y": 9,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 17,
       "Y": 8,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 17,
       "Y": 7,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 17,
       "Y": 6,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 17,
       "Y": 5,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     },
     {
       "X": 17,
       "Y": 0,
       "Z": 0,
       "Type": "steel_wall",
-      "Rotation": 0.0
+      "Rotation": 0.0,
+      "Parameters": {
+        "thermal_diffusivity": "0.1"
+      }
     }
   ],
   "Utilities": [
