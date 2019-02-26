@@ -56,9 +56,8 @@ public class World
             Seed = SceneController.Seed;
         }
 
-        PreinitializeWorld(width, height, depth);
         UnityDebugger.Debugger.Log("World", "World Seed: " + Seed);
-        WorldGenerator.Instance.Generate(this, Seed);
+        WorldGenerator.Instance.Generate(width, height, depth, this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
 
@@ -354,8 +353,7 @@ public class World
         Height = (int)worldJson["Height"];
         Depth = (int)worldJson["Depth"];
 
-        PreinitializeWorld(Width, Height, Depth);
-        SetupWorld();
+        SetupWorld(Width, Height, Depth);
 
         RoomManager.FromJson(worldJson["Rooms"]);
         TilesFromJson(worldJson["Tiles"]);
@@ -441,15 +439,12 @@ public class World
         }
     }
 
-    private void PreinitializeWorld(int width, int height, int depth) 
+    private void SetupWorld(int width, int height, int depth) 
     {
         Width = width;
         Height = height;
         Depth = depth;
-    }
 
-    private void SetupWorld()
-    {
         // Set the current world to be this world.
         Current = this;
 
