@@ -106,13 +106,13 @@ namespace ProjectPorcupine.Buildable.Components
                 componentTypes = FindComponentsInAssembly();
             }
 
-            JToken jComponent = jtoken["Component"];
-            string componentTypeName = jComponent["Type"].ToString();
+            JToken jcomponent = jtoken["Component"];
+            string componentTypeName = jcomponent["Type"].ToString();
 
             Type t;
             if (componentTypes.TryGetValue(componentTypeName, out t))
             {
-                BuildableComponent component = (BuildableComponent)jComponent.ToObject(t);
+                BuildableComponent component = (BuildableComponent)jcomponent.ToObject(t);
 
                 // need to set name explicitly (not part of deserialization as it's passed in)
                 component.Type = componentTypeName;
