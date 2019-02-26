@@ -178,14 +178,6 @@ public class SettingsMenu : MonoBehaviour
         Exit();
     }
 
-    private void Exit()
-    {
-        currentCategory = string.Empty;
-        GameController.Instance.IsModal = false;
-        mainRoot.SetActive(false);
-        changesTracker.Clear();
-    }
-
     public void Cancel()
     {
         // Add all changes made that haven't been applied or tracked yet
@@ -309,6 +301,14 @@ public class SettingsMenu : MonoBehaviour
     private void Start()
     {
         LoadCategories();
+    }
+
+    private void Exit()
+    {
+        currentCategory = string.Empty;
+        GameController.Instance.IsModal = false;
+        mainRoot.SetActive(false);
+        changesTracker.Clear();
     }
 
     private void Update()
