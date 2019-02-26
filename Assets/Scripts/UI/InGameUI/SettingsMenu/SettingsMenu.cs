@@ -174,23 +174,23 @@ public class SettingsMenu : MonoBehaviour
     public void Save()
     {
         Apply();
-
         Settings.SaveSettings();
-        changesTracker.Clear();
-
-        GameController.Instance.IsModal = false;
-        GameController.Instance.SoundController.OnButtonSFX();
-        mainRoot.SetActive(false);
+        Exit();
     }
 
     public void Cancel()
     {
+        // Add all changes made that haven't been applied or tracked yet
+        Dictionary<string, BaseSettingsElement[]> opts;
+        if (options.TryGetValue(currentCategory, out opts))
+        {
+            changesTracker.AddRange(opts.Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
+        }
+
         // If we have made no changes we can freely exit
         if (changesTracker.Count == 0)
         {
-            currentCategory = string.Empty;
-            GameController.Instance.IsModal = false;
-            mainRoot.SetActive(false);
+            Exit();
             return;
         }
 
@@ -207,11 +207,7 @@ public class SettingsMenu : MonoBehaviour
         }
         else
         {
-            // We can't display cancel box so just automatically cancel
-            changesTracker.Clear();
-            currentCategory = string.Empty;
-            GameController.Instance.IsModal = false;
-            mainRoot.SetActive(false);
+            Exit();
             return;
         }
 
@@ -224,11 +220,6 @@ public class SettingsMenu : MonoBehaviour
                 {
                     case DialogBoxResult.Yes:
                         // CANCEL
-                        if (options.ContainsKey(currentCategory))
-                        {
-                            changesTracker.AddRange(options[currentCategory].Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
-                        }
-
                         Settings.LoadSettings();
 
                         for (int i = 0; i < changesTracker.Count; i++)
@@ -237,13 +228,8 @@ public class SettingsMenu : MonoBehaviour
                             changesTracker[i].CancelSettingLUA();
                         }
 
-                        changesTracker.Clear();
-                        currentCategory = string.Empty;
-
-                        GameController.Instance.IsModal = false;
+                        Exit();
                         GameController.Instance.SoundController.OnButtonSFX();
-                        mainRoot.SetActive(false);
-
                         break;
                     case DialogBoxResult.No:
                         GameController.Instance.SoundController.OnButtonSFX();
@@ -315,6 +301,14 @@ public class SettingsMenu : MonoBehaviour
     private void Start()
     {
         LoadCategories();
+    }
+
+    private void Exit()
+    {
+        currentCategory = string.Empty;
+        GameController.Instance.IsModal = false;
+        mainRoot.SetActive(false);
+        changesTracker.Clear();
     }
 
     private void Update()
