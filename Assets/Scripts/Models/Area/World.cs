@@ -348,11 +348,7 @@ public class World
 
         RandomStateFromJson(worldJson["RandomState"]);
 
-        Width = (int)worldJson["Width"];
-        Height = (int)worldJson["Height"];
-        Depth = (int)worldJson["Depth"];
-
-        SetupWorld(Width, Height, Depth);
+        SetupWorld((int)worldJson["Width"], (int)worldJson["Height"],  (int)worldJson["Depth"]);
 
         RoomManager.FromJson(worldJson["Rooms"]);
         TilesFromJson(worldJson["Tiles"]);
