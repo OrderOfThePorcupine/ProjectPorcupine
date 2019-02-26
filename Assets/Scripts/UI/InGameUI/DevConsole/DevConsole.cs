@@ -456,7 +456,7 @@ namespace DeveloperConsole
             }
 
             Log("<color=yellow>Command Info:</color> " + (string.IsNullOrEmpty(help.DetailedDescription) ? help.Description : help.DetailedDescription));
-            Log("<color=yellow>Call it like </color><color=orange> " + help.Title + GetParameters(help));
+            Log("<color=yellow>Call it like </color><color=orange> " + help.Title + "</color>" + GetParameters(help));
         }
 
         /// <summary>
