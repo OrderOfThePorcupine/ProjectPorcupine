@@ -215,7 +215,7 @@ namespace ProjectPorcupine.Pathfinding
             }
 
             RoomPath_AStar roomResolver = new RoomPath_AStar(World.Current, start, RoomEvaluator(goal), RoomHeuristic());
-            return roomResolver.Length > 1;
+            return roomResolver.Length() > 1;
         }
 
         public static Room FindNearestRoom(Tile start)
