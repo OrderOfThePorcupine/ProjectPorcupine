@@ -367,14 +367,10 @@ public class Job : ISelectable
         }
     }
 
-    public void Suspend()
-    {
-        IsActive = false;
-    }
-
     public void SuspendCantReach()
     {
         World.Current.RoomManager.Removed += (room) => ClearCharCantReach();
+        tile.TileChanged += (tile) => ClearCharCantReach();
         Suspend();
     }
 
@@ -632,6 +628,12 @@ public class Job : ISelectable
     /// </summary>
     public void ClearCharCantReach()
     {
+        World.Current.RoomManager.Removed -= (room) => ClearCharCantReach();
+        if (tile != null)
+        {
+            tile.TileChanged -= (tile) => ClearCharCantReach();
+        }
+
         charsCantReach.Clear();
         IsActive = true;
     }
@@ -639,5 +641,10 @@ public class Job : ISelectable
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
+    }
+
+    private void Suspend()
+    {
+        IsActive = false;
     }
 }
