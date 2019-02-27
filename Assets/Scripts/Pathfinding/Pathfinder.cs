@@ -195,6 +195,30 @@ namespace ProjectPorcupine.Pathfinding
             }
         }
 
+        public static List<Room> FindPathToRoom(Room start, Room goal) 
+        {
+            if(start == null || goal || null)
+            {
+                return null;
+            }
+
+            RoomPath_AStar roomResolver =  new RoomPath_AStar(World.Current, start, RoomEvaluator(goal), RoomHeuristic());
+            List<Room> path = roomResolver.GetList();
+            return path;
+        }
+
+        public static bool IsRoomReachable(Room start, Room goal)
+        {
+
+            if(start == null || goal || null)
+            {
+                return false;
+            }
+
+            RoomPath_AStar roomResolver =  new RoomPath_AStar(World.Current, start, RoomEvaluator(goal), RoomHeuristic());
+            return roomResolver.Length > 1;
+        }
+
         public static Room FindNearestRoom(Tile start)
         {
             Path_AStar tileResolver = new Path_AStar(World.Current, start, GoalHasRoomEvaluator(), DijkstraDistance());
@@ -383,6 +407,11 @@ namespace ProjectPorcupine.Pathfinding
         {
             return room =>
                 World.Current.InventoryManager.Inventories.Where(dictEntry => types.Contains(dictEntry.Key)).SelectMany(dictEntry => dictEntry.Value).Any(inv => inv != null && inv.CanBePickedUp(canTakeFromStockpile) && inv.Tile != null && inv.Tile.GetNearestRoom() == room);
+        }
+
+        public static RoomGoalEvaluator RoomEvaluator(Room goal)
+        {
+            return room => room == goal;
         }
 
         public static RoomGoalEvaluator RoomGoalInventoryEvaluator(string type, bool canTakeFromStockpile = true)
