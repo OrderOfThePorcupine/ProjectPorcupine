@@ -242,9 +242,9 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         // buddy.  Just trigger their OnChangedCallback.
         foreach (Tile neighbor in obj.Tile.GetNeighbours())
         {
-            if (neighbor.Utilities != null && neighbor.Utilities.ContainsKey(obj.Type))
+            Utility utility;
+            if (neighbor.Utilities != null && neighbor.Utilities.TryGetValue(obj.Type, out utility))
             {
-                Utility utility = neighbor.Utilities[obj.Type];
                 if (utility.Changed != null)
                 {
                     utility.Changed(utility);
@@ -385,9 +385,9 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         // Just trigger their OnChangedCallback.
         foreach (Tile neighbor in Tile.GetNeighbours())
         {
-            if (neighbor.Utilities != null && neighbor.Utilities.ContainsKey(this.Type))
+            Utility neighborUtility;
+            if (neighbor.Utilities != null && neighbor.Utilities.TryGetValue(this.Type, out neighborUtility))
             {
-                Utility neighborUtility = neighbor.Utilities[this.Type];
                 if (neighborUtility.Changed != null)
                 {
                     neighborUtility.Changed(neighborUtility);
@@ -565,10 +565,9 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             foreach (Tile neighborTile in utilityToUpdate.Tile.GetNeighbours())
             {
-                if (neighborTile != null && neighborTile.Utilities != null && neighborTile.Utilities.ContainsKey(this.Type))
+                Utility utility;
+                if (neighborTile != null && neighborTile.Utilities != null && neighborTile.Utilities.TryGetValue(this.Type, out utility))
                 {
-                    Utility utility = neighborTile.Utilities[this.Type];
-
                     if (utility.Grid != null && utilityToUpdate.Grid == null)
                     {
                         utilityToUpdate.Grid = utility.Grid;
@@ -602,9 +601,9 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
         {
             if (neighborTile != null && neighborTile.Utilities != null)
             {
-                if (neighborTile != null && neighborTile.Utilities != null && neighborTile.Utilities.ContainsKey(this.Type))
+                Utility utility;
+                if (neighborTile != null && neighborTile.Utilities != null && neighborTile.Utilities.TryGetValue(this.Type, out utility))
                 {
-                    Utility utility = neighborTile.Utilities[this.Type];
                     utility.UpdateGrid(utility, utilityToUpdate.Grid);
                 }
             }

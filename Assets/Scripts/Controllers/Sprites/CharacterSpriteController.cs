@@ -128,14 +128,13 @@ namespace ProjectPorcupine.Entities
                 }
             }
 
-            if (objectGameObjectMap.ContainsKey(character) == false)
+            GameObject char_go;
+            if (objectGameObjectMap.TryGetValue(character, out char_go) == false)
             {
                 UnityDebugger.Debugger.LogError("CharacterSpriteController", "OnCharacterChanged -- trying to change visuals for character not in our map.");
                 return;
             }
-
-            GameObject char_go = objectGameObjectMap[character];
-
+            
             char_go.transform.position = new Vector3(character.X, character.Y, character.Z);
 
             if (character.IsSelected)

@@ -78,7 +78,14 @@ public class AtmosphereComponent
     /// <param name="gasName">Gas you want the pressure of.</param>
     public float GetGasAmount(string gasName)
     {
-        return gasses.ContainsKey(gasName) ? gasses[gasName] : 0;
+        float amount;
+
+        if (gasses.TryGetValue(gasName, out amount) == false)
+        {
+            amount = 0;
+        }
+
+        return amount;
     }
 
     /// <summary>
@@ -137,18 +144,21 @@ public class AtmosphereComponent
     /// <param name="amount"> The amount to update by. </param>
     public void ChangeGas(string gasName, float amount)
     {
-        if (gasses.ContainsKey(gasName) == false)
+        float gasAmount;
+        if (gasses.TryGetValue(gasName, out gasAmount))
         {
-            gasses[gasName] = 0;
+            if (gasAmount <= -amount)
+            {
+                gasses.Remove(gasName);
+            }
+            else
+            {
+                gasses[gasName] = gasAmount + amount;
+            }
         }
-
-        if (gasses[gasName] <= -amount)
+        else if (amount > 0)
         {
-            gasses.Remove(gasName);
-        }
-        else
-        {
-            gasses[gasName] += amount;
+            gasses[gasName] = amount;
         }
 
         UpdateTotalGas();

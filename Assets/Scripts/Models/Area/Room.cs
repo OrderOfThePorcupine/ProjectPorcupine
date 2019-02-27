@@ -268,6 +268,7 @@ namespace ProjectPorcupine.Rooms
             return boundaryTiles;
         }
 
+        // FIXME: 'Has' methods are generally a bad idea, should be 'TryGet' instead
         public bool HasRoomBehavior(string behaviorKey)
         {
             return RoomBehaviors.ContainsKey(behaviorKey);

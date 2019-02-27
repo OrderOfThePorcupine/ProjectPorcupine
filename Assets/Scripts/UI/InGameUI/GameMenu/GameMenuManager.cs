@@ -105,12 +105,15 @@ public class GameMenuManager : IEnumerable<GameMenuItem>
         else
         {
             GameMenuItem menuItem = new GameMenuItem(key, callback);
-            if (itemsToAdd.ContainsKey(afterKey) == false)
+
+            List<GameMenuItem> items;
+            if (itemsToAdd.TryGetValue(afterKey, out items) == false)
             {
-                itemsToAdd[afterKey] = new List<GameMenuItem>();
+                items = new List<GameMenuItem>();
+                itemsToAdd[afterKey] = items;
             }
 
-            itemsToAdd[afterKey].Add(menuItem);
+            items.Add(menuItem);
         }
     }
 
@@ -150,12 +153,13 @@ public class GameMenuManager : IEnumerable<GameMenuItem>
     /// <param name="position">The position of the menu item just added.</param>
     private void AddFromItemsToAdd(string key, int position)
     {
-        if (itemsToAdd.ContainsKey(key) && itemsToAdd[key].Count > 0)
+        List<GameMenuItem> items;
+        if (itemsToAdd.TryGetValue(key, out items) && items.Count > 0)
         {
-            for (int i = itemsToAdd[key].Count - 1; i >= 0; i--)
+            for (int i = items.Count - 1; i >= 0; i--)
             {
-                GameMenuItem menuItem = itemsToAdd[key][i];
-                itemsToAdd[key].RemoveAt(i);
+                GameMenuItem menuItem = items[i];
+                items.RemoveAt(i);
                 AddMenuItem(menuItem, position + 1);
             }
         }

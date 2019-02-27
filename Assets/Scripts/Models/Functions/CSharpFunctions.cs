@@ -51,11 +51,13 @@ public class CSharpFunctions : IFunctions
         return assembly.GetType().FullName.EndsWith("AssemblyBuilder") || assembly.Location == null || assembly.Location == string.Empty;
     }
 
+    // FIXME: 'Has' methods are generally a bad idea, should be 'TryGet' instead
     public bool HasFunction(string name)
     {
         return methods.ContainsKey(name);
     }
 
+    // FIXME: 'Has' methods are generally a bad idea, should be 'TryGet' instead
     public bool HasConstructor(string className)
     {
         return constructors.ContainsKey(className);

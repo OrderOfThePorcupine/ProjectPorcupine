@@ -81,9 +81,21 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     /// </summary>
     /// <returns><c>true</c> if there is a prototype with the specified type; otherwise, <c>false</c>.</returns>
     /// <param name="type">The prototype type.</param>
+    [System.Obsolete("Has is deprecated, please use TryGet instead")]
     public bool Has(string type)
     {
         return prototypes.ContainsKey(type);
+    }
+
+    /// <summary>
+    /// Tries to get a specified prototype.
+    /// </summary>
+    /// <param name="type">The prototype type.</param>
+    /// <param name="val">The prototype.</param>
+    /// <returns><c>true</c> if there is a prototype with the specified type; otherwise, <c>false</c>.</returns>
+    public bool TryGet(string type, out T val)
+    {
+        return prototypes.TryGetValue(type, out val);
     }
 
     /// <summary>
@@ -93,9 +105,10 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     /// <param name="type">The prototype type.</param>
     public T Get(string type)
     {
-        if (Has(type))
+        T prot;
+        if (prototypes.TryGetValue(type, out prot))
         {
-            return prototypes[type];
+            return prot;
         }
 
         return default(T);
@@ -116,9 +129,10 @@ public class PrototypeMap<T> where T : IPrototypable, new()
     /// <param name="proto">The prototype instance.</param>
     public void Add(T proto)
     {
-        if (Has(proto.Type))
+        T oldProto;
+        if (TryGet(proto.Type, out oldProto))
         {
-            UnityDebugger.Debugger.LogWarningFormat("PrototypeMap", "Trying to register a prototype of type '{0}' which already exists. Overwriting.", proto.Type);
+            UnityDebugger.Debugger.LogWarningFormat("PrototypeMap", "Trying to register a prototype of type '{0}' which already exists. Overwriting. Old value: {1}", proto.Type, oldProto);
         }
 
         Set(proto);

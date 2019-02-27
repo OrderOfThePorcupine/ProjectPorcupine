@@ -78,10 +78,10 @@ public class LuaFunctionsTest
     {
         // This makes sure that the channel lua is activated since we require to to be
         // we set it back to the old value afterwards as to not annoy the 'dev'
-        bool oldVal = true;
-        if (UnityDebugger.Debugger.Channels.ContainsKey("Lua"))
+        bool oldVal;
+        if (UnityDebugger.Debugger.Channels.TryGetValue("Lua", out oldVal) == false)
         {
-            oldVal = UnityDebugger.Debugger.Channels["Lua"];
+            oldVal = true;
         }
 
         UnityDebugger.Debugger.Channels["Lua"] = true;

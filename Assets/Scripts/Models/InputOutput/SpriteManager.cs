@@ -106,6 +106,9 @@ public static class SpriteManager
     /// <param name="spriteName">Sprite name.</param>
     public static bool HasSprite(string categoryName, string spriteName)
     {
+        // NOTE! This method is a bad idea. Every time we want to know
+        // if a sprite exists we always want the sprite too
+        // So it's wastefull to check before
         Dictionary<string, Sprite> categorySprites;
         if (sprites.TryGetValue(categoryName, out categorySprites))
         {

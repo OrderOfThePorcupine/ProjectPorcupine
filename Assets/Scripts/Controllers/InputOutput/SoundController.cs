@@ -122,13 +122,12 @@ public class SoundController
         }
 
         clip.SetCooldown(cooldownTime);
-        if (!AudioManager.channelGroups.ContainsKey(chanGroup))
+        ChannelGroup channelGroup;
+        if (AudioManager.channelGroups.TryGetValue(chanGroup, out channelGroup) == false)
         {
-            chanGroup = "master";
+            channelGroup = AudioManager.channelGroups["master"];
         }
-
-        ChannelGroup channelGroup = AudioManager.channelGroups[chanGroup];
-
+        
         FMOD.System soundSystem = AudioManager.SoundSystem;
         Channel channel;
         soundSystem.playSound(clip.Get(), channelGroup, true, out channel);
@@ -268,9 +267,10 @@ public class SoundController
 
     public void SetVolume(string channel, float volume)
     {
-        if (AudioManager.channelGroups.ContainsKey(channel))
+        ChannelGroup group;
+        if (AudioManager.channelGroups.TryGetValue(channel, out group))
         {
-            AudioManager.channelGroups[channel].setVolume(volume);
+            group.setVolume(volume);
         }
         else
         {
@@ -285,10 +285,11 @@ public class SoundController
 
     public float GetVolume(string channel)
     {
-        if (AudioManager.channelGroups.ContainsKey(channel))
+        ChannelGroup group;
+        if (AudioManager.channelGroups.TryGetValue(channel, out group))
         {
             float volume = 0;
-            AudioManager.channelGroups[channel].getVolume(out volume);
+            group.getVolume(out volume);
             return volume;
         }
         else
