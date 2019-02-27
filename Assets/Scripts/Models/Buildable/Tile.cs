@@ -422,7 +422,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public bool IsReachableFromAnyNeighbor(bool checkDiagonals = false)
     {
         bool reachableFromSameLevel = GetNeighbours(checkDiagonals).Any(tile => tile != null && tile.MovementCost > 0 && (checkDiagonals == false || IsClippingCorner(tile) == false));
-        bool reachableVertically = GetVerticalNeighbors().Length > 0;
+        bool reachableVertically = GetVerticalNeighbors().Any(tile => tile.IsEnterable() != Enterability.Never);
         return reachableFromSameLevel || reachableVertically;
     }
 
@@ -545,13 +545,13 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public void OnEnter()
     {
         WalkCount++;
-        ReportTileChanged();
+        ReportTileChanged(false);
     }
 
     public void OnTileClean()
     {
         WalkCount = 0;
-        ReportTileChanged();
+        ReportTileChanged(false);
     }
     #endregion
 
@@ -723,14 +723,23 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         }
 
         PathfindingCost = newCost;
+        ReportTileChanged(true);
     }
 
-    private void ReportTileChanged()
+    private void ReportTileChanged(bool informNeighbors = false)
     {
         // Call the callback and let things know we've changed.
         if (TileChanged != null)
         {
             TileChanged(this);
+        }
+
+        if (informNeighbors)
+        {
+            foreach (Tile neighbor in GetNeighbours(false, true, false))
+            {
+                neighbor.ReportTileChanged(false);
+            }
         }
 
         ForceTileUpdate = false;
