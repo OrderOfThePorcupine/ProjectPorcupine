@@ -17,6 +17,7 @@ public class TileSpriteController : BaseSpriteController<Tile>
     public Tilemap[] tilemaps;
     public TilemapRenderer[] tilemapRenderers;
     public UnityEngine.Tilemaps.Tile errorTile;
+    public UnityEngine.Tilemaps.Tile fogTile;
 
     public Dictionary<string, TileBase> TileLookup;
 
@@ -45,6 +46,11 @@ public class TileSpriteController : BaseSpriteController<Tile>
         errorTile.name = "ErrorTile";
         errorTile.color = Color.white;
 
+        fogTile = ScriptableObject.CreateInstance<UnityEngine.Tilemaps.Tile>();
+        fogTile.sprite = SpriteManager.CreateBlankSprite();
+        fogTile.name = "FogTile";
+        fogTile.color = Color.red;
+
         tilemaps = new Tilemap[world.Depth];
         tilemapRenderers = new TilemapRenderer[world.Depth];
         for (int z = 0; z < world.Depth; z++)
@@ -68,14 +74,7 @@ public class TileSpriteController : BaseSpriteController<Tile>
                 {
                     Tile worldTile = world.GetTileAt(x, y, z);
 
-                    TileBase tilemapTile;
-                    if (TileLookup.TryGetValue(worldTile.Type.Type, out tilemapTile) == false)
-                    {
-                        tilemapTile = errorTile;
-                        UnityDebugger.Debugger.LogWarningFormat("TileSpriteController", "Could not find graphics tile for type {0}", worldTile.Type.Type);
-                    }
-
-                    tiles[x + (y * world.Width)] = tilemapTile;
+                    tiles[x + (y * world.Width)] = DetermineTileBaseToUse(worldTile);
                 }
             }
 
@@ -98,20 +97,28 @@ public class TileSpriteController : BaseSpriteController<Tile>
     // This function should be called automatically whenever a tile's data gets changed.
     protected override void OnChanged(Tile tile)
     {
+        tilemaps[tile.Z].SetTile(new Vector3Int(tile.X, tile.Y, 0), DetermineTileBaseToUse(tile));
+    }
+
+    private TileBase DetermineTileBaseToUse(Tile tile)
+    {
         if (tile.Type == TileType.Empty)
         {
-            tilemaps[tile.Z].SetTile(new Vector3Int(tile.X, tile.Y, 0), null);
-            return;
+            return null;
         }
 
         TileBase tilemapTile;
-        if (TileLookup.TryGetValue(tile.Type.Type, out tilemapTile) == false)
+        if (tile.CanSee == false)
+        {
+            return fogTile;
+        }
+        else if (TileLookup.TryGetValue(tile.Type.Type, out tilemapTile) == false)
         {
             tilemapTile = errorTile;
             UnityDebugger.Debugger.LogWarningFormat("TileSpriteController", "Could not find graphics tile for type {0}", tile.Type.Type);
         }
 
-        tilemaps[tile.Z].SetTile(new Vector3Int(tile.X, tile.Y, 0), tilemapTile);
+        return tilemapTile;
     }
 
     protected override void OnRemoved(Tile tile)

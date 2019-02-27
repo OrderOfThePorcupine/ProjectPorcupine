@@ -16,6 +16,7 @@ using ProjectPorcupine.Entities;
 using ProjectPorcupine.PowerNetwork;
 using ProjectPorcupine.Rooms;
 using UnityEngine;
+using System.Collections.Generic;
 
 [MoonSharpUserData]
 public class World
@@ -29,8 +30,8 @@ public class World
     public TemperatureDiffusion temperature;
 
     // The pathfinding graph used to navigate our world map.
-    public Path_TileGraph tileGraph;
-    public Path_RoomGraph roomGraph;
+    private Path_TileGraph tileGraph;
+    private Path_RoomGraph roomGraph;
 
     // TODO: Most likely this will be replaced with a dedicated
     // class for managing job queues (plural!) that might also
@@ -60,8 +61,11 @@ public class World
         WorldGenerator.Instance.Generate(width, height, depth, this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
+        
         // Make one character.
-        CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
+        Character initialCharacter = CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
+
+        DetermineVisibility(initialCharacter.CurrTile);
     }
 
     /// <summary>
@@ -210,6 +214,32 @@ public class World
     public void InvalidateTileGraph()
     {
         tileGraph = null;
+    }
+
+    public Path_TileGraph GetTileGraph()
+    {
+        if (tileGraph == null)
+        {
+            tileGraph = new Path_TileGraph(this);
+        }
+        return tileGraph;
+    }
+
+    public void RegenerateGraphAtTile(Tile tile)
+    {
+        if (tileGraph != null)
+        {
+            tileGraph.RegenerateGraphAtTile(tile);
+        }
+    }
+
+    public Path_RoomGraph GetRoomGraph()
+    {
+        if (roomGraph == null)
+        {
+            roomGraph = new Path_RoomGraph(this);
+        }
+        return roomGraph;
     }
 
     /// <summary>
@@ -599,5 +629,37 @@ public class World
             tileGraph.RegenerateGraphAtTile(t);
             tileGraph.RegenerateGraphAtTile(t.Down());
         }
+    }
+
+    private void DetermineVisibility(Tile start)
+    {
+        Queue<Tile> roomsToVisit = new Queue<Tile>();
+
+        roomsToVisit.Enqueue(start);
+        Tile current;
+        do
+        {
+            current = roomsToVisit.Dequeue();
+
+            bool canEnterCurrent = current.IsEnterable() != Enterability.Never;
+
+            foreach (Tile neighbor in current.GetNeighbours(false, true, true))
+            {
+                if (neighbor == null || neighbor.CanSee)
+                {
+                    continue;
+                }
+
+                if (canEnterCurrent)
+                {
+                    neighbor.CanSee = true;
+                    if (roomsToVisit.Contains(neighbor) == false)
+                    {
+                        roomsToVisit.Enqueue(neighbor);
+                    }
+                }
+            }
+        }
+        while (roomsToVisit.Count > 0);
     }
 }

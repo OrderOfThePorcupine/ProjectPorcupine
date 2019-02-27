@@ -214,7 +214,7 @@ namespace ProjectPorcupine.Pathfinding
                 return false;
             }
 
-            Dictionary<Room, Path_Node<Room>> nodes = World.Current.roomGraph.nodes;
+            Dictionary<Room, Path_Node<Room>> nodes = World.Current.GetRoomGraph().nodes;
 
             List<int> roomsVisited = new List<int>(nodes.Count);
             Queue<Room> roomsToVisit = new Queue<Room>();
@@ -240,10 +240,9 @@ namespace ProjectPorcupine.Pathfinding
                     }
                 }
             }
-            while (currentRoom != goal && roomsToVisit.Count > 0);
+            while (roomsToVisit.Count > 0);
 
-            RoomPath_AStar roomResolver = new RoomPath_AStar(World.Current, start, RoomEvaluator(goal), RoomHeuristic());
-            return roomResolver.Length() > 1;
+            return false;
         }
 
         public static Room FindNearestRoom(Tile start)
