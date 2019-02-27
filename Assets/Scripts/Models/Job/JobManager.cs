@@ -233,9 +233,13 @@ public class JobManager
             return false;
         }
 
+        if (Pathfinder.IsRoomReachable(characterRoom,room))
+        {
+            return true;
+        }
+
         roomsToCheck.Add(room);
 
-        // TODO: Check for room pathing here. If there is a pathway, return true, otherwise return false.
         return true;
     }
 }
