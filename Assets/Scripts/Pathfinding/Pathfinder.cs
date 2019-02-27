@@ -197,7 +197,7 @@ namespace ProjectPorcupine.Pathfinding
 
         public static List<Room> FindPathToRoom(Room start, Room goal) 
         {
-            if(start == null || goal || null)
+            if(start == null || goal == null)
             {
                 return null;
             }
@@ -210,7 +210,7 @@ namespace ProjectPorcupine.Pathfinding
         public static bool IsRoomReachable(Room start, Room goal)
         {
 
-            if(start == null || goal || null)
+            if(start == null || goal == null)
             {
                 return false;
             }
