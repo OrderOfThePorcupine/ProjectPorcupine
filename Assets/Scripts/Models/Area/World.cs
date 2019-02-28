@@ -177,6 +177,32 @@ public class World
     /// <value>The camera data.</value>
     public CameraData CameraData { get; private set; }
 
+    public Path_TileGraph TileGraph
+    {
+        get
+        {
+            if (tileGraph == null)
+            {
+                tileGraph = new Path_TileGraph(this);
+            }
+
+            return tileGraph;
+        }
+    }
+
+    public Path_RoomGraph RoomGraph
+    {
+        get
+        {
+            if (roomGraph == null)
+            {
+                roomGraph = new Path_RoomGraph(this);
+            }
+
+            return roomGraph;
+        }
+    }
+
     /// <summary>
     /// Adds the listeners to the required Time Manager events.
     /// </summary>
@@ -215,37 +241,11 @@ public class World
         tileGraph = null;
     }
 
-    public Path_TileGraph TileGraph
-    {
-        get
-        {
-            if (tileGraph == null)
-            {
-                tileGraph = new Path_TileGraph(this);
-            }
-
-            return tileGraph;
-        }
-    }
-
     public void RegenerateGraphAtTile(Tile tile)
     {
         if (tileGraph != null)
         {
             tileGraph.RegenerateGraphAtTile(tile);
-        }
-    }
-
-    public Path_RoomGraph RoomGraph
-    {
-        get
-        {
-            if (roomGraph == null)
-            {
-                roomGraph = new Path_RoomGraph(this);
-            }
-
-            return roomGraph;
         }
     }
 
