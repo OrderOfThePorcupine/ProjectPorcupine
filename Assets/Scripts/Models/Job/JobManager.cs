@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.Pathfinding;
+using ProjectPorcupine.Rooms;
 
 public class JobManager
 {
@@ -94,9 +95,15 @@ public class JobManager
 
                 Job.JobPriority bestJobPriority = Job.JobPriority.Low;
 
+                // This loop finds the highest priority in the given category
                 foreach (Job job in jobQueue[category])
                 {
                     if (job.IsActive == false || job.IsBeingWorked == true)
+                    {
+                        continue;
+                    }
+
+                    if (CanJobRun(job, character.CurrTile.GetNearestRoom()) == false)
                     {
                         continue;
                     }
@@ -118,14 +125,11 @@ public class JobManager
                         continue;
                     }
 
-                    if (CanJobRun(job))
+                    float pathtime = Pathfinder.FindMinPathTime(character.CurrTile, job.tile, job.adjacent, bestJobPathtime);
+                    if (pathtime < bestJobPathtime)
                     {
-                        float pathtime = Pathfinder.FindMinPathTime(character.CurrTile, job.tile, job.adjacent, bestJobPathtime);
-                        if (pathtime < bestJobPathtime)
-                        {
-                            bestJob = job;
-                            bestJobPathtime = pathtime;
-                        }
+                        bestJob = job;
+                        bestJobPathtime = pathtime;
                     }
                 }
 
@@ -169,7 +173,7 @@ public class JobManager
         }
     }
 
-    private bool CanJobRun(Job job)
+    private bool CanJobRun(Job job, Room characterRoom)
     {
         // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
         if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
@@ -183,11 +187,29 @@ public class JobManager
 
             return false;
         }
-        else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
-            job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
+        else if (job.tile != null)
         {
+            List<Room> roomsChecked = new List<Room>();
+
+            if ((job.adjacent == false && job.tile.IsEnterable() != Enterability.Never) ||
+                (job.adjacent && job.tile.IsReachableFromAnyNeighbor(false)))
+            {
+                if (CanReachRoom(job.tile.Room, roomsChecked, characterRoom))
+                {
+                    return true;
+                }
+
+                foreach (Tile neighbor in job.tile.GetNeighbours(false))
+                {
+                    if (CanReachRoom(neighbor.Room, roomsChecked, characterRoom))
+                    {
+                        return true;
+                    }
+                }
+            }
+
             // No one can reach the job.
-            job.Suspend();
+            job.SuspendCantReach();
             if (JobModified != null)
             {
                 JobModified(job);
@@ -196,6 +218,24 @@ public class JobManager
             return false;
         }
 
+        return true;
+    }
+
+    private bool CanReachRoom(Room room, List<Room> roomsToCheck, Room characterRoom)
+    {
+        if (room == null)
+        {
+            return false;
+        }
+
+        if (roomsToCheck.Contains(room))
+        {
+            return false;
+        }
+
+        roomsToCheck.Add(room);
+
+        // TODO: Check for room pathing here. If there is a pathway, return true, otherwise return false.
         return true;
     }
 }

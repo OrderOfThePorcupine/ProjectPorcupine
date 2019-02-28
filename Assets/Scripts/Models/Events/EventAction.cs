@@ -67,12 +67,14 @@ public class EventActions
     /// <param name="luaFunc">Lua function to add to list of actions.</param>
     public void Register(string actionName, string luaFunc)
     {
-        if (!actionsList.ContainsKey(actionName) || actionsList[actionName] == null)
+        List<string> actions;
+        if (actionsList.TryGetValue(actionName, out actions) == false || actions == null)
         {
-            actionsList[actionName] = new List<string>();
+            actions = new List<string>();
+            actionsList[actionName] = actions;
         }
 
-        actionsList[actionName].Add(luaFunc);
+        actions.Add(luaFunc);
     }
 
     /// <summary>
@@ -82,12 +84,13 @@ public class EventActions
     /// <param name="luaFunc">Lua function to add to list of actions.</param>
     public void Deregister(string actionName, string luaFunc)
     {
-        if (!actionsList.ContainsKey(actionName) || actionsList[actionName] == null)
+        List<string> actions;
+        if (actionsList.TryGetValue(actionName, out actions) == false || actions == null)
         {
             return;
         }
 
-        actionsList[actionName].Remove(luaFunc);
+        actions.Remove(luaFunc);
     }
 
     /// <summary>
@@ -99,12 +102,10 @@ public class EventActions
     /// <param name="parameters">Parameters in question.  First one must be target instance. </param>
     public void Trigger(string actionName, params object[] parameters)
     {
-        if (!actionsList.ContainsKey(actionName) || actionsList[actionName] == null)
+        List<string> actions;
+        if (actionsList.TryGetValue(actionName, out actions) && actions != null)
         {
-        }
-        else
-        {
-            FunctionsManager.Get(parameters[0].GetType().Name).Call(actionsList[actionName], parameters);
+            FunctionsManager.Get(parameters[0].GetType().Name).Call(actions, parameters);
         }
     }
 
@@ -115,6 +116,7 @@ public class EventActions
     /// <param name="actionName">Action name.</param>
     public bool HasEvent(string actionName)
     {
+        // FIXME: 'Has' methods are generally a bad idea, should be 'TryGet' instead
         return actionsList.ContainsKey(actionName);
     }
 

@@ -99,21 +99,21 @@ public class UtilitySpriteController : BaseSpriteController<Utility>
     protected override void OnChanged(Utility util)
     {
         // Make sure the utility's graphics are correct.
-        if (objectGameObjectMap.ContainsKey(util) == false)
+        GameObject util_go;
+        if (objectGameObjectMap.TryGetValue(util, out util_go) == false)
         {
             UnityDebugger.Debugger.LogError("UtilitySpriteController", "OnUtilityChanged -- trying to change visuals for utility not in our map.");
             return;
         }
-
-        GameObject util_go = objectGameObjectMap[util];
-
+        
         util_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForUtility(util);
         util_go.GetComponent<SpriteRenderer>().color = util.Tint;
     }
         
     protected override void OnRemoved(Utility util)
     {
-        if (objectGameObjectMap.ContainsKey(util) == false)
+        GameObject util_go;
+        if (objectGameObjectMap.TryGetValue(util, out util_go) == false)
         {
             UnityDebugger.Debugger.LogError("UtilitySpriteController", "OnUtilityRemoved -- trying to change visuals for utility not in our map.");
             return;
@@ -121,7 +121,6 @@ public class UtilitySpriteController : BaseSpriteController<Utility>
 
         util.Changed -= OnChanged;
         util.Removed -= OnRemoved;
-        GameObject util_go = objectGameObjectMap[util];
         objectGameObjectMap.Remove(util);
         GameObject.Destroy(util_go);
     }

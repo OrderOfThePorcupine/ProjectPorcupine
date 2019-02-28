@@ -43,13 +43,9 @@ public class WorldGenerator
         }
     }
 
-    public void Generate(World world, int seed)
+    public void Generate(int width, int height, int depth, World world, int seed)
     {
         asteroidFloorType = TileType.Empty;
-
-        int width = world.Width;
-        int height = world.Height;
-        int depth = world.Depth;
 
         ReadXML(world);
         world.ResizeWorld(width, height, depth);

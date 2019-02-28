@@ -59,20 +59,10 @@ public static class Settings
             return;
         }
 
-        // If we already have a setting with the same name,
-        if (settingsDict.ContainsKey(key))
-        {
-            // update the setting.
-            settingsDict.Remove(key);
-            settingsDict.Add(key, value);
-            UnityDebugger.Debugger.Log("Settings", "Updated setting : " + key + " to value of " + value);
-        }
-        else
-        {
-            // add a new setting to the dict.
-            settingsDict.Add(key, value);
-            UnityDebugger.Debugger.Log("Settings", "Created new setting : " + key + " to value of " + value);
-        }
+        // If there wasn't a setting already, we are creating a new one
+        bool new_setting = settingsDict.Remove(key) == false;
+        settingsDict.Add(key, value);
+        UnityDebugger.Debugger.Log("Settings", (new_setting ? "Created new setting : " : "Updated setting : ") + key + " to value of " + value);
     }
 
     public static bool GetSetting<T>(string key, out T result)

@@ -14,13 +14,13 @@ namespace ProjectPorcupine.Pathfinding
     public class Cache
     {
         private const int MaxCacheSize = 20;
-
-        private List<CacheKey> pathAge;
+        
+        private CircularBuffer<CacheKey> oldPaths;
         private Dictionary<CacheKey, List<Tile>> pathLookup;
 
         public Cache()
         {
-            pathAge = new List<CacheKey>();
+            oldPaths = new CircularBuffer<CacheKey>(MaxCacheSize);
             pathLookup = new Dictionary<CacheKey, List<Tile>>(new CacheKeyEqualityComparer());
         }
 
@@ -28,29 +28,22 @@ namespace ProjectPorcupine.Pathfinding
         {
             CacheKey key = new CacheKey(path);
 
-            if (pathLookup.ContainsKey(key))
-            {
-                // Move path to last used
-                pathAge.Remove(key);
-                pathAge.Insert(0, key);
-            }
-            else
-            {
-                pathAge.Insert(0, key);
-                pathLookup[key] = path;
+            CacheKey oldKey = oldPaths.Enqueue(key);
 
-                EnforceMaxCount();
+            if (oldKey != null)
+            {
+                pathLookup.Remove(oldKey);
             }
         }
-
-        public bool Contains(CacheKey key)
+        
+        public bool TryGetPath(CacheKey key, out List<Tile> path)
         {
-            return pathLookup.ContainsKey(key);
+            return pathLookup.TryGetValue(key, out path);
         }
 
-        public bool Contains(Tile start, Tile end)
+        public bool TryGetPath(Tile start, Tile end, out List<Tile> path)
         {
-            return pathLookup.ContainsKey(new CacheKey(start, end));
+            return TryGetPath(new CacheKey(start, end), out path);
         }
 
         public List<Tile> GetPath(Tile start, Tile end)
@@ -62,18 +55,7 @@ namespace ProjectPorcupine.Pathfinding
         {
             return pathLookup[key];
         }
-
-        private void EnforceMaxCount()
-        {
-            while (pathLookup.Count > MaxCacheSize)
-            {
-                int index = pathAge.Count - 1;
-                CacheKey key = pathAge[index];
-                pathAge.RemoveAt(index);
-                pathLookup.Remove(key);
-            }
-        }
-
+        
         public class CacheKey
         {
             private Tile start;
@@ -127,6 +109,41 @@ namespace ProjectPorcupine.Pathfinding
             public int GetHashCode(CacheKey bx)
             {
                 return bx.GetHashCode();
+            }
+        }
+
+        /// <summary>
+        /// A fixed size circular buffer used by the pathfinding cache.
+        /// </summary>
+        /// <remarks>This class will only work with reference types. If this should support value types it needs to use Nullable<T>.</remarks>
+        /// <typeparam name="T">The type stored.</typeparam>
+        public class CircularBuffer<T> where T : class
+        {
+            private T[] buffer;
+            private int index;
+
+            public CircularBuffer(int size)
+            {
+                buffer = new T[size];
+                index = 0;
+            }
+
+            public T Enqueue(T newValue)
+            {
+                // Remove all references to this value and then add the value
+                IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    if (comparer.Equals(buffer[i], newValue))
+                    {
+                        buffer[i] = default(T);
+                    }
+                }
+
+                index = (index + 1) % buffer.Length;
+                T oldValue = buffer[index];
+                buffer[index] = newValue;
+                return oldValue;
             }
         }
     }

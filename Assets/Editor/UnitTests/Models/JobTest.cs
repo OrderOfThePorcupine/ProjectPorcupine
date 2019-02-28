@@ -25,7 +25,7 @@ public class JobTest
 
     private Character character;
 
-    [SetUp]
+    [OneTimeSetUp]
     public void Setup()
     {
         string buildOrderActionJson = @"{""Build"": {

@@ -50,7 +50,6 @@ public class World
     public World(int width, int height, int depth)
     {
         // Creates an empty world.
-        SetupWorld(width, height, depth);
         Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
         if (SceneController.NewWorldSize != Vector3.zero)
         {
@@ -58,11 +57,8 @@ public class World
         }
 
         UnityDebugger.Debugger.Log("World", "World Seed: " + Seed);
-        WorldGenerator.Instance.Generate(this, Seed);
+        WorldGenerator.Instance.Generate(width, height, depth, this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
-
-        tileGraph = new Path_TileGraph(this);
-        roomGraph = new Path_RoomGraph(this);
 
         // Make one character.
         CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
@@ -352,11 +348,7 @@ public class World
 
         RandomStateFromJson(worldJson["RandomState"]);
 
-        Width = (int)worldJson["Width"];
-        Height = (int)worldJson["Height"];
-        Depth = (int)worldJson["Depth"];
-
-        SetupWorld(Width, Height, Depth);
+        SetupWorld((int)worldJson["Width"], (int)worldJson["Height"],  (int)worldJson["Depth"]);
 
         RoomManager.FromJson(worldJson["Rooms"]);
         TilesFromJson(worldJson["Tiles"]);
@@ -442,18 +434,18 @@ public class World
         }
     }
 
-    private void SetupWorld(int width, int height, int depth)
+    private void SetupWorld(int width, int height, int depth) 
     {
-        // Set the current world to be this world.
-        // TODO: Do we need to do any cleanup of the old world?
-        Current = this;
-
         Width = width;
         Height = height;
         Depth = depth;
 
+        // Set the current world to be this world.
+        Current = this;
+
         tiles = new Tile[Width, Height, Depth];
 
+        // TODO: Do we need to do any cleanup of the old world?
         RoomManager = new RoomManager();
         RoomManager.Adding += (room) => roomGraph = null;
         RoomManager.Removing += (room) => roomGraph = null;

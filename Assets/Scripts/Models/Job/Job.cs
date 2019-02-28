@@ -367,14 +367,10 @@ public class Job : ISelectable
         }
     }
 
-    public void Suspend()
-    {
-        IsActive = false;
-    }
-
     public void SuspendCantReach()
     {
         World.Current.RoomManager.Removed += (room) => ClearCharCantReach();
+        tile.TileChanged += (tile) => ClearCharCantReach();
         Suspend();
     }
 
@@ -459,7 +455,8 @@ public class Job : ISelectable
 
         foreach (RequestedItem item in RequestedItems.Values)
         {
-            if (DeliveredItems.ContainsKey(item.Type) == false || item.AmountNeeded(DeliveredItems[item.Type]) > 0)
+            Inventory inventory;
+            if (DeliveredItems.TryGetValue(item.Type, out inventory) == false || item.AmountNeeded(inventory) > 0)
             {
                 return false;
             }
@@ -475,13 +472,19 @@ public class Job : ISelectable
 
     public int AmountDesiredOfInventoryType(string type)
     {
-        if (RequestedItems.ContainsKey(type) == false)
+        RequestedItem requestedItem;
+        if (RequestedItems.TryGetValue(type, out requestedItem) == false)
         {
             return 0;
         }
 
-        Inventory inventory = DeliveredItems.ContainsKey(type) ? DeliveredItems[type] : null;
-        return RequestedItems[type].AmountDesired(inventory);
+        Inventory inventory;
+        if (DeliveredItems.TryGetValue(type, out inventory) == false)
+        {
+            inventory = null;
+        }
+
+        return requestedItem.AmountDesired(inventory);
     }
 
     public bool IsRequiredInventoriesAvailable()
@@ -541,7 +544,11 @@ public class Job : ISelectable
     {
         foreach (RequestedItem item in RequestedItems.Values)
         {
-            Inventory inventory = DeliveredItems.ContainsKey(item.Type) ? DeliveredItems[item.Type] : null;
+            Inventory inventory;
+            if (DeliveredItems.TryGetValue(item.Type, out inventory) == false)
+            {
+                inventory = null;
+            }
 
             if (item.DesiresMore(inventory))
             {
@@ -632,6 +639,12 @@ public class Job : ISelectable
     /// </summary>
     public void ClearCharCantReach()
     {
+        World.Current.RoomManager.Removed -= (room) => ClearCharCantReach();
+        if (tile != null)
+        {
+            tile.TileChanged -= (tile) => ClearCharCantReach();
+        }
+
         charsCantReach.Clear();
         IsActive = true;
     }
@@ -639,5 +652,10 @@ public class Job : ISelectable
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
+    }
+
+    private void Suspend()
+    {
+        IsActive = false;
     }
 }

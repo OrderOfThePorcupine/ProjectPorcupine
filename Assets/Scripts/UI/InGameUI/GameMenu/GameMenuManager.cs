@@ -105,12 +105,15 @@ public class GameMenuManager : IEnumerable<GameMenuItem>
         else
         {
             GameMenuItem menuItem = new GameMenuItem(key, callback);
-            if (itemsToAdd.ContainsKey(afterKey) == false)
+
+            List<GameMenuItem> items;
+            if (itemsToAdd.TryGetValue(afterKey, out items) == false)
             {
-                itemsToAdd[afterKey] = new List<GameMenuItem>();
+                items = new List<GameMenuItem>();
+                itemsToAdd[afterKey] = items;
             }
 
-            itemsToAdd[afterKey].Add(menuItem);
+            items.Add(menuItem);
         }
     }
 
@@ -148,7 +151,7 @@ public class GameMenuManager : IEnumerable<GameMenuItem>
     private void AddFromItemsToAdd(string key, int position)
     {
         List<GameMenuItem> items;
-        if (itemsToAdd.TryGetValue(key, out items))
+        if (itemsToAdd.TryGetValue(key, out items) && items.Count > 0)
         {
             for (int i = items.Count - 1; i >= 0; i--)
             {
