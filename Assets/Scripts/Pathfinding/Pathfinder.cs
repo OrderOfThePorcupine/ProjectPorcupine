@@ -214,7 +214,7 @@ namespace ProjectPorcupine.Pathfinding
                 return false;
             }
 
-            Dictionary<Room, Path_Node<Room>> nodes = World.Current.GetRoomGraph().nodes;
+            Dictionary<Room, Path_Node<Room>> nodes = World.Current.RoomGraph.nodes;
 
             List<int> roomsVisited = new List<int>(nodes.Count);
             Queue<Room> roomsToVisit = new Queue<Room>();

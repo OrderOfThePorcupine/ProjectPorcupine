@@ -39,7 +39,7 @@ public class Path_AStar
         // just turns this into an over-engineered Dijkstra's algo
 
         // A dictionary of all valid, walkable nodes.
-        Dictionary<Tile, Path_Node<Tile>> nodes = world.GetTileGraph().nodes;
+        Dictionary<Tile, Path_Node<Tile>> nodes = world.TileGraph.nodes;
 
         // Make sure our start/end tiles are in the list of nodes!
         Path_Node<Tile> start;

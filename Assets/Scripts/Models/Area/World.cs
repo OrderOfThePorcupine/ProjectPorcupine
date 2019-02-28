@@ -215,14 +215,17 @@ public class World
         tileGraph = null;
     }
 
-    public Path_TileGraph GetTileGraph()
+    public Path_TileGraph TileGraph
     {
-        if (tileGraph == null)
+        get
         {
-            tileGraph = new Path_TileGraph(this);
-        }
+            if (tileGraph == null)
+            {
+                tileGraph = new Path_TileGraph(this);
+            }
 
-        return tileGraph;
+            return tileGraph;
+        }
     }
 
     public void RegenerateGraphAtTile(Tile tile)
@@ -233,14 +236,17 @@ public class World
         }
     }
 
-    public Path_RoomGraph GetRoomGraph()
+    public Path_RoomGraph RoomGraph
     {
-        if (roomGraph == null)
+        get
         {
-            roomGraph = new Path_RoomGraph(this);
-        }
+            if (roomGraph == null)
+            {
+                roomGraph = new Path_RoomGraph(this);
+            }
 
-        return roomGraph;
+            return roomGraph;
+        }
     }
 
     /// <summary>

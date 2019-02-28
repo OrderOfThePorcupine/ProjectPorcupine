@@ -46,7 +46,7 @@ public class RoomPath_AStar
         // just turns this into an over-engineered Dijkstra's algo
 
         // A dictionary of all valid, walkable nodes.
-        Dictionary<Room, Path_Node<Room>> nodes = world.GetRoomGraph().nodes;
+        Dictionary<Room, Path_Node<Room>> nodes = world.RoomGraph.nodes;
 
         // Make sure our start/end tiles are in the list of nodes!
         if (nodes.ContainsKey(roomStart) == false)
