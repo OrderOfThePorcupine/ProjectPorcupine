@@ -617,13 +617,12 @@ public class Job : ISelectable
         if (!charsCantReach.Contains(character))
         {
             charsCantReach.Add(character);
-            
         }
     }
 
     public bool CanCharacterReach(Character character)
     {
-        return false == charsCantReach.Contains(character);
+        return charsCantReach.Contains(character) == false;
     }
 
     /// <summary>
@@ -710,6 +709,7 @@ public class Job : ISelectable
                 // No one can reach the job.
                 SuspendCantReach();
             }
+
             return JobState.CantReach;
         }
 
