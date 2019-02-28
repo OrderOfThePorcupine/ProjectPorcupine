@@ -240,9 +240,9 @@ public class JobManager
             return false;
         }
 
-        if (Pathfinder.IsRoomReachable(characterRoom, room))
+        if (Pathfinder.IsRoomReachable(characterRoom, room) == false)
         {
-            return true;
+            return false;
         }
 
         roomsToCheck.Add(room);
