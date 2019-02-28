@@ -173,6 +173,12 @@ public class JobManager
         }
     }
 
+    /// <summary>
+    /// Checks to see if a job can run, and suspends if it can't
+    /// </summary>
+    /// <param name="job">The job that should be tested.</param>
+    /// <param name="characterRoom">Room character is in.</param>
+    /// <returns>true if the job can be run.</returns>
     private bool CanJobRun(Job job, Room characterRoom)
     {
         // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
@@ -191,8 +197,9 @@ public class JobManager
         {
             List<Room> roomsChecked = new List<Room>();
 
-            if ((job.adjacent == false && job.tile.IsEnterable() != Enterability.Never) ||
-                (job.adjacent && job.tile.IsReachableFromAnyNeighbor(false)))
+            if (((job.adjacent == false && job.tile.IsEnterable() != Enterability.Never) ||
+                (job.adjacent && job.tile.IsReachableFromAnyNeighbor(false))) &&
+                job.tile.CanSee)
             {
                 if (CanReachRoom(job.tile.Room, roomsChecked, characterRoom))
                 {

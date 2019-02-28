@@ -49,7 +49,7 @@ public class TileSpriteController : BaseSpriteController<Tile>
         fogTile = ScriptableObject.CreateInstance<UnityEngine.Tilemaps.Tile>();
         fogTile.sprite = SpriteManager.CreateBlankSprite();
         fogTile.name = "FogTile";
-        fogTile.color = Color.red;
+        fogTile.color = Color.gray;
 
         tilemaps = new Tilemap[world.Depth];
         tilemapRenderers = new TilemapRenderer[world.Depth];
@@ -123,16 +123,5 @@ public class TileSpriteController : BaseSpriteController<Tile>
 
     protected override void OnRemoved(Tile tile)
     {
-    }
-
-    private void ChangeTileSprite(GameObject tile_go, string name)
-    {
-        // TODO How to manage if not all of the names are present?
-        tile_go.GetComponent<SpriteRenderer>().sprite = SpriteManager.GetSprite("Tile", name);
-    }
-
-    private bool DoesTileSpriteExist(string name)
-    {
-        return SpriteManager.HasSprite("Tile", name);
     }
 }
