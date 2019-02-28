@@ -82,16 +82,18 @@ namespace ProjectPorcupine.Entities.States
                     break;
 
                 case HaulAction.DeliverMaterial:
-                    path = Pathfinder.FindPath(character.CurrTile, Job.IsTileAtJobSite, Pathfinder.DefaultDistanceHeuristic(Job.tile));
-                    if (path != null && path.Count > 0)
+                    if (Job.CanJobRun(character.CurrTile.Room, false) == Job.JobState.Active)
                     {
-                        character.SetState(new MoveState(character, Pathfinder.GoalTileEvaluator(path.Last(), false), path, this));
+                        path = Pathfinder.FindPath(character.CurrTile, Job.IsTileAtJobSite, Pathfinder.DefaultDistanceHeuristic(Job.tile));
+                        if (path != null && path.Count > 0)
+                        {
+                            character.SetState(new MoveState(character, Pathfinder.GoalTileEvaluator(path.Last(), false), path, this));
+                            break;
+                        }
                     }
-                    else
-                    {
-                        Job.AddCharCantReach(character);
-                        character.InterruptState();
-                    }
+
+                    Job.AddCharCantReach(character);
+                    character.InterruptState();
 
                     break;
 

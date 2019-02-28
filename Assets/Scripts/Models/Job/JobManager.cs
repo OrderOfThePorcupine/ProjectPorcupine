@@ -103,8 +103,13 @@ public class JobManager
                         continue;
                     }
 
-                    if (CanJobRun(job, character.CurrTile.GetNearestRoom()) == false)
+                    if (job.CanJobRun(character.CurrTile.GetNearestRoom(), true) != Job.JobState.Active)
                     {
+                        if (JobModified != null)
+                        {
+                            JobModified(job);
+                        }
+
                         continue;
                     }
 
@@ -171,82 +176,5 @@ public class JobManager
                 yield return job;
             }
         }
-    }
-
-    /// <summary>
-    /// Checks to see if a job can run, and suspends if it can't.
-    /// </summary>
-    /// <param name="job">The job that should be tested.</param>
-    /// <param name="characterRoom">Room character is in.</param>
-    /// <returns>true if the job can be run.</returns>
-    private bool CanJobRun(Job job, Room characterRoom)
-    {
-        // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
-        if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
-        {
-            string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            job.SuspendWaitingForInventory(missing);
-            if (JobModified != null)
-            {
-                JobModified(job);
-            }
-
-            return false;
-        }
-        else if (job.tile != null)
-        {
-            List<Room> roomsChecked = new List<Room>();
-
-            if (((job.adjacent == false && job.tile.IsEnterable() != Enterability.Never) ||
-                (job.adjacent && job.tile.IsReachableFromAnyNeighbor(false))) &&
-                job.tile.CanSee)
-            {
-                if (CanReachRoom(job.tile.Room, roomsChecked, characterRoom))
-                {
-                    return true;
-                }
-
-                foreach (Tile neighbor in job.tile.GetNeighbours(false))
-                {
-                    if (CanReachRoom(neighbor.Room, roomsChecked, characterRoom))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            // No one can reach the job.
-            job.SuspendCantReach();
-            if (JobModified != null)
-            {
-                JobModified(job);
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool CanReachRoom(Room room, List<Room> roomsToCheck, Room characterRoom)
-    {
-        if (room == null)
-        {
-            return false;
-        }
-
-        if (roomsToCheck.Contains(room))
-        {
-            return false;
-        }
-
-        if (Pathfinder.IsRoomReachable(characterRoom, room) == false)
-        {
-            return false;
-        }
-
-        roomsToCheck.Add(room);
-
-        return true;
     }
 }
