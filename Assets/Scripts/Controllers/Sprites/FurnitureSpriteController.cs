@@ -143,9 +143,18 @@ public class FurnitureSpriteController : BaseSpriteController<Furniture>
         }
 
         SpriteRenderer sr = furn_go.AddComponent<SpriteRenderer>();
-        sr.sprite = GetSpriteForFurniture(furniture);
+        if (furniture.Tile.CanSee)
+        {
+            sr.sprite = GetSpriteForFurniture(furniture);
+            sr.color = furniture.Tint;
+        }
+        else
+        {
+            sr.sprite = SpriteManager.CreateBlankSprite();
+            sr.color = Color.gray;
+        }
+
         sr.sortingLayerName = "Furniture";
-        sr.color = furniture.Tint;
 
         furn_go.name = furniture.Type + "_" + furniture.Tile.X + "_" + furniture.Tile.Y;
         furn_go.transform.position = furniture.Tile.Vector3 + ImageUtils.SpritePivotOffset(sr.sprite, furniture.Rotation);

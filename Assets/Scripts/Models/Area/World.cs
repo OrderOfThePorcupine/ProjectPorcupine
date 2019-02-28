@@ -7,6 +7,7 @@
 // ====================================================
 #endregion
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MoonSharp.Interpreter;
@@ -28,15 +29,15 @@ public class World
     // Store all temperature information
     public TemperatureDiffusion temperature;
 
-    // The pathfinding graph used to navigate our world map.
-    public Path_TileGraph tileGraph;
-    public Path_RoomGraph roomGraph;
-
     // TODO: Most likely this will be replaced with a dedicated
     // class for managing job queues (plural!) that might also
     // be semi-static or self initializing or some damn thing.
     // For now, this is just a PUBLIC member of World
     public JobManager jobManager;
+
+    // The pathfinding graph used to navigate our world map.
+    private Path_TileGraph tileGraph;
+    private Path_RoomGraph roomGraph;
 
     // A three-dimensional array to hold our tile data.
     private Tile[,,] tiles;
@@ -61,7 +62,9 @@ public class World
         UnityDebugger.Debugger.Log("World", "Generated World");
 
         // Make one character.
-        CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
+        Character initialCharacter = CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
+
+        DetermineVisibility(initialCharacter.CurrTile);
     }
 
     /// <summary>
@@ -174,6 +177,32 @@ public class World
     /// <value>The camera data.</value>
     public CameraData CameraData { get; private set; }
 
+    public Path_TileGraph TileGraph
+    {
+        get
+        {
+            if (tileGraph == null)
+            {
+                tileGraph = new Path_TileGraph(this);
+            }
+
+            return tileGraph;
+        }
+    }
+
+    public Path_RoomGraph RoomGraph
+    {
+        get
+        {
+            if (roomGraph == null)
+            {
+                roomGraph = new Path_RoomGraph(this);
+            }
+
+            return roomGraph;
+        }
+    }
+
     /// <summary>
     /// Adds the listeners to the required Time Manager events.
     /// </summary>
@@ -210,6 +239,14 @@ public class World
     public void InvalidateTileGraph()
     {
         tileGraph = null;
+    }
+
+    public void RegenerateGraphAtTile(Tile tile)
+    {
+        if (tileGraph != null)
+        {
+            tileGraph.RegenerateGraphAtTile(tile);
+        }
     }
 
     /// <summary>
@@ -599,5 +636,37 @@ public class World
             tileGraph.RegenerateGraphAtTile(t);
             tileGraph.RegenerateGraphAtTile(t.Down());
         }
+    }
+
+    private void DetermineVisibility(Tile start)
+    {
+        Queue<Tile> roomsToVisit = new Queue<Tile>();
+
+        roomsToVisit.Enqueue(start);
+        Tile current;
+        do
+        {
+            current = roomsToVisit.Dequeue();
+
+            bool canEnterCurrent = current.IsEnterable() != Enterability.Never;
+
+            foreach (Tile neighbor in current.GetNeighbours(false, true, true))
+            {
+                if (neighbor == null || neighbor.CanSee)
+                {
+                    continue;
+                }
+
+                if (canEnterCurrent)
+                {
+                    neighbor.CanSee = true;
+                    if (roomsToVisit.Contains(neighbor) == false)
+                    {
+                        roomsToVisit.Enqueue(neighbor);
+                    }
+                }
+            }
+        }
+        while (roomsToVisit.Count > 0);
     }
 }

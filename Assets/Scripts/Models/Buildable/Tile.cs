@@ -40,6 +40,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         X = x;
         Y = y;
         Z = z;
+        CanSee = false;
         Characters = new List<Character>();
         MovementModifier = 1;
         Utilities = new Dictionary<string, Utility>();
@@ -99,6 +100,8 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public int Z { get; private set; }
 
     public float MovementModifier { get; set; }
+
+    public bool CanSee { get; set; }
 
     public float MovementCost
     {
@@ -181,6 +184,8 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
                 Tile tile = World.Current.GetTileAt(x_off, y_off, Z);
                 tile.Furniture = null;
                 UpdatePathfindingCost();
+
+                SetCanSee();
             }
         }
 
@@ -545,13 +550,13 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public void OnEnter()
     {
         WalkCount++;
-        ReportTileChanged(false);
+        ReportTileChanged();
     }
 
     public void OnTileClean()
     {
         WalkCount = 0;
-        ReportTileChanged(false);
+        ReportTileChanged();
     }
     #endregion
 
@@ -723,23 +728,33 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         }
 
         PathfindingCost = newCost;
-        ReportTileChanged(true);
     }
 
-    private void ReportTileChanged(bool informNeighbors = false)
+    private void SetCanSee()
+    {
+        CanSee = true;
+        ReportTileChanged();
+
+        if (IsEnterable() == Enterability.Never)
+        {
+            return;
+        }
+
+        foreach (Tile neighbor in GetNeighbours(false, true, false))
+        {
+            if (neighbor.CanSee == false)
+            {
+                neighbor.SetCanSee();
+            }
+        }
+    }
+
+    private void ReportTileChanged()
     {
         // Call the callback and let things know we've changed.
         if (TileChanged != null)
         {
             TileChanged(this);
-        }
-
-        if (informNeighbors)
-        {
-            foreach (Tile neighbor in GetNeighbours(false, true, false))
-            {
-                neighbor.ReportTileChanged(false);
-            }
         }
 
         ForceTileUpdate = false;

@@ -98,13 +98,18 @@ public class JobManager
                 // This loop finds the highest priority in the given category
                 foreach (Job job in jobQueue[category])
                 {
-                    if (job.IsActive == false || job.IsBeingWorked == true)
+                    if (job.IsActive == false || job.IsBeingWorked == true || job.CanCharacterReach(character) == false)
                     {
                         continue;
                     }
 
-                    if (CanJobRun(job, character.CurrTile.GetNearestRoom()) == false)
+                    if (job.CanJobRun(character.CurrTile.GetNearestRoom(), true) != Job.JobState.Active)
                     {
+                        if (JobModified != null)
+                        {
+                            JobModified(job);
+                        }
+
                         continue;
                     }
 
@@ -171,71 +176,5 @@ public class JobManager
                 yield return job;
             }
         }
-    }
-
-    private bool CanJobRun(Job job, Room characterRoom)
-    {
-        // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
-        if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
-        {
-            string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            job.SuspendWaitingForInventory(missing);
-            if (JobModified != null)
-            {
-                JobModified(job);
-            }
-
-            return false;
-        }
-        else if (job.tile != null)
-        {
-            List<Room> roomsChecked = new List<Room>();
-
-            if ((job.adjacent == false && job.tile.IsEnterable() != Enterability.Never) ||
-                (job.adjacent && job.tile.IsReachableFromAnyNeighbor(false)))
-            {
-                if (CanReachRoom(job.tile.Room, roomsChecked, characterRoom))
-                {
-                    return true;
-                }
-
-                foreach (Tile neighbor in job.tile.GetNeighbours(false))
-                {
-                    if (CanReachRoom(neighbor.Room, roomsChecked, characterRoom))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            // No one can reach the job.
-            job.SuspendCantReach();
-            if (JobModified != null)
-            {
-                JobModified(job);
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool CanReachRoom(Room room, List<Room> roomsToCheck, Room characterRoom)
-    {
-        if (room == null)
-        {
-            return false;
-        }
-
-        if (roomsToCheck.Contains(room))
-        {
-            return false;
-        }
-
-        roomsToCheck.Add(room);
-
-        // TODO: Check for room pathing here. If there is a pathway, return true, otherwise return false.
-        return true;
     }
 }

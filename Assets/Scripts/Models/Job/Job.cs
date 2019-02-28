@@ -11,11 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
-using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.Localization;
 using ProjectPorcupine.Pathfinding;
+using ProjectPorcupine.Rooms;
 using UnityEngine;
 
 [MoonSharpUserData]
@@ -179,6 +179,14 @@ public class Job : ISelectable
         High,
         Medium,
         Low
+    }
+
+    public enum JobState
+    {
+        Active,
+        CantReach,
+        MissingInventory,
+        Suspended
     }
 
     // The items needed to do this job.
@@ -392,6 +400,7 @@ public class Job : ISelectable
     {
         IsActive = true;
         World.Current.InventoryManager.InventoryCreated -= InventoryAvailable;
+        World.Current.InventoryManager.UnregisterInventoryTypeCreated(CheckIfInventorySufficient, inventory.Type);
     }
 
     public bool CheckIfInventorySufficient(Inventory inventory)
@@ -613,7 +622,7 @@ public class Job : ISelectable
 
     public bool CanCharacterReach(Character character)
     {
-        return charsCantReach.Contains(character);
+        return charsCantReach.Contains(character) == false;
     }
 
     /// <summary>
@@ -652,6 +661,81 @@ public class Job : ISelectable
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
+    }
+
+    /// <summary>
+    /// Checks to see if a job can run, and suspends if it can't.
+    /// </summary>
+    /// <param name="characterRoom">Room character is in.</param>
+    /// <param name="changeState">If true allows changing the state.</param>
+    /// <returns>true if the job can be run.</returns>
+    public JobState CanJobRun(Room characterRoom, bool changeState)
+    {
+        // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
+        if (RequestedItems.Count > 0 && GetFirstFulfillableInventoryRequirement() == null)
+        {
+            if (changeState)
+            {
+                string missing = acceptsAny ? "*" : GetFirstDesiredItem().Type;
+                SuspendWaitingForInventory(missing);
+            }
+
+            return JobState.MissingInventory;
+        }
+        else if (tile != null)
+        {
+            List<Room> roomsChecked = new List<Room>();
+
+            if (((adjacent == false && tile.IsEnterable() != Enterability.Never) ||
+                (adjacent && tile.IsReachableFromAnyNeighbor(false))) &&
+                tile.CanSee)
+            {
+                if (CanReachRoom(tile.Room, roomsChecked, characterRoom))
+                {
+                    return JobState.Active;
+                }
+
+                foreach (Tile neighbor in tile.GetNeighbours(false))
+                {
+                    if (CanReachRoom(neighbor.Room, roomsChecked, characterRoom))
+                    {
+                        return JobState.Active;
+                    }
+                }
+            }
+
+            if (changeState)
+            {
+                // No one can reach the job.
+                SuspendCantReach();
+            }
+
+            return JobState.CantReach;
+        }
+
+        return JobState.Active;
+    }
+
+    private bool CanReachRoom(Room room, List<Room> roomsToCheck, Room characterRoom)
+    {
+        if (room == null)
+        {
+            return false;
+        }
+
+        if (roomsToCheck.Contains(room))
+        {
+            return false;
+        }
+
+        if (Pathfinder.IsRoomReachable(characterRoom, room) == false)
+        {
+            return false;
+        }
+
+        roomsToCheck.Add(room);
+
+        return true;
     }
 
     private void Suspend()

@@ -214,8 +214,35 @@ namespace ProjectPorcupine.Pathfinding
                 return false;
             }
 
-            RoomPath_AStar roomResolver = new RoomPath_AStar(World.Current, start, RoomEvaluator(goal), RoomHeuristic());
-            return roomResolver.Length() > 1;
+            Dictionary<Room, Path_Node<Room>> nodes = World.Current.RoomGraph.nodes;
+
+            List<int> roomsVisited = new List<int>(nodes.Count);
+            Queue<Room> roomsToVisit = new Queue<Room>();
+
+            roomsToVisit.Enqueue(start);
+            Room currentRoom;
+            do
+            {
+                currentRoom = roomsToVisit.Dequeue();
+                roomsVisited.Add(currentRoom.ID);
+
+                foreach (Path_Edge<Room> edge in nodes[currentRoom].edges)
+                {
+                    Room room = edge.node.data;
+                    if (room == goal)
+                    {
+                        return true;
+                    }
+
+                    if (roomsVisited.Contains(room.ID) == false && roomsToVisit.Contains(room) == false)
+                    {
+                        roomsToVisit.Enqueue(room);
+                    }
+                }
+            }
+            while (roomsToVisit.Count > 0);
+
+            return false;
         }
 
         public static Room FindNearestRoom(Tile start)

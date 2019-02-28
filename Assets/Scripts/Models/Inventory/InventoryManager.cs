@@ -59,7 +59,11 @@ public class InventoryManager
 
     public void UnregisterInventoryTypeCreated(InventoryOfTypeCreated func, string type)
     {
-        inventoryTypeCreated[type].Remove(func);
+        List<InventoryOfTypeCreated> list;
+        if (inventoryTypeCreated.TryGetValue(type, out list))
+        {
+            list.Remove(func);
+        }
     }
 
     public Tile GetFirstTileWithValidInventoryPlacement(int maxOffset, Tile inTile, Inventory inv)
