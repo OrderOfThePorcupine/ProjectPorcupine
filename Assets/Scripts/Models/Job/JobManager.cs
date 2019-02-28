@@ -98,7 +98,7 @@ public class JobManager
                 // This loop finds the highest priority in the given category
                 foreach (Job job in jobQueue[category])
                 {
-                    if (job.IsActive == false || job.IsBeingWorked == true)
+                    if (job.IsActive == false || job.IsBeingWorked == true || job.CanCharacterReach(character) == false)
                     {
                         continue;
                     }

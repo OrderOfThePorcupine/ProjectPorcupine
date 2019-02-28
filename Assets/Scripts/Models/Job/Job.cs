@@ -400,6 +400,7 @@ public class Job : ISelectable
     {
         IsActive = true;
         World.Current.InventoryManager.InventoryCreated -= InventoryAvailable;
+        World.Current.InventoryManager.UnregisterInventoryTypeCreated(CheckIfInventorySufficient, inventory.Type);
     }
 
     public bool CheckIfInventorySufficient(Inventory inventory)
@@ -616,6 +617,7 @@ public class Job : ISelectable
         if (!charsCantReach.Contains(character))
         {
             charsCantReach.Add(character);
+            
         }
     }
 
