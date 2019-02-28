@@ -7,6 +7,7 @@
 // ====================================================
 #endregion
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MoonSharp.Interpreter;
@@ -16,7 +17,6 @@ using ProjectPorcupine.Entities;
 using ProjectPorcupine.PowerNetwork;
 using ProjectPorcupine.Rooms;
 using UnityEngine;
-using System.Collections.Generic;
 
 [MoonSharpUserData]
 public class World
@@ -29,15 +29,15 @@ public class World
     // Store all temperature information
     public TemperatureDiffusion temperature;
 
-    // The pathfinding graph used to navigate our world map.
-    private Path_TileGraph tileGraph;
-    private Path_RoomGraph roomGraph;
-
     // TODO: Most likely this will be replaced with a dedicated
     // class for managing job queues (plural!) that might also
     // be semi-static or self initializing or some damn thing.
     // For now, this is just a PUBLIC member of World
     public JobManager jobManager;
+
+    // The pathfinding graph used to navigate our world map.
+    private Path_TileGraph tileGraph;
+    private Path_RoomGraph roomGraph;
 
     // A three-dimensional array to hold our tile data.
     private Tile[,,] tiles;
@@ -61,7 +61,6 @@ public class World
         WorldGenerator.Instance.Generate(width, height, depth, this, Seed);
         UnityDebugger.Debugger.Log("World", "Generated World");
 
-        
         // Make one character.
         Character initialCharacter = CharacterManager.Create(GetTileAt((Width / 2) - 1, Height / 2, 0));
 
@@ -222,6 +221,7 @@ public class World
         {
             tileGraph = new Path_TileGraph(this);
         }
+
         return tileGraph;
     }
 
@@ -239,6 +239,7 @@ public class World
         {
             roomGraph = new Path_RoomGraph(this);
         }
+
         return roomGraph;
     }
 

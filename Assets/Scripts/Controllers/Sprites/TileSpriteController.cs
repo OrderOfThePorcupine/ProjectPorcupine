@@ -100,6 +100,10 @@ public class TileSpriteController : BaseSpriteController<Tile>
         tilemaps[tile.Z].SetTile(new Vector3Int(tile.X, tile.Y, 0), DetermineTileBaseToUse(tile));
     }
 
+    protected override void OnRemoved(Tile tile)
+    {
+    }
+
     private TileBase DetermineTileBaseToUse(Tile tile)
     {
         if (tile.Type == TileType.Empty)
@@ -119,9 +123,5 @@ public class TileSpriteController : BaseSpriteController<Tile>
         }
 
         return tilemapTile;
-    }
-
-    protected override void OnRemoved(Tile tile)
-    {
     }
 }

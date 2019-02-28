@@ -174,7 +174,7 @@ public class JobManager
     }
 
     /// <summary>
-    /// Checks to see if a job can run, and suspends if it can't
+    /// Checks to see if a job can run, and suspends if it can't.
     /// </summary>
     /// <param name="job">The job that should be tested.</param>
     /// <param name="characterRoom">Room character is in.</param>
@@ -240,7 +240,7 @@ public class JobManager
             return false;
         }
 
-        if (Pathfinder.IsRoomReachable(characterRoom,room))
+        if (Pathfinder.IsRoomReachable(characterRoom, room))
         {
             return true;
         }

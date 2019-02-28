@@ -60,7 +60,7 @@ public static class SpriteManager
     /// <returns>The error sprite.</returns>
     public static Sprite CreateErrorSprite()
     {
-        noResourceTexture.SetPixel(0, 0, new Color32(255,0,255,255));
+        noResourceTexture.SetPixel(0, 0, new Color32(255, 0, 255, 255));
         return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
     }
 
