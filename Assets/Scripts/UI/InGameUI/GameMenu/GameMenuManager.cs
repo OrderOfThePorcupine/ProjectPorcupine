@@ -132,10 +132,7 @@ public class GameMenuManager : IEnumerable<GameMenuItem>
     /// <returns>Each menu item.</returns>
     IEnumerator<GameMenuItem> IEnumerable<GameMenuItem>.GetEnumerator()
     {
-        foreach (GameMenuItem menuItem in menuItems)
-        {
-            yield return menuItem;
-        }
+        return menuItems.GetEnumerator();
     }
 
     /// <summary>
