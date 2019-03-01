@@ -27,7 +27,7 @@ public class KeyboardManager
 
         TimeManager.Instance.EveryFrameNotModal += (time) => Update();
 
-        ReadXmlOrJsonAfterWeDecide();
+        ReadKeyboardMapping();
     }
 
     public static KeyboardManager Instance
@@ -66,9 +66,9 @@ public class KeyboardManager
         }
     }
 
-    public void ReadXmlOrJsonAfterWeDecide()
+    public void ReadKeyboardMapping()
     {
-        // mock data for now until xml vs json is decided
+        // mock data for now. Should be converted to something else (json?) 
         RegisterInputMapping("MoveCameraEast", KeyboardInputModifier.None, KeyCode.D, KeyCode.RightArrow);
         RegisterInputMapping("MoveCameraWest", KeyboardInputModifier.None, KeyCode.A, KeyCode.LeftArrow);
         RegisterInputMapping("MoveCameraNorth", KeyboardInputModifier.None, KeyCode.W, KeyCode.UpArrow);
