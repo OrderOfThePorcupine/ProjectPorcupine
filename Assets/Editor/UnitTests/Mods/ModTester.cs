@@ -6,19 +6,25 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using System;
 using NUnit.Framework;
 using ProjectPorcupine.Entities;
 
+[TestFixture]
 public class ModTester
 {
-    [SetUp]
+    [OneTimeSetUp]
     public void Setup()
     {
         FunctionsManager.Initialize();
         SpriteManager.Initialize();
         AudioManager.Initialize();
         CharacterNameManager.Initialize();
+    }
+
+    [OneTimeTearDown]
+    public void TearDown()
+    {
+        AudioManager.Destroy();
     }
 
     [Test]

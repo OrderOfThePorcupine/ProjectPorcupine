@@ -73,7 +73,9 @@ public class DialogBoxManager : MonoBehaviour
             dialogBoxQuests = tempGoObj.GetComponent<DialogBoxQuests>();
             DialogBoxes["Quests"] = dialogBoxQuests;
             AddQuestList();
+
             LoadModdedDialogBoxes();
+
             AddMainMenuItems();
         }
     }
@@ -84,10 +86,11 @@ public class DialogBoxManager : MonoBehaviour
     /// <param name="dialogName">The name of the dialog (a.k.a. the title of the dialog).</param>
     public DialogBox ShowDialogBoxByName(string dialogName)
     {
-        if (DialogBoxes.ContainsKey(dialogName))
+        DialogBox dialog;
+        if (DialogBoxes.TryGetValue(dialogName, out dialog))
         {
-            DialogBoxes[dialogName].ShowDialog();
-            return DialogBoxes[dialogName];
+            dialog.ShowDialog();
+            return dialog;
         }
         else
         {
@@ -114,7 +117,7 @@ public class DialogBoxManager : MonoBehaviour
     {
         GameMenuManager.Instance.AddMenuItem(
             "menu_work",
-            () => dialogBoxJobList.ShowDialog(),
+            () => dialogBoxJobList.ToggleDialog(),
             "menu_construction");
 
         GameMenuManager.Instance.AddMenuItem(
@@ -124,15 +127,12 @@ public class DialogBoxManager : MonoBehaviour
 
         GameMenuManager.Instance.AddMenuItem(
             "menu_quests",
-            () => dialogBoxQuests.ShowDialog(),
+            () => dialogBoxQuests.ToggleDialog(),
             "menu_world");
 
         GameMenuManager.Instance.AddMenuItem(
             "menu_options",
-            () =>
-            {
-                dialogBoxOptions.ShowDialog();
-            },
+            () => dialogBoxOptions.ToggleDialog(),
             "menu_quests");
     }
 

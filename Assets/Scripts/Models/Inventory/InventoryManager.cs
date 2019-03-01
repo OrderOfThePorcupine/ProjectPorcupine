@@ -47,17 +47,23 @@ public class InventoryManager
 
     public void RegisterInventoryTypeCreated(InventoryOfTypeCreated func, string type)
     {
-        if (inventoryTypeCreated.ContainsKey(type) == false)
+        List<InventoryOfTypeCreated> inventories;
+        if (inventoryTypeCreated.TryGetValue(type, out inventories) == false)
         {
-            inventoryTypeCreated[type] = new List<InventoryOfTypeCreated>();
+            inventories = new List<InventoryOfTypeCreated>();
+            inventoryTypeCreated[type] = inventories;
         }
 
-        inventoryTypeCreated[type].Add(func);
+        inventories.Add(func);
     }
 
     public void UnregisterInventoryTypeCreated(InventoryOfTypeCreated func, string type)
     {
-        inventoryTypeCreated[type].Remove(func);
+        List<InventoryOfTypeCreated> list;
+        if (inventoryTypeCreated.TryGetValue(type, out list))
+        {
+            list.Remove(func);
+        }
     }
 
     public Tile GetFirstTileWithValidInventoryPlacement(int maxOffset, Tile inTile, Inventory inv)
@@ -136,12 +142,14 @@ public class InventoryManager
         // We may also have to create a new stack on the tile, if the startTile was previously empty.
         if (tileWasEmpty)
         {
-            if (Inventories.ContainsKey(tile.Inventory.Type) == false)
+            List<Inventory> inventories;
+            if (Inventories.TryGetValue(tile.Inventory.Type, out inventories) == false)
             {
-                Inventories[tile.Inventory.Type] = new List<Inventory>();
+                inventories = new List<Inventory>();
+                Inventories[tile.Inventory.Type] = inventories;
             }
 
-            Inventories[tile.Inventory.Type].Add(tile.Inventory);
+            inventories.Add(tile.Inventory);
             InvokeInventoryCreated(tile.Inventory);
         }
 
@@ -174,12 +182,13 @@ public class InventoryManager
         }
 
         // Check that there is a target to transfer to
-        if (job.DeliveredItems.ContainsKey(sourceInventory.Type) == false)
+        Inventory targetInventory;
+        if (job.DeliveredItems.TryGetValue(sourceInventory.Type, out targetInventory) == false)
         {
-            job.DeliveredItems[sourceInventory.Type] = new Inventory(sourceInventory.Type, 0, sourceInventory.MaxStackSize);
+            targetInventory = new Inventory(sourceInventory.Type, 0, sourceInventory.MaxStackSize);
+            job.DeliveredItems[sourceInventory.Type] = targetInventory;
         }
 
-        Inventory targetInventory = job.DeliveredItems[sourceInventory.Type];
         int transferAmount = Mathf.Min(targetInventory.MaxStackSize - targetInventory.StackSize, sourceInventory.StackSize);
 
         sourceInventory.StackSize -= transferAmount;
@@ -198,12 +207,15 @@ public class InventoryManager
         {
             character.Inventory = sourceInventory.Clone();
             character.Inventory.StackSize = 0;
-            if (Inventories.ContainsKey(character.Inventory.Type) == false)
+
+            List<Inventory> inventories;
+            if (Inventories.TryGetValue(character.Inventory.Type, out inventories) == false)
             {
-                Inventories[character.Inventory.Type] = new List<Inventory>();
+                inventories = new List<Inventory>();
+                Inventories[character.Inventory.Type] = inventories;
             }
 
-            Inventories[character.Inventory.Type].Add(character.Inventory);
+            inventories.Add(character.Inventory);
         }
         else if (character.Inventory.Type != sourceInventory.Type)
         {
@@ -274,29 +286,20 @@ public class InventoryManager
 
     public bool HasInventoryOfType(string type, bool canTakeFromStockpile)
     {
-        if (Inventories.ContainsKey(type) == false || Inventories[type].Count == 0)
+        List<Inventory> inventories;
+        if (Inventories.TryGetValue(type, out inventories) == false || inventories.Count == 0)
         {
             return false;
         }
 
-        return Inventories[type].Find(inventory => inventory.CanBePickedUp(canTakeFromStockpile)) != null;
+        return inventories.Find(inventory => inventory.CanBePickedUp(canTakeFromStockpile)) != null;
     }
 
     public bool HasInventoryOfType(string[] types, bool canTakeFromStockpile)
     {
-        // Test that we have records for any of the types
-        List<string> filteredTypes = types
-            .ToList()
-            .FindAll(type => Inventories.ContainsKey(type) && Inventories[type].Count > 0);
-
-        if (filteredTypes.Count == 0)
+        foreach (string objectType in types)
         {
-            return false;
-        }
-
-        foreach (string objectType in filteredTypes)
-        {
-            if (Inventories[objectType].Find(inventory => inventory.CanBePickedUp(canTakeFromStockpile)) != null)
+            if (HasInventoryOfType(objectType, canTakeFromStockpile))
             {
                 return true;
             }
@@ -362,21 +365,10 @@ public class InventoryManager
 
     public void InventoryAvailable(Inventory inventory)
     {
-        if (inventoryTypeCreated.ContainsKey(inventory.Type))
+        List<InventoryOfTypeCreated> inventories;
+        if (inventoryTypeCreated.TryGetValue(inventory.Type, out inventories))
         {
-            List<InventoryOfTypeCreated> remove = new List<InventoryOfTypeCreated>();
-            foreach (InventoryOfTypeCreated func in inventoryTypeCreated[inventory.Type])
-            {
-                if (func(inventory))
-                {
-                    remove.Add(func);
-                }
-            }
-
-            foreach (InventoryOfTypeCreated func in remove)
-            {
-                inventoryTypeCreated[inventory.Type].Remove(func);
-            }
+            inventories.RemoveAll(func => func(inventory));
         }
     }
 
@@ -387,9 +379,10 @@ public class InventoryManager
             return;
         }
 
-        if (Inventories.ContainsKey(inventory.Type))
+        List<Inventory> inventories;
+        if (Inventories.TryGetValue(inventory.Type, out inventories))
         {
-            Inventories[inventory.Type].Remove(inventory);
+            inventories.Remove(inventory);
         }
 
         if (inventory.Tile != null)

@@ -50,6 +50,18 @@ public class DialogBox : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public void ToggleDialog()
+    {
+        if (gameObject.activeSelf == false)
+        {
+            ShowDialog();
+        }
+        else
+        {
+            CloseDialog();
+        }
+    }
+
     public void SetClosedAction(string funcName)
     {
         Closed = () => FunctionsManager.Get("ModDialogBox").Call(funcName, Result); 

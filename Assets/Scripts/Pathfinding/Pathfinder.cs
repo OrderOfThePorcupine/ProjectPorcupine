@@ -195,6 +195,56 @@ namespace ProjectPorcupine.Pathfinding
             }
         }
 
+        public static List<Room> FindPathToRoom(Room start, Room goal) 
+        {
+            if (start == null || goal == null)
+            {
+                return null;
+            }
+
+            RoomPath_AStar roomResolver = new RoomPath_AStar(World.Current, start, RoomEvaluator(goal), RoomHeuristic());
+            List<Room> path = roomResolver.GetList();
+            return path;
+        }
+
+        public static bool IsRoomReachable(Room start, Room goal)
+        {
+            if (start == null || goal == null)
+            {
+                return false;
+            }
+
+            Dictionary<Room, Path_Node<Room>> nodes = World.Current.RoomGraph.nodes;
+
+            List<int> roomsVisited = new List<int>(nodes.Count);
+            Queue<Room> roomsToVisit = new Queue<Room>();
+
+            roomsToVisit.Enqueue(start);
+            Room currentRoom;
+            do
+            {
+                currentRoom = roomsToVisit.Dequeue();
+                roomsVisited.Add(currentRoom.ID);
+
+                foreach (Path_Edge<Room> edge in nodes[currentRoom].edges)
+                {
+                    Room room = edge.node.data;
+                    if (room == goal)
+                    {
+                        return true;
+                    }
+
+                    if (roomsVisited.Contains(room.ID) == false && roomsToVisit.Contains(room) == false)
+                    {
+                        roomsToVisit.Enqueue(room);
+                    }
+                }
+            }
+            while (roomsToVisit.Count > 0);
+
+            return false;
+        }
+
         public static Room FindNearestRoom(Tile start)
         {
             Path_AStar tileResolver = new Path_AStar(World.Current, start, GoalHasRoomEvaluator(), DijkstraDistance());
@@ -383,6 +433,11 @@ namespace ProjectPorcupine.Pathfinding
         {
             return room =>
                 World.Current.InventoryManager.Inventories.Where(dictEntry => types.Contains(dictEntry.Key)).SelectMany(dictEntry => dictEntry.Value).Any(inv => inv != null && inv.CanBePickedUp(canTakeFromStockpile) && inv.Tile != null && inv.Tile.GetNearestRoom() == room);
+        }
+
+        public static RoomGoalEvaluator RoomEvaluator(Room goal)
+        {
+            return room => room == goal;
         }
 
         public static RoomGoalEvaluator RoomGoalInventoryEvaluator(string type, bool canTakeFromStockpile = true)

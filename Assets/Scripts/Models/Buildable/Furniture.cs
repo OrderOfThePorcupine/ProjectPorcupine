@@ -861,10 +861,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
         ////World.current.InvalidateTileGraph();
 
-        if (World.Current.tileGraph != null)
-        {
-            World.Current.tileGraph.RegenerateGraphAtTile(Tile);
-        }
+        World.Current.RegenerateGraphAtTile(Tile);
 
         // We should inform our neighbours that they have just lost a
         // neighbour regardless of type.  
@@ -966,10 +963,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
         ////World.current.InvalidateTileGraph();
 
-        if (World.Current.tileGraph != null)
-        {
-            World.Current.tileGraph.RegenerateGraphAtTile(Tile);
-        }
+        World.Current.RegenerateGraphAtTile(Tile);
 
         // We should inform our neighbours that they have just lost a
         // neighbour regardless of type.  

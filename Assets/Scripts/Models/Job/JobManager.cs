@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.Pathfinding;
+using ProjectPorcupine.Rooms;
 
 public class JobManager
 {
@@ -94,10 +95,21 @@ public class JobManager
 
                 Job.JobPriority bestJobPriority = Job.JobPriority.Low;
 
+                // This loop finds the highest priority in the given category
                 foreach (Job job in jobQueue[category])
                 {
-                    if (job.IsActive == false || job.IsBeingWorked == true)
+                    if (job.IsActive == false || job.IsBeingWorked == true || job.CanCharacterReach(character) == false)
                     {
+                        continue;
+                    }
+
+                    if (job.CanJobRun(character.CurrTile.GetNearestRoom(), true) != Job.JobState.Active)
+                    {
+                        if (JobModified != null)
+                        {
+                            JobModified(job);
+                        }
+
                         continue;
                     }
 
@@ -118,14 +130,11 @@ public class JobManager
                         continue;
                     }
 
-                    if (CanJobRun(job))
+                    float pathtime = Pathfinder.FindMinPathTime(character.CurrTile, job.tile, job.adjacent, bestJobPathtime);
+                    if (pathtime < bestJobPathtime)
                     {
-                        float pathtime = Pathfinder.FindMinPathTime(character.CurrTile, job.tile, job.adjacent, bestJobPathtime);
-                        if (pathtime < bestJobPathtime)
-                        {
-                            bestJob = job;
-                            bestJobPathtime = pathtime;
-                        }
+                        bestJob = job;
+                        bestJobPathtime = pathtime;
                     }
                 }
 
@@ -167,35 +176,5 @@ public class JobManager
                 yield return job;
             }
         }
-    }
-
-    private bool CanJobRun(Job job)
-    {
-        // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
-        if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
-        {
-            string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            job.SuspendWaitingForInventory(missing);
-            if (JobModified != null)
-            {
-                JobModified(job);
-            }
-
-            return false;
-        }
-        else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
-            job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
-        {
-            // No one can reach the job.
-            job.Suspend();
-            if (JobModified != null)
-            {
-                JobModified(job);
-            }
-
-            return false;
-        }
-
-        return true;
     }
 }

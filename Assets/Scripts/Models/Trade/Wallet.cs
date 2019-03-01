@@ -31,9 +31,10 @@ public class Wallet
     {
         get
         {
-            if (currencies.ContainsKey(name))
+            Currency currency;
+            if (currencies.TryGetValue(name, out currency))
             {
-                return currencies[name];
+                return currency;
             }
 
             return null;

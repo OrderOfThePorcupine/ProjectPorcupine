@@ -13,7 +13,6 @@ public class MenuLeft : MonoBehaviour
 {
     // This is the parent of the menus.
     private Transform parent;
-
     private GameMenu currentlyOpen;
 
     // Use this for initialization
@@ -28,14 +27,18 @@ public class MenuLeft : MonoBehaviour
         GameMenuManager.Instance.AddMenuItem("menu_orders", () => OnMenuButtonClicked(orderMenu), 1);
     }
 
-    public void OpenMenuCurrentMenu()
+    public void OpenMenu(GameMenu menu)
     {
-        currentlyOpen.Open();
+        // So that we don't have two menus open at the same time
+        CloseCurrentMenu();
 
-        if (currentlyOpen.name == "ConstructionMenu" || currentlyOpen.name == "OrderMenu")
-        {
-            WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
-        }
+        menu.Open();
+
+        WorldController.Instance.SoundController.OnButtonSFX();
+        
+        WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
+
+        currentlyOpen = menu;
     }
 
     public void CloseCurrentMenu()
@@ -43,13 +46,12 @@ public class MenuLeft : MonoBehaviour
         if (currentlyOpen != null)
         {
             currentlyOpen.Close();
-
-            if (currentlyOpen.name == "ConstructionMenu" || currentlyOpen.name == "OrderMenu")
-            {
-                WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
-                WorldController.Instance.BuildModeController.Building = false;
-            }
+            
+            WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
+            WorldController.Instance.BuildModeController.Building = false;
         }
+
+        currentlyOpen = null;
     }
 
     // Use this function to add all the menus.
@@ -69,12 +71,11 @@ public class MenuLeft : MonoBehaviour
     {
         if (currentlyOpen == menu)
         {
-            currentlyOpen = null;
+            CloseCurrentMenu();
         }
         else
         {
-            currentlyOpen = menu;
-            OpenMenuCurrentMenu();
+            OpenMenu(menu);
         }
     }
 }

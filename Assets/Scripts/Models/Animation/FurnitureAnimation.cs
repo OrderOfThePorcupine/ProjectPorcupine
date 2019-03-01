@@ -98,18 +98,19 @@ namespace Animation
         /// </summary>
         public void SetState(string stateName)
         {
-            if (animations.ContainsKey(stateName) == false)
-            {
-                return;
-            }
-
             if (stateName == currentAnimationState)
             {
                 return;
             }
 
+            SpritenameAnimation animation;
+            if (animations.TryGetValue(stateName, out animation) == false)
+            {
+                return;
+            }
+
             currentAnimationState = stateName;
-            currentAnimation = animations[currentAnimationState];
+            currentAnimation = animation;
             currentAnimation.Play();
             ShowSprite(currentAnimation.CurrentFrameName);                       
         }

@@ -38,31 +38,18 @@ public class Path_AStar
         // We can do this by ignoring the heuristic component of AStar, which basically
         // just turns this into an over-engineered Dijkstra's algo
 
-        // Check to see if we have a valid tile graph
-        if (world.tileGraph == null)
-        {
-            world.tileGraph = new Path_TileGraph(world);
-        }
-
-        // Check to see if we have a valid tile graph
-        if (world.roomGraph == null)
-        {
-            world.roomGraph = new Path_RoomGraph(world);
-        }
-
         // A dictionary of all valid, walkable nodes.
-        Dictionary<Tile, Path_Node<Tile>> nodes = world.tileGraph.nodes;
+        Dictionary<Tile, Path_Node<Tile>> nodes = world.TileGraph.nodes;
 
         // Make sure our start/end tiles are in the list of nodes!
-        if (nodes.ContainsKey(tileStart) == false)
+        Path_Node<Tile> start;
+        if (nodes.TryGetValue(tileStart, out start) == false)
         {
             UnityDebugger.Debugger.LogError("Path_AStar", "The starting tile isn't in the list of nodes!");
 
             return;
         }
-
-        Path_Node<Tile> start = nodes[tileStart];
-
+        
         /*
          * Mostly following this pseusocode:
          * https://en.wikipedia.org/wiki/A*_search_algorithm
@@ -263,14 +250,14 @@ public class Path_AStar
         Queue<Tile> total_path = new Queue<Tile>();
         total_path.Enqueue(current.data); // This "final" step is the path is the goal!
 
-        while (came_From.ContainsKey(current))
+        // Effectivly: current = came_From[current]
+        while (came_From.TryGetValue(current, out current))
         {
             /*    Came_From is a map, where the
             *    key => value relation is real saying
             *    some_node => we_got_there_from_this_node
             */
-
-            current = came_From[current];
+            
             total_path.Enqueue(current.data);
         }
 
