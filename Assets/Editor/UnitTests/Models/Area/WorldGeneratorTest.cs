@@ -8,8 +8,8 @@
 #endregion
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Framework;
 using Newtonsoft.Json;
+using NUnit.Framework;
 
 public class WorldGeneratorTest
 {
