@@ -211,7 +211,8 @@ public class BuildableJobs
             foreach (Job job in jobsArray)
             {
                 pausedJobs.Add(job);
-                job.CancelJob();
+
+                // We formerly called Called job.CancelJob() here, but that is incorrect for pausing a job, we may have to do cleanup that is now no longer done
             }
         }
     }
