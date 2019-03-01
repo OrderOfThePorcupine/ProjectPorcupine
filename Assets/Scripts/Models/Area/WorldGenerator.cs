@@ -47,7 +47,7 @@ public class WorldGenerator
     {
         asteroidFloorType = TileType.Empty;
 
-        ReadJson(world);
+        ReadWorldData(world);
         world.ResizeWorld(width, height, depth);
 
         Random.InitState(seed);
@@ -198,17 +198,21 @@ public class WorldGenerator
         }
     }
 
-    private void ReadJson(World world)
+    private void ReadWorldData(World world)
     {
         // Optimally, this would use GameController.Instance.GeneratorBasePath(), but that apparently may not exist at this point.
         // TODO: Investigate either a way to ensure GameController exists at this time or another place to reliably store the base path, that is accessible
         // both in _World and MainMenu scenes
         string filePath = Path.Combine(Path.Combine(Application.streamingAssetsPath, "WorldGen"), SceneController.GeneratorFile);
-        string furnitureDataText = File.ReadAllText(filePath);
 
-        StreamReader reader = File.OpenText(furnitureDataText);
-        JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
+        StreamReader reader = File.OpenText(filePath);
+        JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader)).First;
 
+        ReadJsonData(world, protoJson);
+    }
+
+    public void ReadJsonData(World world, JToken protoJson)
+    {
         if (protoJson.Contains("Asteroid"))
         {
             try

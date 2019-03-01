@@ -37,7 +37,7 @@ public static class SceneController
         SceneManager.LoadScene(MainSceneName);
     }
 
-    public static World CreateNewWorld(string generatorFile = "Default.xml", bool generateAsteroids = true)
+    public static World CreateNewWorld(string generatorFile = "Default.json", bool generateAsteroids = true)
     {
         GeneratorFile = generatorFile;
         GenerateAsteroids = generateAsteroids;

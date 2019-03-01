@@ -8,8 +8,8 @@
 #endregion
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Serialization;
 using NUnit.Framework;
+using Newtonsoft.Json;
 
 public class WorldGeneratorTest
 {
@@ -36,17 +36,15 @@ public class WorldGeneratorTest
 
         // serialize
         StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new XmlSerializer(typeof(WorldGenerator.AsteroidInfo));
+        JsonSerializer serializer = new JsonSerializer();
 
         serializer.Serialize(writer, asteroidInfo);
 
         StringReader sr = new StringReader(writer.ToString());
 
-        // if you want to dump file to disk for visual check, uncomment this
-        ////File.WriteAllText("Asteroid.xml", writer.ToString());
-
         // deserialize
-        WorldGenerator.AsteroidInfo deserializedAsteroidInfo = (WorldGenerator.AsteroidInfo)serializer.Deserialize(sr);
+        JsonReader reader = new JsonTextReader(sr);
+        WorldGenerator.AsteroidInfo deserializedAsteroidInfo = serializer.Deserialize<WorldGenerator.AsteroidInfo>(reader);
 
         Assert.NotNull(deserializedAsteroidInfo);
     }
