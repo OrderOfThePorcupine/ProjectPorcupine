@@ -10,24 +10,33 @@ public class DialogBoxPrompt : BaseDialogBox
     public override GameObject InitializeElement()
     {
         result = new Parameter();
-        GameObject element = GetVerticalBaseElement("Box", 120, 60, TextAnchor.UpperCenter);
-        string title = GetStringParam("Title");
+        GameObject element = GetFluidVerticalBaseElement("Box", true, true);
+        VerticalLayoutGroup group = element.GetComponent<VerticalLayoutGroup>();
+        group.padding = new RectOffset(30, 30, 30, 30);
+        group.spacing = 0;
+
         string prompt = GetStringParam("Prompt");
         string[] buttons = GetStringArray("Buttons");
 
-        Text text = CreateText(title, true, TextAnchor.UpperCenter);
+        Text text = CreateText(prompt, false, TextAnchor.UpperCenter);
         text.transform.SetParent(element.transform);
+        text.color = Color.white;
+        text.font = Resources.Load<Font>("Fonts/anita-semi-square/Anita semi square");
+        text.resizeTextForBestFit = true;
 
-        text = CreateText(prompt, true, TextAnchor.UpperCenter);
-        text.transform.SetParent(element.transform);
+        GameObject horizontal = GetFluidHorizontalBaseElement("Buttons", true, true, allocatedHeight: 40);
+        horizontal.transform.SetParent(element.transform);
+        HorizontalLayoutGroup button_layout = horizontal.GetComponent<HorizontalLayoutGroup>();
+        button_layout.padding = new RectOffset(5, 5, 5, 5);
+        button_layout.spacing = 5;
 
         foreach (string button in buttons)
         {
             Button obj = CreateButton(button.Trim());
-            obj.transform.SetParent(element.transform);
-            string copy = button;
+            obj.transform.SetParent(horizontal.transform);
             obj.onClick.AddListener(() => {
-                result["ExitButton"] = new Parameter(copy);
+                string copy = button;
+                result.AddParameter(new Parameter("ExitButton", copy));
                 GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
             });
         }

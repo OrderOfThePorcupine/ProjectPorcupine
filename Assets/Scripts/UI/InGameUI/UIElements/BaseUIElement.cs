@@ -40,6 +40,7 @@ public abstract class BaseUIElement
     protected GameObject GetFluidHorizontalBaseElement(string elementTitle = "", bool stretchX = false, bool stretchY = false, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         HorizontalLayoutGroup layout = go.AddComponent<HorizontalLayoutGroup>();
@@ -54,6 +55,7 @@ public abstract class BaseUIElement
     protected GameObject GetFluidVerticalBaseElement(string elementTitle = "", bool stretchX = false, bool stretchY = false, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         VerticalLayoutGroup layout = go.AddComponent<VerticalLayoutGroup>();
@@ -72,6 +74,7 @@ public abstract class BaseUIElement
     protected GameObject GetGridBaseElement(string elementTitle = "", int xSize = 97, int ySize = 37, TextAnchor alignment = TextAnchor.MiddleCenter, int spacingX = 5, int spacingY = 5, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         GridLayoutGroup layout = go.AddComponent<GridLayoutGroup>();
@@ -89,6 +92,7 @@ public abstract class BaseUIElement
     protected GameObject GetHorizontalBaseElement(string elementTitle = "", int xSize = 95, int ySize = 80, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         GridLayoutGroup layout = go.AddComponent<GridLayoutGroup>();
@@ -108,6 +112,7 @@ public abstract class BaseUIElement
     protected GameObject GetVerticalBaseElement(string elementTitle = "", int xSize = 100, int ySize = 80, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         GridLayoutGroup layout = go.AddComponent<GridLayoutGroup>();

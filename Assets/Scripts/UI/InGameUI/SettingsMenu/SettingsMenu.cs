@@ -196,13 +196,11 @@ public class SettingsMenu : MonoBehaviour
 
         var data = new Dictionary<string, object>()
         {
-            // Todo: Localize
-            { "Title", "Are you sure" },
             { "Prompt", "confirm_settings_menu_close" },
             { "Buttons", new string[] { "button_yes", "button_no" } }
         };
         GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (res) => {
-            if (res["ExitButton"].ToString() == "Yes")
+            if (res["ExitButton"].ToString() == "button_yes")
             {
                 // cancel code
                 Settings.LoadSettings();
