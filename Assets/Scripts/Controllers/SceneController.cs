@@ -27,7 +27,7 @@ public static class SceneController
     public static string GeneratorFile { get; private set; }
 
     // Load the main scene.
-    public static void LoadNewWorld(int width, int height, int depth, int seed, string generatorFile = "Default.xml", bool generateAsteroids = true)
+    public static void LoadNewWorld(int width, int height, int depth, int seed, string generatorFile = "Default.json", bool generateAsteroids = true)
     {
         NewWorldSize = new Vector3(width, height, depth);
         Seed = seed;

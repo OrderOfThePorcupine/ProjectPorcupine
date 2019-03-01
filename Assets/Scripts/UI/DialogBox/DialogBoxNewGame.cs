@@ -87,7 +87,7 @@ public class DialogBoxNewGame : DialogBox
             Debug.LogWarning("Converted " + Seed.text + " to hash " + seed);
         }
 
-        string generatorFile = GeneratorInputField.text + ".xml";
+        string generatorFile = GeneratorInputField.text + ".json";
         DialogBoxManager dialogManager = GameObject.FindObjectOfType<DialogBoxManager>();
         dialogManager.dialogBoxPromptOrInfo.SetPrompt("message_creating_new_world");
         dialogManager.dialogBoxPromptOrInfo.ShowDialog();
