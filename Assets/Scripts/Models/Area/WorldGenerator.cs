@@ -7,11 +7,11 @@
 // ====================================================
 #endregion
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class WorldGenerator
@@ -211,7 +211,7 @@ public class WorldGenerator
         ReadJsonData(world, protoJson);
     }
 
-    public void ReadJsonData(World world, JToken protoJson)
+    private void ReadJsonData(World world, JToken protoJson)
     {
         try
         {
