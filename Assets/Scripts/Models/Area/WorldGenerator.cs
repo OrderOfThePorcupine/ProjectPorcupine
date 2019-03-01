@@ -206,62 +206,41 @@ public class WorldGenerator
         string filePath = Path.Combine(Path.Combine(Application.streamingAssetsPath, "WorldGen"), SceneController.GeneratorFile);
 
         StreamReader reader = File.OpenText(filePath);
-        JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader)).First;
+        JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
 
         ReadJsonData(world, protoJson);
     }
 
     public void ReadJsonData(World world, JToken protoJson)
     {
-        if (protoJson.Contains("Asteroid"))
+        try
         {
-            try
-            {
-                ReadJsonAsteroid(protoJson["Asteroid"]);
-            }
-            catch (System.Exception e)
-            {
-                // Leaving this in because UberLogger doesn't handle multiline messages  
-                UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Asteroid" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
-            }
+            ReadJsonAsteroid(protoJson["Asteroid"]);
         }
-        else
+        catch (System.Exception e)
         {
-            UnityDebugger.Debugger.LogError("WorldGenerator", "Did not find a 'Asteroid' element in the WorldGenerator definition file.");
+            // Leaving this in because UberLogger doesn't handle multiline messages  
+            UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Asteroid" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
         }
 
-        if (protoJson.Contains("StartArea"))
+        try
         {
-            try
-            {
-                string startAreaFileName = protoJson["StartArea"]["file"].ToString();
-                string startAreaFilePath = Path.Combine(Application.streamingAssetsPath, Path.Combine("WorldGen", startAreaFileName));
-                ReadStartArea(startAreaFilePath, world);
-            }
-            catch (System.Exception e)
-            {
-                UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/StartArea" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
-            }
+            string startAreaFileName = protoJson["StartArea"]["file"].ToString();
+            string startAreaFilePath = Path.Combine(Application.streamingAssetsPath, Path.Combine("WorldGen", startAreaFileName));
+            ReadStartArea(startAreaFilePath, world);
         }
-        else
+        catch (System.Exception e)
         {
-            UnityDebugger.Debugger.LogError("WorldGenerator", "Did not find a 'StartArea' element in the WorldGenerator definition file.");
+            UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/StartArea" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
         }
 
-        if (protoJson.Contains("Wallet"))
+        try
         {
-            try
-            {
-                ReadJsonWallet(protoJson["Wallet"], world);
-            }
-            catch (System.Exception e)
-            {
-                UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Wallet" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
-            }
+            ReadJsonWallet(protoJson["Wallet"], world);
         }
-        else
+        catch (System.Exception e)
         {
-            UnityDebugger.Debugger.LogError("WorldGenerator", "Did not find a 'Wallet' element in the WorldGenerator definition file.");
+            UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Wallet" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
         }
     }
 
