@@ -45,7 +45,13 @@ public class DialogBoxHandler
     /// </summary>
     public void ForceCloseTopDialog()
     {
-        currentDialogs.Pop().ForceCloseDialog();
+        BaseDialogBox box = currentDialogs.Pop();
+        if (box != null) {
+            box.result.AddParameter(new Parameter("ExitStatus", "Force"));
+            ChangeInteractabilityOfBox(box, false);
+            box.Destroy();
+        }
+        ChangeInteractabilityOfTopDialog(true);
     }
 
     /// <summary>
@@ -53,7 +59,15 @@ public class DialogBoxHandler
     /// </summary>
     public void ForceCloseAllDialogs()
     {
-        currentDialogs.Pop().ForceCloseDialog();
+        while (currentDialogs.Count > 0)
+        {
+            BaseDialogBox box = currentDialogs.Pop();
+            if (box != null) {
+                box.result.AddParameter(new Parameter("ExitStatus", "Force"));
+                ChangeInteractabilityOfBox(box, false);
+                box.Destroy();
+            }
+        }
     }
 
     /// <summary>
@@ -62,7 +76,13 @@ public class DialogBoxHandler
     /// </summary>
     public void SoftCloseTopDialog()
     {
-        currentDialogs.Pop().SoftCloseDialog();
+        BaseDialogBox box = currentDialogs.Pop();
+        if (box != null) {
+            box.result.AddParameter(new Parameter("ExitStatus", "Soft"));
+            ChangeInteractabilityOfBox(box, false);
+            box.Destroy();
+        }
+        ChangeInteractabilityOfTopDialog(true);
     }
 
     /// <summary>
@@ -71,7 +91,15 @@ public class DialogBoxHandler
     /// </summary>
     public void SoftCloseAllDialogs()
     {
-        currentDialogs.Pop().SoftCloseDialog();
+        while (currentDialogs.Count > 0)
+        {
+            BaseDialogBox box = currentDialogs.Pop();
+            if (box != null) {
+                box.result.AddParameter(new Parameter("ExitStatus", "Soft"));
+                ChangeInteractabilityOfBox(box, false);
+                box.Destroy();
+            }
+        }
     }
 
     public void ShowDialogBox(string name, Dictionary<string, object> data = null, BaseDialogBox.OnCloseAction action = null)
@@ -93,12 +121,28 @@ public class DialogBoxHandler
         }
     }
 
+    private void ChangeInteractabilityOfBox(BaseDialogBox box, bool interactability)
+    {
+        if (box != null)
+        {
+            box.root.GetComponent<CanvasGroup>().interactable = interactability;
+        }
+    }
+
+    private void ChangeInteractabilityOfTopDialog(bool interactability)
+    {
+        if (currentDialogs.Count > 0)
+        {
+            ChangeInteractabilityOfBox(currentDialogs.Peek(), interactability);
+        }
+    }
+
     private void FinalizeDialogBox(BaseDialogBox box)
     {
         GameObject go = box.InitializeElement();
         GameObject baseDialog = GameObject.Instantiate(baseDialogTemplate, Vector3.one, Quaternion.identity, root.transform);
-        GameObject contentChild = baseDialog.transform.GetChild(0).gameObject;
-        go.transform.SetParent(contentChild.transform);
+        go.transform.SetParent(baseDialog.transform);
+        box.root = baseDialog;
         RectTransform transform = baseDialog.GetComponent<RectTransform>();
         Vector2 pos = box.prototype.position;
         BoxedDimensions size = box.prototype.size;
@@ -143,6 +187,8 @@ public class DialogBoxHandler
 
         transform.offsetMin = new Vector2(left, bottom);
         transform.offsetMax = new Vector2(-right, -top);
+        ChangeInteractabilityOfTopDialog(false);
+        ChangeInteractabilityOfBox(box, true);
         currentDialogs.Push(box);
     }
 }

@@ -11,21 +11,6 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1147386912049972}
   m_IsPrefabParent: 1
---- !u!1 &1083048467892890
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 224595818155699954}
-  m_Layer: 5
-  m_Name: Contents
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1 &1147386912049972
 GameObject:
   m_ObjectHideFlags: 0
@@ -36,6 +21,7 @@ GameObject:
   - component: {fileID: 224174784448305936}
   - component: {fileID: 222975177794042066}
   - component: {fileID: 114468318601904818}
+  - component: {fileID: 225799768346726448}
   m_Layer: 5
   m_Name: DialogBox
   m_TagString: Untagged
@@ -85,8 +71,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 224595818155699954}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -95,21 +80,14 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!224 &224595818155699954
-RectTransform:
+--- !u!225 &225799768346726448
+CanvasGroup:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1083048467892890}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 224174784448305936}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.037381183, y: 0.051000003}
-  m_AnchorMax: {x: 0.9628252, y: 0.945274}
-  m_AnchoredPosition: {x: 0, y: 1.1000061}
-  m_SizeDelta: {x: 0, y: 2.1000004}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_GameObject: {fileID: 1147386912049972}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

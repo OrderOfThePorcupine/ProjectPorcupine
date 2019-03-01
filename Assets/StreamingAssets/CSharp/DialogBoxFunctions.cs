@@ -28,8 +28,7 @@ public class DialogBoxPrompt : BaseDialogBox
             string copy = button;
             obj.onClick.AddListener(() => {
                 result["ExitButton"] = new Parameter(copy);
-                CloseDialog();
-                GameObject.Destroy(element.transform.parent.parent.gameObject);
+                GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
             });
         }
 

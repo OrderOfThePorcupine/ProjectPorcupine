@@ -40,24 +40,18 @@ public abstract class BaseDialogBox : BaseUIElement
     /// </summary>
     public OnCloseAction OnClose;
 
-    // Force this dialog to close, taking the stance of a cancel exit.
-    public void ForceCloseDialog()
-    {
-        result.AddParameter(new Parameter("ExitStatus", "Force"));
-        DialogExit();
-    }
+    /// <summary>
+    /// The root gameobject of this box.
+    /// </summary>
+    public GameObject root;
 
-    public void SoftCloseDialog()
-    {
-        result.AddParameter(new Parameter("ExitStatus", "Soft"));
-        DialogExit();
-    }
-
-    private void DialogExit()
+    /// <summary>
+    /// Should only be called from DialogBoxHandler.
+    /// </summary>
+    public void Destroy()
     {
         OnClose(result);
-        OnClose = null;
-        callerData = null;
+        GameObject.Destroy(root);
     }
 
     /// <summary>
