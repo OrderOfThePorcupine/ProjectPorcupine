@@ -216,7 +216,7 @@ namespace ProjectPorcupine.Pathfinding
 
             Dictionary<Room, Path_Node<Room>> nodes = World.Current.RoomGraph.nodes;
 
-            List<int> roomsVisited = new List<int>(nodes.Count);
+            HashSet<int> roomsVisited = new HashSet<int>();
             Queue<Room> roomsToVisit = new Queue<Room>();
 
             roomsToVisit.Enqueue(start);
