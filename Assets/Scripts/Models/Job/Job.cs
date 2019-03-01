@@ -684,23 +684,27 @@ public class Job : ISelectable
         }
         else if (tile != null)
         {
-            List<Room> roomsChecked = new List<Room>();
-
             if (((adjacent == false && tile.IsEnterable() != Enterability.Never) ||
                 (adjacent && tile.IsReachableFromAnyNeighbor(false))) &&
                 tile.CanSee)
             {
-                if (CanReachRoom(tile.Room, roomsChecked, characterRoom))
+                HashSet<Room> roomsToCheck = new HashSet<Room>();
+                if (tile.Room != null)
                 {
-                    return JobState.Active;
+                    roomsToCheck.Add(tile.Room);
                 }
 
                 foreach (Tile neighbor in tile.GetNeighbours(false))
                 {
-                    if (CanReachRoom(neighbor.Room, roomsChecked, characterRoom))
+                    if (neighbor.Room != null && roomsToCheck.Contains(neighbor.Room) == false)
                     {
-                        return JobState.Active;
+                        roomsToCheck.Add(neighbor.Room);
                     }
+                }
+
+                if (CanReachRoom(roomsToCheck, characterRoom))
+                {
+                    return JobState.Active;
                 }
             }
 
@@ -716,24 +720,12 @@ public class Job : ISelectable
         return JobState.Active;
     }
 
-    private bool CanReachRoom(Room room, List<Room> roomsToCheck, Room characterRoom)
+    private bool CanReachRoom(HashSet<Room> roomsToCheck, Room characterRoom)
     {
-        if (room == null)
+        if (Pathfinder.IsRoomReachable(characterRoom, roomsToCheck) == false)
         {
             return false;
         }
-
-        if (roomsToCheck.Contains(room))
-        {
-            return false;
-        }
-
-        if (Pathfinder.IsRoomReachable(characterRoom, room) == false)
-        {
-            return false;
-        }
-
-        roomsToCheck.Add(room);
 
         return true;
     }
