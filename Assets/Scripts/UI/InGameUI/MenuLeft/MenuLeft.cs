@@ -34,8 +34,6 @@ public class MenuLeft : MonoBehaviour
 
         menu.Open();
 
-        WorldController.Instance.SoundController.OnButtonSFX();
-        
         WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
 
         currentlyOpen = menu;
