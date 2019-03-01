@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 [MoonSharpUserData]
 public class Parameter
 {
-    // Name is primarily to simplify writing to XML, and will be the same as the key used to access it in a higher up Parameter when read from XML
+    // Name is primarily to simplify writing to data files, and will be the same as the key used to access it in a higher up Parameter when read from XML
     private string name;
 
     // Value is stored as a string and converted as needed, this simplifies storing multiple value types.

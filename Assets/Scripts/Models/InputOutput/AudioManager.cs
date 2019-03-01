@@ -150,7 +150,7 @@ public static class AudioManager
             string audioCategory = new DirectoryInfo(directoryPath).Name;
             string filePath = new FileInfo(file).FullName;
 
-            if (filePath.Contains(".xml") || filePath.Contains(".meta") || filePath.Contains(".db"))
+            if (filePath.Contains(".json") || filePath.Contains(".meta") || filePath.Contains(".db"))
             {
                 continue;
             }

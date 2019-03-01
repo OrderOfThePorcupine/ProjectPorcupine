@@ -253,7 +253,7 @@ public class WorldController : MonoBehaviour
     }
 
     /// <summary>
-    /// Create/overwrite the save file with the XML text.
+    /// Create/overwrite the save file with the serialized text.
     /// </summary>
     /// <param name="filePath">Full path to file.</param>
     /// <param name="writer">TextWriter that contains serialized World data.</param>

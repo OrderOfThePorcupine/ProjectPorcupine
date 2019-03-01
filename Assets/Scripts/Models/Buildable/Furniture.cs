@@ -683,7 +683,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         Width = PrototypeReader.ReadJson(Width, innerJson["Width"]);
         Height = PrototypeReader.ReadJson(Height, innerJson["Height"]);
 
-        /* TODO: This may need altered, for now it is built to match the functionality of the xml reader
+        /* TODO: This may need altered, for now it is built to match the functionality of the prototype reader
         in that if no value is set it is invincible, and the furniture's health system will make it invincible if access while null.
         It may be preferable to have the HealthSystem constructor detect an "invalid" health amount such as -1, and autoset to invincible as appropriate */
         float healthValue = PrototypeReader.ReadJson(-1f, innerJson["Health"]);
