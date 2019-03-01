@@ -45,6 +45,15 @@ public static class SpriteManager
     }
 
     /// <summary>
+    /// Creates a sprite with an error texture.
+    /// </summary>
+    /// <returns>The error sprite.</returns>
+    public static Sprite CreateErrorSprite()
+    {
+        return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
+    }
+
+    /// <summary>
     /// Gets the sprite for the given category and name.
     /// </summary>
     /// <returns>The sprite.</returns>
@@ -64,7 +73,7 @@ public static class SpriteManager
         
         // Return a pink square as a error indication
         UnityDebugger.Debugger.LogWarningFormat("SpriteManager", "No sprite: {0}, using fallback sprite.", spriteName);
-        return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
+        return CreateErrorSprite();
     }
 
     /// <summary>

@@ -577,6 +577,56 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114000013495731334, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_HorizontalFit
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013495731334, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_VerticalFit
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011413206680, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013225789384, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_Padding.m_Left
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013225789384, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_Padding.m_Right
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013225789384, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_Padding.m_Top
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013225789384, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_Padding.m_Bottom
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013225789384, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_Spacing
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013225789384, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_ChildForceExpandHeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013225789384, guid: b65aa179384139040bb9b7291b4923c5,
+        type: 2}
+      propertyPath: m_ChildForceExpandWidth
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b65aa179384139040bb9b7291b4923c5, type: 2}
   m_IsPrefabParent: 0

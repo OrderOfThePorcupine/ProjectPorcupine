@@ -292,6 +292,7 @@ public class BuildModeController : IMouseHandler
                 if (orderAction != null)
                 {
                     job = orderAction.CreateJob(tile, utilityType);
+                    job.adjacent = true;
 
                     // this is here so OrderAction can be used for utility as well as furniture
                     job.OnJobCompleted += (theJob) => World.Current.UtilityManager.ConstructJobCompleted(theJob);

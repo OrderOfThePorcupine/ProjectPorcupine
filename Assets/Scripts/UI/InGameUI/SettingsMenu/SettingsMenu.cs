@@ -174,52 +174,25 @@ public class SettingsMenu : MonoBehaviour
     public void Save()
     {
         Apply();
-
         Settings.SaveSettings();
-        changesTracker.Clear();
-
-        GameController.Instance.IsModal = false;
-        GameController.Instance.SoundController.OnButtonSFX();
-        mainRoot.SetActive(false);
-    }
-
-    private void Exit()
-    {
-        currentCategory = string.Empty;
-        GameController.Instance.IsModal = false;
-        mainRoot.SetActive(false);
-        changesTracker.Clear();
+        Exit();
     }
 
     public void Cancel()
     {
+        // Add all changes made that haven't been applied or tracked yet
+        Dictionary<string, BaseSettingsElement[]> opts;
+        if (options.TryGetValue(currentCategory, out opts))
+        {
+            changesTracker.AddRange(opts.Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
+        }
+
         // If we have made no changes we can freely exit
         if (changesTracker.Count == 0)
         {
             Exit();
             return;
         }
-
-        // Open a dialog box to double check
-        /*
-
-
-            // compared to
-            check = WorldController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
-            check.SetPrompt("confirm_settings_menu_close");
-            check.SetButtons(new DialogBoxResult[] { DialogBoxResult.Yes, DialogBoxResult.No });
-            check.Closed = () => {
-                if (check.Result == DialogBoxResult.Yes)
-                {
-                    // cancel code
-                }
-                else
-                {
-                    // stay
-                }
-            }
-            check.ShowDialog();
-        */
 
         var data = new Dictionary<string, object>()
         {
@@ -228,15 +201,10 @@ public class SettingsMenu : MonoBehaviour
             { "Prompt", "confirm_settings_menu_close" },
             { "Buttons", new string[] { "button_yes", "button_no" } }
         };
-        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (Parameter res) => {
+        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (res) => {
             if (res["ExitButton"].ToString() == "Yes")
             {
                 // cancel code
-                if (options.ContainsKey(currentCategory))
-                {
-                    changesTracker.AddRange(options[currentCategory].Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
-                }
-
                 Settings.LoadSettings();
 
                 for (int i = 0; i < changesTracker.Count; i++)
@@ -317,6 +285,14 @@ public class SettingsMenu : MonoBehaviour
     private void Start()
     {
         LoadCategories();
+    }
+
+    private void Exit()
+    {
+        currentCategory = string.Empty;
+        GameController.Instance.IsModal = false;
+        mainRoot.SetActive(false);
+        changesTracker.Clear();
     }
 
     private void Update()

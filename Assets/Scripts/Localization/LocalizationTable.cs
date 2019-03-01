@@ -98,7 +98,14 @@ namespace ProjectPorcupine.Localization
 
             if (localizationTable.ContainsKey(language) && localizationTable[language].TryGetValue(key, out value))
             {
-                return string.Format(value, additionalValues);
+                try
+                {
+                    return string.Format(value, additionalValues);
+                }
+                catch (FormatException)
+                {
+                    Debug.LogWarning("Bad localization for " + key + ". Arguments found: " + additionalValues.Length);
+                }
             }
 
             if (!missingKeysLogged.Contains(key) && key != string.Empty && IsNumber(key))

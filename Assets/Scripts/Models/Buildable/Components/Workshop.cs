@@ -104,9 +104,11 @@ namespace ProjectPorcupine.Buildable.Components
         public List<ProductionChain> PossibleProductions { get; set; }
 
         [JsonProperty("RunConditions")]
+        [JsonConverter(typeof(ConditionsJsonConvertor))]
         public Conditions RunConditions { get; set; }
 
         [JsonProperty("HaulConditions")]
+        [JsonConverter(typeof(ConditionsJsonConvertor))]
         public Conditions HaulConditions { get; set; }
 
         [JsonProperty("Efficiency")]

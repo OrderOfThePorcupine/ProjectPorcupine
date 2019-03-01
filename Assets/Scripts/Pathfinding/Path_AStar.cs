@@ -26,9 +26,10 @@ public class Path_AStar
         this.path = path;
     }
 
-    public Path_AStar(World world, Tile tileStart, Pathfinder.GoalEvaluator isGoal, Pathfinder.PathfindingHeuristic costEstimate)
+    public Path_AStar(World world, Tile tileStart, Pathfinder.GoalEvaluator isGoal, Pathfinder.PathfindingHeuristic costEstimate, float maxPathTime = float.MaxValue)
     {
         float startTime = Time.realtimeSinceStartup;
+        PathTime = float.MaxValue;  // Default value in case relevant
 
         // Set path to empty Queue so that there always is something to check count on
         path = new Queue<Tile>();
@@ -73,6 +74,13 @@ public class Path_AStar
          *        openSet.Add( start );
          */
 
+        float initial_guess = costEstimate(start.data);
+
+        if (initial_guess > maxPathTime)
+        {
+            return;
+        }
+
         PathfindingPriorityQueue<Path_Node<Tile>> openSet = new PathfindingPriorityQueue<Path_Node<Tile>>();
         openSet.Enqueue(start, 0);
 
@@ -82,7 +90,7 @@ public class Path_AStar
         g_score[start] = 0;
 
         Dictionary<Path_Node<Tile>, float> f_score = new Dictionary<Path_Node<Tile>, float>();
-        f_score[start] = costEstimate(start.data);
+        f_score[start] = initial_guess;
 
         while (openSet.Count > 0)
         {
@@ -92,6 +100,7 @@ public class Path_AStar
             if (isGoal(current.data))
             {
                 Duration = Time.realtimeSinceStartup - startTime;
+                PathTime = g_score[current];
                 Reconstruct_path(came_From, current);
                 return;
             }
@@ -119,6 +128,11 @@ public class Path_AStar
                 came_From[neighbor] = current;
                 g_score[neighbor] = tentative_g_score;
                 f_score[neighbor] = g_score[neighbor] + costEstimate(neighbor.data);
+                if (f_score[neighbor] > maxPathTime)
+                {
+                    // We have reached the maximum path time, and not found a path. No need to add this to the open set.
+                    continue;
+                }
 
                 openSet.EnqueueOrUpdate(neighbor, f_score[neighbor]);
             } // foreach neighbour
@@ -136,6 +150,9 @@ public class Path_AStar
 
     /// Contains the time it took to find the path
     public float Duration { get; private set; }
+
+    /// Distance for the minimum path found
+    public float PathTime { get; protected set; }
 
     public Tile Dequeue()
     {

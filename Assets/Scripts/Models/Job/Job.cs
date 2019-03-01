@@ -20,7 +20,7 @@ using UnityEngine;
 
 [MoonSharpUserData]
 [System.Diagnostics.DebuggerDisplay("Job {JobObjectType}")]
-public class Job : ISelectable, IPrototypable
+public class Job : ISelectable
 {
     // This class holds info for a queued up job, which can include
     // things like placing furniture, moving stored inventory,
@@ -116,6 +116,7 @@ public class Job : ISelectable, IPrototypable
         this.Category = PrototypeManager.JobCategory.Get(category);
         this.adjacent = adjacent;
         this.Description = "job_error_missing_desc";
+        this.IsActive = true;
 
         jobWorkedLua = new List<string>();
         jobCompletedLua = new List<string>();
@@ -149,6 +150,7 @@ public class Job : ISelectable, IPrototypable
         this.Description = other.Description;
         this.acceptsAny = other.acceptsAny;
         this.OrderName = other.OrderName;
+        this.IsActive = true; // A copied job should always start out as active.
 
         jobWorkedLua = new List<string>(other.jobWorkedLua);
         jobCompletedLua = new List<string>(other.jobWorkedLua);
@@ -380,7 +382,7 @@ public class Job : ISelectable, IPrototypable
     {
         if (missing == "*")
         {
-            World.Current.InventoryManager.InventoryCreated += CheckIfInventorySufficient;
+            World.Current.InventoryManager.InventoryCreated += InventoryAvailable;
         }
         else
         {
@@ -390,9 +392,22 @@ public class Job : ISelectable, IPrototypable
         Suspend();
     }
 
-    public void CheckIfInventorySufficient(Inventory inventory)
+    public void InventoryAvailable(Inventory inventory)
     {
         IsActive = true;
+        World.Current.InventoryManager.InventoryCreated -= InventoryAvailable;
+    }
+
+    public bool CheckIfInventorySufficient(Inventory inventory)
+    {
+        RequestedItem item = GetFirstDesiredItem();
+        if (item.Type == inventory.Type)
+        {
+            IsActive = true;
+            return true;
+        }
+
+        return false;
     }
 
     public void CancelJob()
@@ -624,19 +639,5 @@ public class Job : ISelectable, IPrototypable
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
-    }
-
-    // TODO: Why does this implement IPrototypable? It isn't a prototype.
-    public void ReadJsonPrototype(JProperty jsonProto)
-    {
-    }
-
-    public void FSMLogRequirements()
-    {
-        UnityDebugger.Debugger.Log("FSM", string.Format(" - {0} {1}", Type, acceptsAny ? "Any" : "All"));
-        foreach (RequestedItem item in RequestedItems.Values)
-        {
-            UnityDebugger.Debugger.Log("FSM", string.Format("   - {0}, min: {1}, max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested));
-        }
     }
 }

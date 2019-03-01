@@ -10,29 +10,33 @@ using System;
 using System.Collections.Generic;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
+using ProjectPorcupine.Pathfinding;
 
 public class JobManager
 {
-    private HashSet<Job> jobQueue;
+    private Dictionary<JobCategory, HashSet<Job>> jobQueue;
+
+    private CharacterJobPriority[] characterPriorityLevels = (CharacterJobPriority[])Enum.GetValues(typeof(CharacterJobPriority));
+
+    private JobCategory[] categories;
 
     public JobManager()
     {
-        jobQueue = new HashSet<Job>();
+        jobQueue = new Dictionary<JobCategory, HashSet<Job>>();
+        categories = PrototypeManager.JobCategory.Values.ToArray();
+        foreach (JobCategory category in categories)
+        {
+            jobQueue[category] = new HashSet<Job>();
+        }
     }
 
-    public event Action<Job> OnJobCreated;
+    public delegate void JobChanged(Job job);
 
-    public bool IsEmpty()
-    {
-        return jobQueue.Count == 0;
-    }
+    public event JobChanged JobCreated;
 
-    // Returns the job count in the queue.
-    // (Necessary, since jobQueue is private).
-    public int GetCount()
-    {
-        return jobQueue.Count;
-    }
+    public event JobChanged JobModified;
+
+    public event JobChanged JobRemoved;
 
     /// <summary>
     /// Add a job to the JobQueue.
@@ -40,11 +44,16 @@ public class JobManager
     /// <param name="job">The job to be inserted into the Queue.</param>
     public void Enqueue(Job job)
     {
-        DebugLog("Enqueue({0})", job.Type);
+        UnityDebugger.Debugger.LogFormat("JobManager", "Enqueue({0})", job.Type);
 
         job.IsBeingWorked = false;
 
-        jobQueue.Add(job);
+        if (job.Category == null)
+        {
+            UnityDebugger.Debugger.LogErrorFormat("JobManager", "Invalid category for job {1}", job);
+        }
+
+        jobQueue[job.Category].Add(job);
 
         if (job.JobTime < 0)
         {
@@ -54,9 +63,9 @@ public class JobManager
             return;
         }
 
-        if (OnJobCreated != null)
+        if (JobCreated != null)
         {
-            OnJobCreated(job);
+            JobCreated(job);
         }
     }
 
@@ -65,28 +74,72 @@ public class JobManager
     /// </summary>
     public Job GetJob(Character character)
     {
-        DebugLog("{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
+        UnityDebugger.Debugger.LogFormat("JobManager", "{0},{1} GetJob() (Queue size: {2})", character.GetName(), character.ID, jobQueue.Count);
         if (jobQueue.Count == 0)
         {
             return null;
         }
 
-        // This makes a large assumption that we are the only one accessing the queue right now
-        foreach (Job job in jobQueue)
-        { 
-            if (job.IsActive == false || job.IsBeingWorked == true)
+        foreach (CharacterJobPriority charPriority in characterPriorityLevels)
+        {
+            List<JobCategory> jobTypes = character.CategoriesOfPriority(charPriority);
+            foreach (JobCategory category in categories)
             {
-                continue;
+                if (jobTypes.Contains(category) == false)
+                {
+                    continue;
+                }
+
+                UnityDebugger.Debugger.LogFormat("JobManager", "{0} Looking for job of category {1} - {2} options available", character.Name, category.Type, jobQueue[category].Count);
+
+                Job.JobPriority bestJobPriority = Job.JobPriority.Low;
+
+                foreach (Job job in jobQueue[category])
+                {
+                    if (job.IsActive == false || job.IsBeingWorked == true)
+                    {
+                        continue;
+                    }
+
+                    // Lower numbers indicate higher priority.
+                    if (bestJobPriority > job.Priority)
+                    {
+                        bestJobPriority = job.Priority;
+                    }
+                }
+
+                Job bestJob = null;
+                float bestJobPathtime = int.MaxValue;
+
+                foreach (Job job in jobQueue[category])
+                {
+                    if (job.IsActive == false || job.IsBeingWorked == true || job.Priority != bestJobPriority)
+                    {
+                        continue;
+                    }
+
+                    if (CanJobRun(job))
+                    {
+                        float pathtime = Pathfinder.FindMinPathTime(character.CurrTile, job.tile, job.adjacent, bestJobPathtime);
+                        if (pathtime < bestJobPathtime)
+                        {
+                            bestJob = job;
+                            bestJobPathtime = pathtime;
+                        }
+                    }
+                }
+
+                if (bestJob != null)
+                {
+                    UnityDebugger.Debugger.LogFormat("JobManager", "{0} Job Assigned {1} at {2}", character.ID, bestJob, bestJob.tile);
+                    if (JobModified != null)
+                    {
+                        JobModified(bestJob);
+                    }
+
+                    return bestJob;
+                }
             }
-
-            if (CanJobRun(job))
-            {
-                DebugLog("{0} Job Assigned {1} at {2}", character.ID, job, job.tile);
-
-                return job;
-            }
-
-            DebugLog(" - job failed requirements, test the next.");
         }
 
         return null;
@@ -94,7 +147,12 @@ public class JobManager
 
     public void Remove(Job job)
     {
-        jobQueue.Remove(job);
+        jobQueue[job.Category].Remove(job);
+
+        if (JobRemoved != null)
+        {
+            JobRemoved(job);
+        }
     }
 
     /// <summary>
@@ -102,7 +160,13 @@ public class JobManager
     /// </summary>
     public IEnumerable<Job> PeekAllJobs()
     {
-        return jobQueue;
+        foreach (IEnumerable<Job> queue in jobQueue.Values)
+        {
+            foreach (Job job in queue)
+            {
+                yield return job;
+            }
+        }
     }
 
     private bool CanJobRun(Job job)
@@ -111,33 +175,27 @@ public class JobManager
         if (job.RequestedItems.Count > 0 && job.GetFirstFulfillableInventoryRequirement() == null)
         {
             string missing = job.acceptsAny ? "*" : job.GetFirstDesiredItem().Type;
-            DebugLog(" - missingInventory {0}", missing);
             job.SuspendWaitingForInventory(missing);
+            if (JobModified != null)
+            {
+                JobModified(job);
+            }
+
             return false;
         }
         else if ((job.tile != null && job.tile.IsReachableFromAnyNeighbor(true) == false) ||
             job.CharsCantReachCount == World.Current.CharacterManager.Characters.Count)
         {
             // No one can reach the job.
-            DebugLog("JobQueue", "- Job can't be reached");
             job.Suspend();
-            return false;
-        }
-        else
-        {
-            DebugLog(" - {0}", job.acceptsAny ? "Any" : "All");
-            foreach (RequestedItem item in job.RequestedItems.Values)
+            if (JobModified != null)
             {
-                DebugLog("   - {0} Min: {1}, Max: {2}", item.Type, item.MinAmountRequested, item.MaxAmountRequested);
+                JobModified(job);
             }
+
+            return false;
         }
 
         return true;
-    }
-
-    [System.Diagnostics.Conditional("FSM_DEBUG_LOG")]
-    private void DebugLog(string message, params object[] par)
-    {
-        UnityDebugger.Debugger.LogFormat("FSM", message, par);
     }
 }

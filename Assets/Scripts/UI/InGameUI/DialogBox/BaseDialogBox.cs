@@ -40,19 +40,24 @@ public abstract class BaseDialogBox : BaseUIElement
     /// </summary>
     public OnCloseAction OnClose;
 
-    // Was the game controller modal before this dialog
-    public bool wasModal;
+    // Force this dialog to close, taking the stance of a cancel exit.
+    public void ForceCloseDialog()
+    {
+        result.AddParameter(new Parameter("ExitStatus", "Force"));
+        DialogExit();
+    }
 
-    protected void CloseDialog()
+    public void SoftCloseDialog()
+    {
+        result.AddParameter(new Parameter("ExitStatus", "Soft"));
+        DialogExit();
+    }
+
+    private void DialogExit()
     {
         OnClose(result);
         OnClose = null;
         callerData = null;
-        if (!wasModal)
-        {
-            GameController.Instance.IsModal = false;
-        }
-        wasModal = false;
     }
 
     /// <summary>
@@ -66,7 +71,7 @@ public abstract class BaseDialogBox : BaseUIElement
         }
     }
 
-    public string GetStringParam(string key, bool require = true)
+    protected string GetStringParam(string key, bool require = true)
     {
         string val = null;
         if (callerData != null && callerData.ContainsKey(key)) 
@@ -85,7 +90,7 @@ public abstract class BaseDialogBox : BaseUIElement
         return val;
     }
 
-    public float? GetFloatParam(string key, bool require = true)
+    protected float? GetFloatParam(string key, bool require = true)
     {
         float? val = null;
         if (callerData != null && callerData.ContainsKey(key)) 
@@ -104,7 +109,7 @@ public abstract class BaseDialogBox : BaseUIElement
         return val;
     }
 
-    public int? GetIntParam(string key, bool require = true)
+    protected int? GetIntParam(string key, bool require = true)
     {
         int? val = null;
         if (callerData != null && callerData.ContainsKey(key)) 
@@ -123,7 +128,7 @@ public abstract class BaseDialogBox : BaseUIElement
         return val;
     }
 
-    public bool? GetBoolParam(string key, bool require = true)
+    protected bool? GetBoolParam(string key, bool require = true)
     {
         bool? val = null;
         if (callerData != null && callerData.ContainsKey(key)) 
@@ -142,7 +147,7 @@ public abstract class BaseDialogBox : BaseUIElement
         return val;
     }
 
-    public string[] GetStringArray(string key, bool require = true, params char[] separators)
+    protected string[] GetStringArray(string key, bool require = true, params char[] separators)
     {
         string[] res = null;
         if (callerData.ContainsKey(key))

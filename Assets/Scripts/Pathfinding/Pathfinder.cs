@@ -47,6 +47,20 @@ namespace ProjectPorcupine.Pathfinding
         }
 
         /// <summary>
+        /// Calculates the distance between tiles, bailing out if that distance exceeds a threshold.
+        /// </summary>
+        /// <param name="start">Start tile.</param>
+        /// <param name="end">The Goal Tile.</param>
+        /// <param name="adjacent">Allows being adjacent.</param>
+        /// <param name="maxPathTime">Maximum path time before bail out.</param>
+        /// <returns>Path time between start and end tiles.</returns>
+        public static float FindMinPathTime(Tile start, Tile end, bool adjacent = false, float maxPathTime = float.MaxValue)
+        {
+            Path_AStar resolver = new Path_AStar(World.Current, start, GoalTileEvaluator(end, adjacent), ManhattanDistance(end), maxPathTime);
+            return resolver.PathTime;
+        }
+
+        /// <summary>
         /// Finds the path to tile.
         /// </summary>
         /// <returns>The path to tile.</returns>
@@ -222,10 +236,10 @@ namespace ProjectPorcupine.Pathfinding
                 }
 
                 Tile targetTile = null;
-                float distance = 0f;
+                float distance = float.MaxValue;
                 foreach (Furniture furniture in World.Current.FurnitureManager.Where(furniture => furniture.Type == type))
                 {
-                    if (targetTile == null || Vector3.Distance(nearestExit.Vector3, furniture.Tile.Vector3) < distance)
+                    if (Vector3.Distance(nearestExit.Vector3, furniture.Tile.Vector3) < distance)
                     {
                         distance = Vector3.Distance(nearestExit.Vector3, furniture.Tile.Vector3);
                         targetTile = furniture.Tile;
@@ -308,14 +322,17 @@ namespace ProjectPorcupine.Pathfinding
                 // Tile is either adjacent on the same level, or directly above/below, and if above, is empty
                 return tile => (
                     (tile.X >= minX && tile.X <= maxX &&
-                    tile.Y >= minY && tile.Y <= maxY &&
-                    tile.Z == goalTile.Z &&
-                    goalTile.IsClippingCorner(tile) == false) ||
-                    ((tile.Z >= minZ && tile.Z <= maxZ &&
-                    tile.X == goalTile.X &&
-                    tile.Y == goalTile.Y) &&
-                    (tile.Z >= goalTile.Z ||
-                    tile.Type == TileType.Empty)));
+                        tile.Y >= minY && tile.Y <= maxY &&
+                        tile.Z == goalTile.Z &&
+                        goalTile.IsClippingCorner(tile) == false) ||
+                    ((tile.Z == minZ &&
+                        tile.X == goalTile.X &&
+                        tile.Y == goalTile.Y) &&
+                        tile.Type == TileType.Empty) || // Ceiling is empty
+                    ((tile.Z == maxZ &&
+                        tile.X == goalTile.X &&
+                        tile.Y == goalTile.Y) &&
+                        goalTile.Type == TileType.Empty));   // Tile where the character stand is empty
             }
             else
             {
