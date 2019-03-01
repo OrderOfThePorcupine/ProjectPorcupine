@@ -207,9 +207,9 @@ namespace ProjectPorcupine.Pathfinding
             return path;
         }
 
-        public static bool IsRoomReachable(Room start, Room goal)
+        public static bool IsRoomReachable(Room start, HashSet<Room> goal)
         {
-            if (start == null || goal == null)
+            if (start == null || goal == null || goal.Count == 0)
             {
                 return false;
             }
@@ -229,7 +229,7 @@ namespace ProjectPorcupine.Pathfinding
                 foreach (Path_Edge<Room> edge in nodes[currentRoom].edges)
                 {
                     Room room = edge.node.data;
-                    if (room == goal)
+                    if (goal.Contains(room))
                     {
                         return true;
                     }
