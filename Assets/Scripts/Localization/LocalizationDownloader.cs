@@ -275,7 +275,7 @@ namespace ProjectPorcupine.Localization
                 // If there are files without that extension then:
                 // a) someone made a change to localization system and didn't update this
                 // b) We are in a wrong directory, so let's hope we didn't delete anything important.
-                if (file.Extension != ".lang" && file.Extension != ".meta" && file.Extension != ".ver" && file.Extension != ".md" && file.Name != "config.json" && file.Name != "config.xml")
+                if (file.Extension != ".lang" && file.Extension != ".meta" && file.Extension != ".ver" && file.Extension != ".md" && file.Name != "config.json")
                 {
                     UnityDebugger.Debugger.LogError("LocalizationDownloader", "SOMETHING WENT HORRIBLY WRONG AT DOWNLOADING LOCALIZATION!");
                     throw new Exception("SOMETHING WENT HORRIBLY WRONG AT DOWNLOADING LOCALIZATION!");

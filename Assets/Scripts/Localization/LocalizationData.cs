@@ -23,7 +23,7 @@ namespace ProjectPorcupine.Localization
         [JsonProperty("code")]
         private readonly string localizationCode;
 
-        // Even for RTL languages, this is kept as defined in xml. The property does the character reversal
+        // Even for RTL languages, this is kept as defined in the config files. The property does the character reversal
         [JsonProperty("name")]
         private string localName;
 
