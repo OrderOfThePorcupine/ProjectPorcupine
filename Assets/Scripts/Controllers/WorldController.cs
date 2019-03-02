@@ -227,7 +227,7 @@ public class WorldController : MonoBehaviour
     /// </summary>
     /// <param name="filePath">Where to save (Full path).</param>
     /// <returns>Returns the thread that is currently saving data to HDD.</returns>
-    public Thread SaveWorld(string filePath)
+    public Thread SaveWorld(string filePath, System.Action onSave = null)
     {
         // Make sure the save folder exists.
         if (Directory.Exists(GameController.Instance.FileSaveBasePath()) == false)
@@ -246,7 +246,13 @@ public class WorldController : MonoBehaviour
 
         // Launch saving operation in a separate thread.
         // This reduces lag while saving by a little bit.
-        Thread t = new Thread(new ThreadStart(delegate { SaveWorldToHdd(worldJson, writer); }));
+        Thread t = new Thread(new ThreadStart(delegate {
+            SaveWorldToHdd(worldJson, writer);
+            if (onSave != null)
+            {
+                onSave();
+            }
+        }));
         t.Start();
 
         return t;

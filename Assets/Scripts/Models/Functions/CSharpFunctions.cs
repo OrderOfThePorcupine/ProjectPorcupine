@@ -81,12 +81,12 @@ public class CSharpFunctions : IFunctions
             evaluator = new Evaluator(new CompilerContext(settings, CompilationResult));
             evaluator.ReferenceAssembly(Assembly.GetExecutingAssembly());
 
+            // Add all unity assemblies
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
             for (int i = 0; i < assemblies.Length; i++)
             {
-                // only load unity assemblies
-                if (assemblies[i].FullName.Contains("Unity"))
+                // only load unity assemblies and the unity debugger
+                if (assemblies[i].FullName.Contains("UnityEngine") || assemblies[i].FullName.Contains("UnityDebugger"))
                 {
                     evaluator.ReferenceAssembly(assemblies[i]);
                 }
@@ -122,7 +122,7 @@ public class CSharpFunctions : IFunctions
             {
                 UnityDebugger.Debugger.LogError(
                     "CSharp",
-                    string.Format("[{0}] CSharp compile errors ({1}): {2}", scriptName, CompilationResult.Errors.Count, CompilationResult.GetErrorsLog()));
+                    string.Format("[{0}] CSharp compile errors ({1}):\n{2}\nException Details: {3}", scriptName, CompilationResult.Errors.Count, CompilationResult.GetErrorsLog(), ex));
             }
             else
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Linq;
 using DeveloperConsole;
 using ProjectPorcupine.Localization;
@@ -11,106 +12,11 @@ using UnityEngine.UI;
 
 public abstract class DialogBoxFileBase : BaseDialogBox
 {
+    protected GameObject content;
     protected InputField textField;
     protected List<DialogBoxListItem> items = new List<DialogBoxListItem>();
 
-    public void Clicked(int indexColoured, int clickAmount)
-    {
-        if (clickAmount == 1)
-        {
-            for (int i = 0; i < items.Count; i++)
-            {
-                if (i != indexColoured)
-                {
-                    items[i].image.color = new Color32(0, 149, 217, 80);
-                }
-                else
-                {
-                    textField.text = items[i].fileName;
-                    items[i].image.color = new Color32(0, 149, 217, 160);
-                }
-            }
-        }
-        else if (clickAmount >= 2 && items.Count > indexColoured && indexColoured > 0)
-        {
-            DoubleClick(indexColoured);
-        }
-    }
-
-    protected void Delete(string file)
-    {
-        var data = new Dictionary<string, object>()
-        {
-            { "Prompt", "prompt_delete_file" },
-            { "Buttons", new string[] { "button_yes", "cancel" } },
-            { "PromptLocalizationData", new object[] { file } }
-        };
-        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (res) => {
-            if (res["ExitButton"].ToString() == "button_yes")
-            {
-                // delete file
-                File.Delete(file);
-                items.Clear();
-                PopulateScrollRect();
-            }
-        });
-    }
-
-    protected abstract void DoubleClick(int index);
-
-    protected abstract void PopulateScrollRect();
-
-    /// <summary>
-    /// If directory doesn't exist EnsureDirectoryExists will create one.
-    /// </summary>
-    /// <param name="directoryPath">Full directory path.</param>
-    protected void EnsureDirectoryExists(string directoryPath)
-    {
-        if (Directory.Exists(directoryPath) == false)
-        {
-            UnityDebugger.Debugger.LogWarning("DialogBoxLoadSaveGame", "Directory: " + directoryPath + " doesn't exist - creating.");
-            Directory.CreateDirectory(directoryPath);
-        }
-    }
-
-    protected IEnumerable<FileInfo> GetSaveList()
-    {
-        string saveDirectoryPath = GameController.Instance.FileSaveBasePath();
-        EnsureDirectoryExists(saveDirectoryPath);
-
-        DirectoryInfo saveDir = new DirectoryInfo(saveDirectoryPath);
-        return saveDir.GetFiles("*.sav").OrderByDescending(f => f.LastWriteTime);
-    }
-}
-
-public class DialogBoxListItem : MonoBehaviour, IPointerClickHandler
-{
-    public DialogBoxFileBase box;
-    public string fileName;
-    public Image image;
-    public int index;
-    public string fullName;
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        box.Clicked(index, eventData.clickCount);
-    }
-}
-
-public class DialogBoxLoad : DialogBoxFileBase
-{
-    GameObject content;
-    protected override void DoubleClick(int index)
-    {
-        LoadFile(items[index].fullName);
-    }
-
-    private void LoadFile(string fullName)
-    {
-        Debug.Log("Loaded: " + fullName);
-    }
-
-    protected override void PopulateScrollRect()
+    public void PopulateScrollRect()
     {
         content.SetActive(false);
         foreach (Transform child in content.transform)
@@ -156,6 +62,268 @@ public class DialogBoxLoad : DialogBoxFileBase
         content.SetActive(true);
     }
 
+    public void Clicked(int indexColoured, int clickAmount)
+    {
+        if (clickAmount == 1)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (i != indexColoured)
+                {
+                    items[i].image.color = new Color32(0, 149, 217, 80);
+                }
+                else
+                {
+                    textField.text = items[i].fileName;
+                    items[i].image.color = new Color32(0, 149, 217, 160);
+                }
+            }
+        }
+        else if (clickAmount >= 2 && items.Count > indexColoured && indexColoured > 0)
+        {
+            DoubleClick(indexColoured);
+        }
+    }
+
+    protected void Delete(string file)
+    {
+        var data = new Dictionary<string, object>()
+        {
+            { "Prompt", "prompt_delete_file" },
+            { "Buttons", new string[] { "button_yes", "cancel" } },
+            { "PromptLocalizationData", new object[] { file } }
+        };
+        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (res) => {
+            if (res["ExitButton"].ToString() == "button_yes")
+            {
+                // delete file
+                File.Delete(file);
+                items.Clear();
+                PopulateScrollRect();
+            }
+        });
+    }
+
+    protected abstract void DoubleClick(int index);
+
+    /// <summary>
+    /// If directory doesn't exist EnsureDirectoryExists will create one.
+    /// </summary>
+    /// <param name="directoryPath">Full directory path.</param>
+    protected void EnsureDirectoryExists(string directoryPath)
+    {
+        if (Directory.Exists(directoryPath) == false)
+        {
+            UnityDebugger.Debugger.LogWarning("DialogBoxLoadSaveGame", "Directory: " + directoryPath + " doesn't exist - creating.");
+            Directory.CreateDirectory(directoryPath);
+        }
+    }
+
+    protected IEnumerable<FileInfo> GetSaveList()
+    {
+        string saveDirectoryPath = GameController.Instance.FileSaveBasePath();
+        EnsureDirectoryExists(saveDirectoryPath);
+
+        DirectoryInfo saveDir = new DirectoryInfo(saveDirectoryPath);
+        return saveDir.GetFiles("*.sav").OrderByDescending(f => f.LastWriteTime);
+    }
+}
+
+public class DialogBoxListItem : MonoBehaviour, IPointerClickHandler
+{
+    public DialogBoxFileBase box;
+    public string fileName;
+    public Image image;
+    public int index;
+    public string fullName;
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        box.Clicked(index, eventData.clickCount);
+    }
+}
+
+public class DialogBoxSave : DialogBoxFileBase
+{
+    protected override void DoubleClick(int index)
+    {
+        SaveFile(items[index].fileName);
+    }
+
+    private void ActuallySaveFile(string filePath)
+    {
+        GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
+        var promptData = new Dictionary<string, object>()
+        {
+            { "Prompt", "message_saving_game" },
+        };
+        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", promptData, (res) => {
+            // Just show a quick 'game saved' then close it
+            promptData = new Dictionary<string, object>()
+            {
+                { "Prompt", "message_game_saved" }
+            };
+            GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", promptData);
+            new Thread(() => {
+                Thread.Sleep(TimeSpan.FromSeconds(1.5));
+                GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
+            });
+        });
+
+        Thread thread = WorldController.Instance.SaveWorld(filePath, () => {
+            GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
+        });
+    }
+
+    private void SaveFile(string fileName)
+    {
+        if (fileName == string.Empty)
+        {
+            var data = new Dictionary<string, object>()
+            {
+                { "Prompt", "message_name_or_file_needed_for_save" },
+                { "Buttons", new string[] { "okay" } }
+            };
+            GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, null);
+            return;
+        }
+
+        // Right now fileName is just what was in the dialog box.  We need to pad this out to the full
+        // path, plus an extension!
+        // In the end, we're looking for something that's going to be similar to this (depending on OS)
+        //    <User>\ApplicationData\MyCompanyName\MyGameName\Saves\SaveGameName123.sav
+        string path = GameController.Instance.FileSaveBasePath();
+        EnsureDirectoryExists(path);
+        string filePath = System.IO.Path.Combine(path, fileName + ".sav");
+
+        if (File.Exists(filePath))
+        {
+            var data = new Dictionary<string, object>()
+            {
+                { "Prompt", "prompt_overwrite_existing_file" },
+                { "PromptLocalizationData", filePath },
+                { "Buttons", new string[] { "yes", "no" } }
+            };
+            GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (res) => {
+                if (res["ExitButton"].ToString() == "button_yes")
+                {
+                    // save
+                    ActuallySaveFile(filePath);
+                }
+            });
+        }
+        else
+        {
+            ActuallySaveFile(filePath);
+        }
+    }
+
+    public override GameObject InitializeElement()
+    {
+        result = new Parameter();
+        GameObject element = new GameObject();
+        VerticalLayoutGroup group = element.AddComponent<VerticalLayoutGroup>();
+        group.padding = new RectOffset(0, 0, 0, 0);
+        group.spacing = 0;
+        group.childAlignment = TextAnchor.LowerCenter;
+
+        GameObject textAndScroll = new GameObject();
+        group = textAndScroll.AddComponent<VerticalLayoutGroup>();
+        textAndScroll.transform.SetParent(element.transform);
+        group.padding = new RectOffset(30, 30, 20, 5);
+        group.spacing = 0;
+        group.childAlignment = TextAnchor.UpperCenter;
+
+        Text text = CreateTextCustom("save", Color.white, FontAnitaSemiSquare, true, TextAnchor.UpperCenter);
+        text.transform.SetParent(textAndScroll.transform);
+
+        content = CreateScrollView(textAndScroll, false, true, 200, 80);
+        group = content.AddComponent<VerticalLayoutGroup>();
+        group.padding = new RectOffset(0, 0, 0, 0);
+        group.spacing = 10;
+
+        AutomaticVerticalSize sizer = content.AddComponent<AutomaticVerticalSize>();
+        sizer.childHeight = 50f;
+
+        GameObject bottom_bar = GetFluidHorizontalBaseElement("Bottom", true, true, allocatedHeight: 40);
+        HorizontalLayoutGroup layout = bottom_bar.GetComponent<HorizontalLayoutGroup>();
+        layout.padding = new RectOffset(30, 30, 0, 30);
+        layout.spacing = 10;
+        layout.transform.SetParent(element.transform);
+        layout.childForceExpandHeight = false;
+        layout.childAlignment = TextAnchor.LowerCenter;
+
+        textField = CreateInputField("");
+        textField.transform.SetParent(bottom_bar.transform);
+        AllocateSpaceForGameObject(textField.gameObject, 40, 80);
+
+        Button submit = CreateButton("save");
+        submit.transform.SetParent(bottom_bar.transform);
+        submit.onClick.AddListener(() => {
+            SaveFile(textField.text);
+        });
+
+        Button cancel = CreateButton("cancel");
+        cancel.transform.SetParent(bottom_bar.transform);
+        cancel.onClick.AddListener(() => {
+            GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
+        });
+
+        PopulateScrollRect();
+        return element;
+    }
+}
+
+public class DialogBoxLoad : DialogBoxFileBase
+{
+    protected override void DoubleClick(int index)
+    {
+        LoadFile(items[index].fileName);
+    }
+
+    private void LoadFile(string fileName)
+    {
+        if (fileName == string.Empty)
+        {
+            var promptData = new Dictionary<string, object>()
+            {
+                { "Prompt", "message_file_needed_for_load" },
+                { "Buttons", new string[] { "okay" } }
+            };
+            GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", promptData, null);
+            return;
+        }
+
+        // Right now fileName is just what was in the dialog box.  We need to pad this out to the full
+        // path, plus an extension!
+        // In the end, we're looking for something that's going to be similar to this (depending on OS)
+        //    <User>\ApplicationData\MyCompanyName\MyGameName\Saves\SaveGameName123.sav
+        string loc = GameController.Instance.FileSaveBasePath();
+        EnsureDirectoryExists(loc);
+        string filePath = System.IO.Path.Combine(loc, fileName + ".sav");
+        if (!File.Exists(filePath))
+        {
+            var errData = new Dictionary<string, object>()
+            {
+                { "Prompt", "message_file_doesn't_exist" },
+                { "PromptLocalizationData", filePath },
+                { "Buttons", new string[] { "okay" } }
+            };
+            GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", errData, null);
+        }
+        else
+        {
+            GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
+
+            var data = new Dictionary<string, object>()
+            {
+                { "Prompt", "message_loading_game" },
+            };
+            GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, null);
+            SceneController.LoadWorld(filePath);
+        }
+    }
+
     public override GameObject InitializeElement()
     {
         result = new Parameter();
@@ -195,7 +363,7 @@ public class DialogBoxLoad : DialogBoxFileBase
         textField.transform.SetParent(bottom_bar.transform);
         AllocateSpaceForGameObject(textField.gameObject, 40, 80);
 
-        Button submit = CreateButton("submit");
+        Button submit = CreateButton("load");
         submit.transform.SetParent(bottom_bar.transform);
         submit.onClick.AddListener(() => {
             LoadFile(textField.text);
@@ -385,7 +553,7 @@ public class DialogBoxPrompt : BaseDialogBox
         group.spacing = 10;
 
         string prompt = GetStringParam("Prompt");
-        string[] buttons = GetStringArray("Buttons");
+        string[] buttons = GetStringArray("Buttons", false) ?? new string[0];
         object[] extraData = GetObjectArray("PromptLocalizationData", false) ?? new object[0];
 
         Text text = CreateTextCustom(prompt, Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter, true, extraData);
