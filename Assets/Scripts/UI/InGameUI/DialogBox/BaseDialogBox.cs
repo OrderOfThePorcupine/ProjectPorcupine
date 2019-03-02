@@ -145,6 +145,26 @@ public abstract class BaseDialogBox : BaseUIElement
         return val;
     }
 
+    protected object[] GetObjectArray(string key, bool require = true, params char[] separators)
+    {
+        object[] res = null;
+        if (callerData.ContainsKey(key))
+        {
+            res = (object[])callerData[key];
+        }
+        else if (parameterData.ContainsKey(key))
+        {
+            // comma separated list
+            res = parameterData[key].ToString().Split(separators);
+        }
+        else if (require)
+        {
+            UnityDebugger.Debugger.LogError("DialogBox", "Was expecting " + key + " parameter data");
+        }
+
+        return res;
+    }
+
     protected string[] GetStringArray(string key, bool require = true, params char[] separators)
     {
         string[] res = null;

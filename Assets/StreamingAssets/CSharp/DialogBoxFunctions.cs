@@ -22,12 +22,12 @@ public abstract class DialogBoxFileBase : BaseDialogBox
             {
                 if (i != indexColoured)
                 {
-                    items[i].image.color = Color.white;
+                    items[i].image.color = new Color32(0, 149, 217, 80);
                 }
                 else
                 {
                     textField.text = items[i].fileName;
-                    items[i].image.color = Color.blue;
+                    items[i].image.color = new Color32(0, 149, 217, 160);
                 }
             }
         }
@@ -39,9 +39,21 @@ public abstract class DialogBoxFileBase : BaseDialogBox
 
     protected void Delete(string file)
     {
-        Debug.Log("DELETE: " + file);
-        items.Clear();
-        PopulateScrollRect();
+        var data = new Dictionary<string, object>()
+        {
+            { "Prompt", "prompt_delete_file" },
+            { "Buttons", new string[] { "button_yes", "cancel" } },
+            { "PromptLocalizationData", new object[] { file } }
+        };
+        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (res) => {
+            if (res["ExitButton"].ToString() == "button_yes")
+            {
+                // delete file
+                File.Delete(file);
+                items.Clear();
+                PopulateScrollRect();
+            }
+        });
     }
 
     protected abstract void DoubleClick(int index);
@@ -88,7 +100,6 @@ public class DialogBoxListItem : MonoBehaviour, IPointerClickHandler
 public class DialogBoxLoad : DialogBoxFileBase
 {
     GameObject content;
-
     protected override void DoubleClick(int index)
     {
         LoadFile(items[index].fullName);
@@ -101,6 +112,7 @@ public class DialogBoxLoad : DialogBoxFileBase
 
     protected override void PopulateScrollRect()
     {
+        content.SetActive(false);
         foreach (Transform child in content.transform)
         {
             GameObject.Destroy(child.gameObject);
@@ -111,21 +123,27 @@ public class DialogBoxLoad : DialogBoxFileBase
         {
             string fileName = Path.GetFileNameWithoutExtension(file.FullName);
             string formattedName = string.Format("{0}\n<i>{1}</i>", fileName, file.LastWriteTime);
-            GameObject horizontal = GetFluidHorizontalBaseElement(fileName, true, true);
+            GameObject horizontal = GetFluidHorizontalBaseElement(fileName, true, true, allocatedHeight: 60);
             horizontal.transform.SetParent(content.transform);
             Image image = horizontal.AddComponent<Image>();
-            image.sprite = null;
+            GameObject.Destroy(horizontal.GetComponent<LayoutElement>());
+            horizontal.transform.localScale = Vector3.one;
 
-            Text text = CreateTextCustom(formattedName, Color.white, FontAnitaSemiSquare, true, TextAnchor.UpperCenter, false);
+            image.color = new Color32(0, 149, 217, 80);
+
+            Text text = CreateTextCustom(formattedName, Color.black, FontAnitaSemiSquare, true, TextAnchor.UpperCenter, false);
             text.transform.SetParent(horizontal.transform);
 
             Button delete = CreateButton("");
             delete.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/x");
+            delete.transition = Button.Transition.None;
             delete.transform.SetParent(horizontal.transform);
             delete.onClick.AddListener(() => {
                 string name = file.FullName;
                 Delete(name);
             });
+            AspectRatioFitter ratio = delete.gameObject.AddComponent<AspectRatioFitter>();
+            ratio.aspectMode = AspectRatioFitter.AspectMode.HeightControlsWidth;
 
             DialogBoxListItem item = horizontal.AddComponent<DialogBoxListItem>();
             item.box = this;
@@ -135,37 +153,58 @@ public class DialogBoxLoad : DialogBoxFileBase
             item.image = image;
             items.Add(item);
         }
+        content.SetActive(true);
     }
 
     public override GameObject InitializeElement()
     {
         result = new Parameter();
-        GameObject element = GetFluidVerticalBaseElement("Box", true, true);
-        VerticalLayoutGroup group = element.GetComponent<VerticalLayoutGroup>();
-        group.padding = new RectOffset(50, 50, 30, 50);
-        group.spacing = 20;
+        GameObject element = new GameObject();
+        VerticalLayoutGroup group = element.AddComponent<VerticalLayoutGroup>();
+        group.padding = new RectOffset(0, 0, 0, 0);
+        group.spacing = 0;
+        group.childAlignment = TextAnchor.LowerCenter;
+
+        GameObject textAndScroll = new GameObject();
+        group = textAndScroll.AddComponent<VerticalLayoutGroup>();
+        textAndScroll.transform.SetParent(element.transform);
+        group.padding = new RectOffset(30, 30, 20, 5);
+        group.spacing = 0;
+        group.childAlignment = TextAnchor.UpperCenter;
 
         Text text = CreateTextCustom("load", Color.white, FontAnitaSemiSquare, true, TextAnchor.UpperCenter);
-        text.transform.SetParent(element.transform);
+        text.transform.SetParent(textAndScroll.transform);
 
-        content = CreateScrollView(element, false, true, 200, 80);
+        content = CreateScrollView(textAndScroll, false, true, 200, 80);
         group = content.AddComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(0, 0, 0, 0);
-        group.spacing = 20;
+        group.spacing = 10;
 
-        GameObject bottom_bar = GetFluidHorizontalBaseElement("Bottom", true, true);
+        AutomaticVerticalSize sizer = content.AddComponent<AutomaticVerticalSize>();
+        sizer.childHeight = 50f;
+
+        GameObject bottom_bar = GetFluidHorizontalBaseElement("Bottom", true, true, allocatedHeight: 40);
         HorizontalLayoutGroup layout = bottom_bar.GetComponent<HorizontalLayoutGroup>();
-        layout.padding = new RectOffset(0, 0, 0, 0);
-        layout.spacing = 20;
+        layout.padding = new RectOffset(30, 30, 0, 30);
+        layout.spacing = 10;
         layout.transform.SetParent(element.transform);
+        layout.childForceExpandHeight = false;
+        layout.childAlignment = TextAnchor.LowerCenter;
 
         textField = CreateInputField("");
         textField.transform.SetParent(bottom_bar.transform);
+        AllocateSpaceForGameObject(textField.gameObject, 40, 80);
 
         Button submit = CreateButton("submit");
         submit.transform.SetParent(bottom_bar.transform);
         submit.onClick.AddListener(() => {
             LoadFile(textField.text);
+        });
+
+        Button cancel = CreateButton("cancel");
+        cancel.transform.SetParent(bottom_bar.transform);
+        cancel.onClick.AddListener(() => {
+            GameController.Instance.DialogBoxManager.SoftCloseTopDialog();
         });
 
         PopulateScrollRect();
@@ -211,8 +250,9 @@ public class DialogBoxOptions : BaseDialogBox
         result = new Parameter();
         GameObject element = GetFluidVerticalBaseElement("Box", true, true);
         VerticalLayoutGroup group = element.GetComponent<VerticalLayoutGroup>();
-        group.padding = new RectOffset(50, 50, 30, 50);
-        group.spacing = 20;
+        group.padding = new RectOffset(50, 50, 30, 30);
+        group.spacing = 10;
+        group.childForceExpandHeight = false;
 
         Text text = CreateTextCustom("menu_options", Color.white, FontAnitaSemiSquare, true, TextAnchor.UpperCenter);
         text.transform.SetParent(element.transform);
@@ -342,16 +382,14 @@ public class DialogBoxPrompt : BaseDialogBox
         GameObject element = GetFluidVerticalBaseElement("Box", true, true);
         VerticalLayoutGroup group = element.GetComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(30, 30, 30, 30);
-        group.spacing = 0;
+        group.spacing = 10;
 
         string prompt = GetStringParam("Prompt");
         string[] buttons = GetStringArray("Buttons");
+        object[] extraData = GetObjectArray("PromptLocalizationData", false) ?? new object[0];
 
-        Text text = CreateText(prompt, false, TextAnchor.UpperCenter);
+        Text text = CreateTextCustom(prompt, Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter, true, extraData);
         text.transform.SetParent(element.transform);
-        text.color = Color.white;
-        text.font = Resources.Load<Font>("Fonts/anita-semi-square/Anita semi square");
-        text.resizeTextForBestFit = true;
 
         GameObject horizontal = GetFluidHorizontalBaseElement("Buttons", true, true, allocatedHeight: 40);
         horizontal.transform.SetParent(element.transform);

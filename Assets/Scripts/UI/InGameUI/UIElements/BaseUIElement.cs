@@ -150,7 +150,7 @@ public abstract class BaseUIElement
         baseLayout.minHeight = allocatedHeight;
     }
 
-    protected Text CreateTextCustom(string withText, Color color, string font, bool bestFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
+    protected Text CreateTextCustom(string withText, Color color, string font, bool bestFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true, params object[] localizationData)
     {
         if (loadedResources.ContainsKey("Text") == false)
         {
@@ -163,7 +163,7 @@ public abstract class BaseUIElement
 
         if (localize)
         {
-            text.text = LocalizationTable.GetLocalization(withText);
+            text.text = LocalizationTable.GetLocalization(withText, localizationData);
         }
         else
         {
@@ -180,7 +180,7 @@ public abstract class BaseUIElement
         return text;
     }
 
-    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
+    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true, params object[] localizationData)
     {
         if (loadedResources.ContainsKey("Text") == false)
         {
@@ -191,7 +191,7 @@ public abstract class BaseUIElement
 
         if (localize)
         {
-            text.text = LocalizationTable.GetLocalization(withText);
+            text.text = LocalizationTable.GetLocalization(withText, localizationData);
         }
         else
         {

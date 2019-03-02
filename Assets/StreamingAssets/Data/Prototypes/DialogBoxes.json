@@ -4,8 +4,8 @@
       "ClassName": "DialogBoxLoad",
       "Position": { "x": "50%", "y": "50%" },
       "Dimensions": {
-        "width": "25%",
-        "height": "50%"
+        "width": "30%",
+        "height": "60%"
       },
       "Background": "general"
     },
@@ -13,8 +13,8 @@
       "ClassName": "DialogBoxSave",
       "Position": { "x": "50%", "y": "50%" },
       "Dimensions": {
-        "width": "25%",
-        "height": "50%"
+        "width": "30%",
+        "height": "60%"
       },
       "Background": "general"
     },
@@ -36,8 +36,8 @@
       "ClassName": "DialogBoxButtonMenu",
       "Position": { "x": "50%", "y": "50%" },
       "Dimensions": {
-        "width": "25%",
-        "height": "50%"
+        "width": "35%",
+        "height": "60%"
       },
       "Background": "general"
     },
@@ -45,8 +45,8 @@
       "ClassName": "DialogBoxOptions",
       "Position": { "x": "50%", "y": "50%" },
       "Dimensions": {
-        "width": "25%",
-        "height": "50%"
+        "width": "35%",
+        "height": "60%"
       },
       "Background": "general"
     },
