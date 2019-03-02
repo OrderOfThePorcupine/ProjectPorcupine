@@ -23,22 +23,28 @@ public class DialogBoxPrototype : IPrototypable
     /// <summary>
     /// Data about this class
     /// </summary>
-    public UIComponent classData;
+    public UIComponent classData { get; private set; }
 
     /// <summary>
     /// The dimensions of the dialog box.
     /// </summary>
-    public BoxedDimensions size;
+    public BoxedDimensions size { get; private set; }
 
     /// <summary>
     /// The position of the dialog box.
     /// </summary>
-    public Vector2 position;
+    public Vector2 position { get; private set; }
 
     /// <summary>
     /// The name of the dialog box
     /// </summary>
     public string Type { get; set; }
+
+    /// <summary>
+    /// The type of background.
+    /// </summary>
+    /// <value></value>
+    public string Background { get; private set; }
 
     /// <summary>
     /// Reads the prototype from the specified JObject.
@@ -56,6 +62,7 @@ public class DialogBoxPrototype : IPrototypable
             UnityDebugger.Debugger.LogError("DialogBox", "Error occurred in parsing position: " + err);
         }
 
+        Background = jsonProto.Value["Background"].ToString() ?? "general";
         position = new Vector2(x ?? 0f, y ?? 0f);
         size = BoxedDimensions.ReadJsonPrototype(jsonProto.Value["Dimensions"]);
         classData = new UIComponent();

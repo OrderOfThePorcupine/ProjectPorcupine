@@ -20,8 +20,6 @@ using UnityEngine.UI;
 public class DialogBoxHandler
 {
     private GameObject root;
-    private GameObject baseDialogTemplate;
-
     private Stack<BaseDialogBox> currentDialogs = new Stack<BaseDialogBox>();
 
     public bool IsModal
@@ -32,19 +30,17 @@ public class DialogBoxHandler
         }
     }
 
-    public DialogBoxHandler(GameObject parent, GameObject baseTemplate)
+    public DialogBoxHandler(GameObject parent)
     {
         root = new GameObject("Dialog Boxes", typeof(RectTransform));
         root.transform.SetParent(parent.transform, false);
         root.transform.SetAsLastSibling();
         RectTransform transform = root.GetComponent<RectTransform>();
         transform.anchorMax = new Vector2(1, 1);
-        transform.anchorMin = new Vector2();
-        transform.position = new Vector3();
-        transform.offsetMax = new Vector2();
-        transform.offsetMin = new Vector2();
-
-        baseDialogTemplate = baseTemplate;
+        transform.anchorMin = Vector2.zero;
+        transform.position = Vector3.zero;
+        transform.offsetMax = Vector2.zero;
+        transform.offsetMin = Vector2.zero;
     }
 
     /// <summary>
@@ -147,14 +143,15 @@ public class DialogBoxHandler
     private void FinalizeDialogBox(BaseDialogBox box)
     {
         GameObject go = box.InitializeElement();
-        GameObject baseDialog = GameObject.Instantiate(baseDialogTemplate, Vector3.one, Quaternion.identity, root.transform);
+        GameObject resource = Resources.Load<GameObject>("UI/DialogBoxes/DialogBox_" + box.prototype.Background);
+        GameObject baseDialog = GameObject.Instantiate(resource, Vector3.one, Quaternion.identity, root.transform);
         box.root = baseDialog;
         RectTransform transform = baseDialog.GetComponent<RectTransform>();
         Vector2 pos = box.prototype.position;
         BoxedDimensions size = box.prototype.size;
 
-        transform.anchorMax = new Vector2(pos.x + size.right / 2, pos.y + size.top / 2);
-        transform.anchorMin = new Vector2(pos.x - size.left / 2, pos.y - size.bottom / 2);
+        transform.anchorMax = new Vector2(pos.x + size.right, pos.y + size.top);
+        transform.anchorMin = new Vector2(pos.x - size.left, pos.y - size.bottom);
         transform.offsetMax = Vector2.zero;
         transform.offsetMin = Vector2.zero;
 

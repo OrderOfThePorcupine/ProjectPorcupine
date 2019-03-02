@@ -1,28 +1,65 @@
 {
   "DialogBox": {
-    // "Options": {
-    //   "ClassName": "DialogBoxOptions",
-    //   "Position": { "x": "50%", "y": "50%" },
-    //   "Dimensions": {
-    //     "top": "25%",
-    //     "bottom": "25%",
-    //     "left": "10%",
-    //     "right": "10%"
-    //   },
-    //   "Parameters": {
-    //     "Title": "Options"
-    //   }
-    //   // same as "Dimensions": { "height": "50%", "width": "20%" }
-    // },
+    "Load": {
+      "ClassName": "DialogBoxLoad",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "25%",
+        "height": "50%"
+      },
+      "Background": "general"
+    },
+    "Save": {
+      "ClassName": "DialogBoxSave",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "25%",
+        "height": "50%"
+      },
+      "Background": "general"
+    },
+    "LoadingScreen": {
+      "ClassName": "DialogBoxPrompt",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "top": "12.5%",
+        "bottom": "12.5%",
+        "left": "12.5%",
+        "right": "12.5%"
+      },
+      "Background": "prompt",
+      "Parameters": {
+        "Prompt": "message_creating_new_world"
+      }
+    },
+    "ButtonMenu": {
+      "ClassName": "DialogBoxButtonMenu",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "25%",
+        "height": "50%"
+      },
+      "Background": "general"
+    },
+    "Options": {
+      "ClassName": "DialogBoxOptions",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "25%",
+        "height": "50%"
+      },
+      "Background": "general"
+    },
     "Prompt": {
       "ClassName": "DialogBoxPrompt",
       "Position": { "x": "50%", "y": "50%" },
       "Dimensions": {
-        "top": "25%",
-        "bottom": "25%",
-        "left": "25%",
-        "right": "25%"
+        "top": "12.5%",
+        "bottom": "12.5%",
+        "left": "12.5%",
+        "right": "12.5%"
       },
+      "Background": "prompt"
     }
   }
 }

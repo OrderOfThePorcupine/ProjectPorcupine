@@ -72,14 +72,21 @@ public class CSharpFunctions : IFunctions
 
         try
         {
-            evaluator = new Evaluator(new CompilerContext(new CompilerSettings(), CompilationResult));
+            CompilerSettings settings = new CompilerSettings();
+
+            // only optimise on release builds so that we have faster loadtimes
+            // when debugging
+            settings.Optimize = !UnityEngine.Debug.isDebugBuild;
+
+            evaluator = new Evaluator(new CompilerContext(settings, CompilationResult));
+            evaluator.ReferenceAssembly(Assembly.GetExecutingAssembly());
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             for (int i = 0; i < assemblies.Length; i++)
             {
-                // skip System.Core to prevent ambigious error when using System.Linq in scripts
-                if (!assemblies[i].FullName.Contains("System.Core"))
+                // only load unity assemblies
+                if (assemblies[i].FullName.Contains("Unity"))
                 {
                     evaluator.ReferenceAssembly(assemblies[i]);
                 }
@@ -111,9 +118,18 @@ public class CSharpFunctions : IFunctions
         }
         catch (Exception ex)
         {
-            UnityDebugger.Debugger.LogError(
+            if (CompilationResult.HasErrors)
+            {
+                UnityDebugger.Debugger.LogError(
+                    "CSharp",
+                    string.Format("[{0}] CSharp compile errors ({1}): {2}", scriptName, CompilationResult.Errors.Count, CompilationResult.GetErrorsLog()));
+            }
+            else
+            {
+                UnityDebugger.Debugger.LogError(
                         "CSharp",
-                        string.Format("[{0}] Problem loading functions from CSharp script: {1}", scriptName, ex.ToString()));
+                        string.Format("[{0}] Problem loading functions from CSharp script: {1}", scriptName, ex.Message));
+            }
         }
 
         return success;

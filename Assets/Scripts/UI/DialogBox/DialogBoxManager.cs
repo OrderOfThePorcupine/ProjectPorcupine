@@ -130,7 +130,7 @@ public class DialogBoxManager : MonoBehaviour
             "menu_options",
             () =>
             {
-                dialogBoxOptions.ShowDialog();
+                GameController.Instance.DialogBoxManager.ShowDialogBox("Options");
             },
             "menu_quests");
     }

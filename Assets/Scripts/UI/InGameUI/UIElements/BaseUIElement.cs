@@ -37,6 +37,8 @@ public abstract class BaseUIElement
     /// </summary>
     public abstract GameObject InitializeElement();
 
+    protected const string FontAnitaSemiSquare = "Fonts/anita-semi-square/Anita semi square";
+
     protected GameObject GetFluidHorizontalBaseElement(string elementTitle = "", bool stretchX = false, bool stretchY = false, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
@@ -125,11 +127,57 @@ public abstract class BaseUIElement
         return go;
     }
 
+    protected GameObject CreateScrollView(GameObject parent, bool horizontal, bool vertical, int height = 180, int width = 60)
+    {
+        if (loadedResources.ContainsKey("ScrollView") == false)
+        {
+            loadedResources["ScrollView"] = Resources.Load<GameObject>("UI/Elements/ScrollView");
+        }
+
+        GameObject go = GameObject.Instantiate(loadedResources["ScrollView"]);
+        ScrollRect scroll = go.GetComponent<ScrollRect>();
+        scroll.horizontal = horizontal;
+        scroll.vertical = vertical;
+        AllocateSpaceForGameObject(go, height, width);
+        go.transform.SetParent(parent.transform);
+        return go.transform.GetChild(0).GetChild(0).gameObject;
+    }
+
     protected void AllocateSpaceForGameObject(GameObject toAllocate, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         LayoutElement baseLayout = toAllocate.AddComponent<LayoutElement>();
         baseLayout.minWidth = allocatedWidth;
         baseLayout.minHeight = allocatedHeight;
+    }
+
+    protected Text CreateTextCustom(string withText, Color color, string font, bool bestFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
+    {
+        if (loadedResources.ContainsKey("Text") == false)
+        {
+            loadedResources["Text"] = Resources.Load<GameObject>("UI/Elements/Text");
+        }
+
+        Text text = GameObject.Instantiate(loadedResources["Text"]).GetComponent<Text>();
+        text.color = color;
+        text.font = Resources.Load<Font>(font);
+
+        if (localize)
+        {
+            text.text = LocalizationTable.GetLocalization(withText);
+        }
+        else
+        {
+            text.text = withText;
+        }
+
+        text.alignment = alignment;
+
+        if (bestFit == true)
+        {
+            text.resizeTextForBestFit = true;
+        }
+
+        return text;
     }
 
     protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)

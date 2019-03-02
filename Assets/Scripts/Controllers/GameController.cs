@@ -56,7 +56,7 @@ public class GameController : MonoBehaviour
         EnableDontDestroyOnLoad();
 
         SoundController = new SoundController();
-        DialogBoxManager = new DialogBoxHandler(GameObject.Find("Canvas"), Resources.Load<GameObject>("UI/DialogBoxes/DialogBox"));
+        DialogBoxManager = new DialogBoxHandler(GameObject.Find("Canvas"));
 
         IsModal = false;
         IsPaused = false;

@@ -50,7 +50,11 @@ public abstract class BaseDialogBox : BaseUIElement
     /// </summary>
     public void Destroy()
     {
-        OnClose(result);
+        if (OnClose != null)
+        {
+            OnClose(result);
+        }
+
         GameObject.Destroy(root);
     }
 
