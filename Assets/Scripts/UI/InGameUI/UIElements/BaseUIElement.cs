@@ -209,6 +209,24 @@ public abstract class BaseUIElement
         return text;
     }
 
+    protected Button CreateTextButton(string text, bool localize = true)
+    {
+        if (loadedResources.ContainsKey("TextButton") == false)
+        {
+            loadedResources["TextButton"] = Resources.Load<GameObject>("UI/Elements/TextButton");
+        }
+
+        if (localize)
+        {
+            text = LocalizationTable.GetLocalization(text);
+        }
+
+        Button button = GameObject.Instantiate(loadedResources["TextButton"]).GetComponent<Button>();
+        button.GetComponent<Text>().text = text;
+        
+        return button;
+    }
+
     protected Button CreateButton(string text, bool localize = true)
     {
         if (loadedResources.ContainsKey("Button") == false)

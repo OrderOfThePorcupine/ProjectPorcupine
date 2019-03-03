@@ -202,24 +202,34 @@ public class DialogBoxQuests : BaseDialogBox
         GameObject.Destroy(scroll.GetComponent<LayoutGroup>());
 
         AutomaticVerticalSize sizer = content.AddComponent<AutomaticVerticalSize>();
-        sizer.childHeight = 250f;
+        sizer.childHeight = 270f;
 
         IEnumerable<Quest> quests = Quest.GetCompletableQuests();
 
+        int i = 0;
         foreach (Quest quest in quests)
         {
             GameObject questGo = new GameObject(quest.Name);
             questGo.transform.SetParent(content.transform);
+            questGo.AddComponent<Image>().color = (i++ % 2 == 0) ? new Color32(0, 149, 217, 80) : new Color32(0, 149, 217, 160);
             VerticalLayoutGroup vertical = questGo.AddComponent<VerticalLayoutGroup>();
+            vertical.padding = new RectOffset(20, 20, 10, 10);
+            vertical.spacing = 0;
+            vertical.childAlignment = TextAnchor.UpperLeft;
+            vertical.childForceExpandHeight = false;
+
+            GameObject textLoc = new GameObject("text");
+            textLoc.transform.SetParent(questGo.transform);
+            vertical = textLoc.AddComponent<VerticalLayoutGroup>();
             vertical.padding = new RectOffset(0, 0, 0, 0);
             vertical.spacing = 0;
             vertical.childAlignment = TextAnchor.UpperLeft;
 
             text = CreateTextCustom(quest.Name, Color.white, FontAnitaSemiSquare, false, TextAnchor.UpperCenter, false);
-            text.transform.SetParent(questGo.transform);
+            text.transform.SetParent(textLoc.transform);
 
             text = CreateTextCustom(quest.Description, Color.white, FontAnitaSemiSquare, false, TextAnchor.MiddleLeft, false);
-            text.transform.SetParent(questGo.transform);
+            text.transform.SetParent(textLoc.transform);
 
             StringBuilder goals = new StringBuilder("Goals: ");
             foreach (QuestGoal goal in quest.Goals)
@@ -231,7 +241,7 @@ public class DialogBoxQuests : BaseDialogBox
             }
 
             text = CreateTextCustom(goals.ToString(), Color.white, FontAnitaSemiSquare, false, TextAnchor.MiddleLeft, false);
-            text.transform.SetParent(questGo.transform);
+            text.transform.SetParent(textLoc.transform);
 
             StringBuilder rewards = new StringBuilder("Rewards: ");
             foreach (QuestReward reward in quest.Rewards)
@@ -242,10 +252,21 @@ public class DialogBoxQuests : BaseDialogBox
             }
 
             text = CreateTextCustom(rewards.ToString(), Color.white, FontAnitaSemiSquare, false, TextAnchor.MiddleLeft, false);
-            text.transform.SetParent(questGo.transform);
+            text.transform.SetParent(textLoc.transform);
+
+            GameObject buttons = new GameObject("buttons");
+            buttons.transform.SetParent(questGo.transform);
+            vertical = buttons.AddComponent<VerticalLayoutGroup>();
+            vertical.padding = new RectOffset(0, 0, 0, 0);
+            vertical.spacing = 0;
+            vertical.childAlignment = TextAnchor.LowerRight;
+            vertical.GetComponent<RectTransform>().pivot = new Vector2(1, 0.5f);
+            AspectRatioFitter tmpRatio = buttons.AddComponent<AspectRatioFitter>();
+            tmpRatio.aspectMode = AspectRatioFitter.AspectMode.HeightControlsWidth;
+            tmpRatio.aspectRatio = 4;
 
             Button accept = CreateButton("accept");
-            accept.transform.SetParent(questGo.transform);
+            accept.transform.SetParent(buttons.transform);
             accept.onClick.AddListener(() => {
                 Quest copy = quest;
                 copy.IsAccepted = true;
@@ -300,6 +321,7 @@ public class DialogBoxJobList : BaseDialogBox
 {
     private Color primaryColor = new Color32(0, 149, 217, 80);
     private Color secondaryColor = new Color32(0, 149, 217, 160);
+    private Color selectedColor = new Color32(0, 149, 217, 160);
     private GameObject content;
 
     public void Clicked(int index, Character character)
@@ -307,14 +329,15 @@ public class DialogBoxJobList : BaseDialogBox
         Image[] images = content.GetComponentsInChildren<Image>();
         for (int i = 0; i < images.Length; i++)
         {
-            if (i == index)
+            if (i != index)
             {
-                images[i].color = primaryColor;
+                images[i].color = i % 2 == 0 ? primaryColor : secondaryColor;
             }
             else
             {
-                images[i].color = secondaryColor;
+                images[i].color = selectedColor;
             }
+            images[i].GetComponentInChildren<Button>().gameObject.SetActive(i == index);
         }
 
         // center on character
@@ -358,23 +381,21 @@ public class DialogBoxJobList : BaseDialogBox
             GameObject job = new GameObject(i.ToString());
             job.transform.SetParent(content.transform);
             HorizontalLayoutGroup horizGroup = job.AddComponent<HorizontalLayoutGroup>();
-            horizGroup.padding = new RectOffset(0, 0, 0, 0);
+            horizGroup.padding = new RectOffset(10, 0, 0, 0);
             horizGroup.spacing = 10;
             horizGroup.childAlignment = TextAnchor.MiddleLeft;
 
             Image image = job.AddComponent<Image>();
             GameObject.Destroy(job.GetComponent<LayoutElement>());
             job.transform.localScale = Vector3.one;
-            image.color = primaryColor;
+            image.color = i % 2 == 0 ? primaryColor : secondaryColor;
 
             string jobDescription = LocalizationTable.GetLocalization(character.GetJobDescription());
 
             text = CreateTextCustom(string.Format("<b>{0}</b> - {1}", character.GetName(), jobDescription), Color.white, FontAnitaSemiSquare, false, localize: false);
             text.transform.SetParent(job.transform);
 
-            Button delete = CreateButton("");
-            delete.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/x");
-            delete.transition = Button.Transition.None;
+            Button delete = CreateTextButton("X");
             delete.transform.SetParent(job.transform);
             delete.onClick.AddListener(() => {
                 Character copy = character;
@@ -383,9 +404,7 @@ public class DialogBoxJobList : BaseDialogBox
                 GameObject.Destroy(copyGo);
             });
             delete.GetComponent<RectTransform>().pivot = new Vector2(1, 0.5f);
-            AspectRatioFitter ratio = delete.gameObject.AddComponent<AspectRatioFitter>();
-            ratio.aspectMode = AspectRatioFitter.AspectMode.HeightControlsWidth;
-            GameObject.Destroy(delete.GetComponent<LayoutElement>());
+            delete.gameObject.SetActive(false);
 
             DialogBoxJobListItem item = job.AddComponent<DialogBoxJobListItem>();
             item.box = this;
@@ -438,7 +457,8 @@ public class DialogBoxTrade : BaseDialogBox
     private Text tradeCost;
     private Button acceptButton;
     public Trade currentTrade;
-
+    private Color primaryColor = new Color32(0, 149, 217, 80);
+    private Color secondaryColor = new Color32(0, 149, 217, 160);
     public void BuildHeader()
     {
         float tradeAmount = currentTrade.TradeCurrencyBalanceForPlayer;
@@ -514,7 +534,7 @@ public class DialogBoxTrade : BaseDialogBox
         content = CreateScrollView(scrollview, false, true, 200, 80);
         horizGroup = content.AddComponent<HorizontalLayoutGroup>();
         horizGroup.padding = new RectOffset(0, 0, 0, 0);
-        horizGroup.spacing = 10;
+        horizGroup.spacing = 0;
 
         // we have 6 columns
         VerticalLayoutGroup[] groups = new VerticalLayoutGroup[6];
@@ -525,8 +545,10 @@ public class DialogBoxTrade : BaseDialogBox
             AutomaticVerticalSize sizer = groups[i].gameObject.AddComponent<AutomaticVerticalSize>();
             sizer.childHeight = 50f;
             groups[i].padding = new RectOffset(0, 0, 0, 0);
-            groups[i].spacing = 5;
+            groups[i].spacing = 0;
             groups[i].transform.localScale = Vector3.one;
+            Image image = groups[i].gameObject.AddComponent<Image>();
+            image.color = i % 2 == 0 ? primaryColor : secondaryColor;
         }
 
         foreach (TradeItem tradeItem in currentTrade.TradeItems)
@@ -534,22 +556,23 @@ public class DialogBoxTrade : BaseDialogBox
             TradeItemElement element = new TradeItemElement();
             element.item = tradeItem;
 
-            text = CreateTextCustom(tradeItem.Type, Color.black, FontAnitaSemiSquare, true);
+            text = CreateTextCustom(tradeItem.Type, Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter);
             text.transform.SetParent(groups[0].transform);
 
-            element.playerStock = CreateTextCustom("", Color.black, FontAnitaSemiSquare, true);
+            element.playerStock = CreateTextCustom("", Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter);
             element.playerStock.transform.SetParent(groups[1].transform);
 
-            text = CreateTextCustom(tradeItem.PlayerSellItemPrice.ToString("N2"), Color.black, FontAnitaSemiSquare, true);
+            text = CreateTextCustom(tradeItem.PlayerSellItemPrice.ToString("N2"), Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter);
             text.transform.SetParent(groups[2].transform);
 
             // Buttons
-            GameObject buttons = GetFluidHorizontalBaseElement("Buttons", true, true, allocatedHeight: 25);
+            GameObject buttons = GetFluidHorizontalBaseElement("Buttons", true, true);
             buttons.transform.SetParent(groups[3].transform);
             GameObject.Destroy(buttons.GetComponent<LayoutElement>());
             buttons.transform.localScale = Vector3.one;
+            buttons.GetComponent<HorizontalLayoutGroup>().spacing = 0;
 
-            Button buyAll = CreateButton("<<", false);
+            Button buyAll = CreateTextButton("<<", false);
             buyAll.transform.SetParent(buttons.transform);
             buyAll.onClick.AddListener(() => {
                 TradeItemElement copy = element;
@@ -558,11 +581,14 @@ public class DialogBoxTrade : BaseDialogBox
                 BuildHeader();
             });
 
-            Button buyOne = CreateButton("<", false);
+            Button buyOne = CreateTextButton("<", false);
             buyOne.transform.SetParent(buttons.transform);
             buyOne.onClick.AddListener(() => {
                 TradeItemElement copy = element;
-                copy.item.TradeAmount++;
+                if (copy.item.TradeAmount < int.MaxValue)
+                {
+                    copy.item.TradeAmount++;
+                }
                 copy.UpdateInterface();
                 BuildHeader();
             });
@@ -572,22 +598,35 @@ public class DialogBoxTrade : BaseDialogBox
             element.tradeAmount.contentType = InputField.ContentType.IntegerNumber;
             element.tradeAmount.onEndEdit.AddListener((string val) => {
                 TradeItemElement copy = element;
-                copy.item.TradeAmount = int.Parse(val);
+                int tmp;
+                if (!int.TryParse(val, out tmp))
+                {
+                    element.tradeAmount.text = int.MaxValue.ToString();
+                    tmp = int.MaxValue;
+                }
                 copy.UpdateInterface();
                 BuildHeader();
             });
             element.tradeAmount.textComponent.alignment = TextAnchor.MiddleCenter;
+            element.tradeAmount.gameObject.AddComponent<LayoutElement>().minWidth = 60;
+            element.tradeAmount.textComponent.horizontalOverflow = HorizontalWrapMode.Wrap;
+            element.tradeAmount.textComponent.verticalOverflow = VerticalWrapMode.Overflow;
+            element.tradeAmount.textComponent.resizeTextForBestFit = true;
+            element.tradeAmount.textComponent.resizeTextMaxSize = 30;
 
-            Button sellOne = CreateButton(">", false);
+            Button sellOne = CreateTextButton(">", false);
             sellOne.transform.SetParent(buttons.transform);
             sellOne.onClick.AddListener(() => {
                 TradeItemElement copy = element;
-                copy.item.TradeAmount--;
+                if (copy.item.TradeAmount > int.MinValue)
+                {
+                    copy.item.TradeAmount--;
+                }
                 copy.UpdateInterface();
                 BuildHeader();
             });
 
-            Button sellAll = CreateButton(">>", false);
+            Button sellAll = CreateTextButton(">>", false);
             sellAll.transform.SetParent(buttons.transform);
             sellAll.onClick.AddListener(() => {
                 TradeItemElement copy = element;
@@ -596,10 +635,10 @@ public class DialogBoxTrade : BaseDialogBox
                 BuildHeader();
             });
 
-            text = CreateTextCustom(tradeItem.TraderSellItemPrice.ToString("N2"), Color.black, FontAnitaSemiSquare, true);
+            text = CreateTextCustom(tradeItem.TraderSellItemPrice.ToString("N2"), Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter);
             text.transform.SetParent(groups[4].transform);
 
-            element.tradeStock = CreateTextCustom("", Color.black, FontAnitaSemiSquare, true);
+            element.tradeStock = CreateTextCustom("", Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter);
             element.tradeStock.transform.SetParent(groups[5].transform);
             element.UpdateInterface();
         }
@@ -647,6 +686,9 @@ public abstract class DialogBoxFileBase : BaseDialogBox
     protected ScrollRect scroll;
     protected InputField textField;
     protected List<DialogBoxListItem> items = new List<DialogBoxListItem>();
+    protected Color primaryColor = new Color32(0, 149, 217, 80);
+    protected Color secondaryColor = new Color32(0, 149, 217, 160);
+    protected Color selectedColor = new Color32(0, 149, 217, 255);
 
     public void PopulateScrollRect()
     {
@@ -660,29 +702,30 @@ public abstract class DialogBoxFileBase : BaseDialogBox
         foreach (FileInfo file in GetSaveList())
         {
             string fileName = Path.GetFileNameWithoutExtension(file.FullName);
-            string formattedName = string.Format("{0}\n<i>{1}</i>", fileName, file.LastWriteTime);
+            string formattedName = string.Format("{0}\n<i><size=11>{1}</size></i>", fileName, file.LastWriteTime);
             GameObject horizontal = GetFluidHorizontalBaseElement(fileName, true, true, allocatedHeight: 60);
             horizontal.transform.SetParent(content.transform);
+            HorizontalLayoutGroup group = horizontal.GetComponent<HorizontalLayoutGroup>();
+            group.spacing = 10;
+            group.padding = new RectOffset(0, 10, 0, 0);
+
             Image image = horizontal.AddComponent<Image>();
             GameObject.Destroy(horizontal.GetComponent<LayoutElement>());
             horizontal.transform.localScale = Vector3.one;
 
-            image.color = new Color32(0, 149, 217, 80);
+            image.color = count % 2 == 0 ? primaryColor : secondaryColor;
 
-            Text text = CreateTextCustom(formattedName, Color.black, FontAnitaSemiSquare, true, TextAnchor.UpperCenter, false);
+            Text text = CreateTextCustom(formattedName, Color.white, FontAnitaSemiSquare, true, TextAnchor.UpperCenter, false);
             text.transform.SetParent(horizontal.transform);
 
-            Button delete = CreateButton("");
-            delete.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/x");
-            delete.transition = Button.Transition.None;
+            Button delete = CreateTextButton("X");
             delete.transform.SetParent(horizontal.transform);
             delete.onClick.AddListener(() => {
                 string name = file.FullName;
                 Delete(name);
             });
-            delete.GetComponent<RectTransform>().pivot = new Vector2(1, 0.5f);
-            AspectRatioFitter ratio = delete.gameObject.AddComponent<AspectRatioFitter>();
-            ratio.aspectMode = AspectRatioFitter.AspectMode.HeightControlsWidth;
+            // delete.GetComponent<RectTransform>().pivot = new Vector2(1, 0.5f);
+            delete.gameObject.SetActive(false);
 
             DialogBoxListItem item = horizontal.AddComponent<DialogBoxListItem>();
             item.box = this;
@@ -690,6 +733,7 @@ public abstract class DialogBoxFileBase : BaseDialogBox
             item.fullName = file.FullName;
             item.index = count++;
             item.image = image;
+            item.deleteButton = delete;
             items.Add(item);
         }
         scroll.scrollSensitivity = count / 2;
@@ -704,13 +748,14 @@ public abstract class DialogBoxFileBase : BaseDialogBox
             {
                 if (i != indexColoured)
                 {
-                    items[i].image.color = new Color32(0, 149, 217, 80);
+                    items[i].image.color = i % 2 == 0 ? primaryColor : secondaryColor;
                 }
                 else
                 {
                     textField.text = items[i].fileName;
-                    items[i].image.color = new Color32(0, 149, 217, 160);
+                    items[i].image.color = selectedColor;
                 }
+                items[i].deleteButton.gameObject.SetActive(i == indexColoured);
             }
         }
         else if (clickAmount >= 2 && items.Count > indexColoured && indexColoured > 0)
@@ -770,6 +815,7 @@ public class DialogBoxListItem : MonoBehaviour, IPointerClickHandler
     public Image image;
     public int index;
     public string fullName;
+    public Button deleteButton;
 
     public void OnPointerClick(PointerEventData eventData)
     {
