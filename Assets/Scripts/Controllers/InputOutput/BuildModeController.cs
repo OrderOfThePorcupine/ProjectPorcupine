@@ -299,7 +299,7 @@ public class BuildModeController : IMouseHandler
                 }
                 else
                 {
-                    UnityDebugger.Debugger.LogError("BuildModeController", "There is no furniture job prototype for '" + utilityType + "'");
+                    UnityDebugger.Debugger.LogError("BuildModeController", "There is no utility job prototype for '" + utilityType + "'");
                     job = new Job(tile, utilityType, World.Current.UtilityManager.ConstructJobCompleted, 0.1f, null, Job.JobPriority.High, "construct")
                     {
                         Description = "job_build_" + utilityType + "_desc"
