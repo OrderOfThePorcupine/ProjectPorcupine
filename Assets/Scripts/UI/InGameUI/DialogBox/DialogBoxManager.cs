@@ -17,7 +17,7 @@ using UnityEngine.UI;
 /// <summary>
 /// The controller for dialog boxes.
 /// </summary>
-public class DialogBoxHandler
+public class DialogBoxManager : MonoBehaviour
 {
     private GameObject root;
     private Stack<BaseDialogBox> currentDialogs = new Stack<BaseDialogBox>();
@@ -30,9 +30,14 @@ public class DialogBoxHandler
         }
     }
 
-    public DialogBoxHandler(GameObject parent)
+    /// <summary>
+    /// Create a new handler.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <returns></returns>
+    public static DialogBoxManager CreateDialogBoxManager(GameObject parent)
     {
-        root = new GameObject("Dialog Boxes", typeof(RectTransform));
+        GameObject root = new GameObject("Dialog Boxes", typeof(RectTransform));
         root.transform.SetParent(parent.transform, false);
         root.transform.SetAsLastSibling();
         RectTransform transform = root.GetComponent<RectTransform>();
@@ -41,6 +46,26 @@ public class DialogBoxHandler
         transform.position = Vector3.zero;
         transform.offsetMax = Vector2.zero;
         transform.offsetMin = Vector2.zero;
+        DialogBoxManager dialogBoxManager = root.AddComponent<DialogBoxManager>();
+        dialogBoxManager.root = root;
+        return dialogBoxManager;
+    }
+
+    public static DialogBoxManager FindInstance()
+    {
+        if (MainMenuController.Instance != null)
+        {
+            return MainMenuController.Instance.DialogBoxManager;
+        }
+        else if (WorldController.Instance.DialogBoxManager != null)
+        {
+            return WorldController.Instance.DialogBoxManager;
+        }
+        else
+        {
+            UnityDebugger.Debugger.LogError("DialogBox", "Couldn't find DialogBoxManager");
+            return null;
+        }
     }
 
     /// <summary>
@@ -105,25 +130,50 @@ public class DialogBoxHandler
         }
     }
 
-    public void ShowDialogBox(string name, Dictionary<string, object> data = null, BaseDialogBox.OnCloseAction action = null)
+    /// <summary>
+    /// Shows a specific dialog box with custom data and action upon exit.
+    /// </summary>
+    /// <param name="name">The name of the dialog box to open</param>
+    /// <param name="data">Custom data to pass in</param>
+    /// <param name="action">Upon exit of the dialog box this function is called</param>
+    /// <param name="closeAfterSeconds">Close the top dialog box after this amount of time</param>
+    /// <remarks>
+    ///     "closeAfterSeconds" relies that the top dialog after that amount
+    ///     of time will be equal to the one spawned by this function.
+    /// </remarks>
+
+    public void ShowDialogBox(string name, Dictionary<string, object> data = null, BaseDialogBox.OnCloseAction action = null, float? closeAfterSeconds = null)
     {
         DialogBoxPrototype proto = PrototypeManager.DialogBox.Get(name);
-        BaseDialogBox box = FunctionsManager.DialogBox.CreateInstance<BaseDialogBox>(proto.classData.Type, false);
-        if (box != null)
+        if (proto == null)
         {
-            box.OnClose = action;
-            box.callerData = data;
-            box.prototype = proto;
-            box.parameterData = proto.classData.Parameters;
-            box.InitializeLUA();
-            FinalizeDialogBox(box);
+            UnityDebugger.Debugger.LogError("DialogBox", "DialogBoxPrototype doesn't exist: " + name);
         }
-        else
+
+        BaseDialogBox box = FunctionsManager.DialogBox.CreateInstance<BaseDialogBox>(proto.classData.Type, false);
+        if (box == null)
         {
             UnityDebugger.Debugger.LogError("DialogBox", "DialogBox doesn't exist: " + name);
         }
+
+        box.OnClose = action;
+        box.callerData = data ?? new Dictionary<string, object>();
+        box.prototype = proto;
+        box.parameterData = proto.classData.Parameters;
+        box.InitializeLUA();
+        FinalizeDialogBox(box);
+
+        if (closeAfterSeconds.HasValue)
+        {
+            Invoke("SoftCloseTopDialog", closeAfterSeconds.Value);
+        }
     }
 
+    /// <summary>
+    /// Enables/Disables if a box can be interacted by the event system.
+    /// </summary>
+    /// <param name="box">The box to change</param>
+    /// <param name="interactability">True means it can be interacted with</param>
     private void ChangeInteractabilityOfBox(BaseDialogBox box, bool interactability)
     {
         if (box != null)
@@ -132,6 +182,10 @@ public class DialogBoxHandler
         }
     }
 
+    /// <summary>
+    /// Enables/Disables if the top box can be interacted by the event system.
+    /// </summary>
+    /// <param name="interactability">True means it can be interacted with</param>
     private void ChangeInteractabilityOfTopDialog(bool interactability)
     {
         if (currentDialogs.Count > 0)
@@ -162,9 +216,6 @@ public class DialogBoxHandler
         transform.anchorMin = Vector2.zero;
         transform.offsetMax = Vector2.zero;
         transform.offsetMin = Vector2.zero;
-
-        //transform.anchorMin = new Vector2(pos.x - size.left / 2, pos.y - size.bottom / 2);
-        //transform.anchorMax = new Vector2(pos.x + size.right / 2, pos.y + size.top / 2);
 
         ChangeInteractabilityOfTopDialog(false);
         ChangeInteractabilityOfBox(box, true);

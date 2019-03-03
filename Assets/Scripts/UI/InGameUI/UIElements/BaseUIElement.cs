@@ -138,6 +138,7 @@ public abstract class BaseUIElement
         ScrollRect scroll = go.GetComponent<ScrollRect>();
         scroll.horizontal = horizontal;
         scroll.vertical = vertical;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
         AllocateSpaceForGameObject(go, height, width);
         go.transform.SetParent(parent.transform);
         return go.transform.GetChild(0).GetChild(0).gameObject;

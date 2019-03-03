@@ -154,7 +154,7 @@ function Stockpile_GetItemsFromFilter( furniture )
 end
 
 function Stockpile_SetNewFilter( furniture, character )
-    WorldController.Instance.DialogBoxManager.ShowDialogBoxByName("Filter")
+    DialogBoxManager.FindInstance().ShowDialogBoxByName("Filter")
 end
 
 function Stockpile_UpdateAction( furniture, deltaTime )

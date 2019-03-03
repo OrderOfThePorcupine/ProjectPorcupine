@@ -64,7 +64,7 @@ public class GameMenuController : MonoBehaviour
         Button button = gameObject.GetComponent<Button>();
         button.onClick.AddListener(delegate
             {
-                if (!GameController.Instance.IsModal)
+                if (!DialogBoxManager.FindInstance().IsModal)
                 {
                     DeactivateAll();
                     gameMenuItem.Trigger();

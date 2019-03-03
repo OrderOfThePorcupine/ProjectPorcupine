@@ -46,7 +46,7 @@ public abstract class BaseDialogBox : BaseUIElement
     public GameObject root;
 
     /// <summary>
-    /// Should only be called from DialogBoxHandler.
+    /// Should only be called from DialogBoxManager.
     /// </summary>
     public void Destroy()
     {

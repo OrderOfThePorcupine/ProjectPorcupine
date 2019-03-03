@@ -25,7 +25,7 @@ public class MainMenu : MonoBehaviour
         GameObject newWorldButton = CreateButtonGO(buttonPrefab, "New World", "new_world");
         newWorldButton.GetComponent<Button>().onClick.AddListener(delegate
         {
-            if (!GameController.Instance.IsModal)
+            if (!DialogBoxManager.FindInstance().IsModal)
             {
                 SceneController.ConfigureNewWorld();
             }
@@ -34,16 +34,16 @@ public class MainMenu : MonoBehaviour
         GameObject loadWorldButton = CreateButtonGO(buttonPrefab, "Load", "load");
         loadWorldButton.GetComponent<Button>().onClick.AddListener(delegate
         {
-            if (!GameController.Instance.IsModal)
+            if (!DialogBoxManager.FindInstance().IsModal)
             {
-                MainMenuController.Instance.DialogBoxManager.dialogBoxLoadGame.ShowDialog();
+                DialogBoxManager.FindInstance().ShowDialogBox("Load");
             }
         });
 
         GameObject settingsButton = CreateButtonGO(buttonPrefab, "Settings", "menu_settings");
         settingsButton.GetComponent<Button>().onClick.AddListener(delegate
         {
-            if (!GameController.Instance.IsModal)
+            if (!DialogBoxManager.FindInstance().IsModal)
             {
                 SettingsMenu.Open();
             }
@@ -52,7 +52,7 @@ public class MainMenu : MonoBehaviour
         GameObject quitButton = CreateButtonGO(buttonPrefab, "Quit", "menu_quit");
         quitButton.GetComponent<Button>().onClick.AddListener(delegate
         {
-            if (!GameController.Instance.IsModal)
+            if (!DialogBoxManager.FindInstance().IsModal)
             {
                 SceneController.QuitGame();
             }

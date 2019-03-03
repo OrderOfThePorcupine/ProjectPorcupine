@@ -33,7 +33,9 @@ public class TraderShipController : MonoBehaviour
 
     public SpriteRenderer Renderer { get; private set; }
 
-    public void Init(Vector3 leavingCoords, Vector3 landingCoords, float speed, Trader trader,  Dictionary<string, SpritenameAnimation> animations, SpriteRenderer renderer, float destinationReachedThreshold = 0.1f)
+    public Furniture LandingPad { get; private set; }
+
+    public void Init(Furniture destinationPad, Vector3 leavingCoords, Vector3 landingCoords, float speed, Trader trader,  Dictionary<string, SpritenameAnimation> animations, SpriteRenderer renderer, float destinationReachedThreshold = 0.1f)
     {
         this.LeavingCoordinates = leavingCoords;
         this.LandingCoordinates = landingCoords;
@@ -45,6 +47,7 @@ public class TraderShipController : MonoBehaviour
         this.AnimationIdle = animations["idle"];
         this.AnimationFlying = animations["flying"];
         this.Renderer = renderer;
+        this.LandingPad = destinationPad;
     }
 
     public void FixedUpdate()

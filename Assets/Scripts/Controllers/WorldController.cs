@@ -76,6 +76,20 @@ public class WorldController : MonoBehaviour
         }
     }
 
+    // @TODO: Find better place later on.
+    private void AddQuestList()
+    {
+        // TODO implement
+    //     Transform layoutRoot = GameObject.Find("Canvas").transform;
+    //     GameObject go = (GameObject)Instantiate(Resources.Load("UI/QuestsMainScreenBox"), layoutRoot.transform);
+    //     go.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, -55, 0);
+
+    //     GameObject buttonQuestGameObject = (GameObject)Instantiate(Resources.Load("UI/PinToggleButton"), this.gameObject.transform);
+    //     buttonQuestGameObject.name = "ToggleQuestPinButton";
+    //     buttonQuestGameObject.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, 0, 0);
+    //     buttonQuestGameObject.GetComponent<UnityEngine.UI.Toggle>().onValueChanged.AddListener(go.SetActive);
+    }
+
     public void OnEnable()
     {
         if (Instance == null || Instance == this)
@@ -160,8 +174,6 @@ public class WorldController : MonoBehaviour
         GameObject dateTimeDisplay = Instantiate(Resources.Load("UI/DateTimeDisplay"), canvas.transform, false) as GameObject;
         dateTimeDisplay.name = "DateTimeDisplay";
 
-        GameController.Instance.IsModal = false;
-
         // Settings UI is a 'dialog box' (kinda), so it comes here.  
         // Where as DevConsole is a constant menu item (it can appear 'anywhere' so it appears after)
         GameObject settingsMenu = (GameObject)Instantiate(Resources.Load("UI/SettingsMenu/SettingsMenu"));
@@ -173,9 +185,10 @@ public class WorldController : MonoBehaviour
             settingsMenu.SetActive(true);
         }
 
+        AddQuestList();
+
         // This will place it after context menu (and the inventory menu) and settings menu
-        DialogBoxManager = GameObject.Find("Dialog Boxes").GetComponent<DialogBoxManager>();
-        DialogBoxManager.transform.SetAsLastSibling();
+        DialogBoxManager = DialogBoxManager.CreateDialogBoxManager(canvas);
 
         GameObject devConsole = (GameObject)Instantiate(Resources.Load("UI/Console/DevConsole"));
 
@@ -187,6 +200,26 @@ public class WorldController : MonoBehaviour
             devConsole.SetActive(true);
             DeveloperConsole.DevConsole.Close();
         }
+
+        GameMenuManager.Instance.AddMenuItem(
+            "menu_work",
+            () => DialogBoxManager.FindInstance().ShowDialogBox("JobList"),
+            "menu_construction");
+
+        GameMenuManager.Instance.AddMenuItem(
+            "menu_world",
+            null,
+            "menu_work");
+
+        GameMenuManager.Instance.AddMenuItem(
+            "menu_quests",
+            () => DialogBoxManager.FindInstance().ShowDialogBox("Quests"),
+            "menu_world");
+
+        GameMenuManager.Instance.AddMenuItem(
+            "menu_options",
+            () => DialogBoxManager.FindInstance().ShowDialogBox("Options"),
+            "menu_quests");
     }
 
     /// <summary>

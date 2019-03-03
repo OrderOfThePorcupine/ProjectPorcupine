@@ -1,5 +1,41 @@
 {
   "DialogBox": {
+    "Quests": {
+      "ClassName": "DialogBoxQuests",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "45%",
+        "height": "70%"
+      },
+      "Background": "general"
+    },
+    "NewGame": {
+      "ClassName": "DialogBoxNewGame",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "40%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "JobList": {
+      "ClassName": "DialogBoxJobList",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "30%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "Trade": {
+      "ClassName": "DialogBoxTrade",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "60%",
+        "height": "80%"
+      },
+      "Background": "general"
+    },
     "Load": {
       "ClassName": "DialogBoxLoad",
       "Position": { "x": "50%", "y": "50%" },

@@ -54,7 +54,6 @@ public class SettingsMenu : MonoBehaviour
             return;
         }
 
-        GameController.Instance.IsModal = true;
         GameController.Instance.SoundController.OnButtonSFX();
 
         instance.changesTracker.Clear();
@@ -199,7 +198,7 @@ public class SettingsMenu : MonoBehaviour
             { "Prompt", "confirm_settings_menu_close" },
             { "Buttons", new string[] { "button_yes", "button_no" } }
         };
-        GameController.Instance.DialogBoxManager.ShowDialogBox("Prompt", data, (res) => {
+        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, (res) => {
             if (res["ExitButton"].ToString() == "button_yes")
             {
                 // cancel code
@@ -288,7 +287,6 @@ public class SettingsMenu : MonoBehaviour
     private void Exit()
     {
         currentCategory = string.Empty;
-        GameController.Instance.IsModal = false;
         mainRoot.SetActive(false);
         changesTracker.Clear();
     }
