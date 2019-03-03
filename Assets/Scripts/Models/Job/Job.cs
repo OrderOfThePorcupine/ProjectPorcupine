@@ -356,7 +356,6 @@ public class Job : ISelectable
                 // Let everyone know that the job is officially concluded
                 if (OnJobStopped != null)
                 {
-                    Debug.LogWarning("Job stopped from finishing work");
                     OnJobStopped(this);
                 }
             }
@@ -411,8 +410,6 @@ public class Job : ISelectable
     {
         if (OnJobStopped != null)
         {
-
-            Debug.LogWarning("Job stopped from being cancelled");
             OnJobStopped(this);
         }
 
