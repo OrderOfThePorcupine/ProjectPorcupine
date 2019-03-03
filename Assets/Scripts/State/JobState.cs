@@ -102,7 +102,6 @@ namespace ProjectPorcupine.Entities.States
 
             // Tell anyone else who cares that it was cancelled
             // We formerly called Called job.CancelJob() here, but that is incorrect for pausing a job, we may have to do cleanup that is now no longer done
-
             if (Job.IsNeed)
             {
                 return;
