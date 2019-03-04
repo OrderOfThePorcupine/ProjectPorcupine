@@ -6,59 +6,54 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
-using ProjectPorcupine.UI.Animation;
+
 using UnityEngine;
 
 public class MenuLeft : MonoBehaviour
 {
     // This is the parent of the menus.
     private Transform parent;
-
-    private GameObject CurrentlyOpen { get; set; }
+    private GameMenu currentlyOpen;
 
     // Use this for initialization
     public void Start()
     {
         parent = this.gameObject.transform;
 
-        GameObject constructionMenu = AddMenu("ConstructionMenu", "ConstructionMenu", typeof(ConstructionMenu));
-        GameObject orderMenu = AddMenu("OrderMenu", "ConstructionMenu", typeof(OrderMenu));
+        GameMenu constructionMenu = AddMenu("ConstructionMenu", "ConstructionMenu", typeof(ConstructionMenu));
+        GameMenu orderMenu = AddMenu("OrderMenu", "ConstructionMenu", typeof(OrderMenu));
 
         GameMenuManager.Instance.AddMenuItem("menu_construction", () => OnMenuButtonClicked(constructionMenu), 0);
         GameMenuManager.Instance.AddMenuItem("menu_orders", () => OnMenuButtonClicked(orderMenu), 1);
     }
 
-    public void OpenMenu(GameObject menu)
+    public void OpenMenu(GameMenu menu)
     {
         // So that we don't have two menus open at the same time
         CloseCurrentMenu();
 
-        menu.GetComponent<SlideAnimation>().Show();
+        menu.Open();
 
-        WorldController.Instance.SoundController.OnButtonSFX();
-        
         WorldController.Instance.SpawnInventoryController.SetUIVisibility(false);
 
-        CurrentlyOpen = menu;
+        currentlyOpen = menu;
     }
 
     public void CloseCurrentMenu()
     {
-        if (CurrentlyOpen != null)
+        if (currentlyOpen != null)
         {
-            CurrentlyOpen.GetComponent<SlideAnimation>().Hide();
+            currentlyOpen.Close();
             
             WorldController.Instance.SpawnInventoryController.SetUIVisibility(SettingsKeyHolder.DeveloperMode);
             WorldController.Instance.BuildModeController.Building = false;
-
-            WorldController.Instance.SoundController.OnButtonSFX();
         }
 
-        CurrentlyOpen = null;
+        currentlyOpen = null;
     }
 
     // Use this function to add all the menus.
-    private GameObject AddMenu(string menuName, string prefabName, System.Type useComponent)
+    private GameMenu AddMenu(string menuName, string prefabName, System.Type useComponent)
     {
         GameObject tempGoObj;
         tempGoObj = (GameObject)Instantiate(Resources.Load("UI/MenuLeft/" + prefabName));
@@ -67,12 +62,12 @@ public class MenuLeft : MonoBehaviour
 
         tempGoObj.AddComponent(useComponent);
 
-        return tempGoObj;
+        return tempGoObj.GetComponent<GameMenu>();
     }
 
-    private void OnMenuButtonClicked(GameObject menu)
+    private void OnMenuButtonClicked(GameMenu menu)
     {
-        if (CurrentlyOpen == menu)
+        if (currentlyOpen == menu)
         {
             CloseCurrentMenu();
         }

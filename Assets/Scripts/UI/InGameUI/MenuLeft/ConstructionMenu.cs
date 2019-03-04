@@ -13,7 +13,7 @@ using ProjectPorcupine.Rooms;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ConstructionMenu : MonoBehaviour
+public class ConstructionMenu : GameMenu
 {
     private const string LocalizationDeconstruct = "deconstruct_furniture";
 
@@ -74,8 +74,10 @@ public class ConstructionMenu : MonoBehaviour
         }
     }
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         Text title = GetComponentInChildren<Text>();
         title.text = LocalizationTable.GetLocalization("menu_construction");
 
