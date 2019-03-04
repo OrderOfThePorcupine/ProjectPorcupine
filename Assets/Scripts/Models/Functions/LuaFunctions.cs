@@ -78,6 +78,18 @@ public class LuaFunctions : IFunctions
         return true;
     }
 
+    /// <summary>
+    /// Loads the script from the given file.
+    /// </summary>
+    /// <param name="file">The file to run.</param>
+    /// <param name="scriptName">The script name.</param>
+    public bool LoadFile(string file, string scriptName)
+    {
+        // can't use LoadFile without a custom ILoader (since it defaults to Resources/Scripts)
+        // so basically it would just be more work than doing this
+        return LoadScript(System.IO.File.ReadAllText(file), scriptName);
+    }
+
     public DynValue CallWithError(string functionName, params object[] args)
     {
         return Call(functionName, true, args);

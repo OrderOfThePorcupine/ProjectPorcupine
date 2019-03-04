@@ -129,6 +129,34 @@ public static class ModUtils
         return value.Clamp(min, max);
     }
 
+    public static string HandlePath(string file)
+    {
+        if (file.StartsWith("~"))
+        {
+            return file.Replace("~", ModUtils.HomeDirPath());
+        }
+        else
+        {
+            return Application.streamingAssetsPath + file;
+        }
+    }
+
+    public static string HomeDirPath()
+    {
+        if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.Windows)
+        {
+            string drive = System.Environment.GetEnvironmentVariable("HOMEDRIVE");
+            string path = System.Environment.GetEnvironmentVariable("HOMEPATH");
+
+            // home path already includes the backslash so we can just return them
+            return drive + path;
+        }
+        else
+        {
+            return System.Environment.GetEnvironmentVariable("HOME");
+        }
+    }
+
     public static int Min(int a, int b)
     {
         return Mathf.Min(a, b);

@@ -36,7 +36,7 @@ namespace DeveloperConsole
         private const int AutoclearThreshold = 18000;
 
         /// <summary>
-        /// Singleton patterned instnace.
+        /// Singleton patterned instance.
         /// Private since there are static functions only for controlled access.
         /// </summary>
         private static DevConsole instance;
@@ -55,6 +55,16 @@ namespace DeveloperConsole
         /// History of commands.
         /// </summary>
         private List<string> history = new List<string>();
+
+        /// <summary>
+        /// Separate from history to allow clearing during macro recording.
+        /// </summary>
+        private List<string> macroHistory = new List<string>();
+
+        /// <summary>
+        /// Is a macro being recorded right now.
+        /// </summary>
+        private bool recordingMacro = false;
 
         /// <summary>
         /// What index the history is at.
@@ -95,10 +105,10 @@ namespace DeveloperConsole
         private ScrollRect autoComplete;
 
         /// <summary>
-        /// Holds possible candidates.
+        /// The autocomplete text element to write to.
         /// </summary>
         [SerializeField]
-        private GameObject contentAutoComplete;
+        private Text autoCompleteTextElement;
 
         /// <summary>
         /// The scrolling rect for the main console logger.
@@ -271,31 +281,21 @@ namespace DeveloperConsole
         /// </summary>
         public static void Execute(string command)
         {
+            command = command.Trim();
+
             // Guard
-            if (instance == null || command.Trim() == string.Empty)
+            if (instance == null || command == string.Empty)
             {
                 return;
             }
 
-            // Get method and arguments
-
-            // We want to ONLY split once!
-            string[] methodNameAndArgs = command.Trim().TrimEnd(')').Split(new char[] { '(' }, 2);
-            string method = command;
-            string args = string.Empty;
-
             IEnumerable<CommandBase> commandsToCall;
 
-            if (methodNameAndArgs.Length == 2)
-            {
-                // If both method and arguments exist split them
-                method = methodNameAndArgs[0];
-                args = methodNameAndArgs[1];
-            }
-            else if (method.Trim().EndsWith("?"))
+            // Get method and arguments
+            if (command.EndsWith("?"))
             {
                 // This is help
-                string testString = method.ToLower().Trim().TrimEnd('?');
+                string testString = command.ToLower().TrimEnd('?');
                 commandsToCall = instance.consoleCommands.Where(cB => cB.Title.ToLower() == testString);
 
                 foreach (CommandBase commandToCall in commandsToCall)
@@ -305,16 +305,27 @@ namespace DeveloperConsole
 
                 return;
             }
+
+            string[] methodAndArgs = command.Split(new char[] { ' ' }, 2);
+            string method;
+            string args;
+
+            if (methodAndArgs.Length == 2)
+            {
+                method = methodAndArgs[0];
+                args = methodAndArgs[1];
+            }
             else
             {
                 // Do a default
                 // We will do a null checker
-                // If its null then set to default which is "" by default :P
+                // If its null then set to default which is "" by default
                 args = null;
+                method = command;
             }
 
             // Execute command
-            commandsToCall = instance.consoleCommands.Where(cB => cB.Title.ToLower() == method.ToLower().Trim());
+            commandsToCall = instance.consoleCommands.Where(cB => cB.Title.ToLower() == method.ToLower());
 
             if (commandsToCall.Count() > 0)
             {
@@ -341,6 +352,8 @@ namespace DeveloperConsole
                             }
                         }
 
+                        // only add valid commands
+                        instance.macroHistory.Add(command);
                         commandToCall.ExecuteCommand(args);
                     }
                 }
@@ -366,6 +379,71 @@ namespace DeveloperConsole
             }
         }
 
+        public static void StartMacro()
+        {
+            if (instance == null)
+            {
+                return;
+            }
+
+            if (instance.recordingMacro)
+            {
+                LogError("Can't record a macro during the recording of a macro.");
+
+                // remove last command from macro history
+                instance.macroHistory.RemoveAt(instance.macroHistory.Count - 1);
+            }
+            else
+            {
+                instance.recordingMacro = true;
+                instance.macroHistory.Clear();
+            }
+        }
+
+        public static void FinishMacro(string file)
+        {
+            if (instance == null)
+            {
+                return;
+            }
+
+            // remove last command
+            instance.macroHistory.RemoveAt(instance.macroHistory.Count - 1);
+
+            if (file == null)
+            {
+                LogError("No file given");
+                return;
+            }
+
+            if (!instance.recordingMacro)
+            {
+                LogError("No macro being recorded right now.");
+                return;
+            }
+            else
+            {
+                System.IO.File.WriteAllText(file, string.Join("\n", instance.macroHistory.ToArray()));
+                instance.recordingMacro = false;
+                instance.macroHistory.Clear();
+            }
+        }
+
+        public static void RunMacro(string file)
+        {
+            if (file == null)
+            {
+                LogError("No file given");
+                return;
+            }
+
+            foreach (string line in System.IO.File.ReadAllLines(file))
+            {
+                Log("$ " + line);
+                Execute(line);
+            }
+        }
+
         /// <summary>
         /// Runs the help method of the passed interface.
         /// </summary>
@@ -378,7 +456,7 @@ namespace DeveloperConsole
             }
 
             Log("<color=yellow>Command Info:</color> " + (string.IsNullOrEmpty(help.DetailedDescription) ? help.Description : help.DetailedDescription));
-            Log("<color=yellow>Call it like </color><color=orange> " + help.Title + GetParameters(help) + "</color>");
+            Log("<color=yellow>Call it like </color><color=orange> " + help.Title + "</color>" + GetParameters(help));
         }
 
         /// <summary>
@@ -547,7 +625,16 @@ namespace DeveloperConsole
                 return string.Empty;
             }
 
-            return " (" + description.Parameters + ")";
+            // Each first word is in green the other is in white
+            string result = string.Empty;
+            string[] split = description.Parameters.Split();
+
+            for (int i = 0; i < split.Length - 1; i += 2)
+            {
+                result += " <color=teal>" + split[i] + "</color> <color=white>" + split[i + 1] + "</color>";
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -623,8 +710,9 @@ namespace DeveloperConsole
             if (inputText != string.Empty)
             {
                 // Add Text to log, history then execute
-                Log(inputText);
+                Log("$ " + inputText);
                 history.Add(inputText);
+
                 Execute(inputText);
             }
         }
@@ -877,27 +965,18 @@ namespace DeveloperConsole
             if (selectedCandidate != -1)
             {
                 autoComplete.gameObject.SetActive(true);
-
-                // Delete current children
-                foreach (Transform child in contentAutoComplete.transform)
-                {
-                    Destroy(child.gameObject);
-                }
+                autoCompleteTextElement.text = string.Empty;
 
                 // Recreate from possible candidates
                 for (int i = 0; i < possibleCandidates.Count; i++)
                 {
-                    GameObject go = Instantiate(Resources.Load<GameObject>("UI/Console/DevConsole_AutoCompleteOption"));
-                    go.transform.SetParent(contentAutoComplete.transform);
-
-                    // Quick way to add component / text
                     if (i != selectedCandidate)
                     {
-                        go.GetComponent<Text>().text = "<color=white>" + possibleCandidates[i] + "</color>";
+                        autoCompleteTextElement.text += "<color=white>" + possibleCandidates[i] + "</color>\n";
                     }
                     else
                     {
-                        go.GetComponent<Text>().text = "<color=yellow>" + possibleCandidates[i] + "</color>";
+                        autoCompleteTextElement.text += "<color=yellow>" + possibleCandidates[i] + "</color>\n";
                     }
                 }
             }
