@@ -8,8 +8,8 @@ install $UNITY_WINDOWS_TARGET_PACKAGE_URL
 # to get download version names and hashes
 
 BASE_URL=https://netstorage.unity3d.com/unity
-HASH=eb4bc6fa7f1d
-VERSION=2017.4.22f1
+HASH=de35fe252486
+VERSION=2017.4.21f1
 
 download() {
   file=$1
