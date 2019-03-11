@@ -7,7 +7,6 @@
 // ====================================================
 #endregion
 
-
 using System.Collections.Generic;
 using System.Linq;
 using ProjectPorcupine.Localization;
@@ -21,12 +20,17 @@ public class DialogBoxManager : MonoBehaviour
 {
     private GameObject root;
     private Stack<BaseDialogBox> currentDialogs = new Stack<BaseDialogBox>();
+    public int modalCount;
 
     public bool IsModal
     {
         get
         {
-            return currentDialogs.Count > 0;
+            return (modalCount + currentDialogs.Count) > 0;
+        }
+        set
+        {
+            modalCount += value ? 1 : -1;
         }
     }
 
@@ -35,19 +39,22 @@ public class DialogBoxManager : MonoBehaviour
     /// </summary>
     /// <param name="parent"></param>
     /// <returns></returns>
-    public static DialogBoxManager CreateDialogBoxManager(GameObject parent)
+    public static DialogBoxManager CreateDialogBoxManager(GameObject parentCanvas)
     {
-        GameObject root = new GameObject("Dialog Boxes", typeof(RectTransform));
-        root.transform.SetParent(parent.transform, false);
-        root.transform.SetAsLastSibling();
-        RectTransform transform = root.GetComponent<RectTransform>();
+        Canvas canvas = new GameObject("Canvas-DialogBoxes", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(UIRescaler)).GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.pixelPerfect = true;
+        canvas.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+        canvas.transform.SetParent(parentCanvas.transform);
+        canvas.transform.SetAsLastSibling();
+        RectTransform transform = canvas.GetComponent<RectTransform>();
         transform.anchorMax = new Vector2(1, 1);
         transform.anchorMin = Vector2.zero;
         transform.position = Vector3.zero;
         transform.offsetMax = Vector2.zero;
         transform.offsetMin = Vector2.zero;
-        DialogBoxManager dialogBoxManager = root.AddComponent<DialogBoxManager>();
-        dialogBoxManager.root = root;
+        DialogBoxManager dialogBoxManager = canvas.gameObject.AddComponent<DialogBoxManager>();
+        dialogBoxManager.root = canvas.gameObject;
         return dialogBoxManager;
     }
 
@@ -69,20 +76,6 @@ public class DialogBoxManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Closes the top dialog without saving changes.
-    /// </summary>
-    public void ForceCloseTopDialog()
-    {
-        BaseDialogBox box = currentDialogs.Pop();
-        if (box != null) {
-            box.result.AddParameter(new Parameter("ExitStatus", "Force"));
-            ChangeInteractabilityOfBox(box, false);
-            box.Destroy();
-        }
-        ChangeInteractabilityOfTopDialog(true);
-    }
-
-    /// <summary>
     /// Closes all dialogs without saving changes.
     /// </summary>
     public void ForceCloseAllDialogs()
@@ -91,9 +84,7 @@ public class DialogBoxManager : MonoBehaviour
         {
             BaseDialogBox box = currentDialogs.Pop();
             if (box != null) {
-                box.result.AddParameter(new Parameter("ExitStatus", "Force"));
-                ChangeInteractabilityOfBox(box, false);
-                box.Destroy();
+                Destroy(box.root);
             }
         }
     }
@@ -106,9 +97,8 @@ public class DialogBoxManager : MonoBehaviour
     {
         BaseDialogBox box = currentDialogs.Pop();
         if (box != null) {
-            box.result.AddParameter(new Parameter("ExitStatus", "Soft"));
             ChangeInteractabilityOfBox(box, false);
-            box.Destroy();
+            box.OnClose();
         }
         ChangeInteractabilityOfTopDialog(true);
     }
@@ -123,50 +113,92 @@ public class DialogBoxManager : MonoBehaviour
         {
             BaseDialogBox box = currentDialogs.Pop();
             if (box != null) {
-                box.result.AddParameter(new Parameter("ExitStatus", "Soft"));
                 ChangeInteractabilityOfBox(box, false);
-                box.Destroy();
+                box.OnClose();
             }
         }
     }
 
-    /// <summary>
-    /// Shows a specific dialog box with custom data and action upon exit.
-    /// </summary>
-    /// <param name="name">The name of the dialog box to open</param>
-    /// <param name="data">Custom data to pass in</param>
-    /// <param name="action">Upon exit of the dialog box this function is called</param>
-    /// <param name="closeAfterSeconds">Close the top dialog box after this amount of time</param>
-    /// <remarks>
-    ///     "closeAfterSeconds" relies that the top dialog after that amount
-    ///     of time will be equal to the one spawned by this function.
-    /// </remarks>
-
-    public void ShowDialogBox(string name, Dictionary<string, object> data = null, BaseDialogBox.OnCloseAction action = null, float? closeAfterSeconds = null)
+    private BaseDialogBox GetDialogBox(string name, params object[] args)
     {
         DialogBoxPrototype proto = PrototypeManager.DialogBox.Get(name);
         if (proto == null)
         {
             UnityDebugger.Debugger.LogError("DialogBox", "DialogBoxPrototype doesn't exist: " + name);
         }
+        BaseDialogBox box;
 
-        BaseDialogBox box = FunctionsManager.DialogBox.CreateInstance<BaseDialogBox>(proto.classData.Type, false);
-        if (box == null)
+        if (proto.ClassName != null)
         {
-            UnityDebugger.Debugger.LogError("DialogBox", "DialogBox doesn't exist: " + name);
+            box = FunctionsManager.DialogBox.CreateInstance<BaseDialogBox>(proto.ClassName, false, args);
+        }
+        else if (proto.CreatorFunction != null)
+        {
+            box = FunctionsManager.DialogBox.Call<BaseDialogBox>(proto.CreatorFunction, args);
+        }
+        else
+        {
+            UnityDebugger.Debugger.LogError("DialogBox", "DialogBox doesn't have a creator function or class type: " + name);
+            return null;
         }
 
-        box.OnClose = action;
-        box.callerData = data ?? new Dictionary<string, object>();
         box.prototype = proto;
-        box.parameterData = proto.classData.Parameters;
+        return box;
+    }
+
+    /// <summary>
+    /// Show a prompt styled dialog box.
+    /// </summary>
+    /// <param name="name">The name of the dialog box to open</param>
+    /// <param name="actions">Actionables that the dialog should support</param>
+    /// <param name="args">Args to pass onto the init function</param>
+    public void ShowDialogBox(string name, DialogBoxActionBuilder actions = null, OnClose onClose = null, params object[] args)
+    {
+        BaseDialogBox box = GetDialogBox(name, args);
+        if (box == null) { return; }
+        box.actionableData = actions;
+        box.onClose = onClose;
         box.InitializeLUA();
         FinalizeDialogBox(box);
+    }
 
-        if (closeAfterSeconds.HasValue)
-        {
-            Invoke("SoftCloseTopDialog", closeAfterSeconds.Value);
-        }
+    /// <summary>
+    /// Show a prompt styled dialog box.
+    /// </summary>
+    /// <param name="name">The name of the dialog box to open</param>
+    /// <param name="actions">Actionables that the dialog should support</param>
+    /// <param name="args">Args to pass onto the init function</param>
+    public void ShowDialogBox(string name, DialogBoxActionBuilder actions, params object[] args)
+    {
+        ShowDialogBox(name, actions, null, args);
+    }
+
+    /// <summary>
+    /// Show a dialog box for a certain amount of time.
+    /// </summary>
+    /// <param name="name">The name of the dialog box to open</param>
+    /// <param name="actions">Actionables that the dialog should support</param>
+    /// <param name="args">Args to pass onto the init function</param>
+    public void ShowDialogBox(string name, OnClose onClose, params object[] args)
+    {
+        ShowDialogBox(name, null, onClose, args);
+    }
+
+    /// <summary>
+    /// Show a temporary dialog box.
+    /// You can't have any conditional actions since it can't close before
+    /// the timeout.
+    /// </summary>
+    /// <param name="name">The name of the dialog box to open</param>
+    /// <param name="timeout">The time in seconds to wait</param>
+    /// <param name="args">Args to pass onto the init function</param>
+    public void ShowTemporaryDialogBox(string name, float timeout, params object[] args)
+    {
+        BaseDialogBox box = GetDialogBox(name, args);
+        if (box == null) { return; }
+        box.InitializeLUA();
+        FinalizeDialogBox(box);
+        Invoke("SoftCloseTopDialog", timeout);
     }
 
     /// <summary>

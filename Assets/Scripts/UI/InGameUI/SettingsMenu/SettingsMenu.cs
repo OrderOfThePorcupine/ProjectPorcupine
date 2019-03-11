@@ -58,6 +58,7 @@ public class SettingsMenu : MonoBehaviour
 
         instance.changesTracker.Clear();
         instance.mainRoot.SetActive(true);
+        DialogBoxManager.FindInstance().IsModal = true;
 
         if (instance.options.Count > 0)
         {
@@ -193,32 +194,22 @@ public class SettingsMenu : MonoBehaviour
             return;
         }
 
-        var data = new Dictionary<string, object>()
-        {
-            { "Prompt", "confirm_settings_menu_close" },
-            { "Buttons", new string[] { "button_yes", "button_no" } }
-        };
-        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, (res) => {
-            if (res["ExitButton"].ToString() == "button_yes")
-            {
-                // cancel code
-                Settings.LoadSettings();
-
-                for (int i = 0; i < changesTracker.Count; i++)
+        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", DialogBoxActionBuilder.YesNo(),
+            (ActionResult res) => {
+                if (res == ActionResult.Yes)
                 {
-                    changesTracker[i].CancelSetting();
-                    changesTracker[i].CancelSettingLUA();
-                }
+                    // yes code
+                    Settings.LoadSettings();
+                    for (int i = 0; i < changesTracker.Count; i++)
+                    {
+                        changesTracker[i].CancelSetting();
+                        changesTracker[i].CancelSettingLUA();
+                    }
 
+                    Exit();
+                }
                 GameController.Instance.SoundController.OnButtonSFX();
-                Exit();
-            }
-            else
-            {
-                GameController.Instance.SoundController.OnButtonSFX();
-                // stay code
-            }
-        });
+            }, "confirm_settings_menu_close");
     }
 
     public void Default()
@@ -289,6 +280,7 @@ public class SettingsMenu : MonoBehaviour
         currentCategory = string.Empty;
         mainRoot.SetActive(false);
         changesTracker.Clear();
+        DialogBoxManager.FindInstance().IsModal = false;
     }
 
     private void Update()

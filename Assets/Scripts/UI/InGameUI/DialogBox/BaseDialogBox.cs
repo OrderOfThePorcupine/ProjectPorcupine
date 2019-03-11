@@ -18,17 +18,10 @@ using UnityEngine;
 [MoonSharp.Interpreter.MoonSharpUserData]
 public abstract class BaseDialogBox : BaseUIElement
 {
-    public delegate void OnCloseAction(Parameter result);
-
     /// <summary>
-    /// The result of the box.
+    /// Actionable data.
     /// </summary>
-    public Parameter result;
-
-    /// <summary>
-    /// Extra data from the caller.
-    /// </summary>
-    public Dictionary<string, object> callerData;
+    public IEnumerable<Actionable> actionableData;
 
     /// <summary>
     /// Data about this class
@@ -36,25 +29,26 @@ public abstract class BaseDialogBox : BaseUIElement
     public DialogBoxPrototype prototype;
 
     /// <summary>
-    /// On close of the dialog box.
-    /// </summary>
-    public OnCloseAction OnClose;
-
-    /// <summary>
     /// The root gameobject of this box.
     /// </summary>
     public GameObject root;
 
     /// <summary>
-    /// Should only be called from DialogBoxManager.
+    /// Action to call upon exit of dialog box.
     /// </summary>
-    public void Destroy()
-    {
-        if (OnClose != null)
-        {
-            OnClose(result);
-        }
+    public OnClose onClose;
 
+    /// <summary>
+    /// The result of action
+    /// </summary>
+    protected ActionResult result = ActionResult.None;
+
+    public void OnClose()
+    {
+        if (onClose != null)
+        {
+            onClose(result);
+        }
         GameObject.Destroy(root);
     }
 
@@ -63,126 +57,10 @@ public abstract class BaseDialogBox : BaseUIElement
     /// </summary>
     public void InitializeLUA()
     {
-        if (parameterData.ContainsKey("LUAInitializeFunction"))
-        {
-            FunctionsManager.SettingsMenu.Call(parameterData["LUAInitializeFunction"].ToString(), this);
-        }
-    }
-
-    protected string GetStringParam(string key, bool require = true)
-    {
-        string val = null;
-        if (callerData != null && callerData.ContainsKey(key)) 
-        {
-            val = (string)callerData[key];
-        }
-        else if (parameterData.ContainsKey(key))
-        {
-            val = parameterData[key].ToString();
-        }
-        else if (require)
-        {
-            UnityDebugger.Debugger.LogError("DialogBox", "Was expecting " + key + " parameter data");
-        }
-
-        return val;
-    }
-
-    protected float? GetFloatParam(string key, bool require = true)
-    {
-        float? val = null;
-        if (callerData != null && callerData.ContainsKey(key)) 
-        {
-            val = (float)callerData[key];
-        }
-        else if (parameterData.ContainsKey(key))
-        {
-            val = parameterData[key].ToFloat();
-        }
-        else if (require)
-        {
-            UnityDebugger.Debugger.LogError("DialogBox", "Was expecting " + key + " parameter data");
-        }
-
-        return val;
-    }
-
-    protected int? GetIntParam(string key, bool require = true)
-    {
-        int? val = null;
-        if (callerData != null && callerData.ContainsKey(key)) 
-        {
-            val = (int)callerData[key];
-        }
-        else if (parameterData.ContainsKey(key))
-        {
-            val = parameterData[key].ToInt();
-        }
-        else if (require)
-        {
-            UnityDebugger.Debugger.LogError("DialogBox", "Was expecting " + key + " parameter data");
-        }
-
-        return val;
-    }
-
-    protected bool? GetBoolParam(string key, bool require = true)
-    {
-        bool? val = null;
-        if (callerData != null && callerData.ContainsKey(key)) 
-        {
-            val = (bool)callerData[key];
-        }
-        else if (parameterData.ContainsKey(key))
-        {
-            val = parameterData[key].ToBool();
-        }
-        else if (require)
-        {
-            UnityDebugger.Debugger.LogError("DialogBox", "Was expecting " + key + " parameter data");
-        }
-
-        return val;
-    }
-
-    protected object[] GetObjectArray(string key, bool require = true, params char[] separators)
-    {
-        object[] res = null;
-        if (callerData.ContainsKey(key))
-        {
-            res = (object[])callerData[key];
-        }
-        else if (parameterData.ContainsKey(key))
-        {
-            // comma separated list
-            res = parameterData[key].ToString().Split(separators);
-        }
-        else if (require)
-        {
-            UnityDebugger.Debugger.LogError("DialogBox", "Was expecting " + key + " parameter data");
-        }
-
-        return res;
-    }
-
-    protected string[] GetStringArray(string key, bool require = true, params char[] separators)
-    {
-        string[] res = null;
-        if (callerData.ContainsKey(key))
-        {
-            res = (string[])callerData[key];
-        }
-        else if (parameterData.ContainsKey(key))
-        {
-            // comma separated list
-            res = parameterData[key].ToString().Split(separators);
-        }
-        else if (require)
-        {
-            UnityDebugger.Debugger.LogError("DialogBox", "Was expecting " + key + " parameter data");
-        }
-
-        return res;
+        // if (parameterData.ContainsKey("LUAInitializeFunction"))
+        // {
+        //     FunctionsManager.DialogBox.Call(parameterData["LUAInitializeFunction"].ToString(), this);
+        // }
     }
 
     public override string GetName()

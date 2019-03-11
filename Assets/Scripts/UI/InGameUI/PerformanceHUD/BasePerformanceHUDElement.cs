@@ -15,6 +15,11 @@ using System;
 [MoonSharp.Interpreter.MoonSharpUserData]
 public abstract class BasePerformanceHUDComponent : BaseUIElement
 {
+    /// <summary>
+    /// Internal option data.
+    /// </summary>
+    public Parameter parameterData;
+
     public event EventHandler UpdateHandler;
 
     public abstract void Update();

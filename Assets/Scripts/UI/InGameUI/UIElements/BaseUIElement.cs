@@ -16,11 +16,6 @@ using UnityEngine.UI;
 public abstract class BaseUIElement
 {
     /// <summary>
-    /// Internal option data.
-    /// </summary>
-    public Parameter parameterData;
-
-    /// <summary>
     /// For internals, to prevent having to load resources every time.
     /// </summary>
     private static Dictionary<string, GameObject> loadedResources = new Dictionary<string, GameObject>();

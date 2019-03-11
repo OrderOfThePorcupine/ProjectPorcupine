@@ -80,19 +80,17 @@ public class TradeController
     {
         Trader playerTrader = Trader.FromPlayer(World.Current.Wallet[tradeShip.Trader.Currency.Name]);
         Trade trade = new Trade(playerTrader, tradeShip.Trader);
-        var data = new Dictionary<string, object>()
-        {
-            { "Trade", trade }
-        };
-        DialogBoxManager.FindInstance().ShowDialogBox("Trade", data, (Parameter res) => {
+        DialogBoxManager.FindInstance().ShowDialogBox("Trade", (ActionResult res) => {
             tradeShip.TradeCompleted = true;
-            if (res["TradeResult"].ToString() == "TradeCompleted")
+            if (res == ActionResult.Accept)
             {
+                // trade accepted so transfer
                 TransferTradedItems(trade, tradeShip.LandingCoordinates);
             }
+
             TradeShips.Remove(tradeShip);
             LandingPadsInUse.Remove(tradeShip.LandingPad);
-        });
+        }, trade);
     }
 
     /// <summary>

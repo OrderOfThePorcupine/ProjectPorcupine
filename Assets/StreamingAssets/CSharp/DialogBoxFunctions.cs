@@ -45,7 +45,6 @@ public class DialogBoxNewGame : BaseDialogBox
 
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = new GameObject();
         VerticalLayoutGroup group = element.AddComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(0, 0, 20, 0);
@@ -164,7 +163,7 @@ public class DialogBoxNewGame : BaseDialogBox
             && addedChar != '9'
             && addedChar != '0')
         {
-            //return a null character
+            // return a null character
             output = '\0';
         }
 
@@ -176,7 +175,6 @@ public class DialogBoxQuests : BaseDialogBox
 {
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = new GameObject();
         VerticalLayoutGroup group = element.AddComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(0, 0, 20, 0);
@@ -347,7 +345,6 @@ public class DialogBoxJobList : BaseDialogBox
 
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = new GameObject();
         VerticalLayoutGroup group = element.AddComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(0, 0, 20, 0);
@@ -474,15 +471,13 @@ public class DialogBoxTrade : BaseDialogBox
         acceptButton.interactable = currentTrade.IsValid();
     }
 
+    public DialogBoxTrade(Trade tradeItem)
+    {
+        this.currentTrade = tradeItem;
+    }
+
     public override GameObject InitializeElement()
     {
-        if (!callerData.ContainsKey("Trade"))
-        {
-            Debug.LogError("DialogBoxTrade requires `Trade` parameter in callerData");
-        }
-        currentTrade = (Trade)callerData["Trade"];
-
-        result = new Parameter();
         GameObject main = new GameObject("Main");
         VerticalLayoutGroup group = main.AddComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(30, 30, 20, 5);
@@ -664,14 +659,14 @@ public class DialogBoxTrade : BaseDialogBox
         acceptButton = CreateButton("accept");
         acceptButton.transform.SetParent(bottomBar.transform);
         acceptButton.onClick.AddListener(() => {
-            result.AddParameter(new Parameter("TradeResult", "TradeCompleted"));
+            result = ActionResult.Accept;
             DialogBoxManager.FindInstance().SoftCloseTopDialog();
         });
 
         Button cancel = CreateButton("cancel");
         cancel.transform.SetParent(bottomBar.transform);
         cancel.onClick.AddListener(() => {
-            result.AddParameter(new Parameter("TradeResult", "TradeCancelled"));
+            result = ActionResult.Cancel;
             DialogBoxManager.FindInstance().SoftCloseTopDialog();
         });
 
@@ -766,21 +761,15 @@ public abstract class DialogBoxFileBase : BaseDialogBox
 
     protected void Delete(string file)
     {
-        var data = new Dictionary<string, object>()
-        {
-            { "Prompt", "prompt_delete_file" },
-            { "Buttons", new string[] { "button_yes", "cancel" } },
-            { "PromptLocalizationData", new object[] { (object)file } }
-        };
-        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, (res) => {
-            if (res["ExitButton"].ToString() == "button_yes")
-            {
-                // delete file
-                File.Delete(file);
-                items.Clear();
-                PopulateScrollRect();
-            }
-        });
+        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", DialogBoxActionBuilder.YesCancel(),
+            (ActionResult res) => {
+                if (res == ActionResult.Yes)
+                {
+                    File.Delete(file);
+                    items.Clear();
+                    PopulateScrollRect();
+                }
+            }, "prompt_delete_file", file);
     }
 
     protected abstract void DoubleClick(int index);
@@ -833,18 +822,10 @@ public class DialogBoxSave : DialogBoxFileBase
     private void ActuallySaveFile(string filePath)
     {
         DialogBoxManager.FindInstance().SoftCloseTopDialog();
-        var promptData = new Dictionary<string, object>()
-        {
-            { "Prompt", "message_saving_game" },
-        };
-        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", promptData, (res) => {
+        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", (res) => {
             // Just show a quick 'game saved' then close it
-            promptData = new Dictionary<string, object>()
-            {
-                { "Prompt", "message_game_saved" }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", promptData, null, 1.5f);
-        });
+            DialogBoxManager.FindInstance().ShowTemporaryDialogBox("Prompt", 1.5f, "message_game_saved");
+        }, "message_saving_game");
 
         Thread thread = WorldController.Instance.SaveWorld(filePath, () => {
             DialogBoxManager.FindInstance().SoftCloseTopDialog();
@@ -855,12 +836,8 @@ public class DialogBoxSave : DialogBoxFileBase
     {
         if (fileName == string.Empty)
         {
-            var data = new Dictionary<string, object>()
-            {
-                { "Prompt", "message_name_or_file_needed_for_save" },
-                { "Buttons", new string[] { "okay" } }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, null);
+            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", new DialogBoxActionBuilder().OK(),
+                "message_name_or_file_needed_for_save");
             return;
         }
 
@@ -874,19 +851,15 @@ public class DialogBoxSave : DialogBoxFileBase
 
         if (File.Exists(filePath))
         {
-            var data = new Dictionary<string, object>()
-            {
-                { "Prompt", "prompt_overwrite_existing_file" },
-                { "PromptLocalizationData", new object[] { (object)filePath } },
-                { "Buttons", new string[] { "button_yes", "button_no" } }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, (res) => {
-                if (res["ExitButton"].ToString() == "button_yes")
+            // Give overwrite confirmation
+            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", DialogBoxActionBuilder.YesNo(),
+            (ActionResult res) => {
+                if (res == ActionResult.Yes)
                 {
                     // save
                     ActuallySaveFile(filePath);
                 }
-            });
+            }, "prompt_overwrite_existing_file", filePath);
         }
         else
         {
@@ -896,7 +869,6 @@ public class DialogBoxSave : DialogBoxFileBase
 
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = new GameObject("Main");
         VerticalLayoutGroup group = element.AddComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(0, 0, 30, 0);
@@ -964,12 +936,7 @@ public class DialogBoxLoad : DialogBoxFileBase
     {
         if (fileName == string.Empty)
         {
-            var data = new Dictionary<string, object>()
-            {
-                { "Prompt", "message_file_needed_for_load" },
-                { "Buttons", new string[] { "okay" } }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, null);
+            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", new DialogBoxActionBuilder().OK(), "message_file_needed_for_load");
             return;
         }
 
@@ -982,13 +949,7 @@ public class DialogBoxLoad : DialogBoxFileBase
         string filePath = System.IO.Path.Combine(loc, fileName + ".sav");
         if (!File.Exists(filePath))
         {
-            var data = new Dictionary<string, object>()
-            {
-                { "Prompt", "message_file_doesn't_exist" },
-                { "PromptLocalizationData", filePath },
-                { "Buttons", new string[] { "okay" } }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, null);
+            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", new DialogBoxActionBuilder().OK(), "message_file_doesn't_exist", filePath);
         }
         else
         {
@@ -1000,7 +961,6 @@ public class DialogBoxLoad : DialogBoxFileBase
 
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = new GameObject("Main");
         VerticalLayoutGroup group = element.AddComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(0, 0, 30, 0);
@@ -1059,27 +1019,30 @@ public class DialogBoxLoad : DialogBoxFileBase
 
 public class DialogBoxButtonMenu : BaseDialogBox
 {
+    private string title;
+
+    public DialogBoxButtonMenu(string title)
+    {
+        this.title = title;
+    }
+
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = GetFluidVerticalBaseElement("Box", true, true);
         VerticalLayoutGroup group = element.GetComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(50, 50, 30, 50);
         group.spacing = 20;
 
-        string title = GetStringParam("Title");
-        string[] buttons = GetStringArray("Buttons");
-
         Text text = CreateTextCustom(title, Color.white, FontAnitaSemiSquare, true, TextAnchor.UpperCenter);
         text.transform.SetParent(element.transform);
 
-        foreach (string button in buttons)
+        foreach (Actionable button in this.actionableData)
         {
-            Button obj = CreateButton(button.Trim());
+            Button obj = CreateButton(button.Name);
             obj.transform.SetParent(element.transform);
             obj.onClick.AddListener(() => {
-                string copy = button;
-                result.AddParameter(new Parameter("ExitButton", copy));
+                Actionable copy = button;
+                result = copy.Return;
                 DialogBoxManager.FindInstance().SoftCloseTopDialog();
             });
         }
@@ -1092,7 +1055,6 @@ public class DialogBoxOptions : BaseDialogBox
 {
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = GetFluidVerticalBaseElement("Box", true, true);
         VerticalLayoutGroup group = element.GetComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(50, 50, 30, 30);
@@ -1109,110 +1071,90 @@ public class DialogBoxOptions : BaseDialogBox
         Button newWorld = CreateButton("new_world");
         newWorld.transform.SetParent(element.transform);
         newWorld.onClick.AddListener(() => {
-            var data = new Dictionary<string, object>()
-            {
-                { "Prompt", "prompt_save_before_creating_new_world" },
-                { "Buttons", new string[] { "button_yes", "button_no", "cancel" } }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, (res) => {
-                if (res["ExitButton"].ToString() == "button_yes")
-                {
-                    // save game
-                    DialogBoxManager.FindInstance().ShowDialogBox("Save", null, (_) => {
+            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", DialogBoxActionBuilder.YesNoCancel(),
+                (ActionResult res) => {
+                    if (res == ActionResult.Yes)
+                    {
+                        // save game
+                        DialogBoxManager.FindInstance().ShowDialogBox("Save", null, (_) => {
+                            DialogBoxManager.FindInstance().SoftCloseTopDialog();
+                            DialogBoxManager.FindInstance().ShowDialogBox("LoadingScreen");
+                            SceneController.ConfigureNewWorld();
+                        });
+                    }
+                    else if (res == ActionResult.No)
+                    {
+                        // dont save game
+                        // so just load
                         DialogBoxManager.FindInstance().SoftCloseTopDialog();
                         DialogBoxManager.FindInstance().ShowDialogBox("LoadingScreen");
                         SceneController.ConfigureNewWorld();
-                    });
-                }
-                else if (res["ExitButton"].ToString() == "button_no")
-                {
-                    // dont save game
-                    // so just load
-                    DialogBoxManager.FindInstance().SoftCloseTopDialog();
-                    DialogBoxManager.FindInstance().ShowDialogBox("LoadingScreen");
-                    SceneController.ConfigureNewWorld();
-                }
-                // else we don't have to do anything
-                // the cancel will just close the prompt save window
-                // and since it won't then open the load window
-                // it'll just go back to the options menu as normal
-            });
+                    }
+                }, "prompt_save_before_creating_new_world");
         });
 
         Button save = CreateButton("save");
         save.transform.SetParent(element.transform);
         save.onClick.AddListener(() => {
             DialogBoxManager.FindInstance().SoftCloseTopDialog();
-            DialogBoxManager.FindInstance().ShowDialogBox("Save", null, null);
+            DialogBoxManager.FindInstance().ShowDialogBox("Save");
         });
 
         Button load = CreateButton("load");
         load.transform.SetParent(element.transform);
         load.onClick.AddListener(() => {
-            var data = new Dictionary<string, object>()
-            {
-                { "Prompt", "prompt_save_before_loading_new_game" },
-                { "Buttons", new string[] { "button_yes", "button_no", "cancel" } }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", data, (res) => {
-                if (res["ExitButton"].ToString() == "button_yes")
-                {
-                    // save game
+            DialogBoxManager.FindInstance().ShowDialogBox("Prompt", DialogBoxActionBuilder.YesNoCancel(),
+                (ActionResult res) => {
+                    if (res == ActionResult.Yes)
+                    {
+                        // save game
                     DialogBoxManager.FindInstance().SoftCloseTopDialog();
-                    DialogBoxManager.FindInstance().ShowDialogBox("Save", null, (_) => {
-                        DialogBoxManager.FindInstance().ShowDialogBox("Load", null, null);
+                    DialogBoxManager.FindInstance().ShowDialogBox("Save", (_) => {
+                        DialogBoxManager.FindInstance().ShowDialogBox("Load");
                     });
-                }
-                else if (res["ExitButton"].ToString() == "button_no")
-                {
-                    // dont save game
-                    // so just load
-                    DialogBoxManager.FindInstance().SoftCloseTopDialog();
-                    DialogBoxManager.FindInstance().ShowDialogBox("Load", null, null);
-                }
-                // else we don't have to do anything
-                // the cancel will just close the prompt save window
-                // and since it won't then open the load window
-                // it'll just go back to the options menu as normal
-            });
+                    }
+                    else if (res == ActionResult.No)
+                    {
+                        // dont save game
+                        // so just load
+                        DialogBoxManager.FindInstance().SoftCloseTopDialog();
+                        DialogBoxManager.FindInstance().ShowDialogBox("Load");
+                    }
+                }, "prompt_save_before_loading_new_game");
         });
 
         Button settings = CreateButton("menu_settings");
         settings.transform.SetParent(element.transform);
         settings.onClick.AddListener(() => {
-            // we hide the menu but don't close it yet
-            // this is so that the IsModal flag is still on for the entirety
-            // of settings menu being open.
-            // @TODO: Make settings menu a dialog
-            element.SetActive(false);
-            SettingsMenu.Open();
             DialogBoxManager.FindInstance().SoftCloseTopDialog();
+            SettingsMenu.Open();
         });
 
         Button quit = CreateButton("menu_quit");
         quit.transform.SetParent(element.transform);
         quit.onClick.AddListener(() => {
             DialogBoxManager.FindInstance().SoftCloseTopDialog();
-            var data = new Dictionary<string, object>()
-            {
-                { "Title", "menu_options" },
-                { "Buttons", new string[] { "menu_resume", "menu_quit_to_menu", "menu_quit_game" } }
-            };
-            DialogBoxManager.FindInstance().ShowDialogBox("ButtonMenu", data, (Parameter res) => {
-                if (res["ExitButton"].ToString() == "menu_resume")
-                {
-                    DialogBoxManager.FindInstance().SoftCloseAllDialogs();
-                }
-                else if (res["ExitButton"].ToString() == "menu_quit_to_menu")
-                {
-                    DialogBoxManager.FindInstance().SoftCloseAllDialogs();
-                    SceneController.LoadMainMenu();
-                }
-                else if (res["ExitButton"].ToString() == "menu_quit_game")
-                {
-                    SceneController.QuitGame();
-                }
-            });
+            DialogBoxActionBuilder actions = new DialogBoxActionBuilder()
+                .Cancel("menu_resume")
+                .Quit("menu_quit_to_menu")
+                .Abort("menu_quit_game");
+
+            DialogBoxManager.FindInstance().ShowDialogBox("ButtonMenu", actions,
+                (ActionResult res) => {
+                    if (res == ActionResult.Cancel)
+                    {
+                        DialogBoxManager.FindInstance().SoftCloseAllDialogs();
+                    }
+                    else if (res == ActionResult.Quit)
+                    {
+                        DialogBoxManager.FindInstance().SoftCloseAllDialogs();
+                        SceneController.LoadMainMenu();
+                    }
+                    else if (res == ActionResult.Abort)
+                    {
+                        SceneController.QuitGame();
+                    }
+                }, "menu_options");
         });
 
         return element;
@@ -1221,19 +1163,22 @@ public class DialogBoxOptions : BaseDialogBox
 
 public class DialogBoxPrompt : BaseDialogBox
 {
+    string prompt;
+    object[] localizationData;
+    public DialogBoxPrompt(string prompt, params object[] localizationData)
+    {
+        this.prompt = prompt;
+        this.localizationData = localizationData;
+    }
+
     public override GameObject InitializeElement()
     {
-        result = new Parameter();
         GameObject element = GetFluidVerticalBaseElement("Box", true, true);
         VerticalLayoutGroup group = element.GetComponent<VerticalLayoutGroup>();
         group.padding = new RectOffset(30, 30, 30, 30);
         group.spacing = 10;
 
-        string prompt = GetStringParam("Prompt");
-        string[] buttons = GetStringArray("Buttons", false) ?? new string[0];
-        object[] extraData = GetObjectArray("PromptLocalizationData", false) ?? new object[0];
-
-        Text text = CreateTextCustom(prompt, Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter, true, extraData);
+        Text text = CreateTextCustom(prompt, Color.white, FontAnitaSemiSquare, true, TextAnchor.MiddleCenter, true, localizationData);
         text.transform.SetParent(element.transform);
 
         GameObject horizontal = GetFluidHorizontalBaseElement("Buttons", true, true, allocatedHeight: 40);
@@ -1242,13 +1187,13 @@ public class DialogBoxPrompt : BaseDialogBox
         button_layout.padding = new RectOffset(5, 5, 5, 5);
         button_layout.spacing = 5;
 
-        foreach (string button in buttons)
+        foreach (Actionable button in this.actionableData)
         {
-            Button obj = CreateButton(button.Trim());
-            obj.transform.SetParent(horizontal.transform);
+            Button obj = CreateButton(button.Name);
+            obj.transform.SetParent(element.transform);
             obj.onClick.AddListener(() => {
-                string copy = button;
-                result.AddParameter(new Parameter("ExitButton", copy));
+                Actionable copy = button;
+                result = copy.Return;
                 DialogBoxManager.FindInstance().SoftCloseTopDialog();
             });
         }

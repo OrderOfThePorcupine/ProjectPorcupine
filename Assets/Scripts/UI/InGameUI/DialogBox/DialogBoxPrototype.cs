@@ -18,13 +18,6 @@ using UnityEngine;
 [MoonSharp.Interpreter.MoonSharpUserData]
 public class DialogBoxPrototype : IPrototypable
 {
-    public delegate void OnCloseAction(Parameter result);
-
-    /// <summary>
-    /// Data about this class
-    /// </summary>
-    public UIComponent classData { get; private set; }
-
     /// <summary>
     /// The dimensions of the dialog box.
     /// </summary>
@@ -38,13 +31,23 @@ public class DialogBoxPrototype : IPrototypable
     /// <summary>
     /// The name of the dialog box
     /// </summary>
-    public string Type { get; set; }
+    public string Type { get; private set; }
 
     /// <summary>
     /// The type of background.
     /// </summary>
-    /// <value></value>
     public string Background { get; private set; }
+
+    /// <summary>
+    /// Associated creator function for this prototype to call.
+    /// If null you should use the constructor of the className to build
+    /// </summary>
+    public string CreatorFunction { get; private set; }
+
+    /// <summary>
+    /// This classname to instantiate for this dialog box.
+    /// </summary>
+    public string ClassName { get; private set; }
 
     /// <summary>
     /// Reads the prototype from the specified JObject.
@@ -53,6 +56,26 @@ public class DialogBoxPrototype : IPrototypable
     public void ReadJsonPrototype(JProperty jsonProto)
     {
         Type = jsonProto.Name;
+
+        if (jsonProto.Value["ClassName"] != null)
+        {
+            ClassName = jsonProto.Value["ClassName"].ToString();
+        }
+
+        if (jsonProto.Value["CreatorFunction"] != null)
+        {
+            CreatorFunction = jsonProto.Value["CreatorFunction"].ToString();
+        }
+
+        if (ClassName != null && CreatorFunction != null)
+        {
+            UnityDebugger.Debugger.LogError("DialogBox", "Can't have both a creator function and a class name, choosing creator function");
+        }
+        else if (ClassName == null && CreatorFunction == null)
+        {
+            UnityDebugger.Debugger.LogError("DialogBox", "Needs either a creator function or a class name.");
+        }
+
         string err = "";
         float? x = BoxedDimensions.ParsePercentage(jsonProto.Value["Position"]["x"], ref err);
         float? y = BoxedDimensions.ParsePercentage(jsonProto.Value["Position"]["y"], ref err);
@@ -62,10 +85,16 @@ public class DialogBoxPrototype : IPrototypable
             UnityDebugger.Debugger.LogError("DialogBox", "Error occurred in parsing position: " + err);
         }
 
-        Background = jsonProto.Value["Background"].ToString() ?? "general";
+        if (jsonProto.Value["Background"] != null)
+        {
+            Background = jsonProto.Value["Background"].ToString();
+        }
+        else
+        {
+            Background = "general";
+        }
+
         position = new Vector2(x ?? 0f, y ?? 0f);
         size = BoxedDimensions.ReadJsonPrototype(jsonProto.Value["Dimensions"]);
-        classData = new UIComponent();
-        classData.ReadJson(jsonProto.Value);
     }
 }
