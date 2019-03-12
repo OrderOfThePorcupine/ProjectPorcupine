@@ -40,7 +40,11 @@ public class BuildGame
 
     public static void OSX()
     {
-        BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_OSX", BuildTarget.StandaloneOSXUniversal, BuildOptions.None);
+        #if UNITY_2017_4_OR_NEWER
+			BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_OSX", BuildTarget.StandaloneOSX, BuildOptions.None);
+		#else
+            BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_OSX", BuildTarget.StandaloneOSXUniversal, BuildOptions.None);
+        #endif
     }
 
     public static void Linux()
