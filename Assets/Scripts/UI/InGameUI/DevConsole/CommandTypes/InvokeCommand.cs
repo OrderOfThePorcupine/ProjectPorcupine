@@ -57,7 +57,8 @@ namespace DeveloperConsole.Core
         {
             try
             {
-                FunctionsManager.DevConsole.CallWithError(FunctionName, ParseArguments(arguments));
+                DynValue tmp;
+                FunctionsManager.DevConsole.TryCall(FunctionName, true, out tmp, ParseArguments(arguments));
             }
             catch (Exception e)
             {

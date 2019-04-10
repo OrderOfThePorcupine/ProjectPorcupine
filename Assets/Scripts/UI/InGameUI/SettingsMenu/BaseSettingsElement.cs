@@ -16,6 +16,11 @@ using System;
 public abstract class BaseSettingsElement : BaseUIElement
 {
     /// <summary>
+    /// Internal option data.
+    /// </summary>
+    public Parameter parameterData;
+
+    /// <summary>
     /// Option data for this element.
     /// </summary>
     public SettingsOption option;
@@ -44,7 +49,7 @@ public abstract class BaseSettingsElement : BaseUIElement
     {
         if (parameterData.ContainsKey("LUAInitializeFunction"))
         {
-            FunctionsManager.SettingsMenu.Call(parameterData["LUAInitializeFunction"].ToString(), this);
+            FunctionsManager.SettingsMenu.TryCall(parameterData["LUAInitializeFunction"].ToString(), this);
         }
     }
 

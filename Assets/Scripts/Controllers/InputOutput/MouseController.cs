@@ -466,7 +466,7 @@ namespace ProjectPorcupine.Mouse
             }
 
             // If we're over a UI element or the settings/options menu is open, then bail out from this.
-            if (EventSystem.current.IsPointerOverGameObject() || GameController.Instance.IsModal)
+            if (EventSystem.current.IsPointerOverGameObject() || DialogBoxManager.FindInstance().IsModal)
             {
                 return;
             }

@@ -281,8 +281,9 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
             return Type;
         }
 
-        DynValue ret = FunctionsManager.Utility.Call(getSpriteNameAction, this);
-        return ret.String;
+        string res;
+        FunctionsManager.Utility.TryCall(getSpriteNameAction, out res, this);
+        return res;
     }
 
     public T GetOrderAction<T>() where T : OrderAction
@@ -654,7 +655,7 @@ public class Utility : ISelectable, IPrototypable, IContextActionProvider, IBuil
 
     private void InvokeContextMenuLuaAction(ContextMenuAction action, Character character)
     {
-        FunctionsManager.Utility.Call(action.Parameter, this, character);
+        FunctionsManager.Utility.TryCall(action.Parameter, this, character);
     }
 
     [MoonSharpVisible(true)]

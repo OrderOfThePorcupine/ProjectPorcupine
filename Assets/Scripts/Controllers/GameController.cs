@@ -20,14 +20,11 @@ public class GameController : MonoBehaviour
 
     public SoundController SoundController { get; private set; }
 
-    // If true, a modal dialog box is open, so normal inputs should be ignored.
-    public bool IsModal { get; set; }
-
     public bool IsPaused
     {
         get
         {
-            return TimeManager.Instance.IsPaused || IsModal;
+            return TimeManager.Instance.IsPaused || DialogBoxManager.FindInstance().IsModal;
         }
 
         set
@@ -54,8 +51,6 @@ public class GameController : MonoBehaviour
         EnableDontDestroyOnLoad();
 
         SoundController = new SoundController();
-
-        IsModal = false;
         IsPaused = false;
 
         KeyboardManager.Instance.RegisterInputAction("Pause", KeyboardMappedInputType.KeyUp, () => { IsPaused = !IsPaused; });

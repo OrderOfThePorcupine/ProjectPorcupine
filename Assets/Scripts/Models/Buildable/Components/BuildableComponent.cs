@@ -268,8 +268,7 @@ namespace ProjectPorcupine.Buildable.Components
                 }
                 else if (!string.IsNullOrEmpty(sourceDataInfo.FromFunction))
                 {
-                    DynValue ret = FunctionsManager.Furniture.Call(sourceDataInfo.FromFunction, furniture);
-                    retString = ret.String;
+                    FunctionsManager.Furniture.TryCall(sourceDataInfo.FromFunction, out retString, furniture);
                 }
                 else if (!string.IsNullOrEmpty(sourceDataInfo.FromParameter))
                 {
@@ -291,8 +290,7 @@ namespace ProjectPorcupine.Buildable.Components
                 }
                 else if (!string.IsNullOrEmpty(sourceDataInfo.FromFunction))
                 {
-                    DynValue ret = FunctionsManager.Furniture.Call(sourceDataInfo.FromFunction, furniture);
-                    retFloat = (float)ret.Number;
+                    FunctionsManager.Furniture.TryCall(sourceDataInfo.FromFunction, out retFloat, furniture);
                 }
                 else if (!string.IsNullOrEmpty(sourceDataInfo.FromParameter))
                 {

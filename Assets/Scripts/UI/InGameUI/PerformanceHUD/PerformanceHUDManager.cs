@@ -67,7 +67,8 @@ public class PerformanceHUDManager : MonoBehaviour
         {
             for (int j = 0; j < groups[i].componentData.Count; j++)
             {
-                BasePerformanceHUDComponent element = FunctionsManager.PerformanceHUD.CreateInstance<BasePerformanceHUDComponent>(groups[i].componentData[j].Type, true);
+                BasePerformanceHUDComponent element;
+                FunctionsManager.PerformanceHUD.TryCreateInstance(groups[i].componentData[j].Type, false, out element);
                 element.parameterData = groups[i].componentData[j].Parameters;
                 element.InitializeLUA();
                 elements.Add(element);

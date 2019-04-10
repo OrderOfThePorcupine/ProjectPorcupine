@@ -190,7 +190,7 @@ public class TimeManager
         }
 
         // Systems that update every frame not in Modal.
-        if (GameController.Instance.IsModal == false)
+        if (DialogBoxManager.FindInstance().IsModal == false)
         {
             InvokeEvent(EveryFrameNotModal, time);
         }

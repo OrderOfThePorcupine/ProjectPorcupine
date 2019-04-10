@@ -101,7 +101,7 @@ namespace ProjectPorcupine.OrderActions
             Job job = null;
             if (!string.IsNullOrEmpty(functionName))
             {
-                job = FunctionsManager.Furniture.Call<Job>(functionName, furniture, null);
+                FunctionsManager.Furniture.TryCall<Job>(functionName, out job, null);
                 job.OrderName = Type;
             }
 

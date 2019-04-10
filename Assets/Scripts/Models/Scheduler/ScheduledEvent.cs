@@ -102,7 +102,7 @@ namespace Scheduler
             }
             else
             {
-                this.OnFire = (evt) => FunctionsManager.ScheduledEvent.Call(eventPrototype.LuaFunctionName, evt);
+                this.OnFire = (evt) => FunctionsManager.ScheduledEvent.TryCall(eventPrototype.LuaFunctionName, evt);
             }
 
             this.Cooldown = cooldown;

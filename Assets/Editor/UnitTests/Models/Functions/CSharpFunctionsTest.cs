@@ -54,7 +54,8 @@ public class CSharpFunctionsTest
     public void Test_CallFunction()
     {
         functions.LoadScript(testCode1, "TestClass1");
-        double value = functions.Call<double>("test_func0");
+        double value;
+        Assert.IsTrue(functions.TryCallFunction("test_func0", out value));
         Assert.AreEqual(42.0, value);
     }
 
@@ -63,7 +64,8 @@ public class CSharpFunctionsTest
     {
         testFurniture1 = testFurniture1.Replace("'", "\"");
         functions.LoadScript(testFurniture1, "FurnitureFunctions");
-        string value = functions.Call<string>("PowerCellPress_StatusInfo", new Furniture());
+        string value;
+        Assert.IsTrue(functions.TryCallFunction("PowerCellPress_StatusInfo", out value, new Furniture()));
         Assert.IsTrue(value.Contains("Status"));
     }
 
@@ -71,7 +73,8 @@ public class CSharpFunctionsTest
     public void Test_CallFunctionDynValue()
     {
         functions.LoadScript(testCode1, "TestClass1");
-        DynValue value = functions.Call("test_func0");
+        DynValue value;
+        Assert.IsTrue(functions.TryCallFunction("test_func0", out value));
         Assert.AreEqual(42.0, value.Number);
     }
 }

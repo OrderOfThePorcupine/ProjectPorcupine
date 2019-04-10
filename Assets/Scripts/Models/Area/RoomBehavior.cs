@@ -386,7 +386,7 @@ namespace ProjectPorcupine.Rooms
 
         private void InvokeContextMenuLuaAction(ContextMenuAction action, Character character)
         {
-            FunctionsManager.RoomBehavior.Call(action.Parameter, this, character);
+            FunctionsManager.RoomBehavior.TryCall(action.Parameter, this, character);
         }
 
         [MoonSharpVisible(true)]
