@@ -77,14 +77,17 @@ public class SettingsMenu : MonoBehaviour
             return;
         }
 
+        Dictionary<string, BaseSettingsElement[]> option;
+
         // Optimisation for saving
-        if (instance.currentCategory != string.Empty && instance.currentCategory != category && instance.options.ContainsKey(instance.currentCategory))
+        if (instance.currentCategory != string.Empty && instance.currentCategory != category && instance.options.TryGetValue(instance.currentCategory, out option))
         {
-            foreach (string headingName in instance.options[instance.currentCategory].Keys)
+            foreach (string headingName in option.Keys)
             {
-                for (int i = 0; i < instance.options[instance.currentCategory][headingName].Length; i++)
+                BaseSettingsElement[] settingsElements = option[headingName];
+                for (int i = 0; i < settingsElements.Length; i++)
                 {
-                    BaseSettingsElement elementCopy = instance.options[instance.currentCategory][headingName][i];
+                    BaseSettingsElement elementCopy = settingsElements[i];
 
                     if (elementCopy != null && elementCopy.valueChanged)
                     {
@@ -120,26 +123,22 @@ public class SettingsMenu : MonoBehaviour
                 button.SelectColor();
             }
         }
-
-        if (instance.options.ContainsKey(category) == false)
+        
+        if (instance.currentCategory != string.Empty && instance.options.TryGetValue(category, out option))
         {
-            return;
-        }
-
-        if (instance.currentCategory != string.Empty && instance.options.ContainsKey(instance.currentCategory))
-        {
-            foreach (string headingName in instance.options[instance.currentCategory].Keys)
+            foreach (string headingName in option.Keys)
             {
                 // Create heading prefab
                 SettingsHeading heading = Instantiate(instance.headingPrefab).GetComponent<SettingsHeading>();
                 heading.SetText(headingName);
                 heading.transform.SetParent(instance.elementRoot.transform);
 
-                for (int i = 0; i < instance.options[instance.currentCategory][headingName].Length; i++)
+                BaseSettingsElement[] settingsElements = option[headingName];
+                for (int i = 0; i < settingsElements.Length; i++)
                 {
-                    if (instance.options[instance.currentCategory][headingName][i] != null)
+                    if (settingsElements[i] != null)
                     {
-                        BaseSettingsElement element = instance.options[instance.currentCategory][headingName][i];
+                        BaseSettingsElement element = settingsElements[i];
                         GameObject go = element.InitializeElement();
                         TooltipComponent tc = go.AddComponent<TooltipComponent>();
                         tc.Tooltip = element.option.tooltip;
@@ -159,9 +158,10 @@ public class SettingsMenu : MonoBehaviour
 
     public void Apply()
     {
-        if (options.ContainsKey(currentCategory))
+        Dictionary<string, BaseSettingsElement[]> option;
+        if (options.TryGetValue(currentCategory, out option))
         {
-            changesTracker.AddRange(options[currentCategory].Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
+            changesTracker.AddRange(option.Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
         }
 
         for (int i = 0; i < changesTracker.Count; i++)
@@ -198,7 +198,7 @@ public class SettingsMenu : MonoBehaviour
             (ActionResult res) => {
                 if (res == ActionResult.Yes)
                 {
-                    // yes code
+                    // Cancel changes then quit
                     Settings.LoadSettings();
                     for (int i = 0; i < changesTracker.Count; i++)
                     {
@@ -326,7 +326,8 @@ public class SettingsMenu : MonoBehaviour
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.Type, true);
+                    BaseSettingsElement element;
+                    FunctionsManager.SettingsMenu.TryCreateInstance(keyValuePair.Value[j].classData.Type, false, out element);
                     element.option = keyValuePair.Value[j];
                     element.parameterData = keyValuePair.Value[j].classData.Parameters;
                     element.InitializeLUA();

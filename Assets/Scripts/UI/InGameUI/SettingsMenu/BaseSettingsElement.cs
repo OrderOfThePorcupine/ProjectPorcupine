@@ -49,7 +49,7 @@ public abstract class BaseSettingsElement : BaseUIElement
     {
         if (parameterData.ContainsKey("LUAInitializeFunction"))
         {
-            FunctionsManager.SettingsMenu.Call(parameterData["LUAInitializeFunction"].ToString(), this);
+            FunctionsManager.SettingsMenu.TryCall(parameterData["LUAInitializeFunction"].ToString(), this);
         }
     }
 

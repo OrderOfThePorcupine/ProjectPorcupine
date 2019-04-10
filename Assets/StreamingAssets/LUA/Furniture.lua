@@ -91,15 +91,15 @@ function IsEnterable_AirlockDoor( furniture )
                 -- Pressure's different, pump to equalize
                 if(math.abs(ModUtils.Round(insideRoom.GetGasPressure(),3) - ModUtils.Round(outsideRoom.GetGasPressure(),3)) > tolerance) then
                     if (insideRoom.GetGasPressure() < outsideRoom.GetGasPressure()) then
-                        insideRoom.RoomBehaviors["roombehavior_airlock"].CallEventAction("PumpIn",  outsideRoom.GetGasPressure())
+                        insideRoom.RoomBehaviors["roombehavior_airlock"].TryCallEventAction("PumpIn",  outsideRoom.GetGasPressure())
                     else
-                        insideRoom.RoomBehaviors["roombehavior_airlock"].CallEventAction("PumpOut", outsideRoom.GetGasPressure())
+                        insideRoom.RoomBehaviors["roombehavior_airlock"].TryCallEventAction("PumpOut", outsideRoom.GetGasPressure())
                     end
                     return ENTERABILITY_SOON
                 else
                     if (furniture.Parameters["openness"].ToFloat() >= 1) then
                         -- We're fully open deactivate pumps and let the room know we're done pumping
-                        insideRoom.RoomBehaviors["roombehavior_airlock"].CallEventAction("PumpOff")
+                        insideRoom.RoomBehaviors["roombehavior_airlock"].TryCallEventAction("PumpOff")
                         return ENTERABILITY_YES --ENTERABILITY.Yes
                     end
                     furniture.Parameters["is_opening"].SetValue(1)
@@ -427,7 +427,7 @@ function PowerGenerator_FuelInfo(furniture)
 end
 
 function LandingPad_Test_CallTradeShip(furniture, character)
-   WorldController.Instance.TradeController.CallTradeShipTest(furniture)
+   WorldController.Instance.TradeController.TryCallTradeShipTest(furniture)
 end
 
 -- This function gets called once, when the furniture is installed

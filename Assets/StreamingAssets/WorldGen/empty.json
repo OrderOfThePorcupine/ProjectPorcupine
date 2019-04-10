@@ -1,0 +1,47 @@
+{
+   "Asteroid": {
+      "AsteroidSize": "10",
+      "AsteroidDensity": ".5",
+      "ResourceChance": "0.15",
+      "Resources": [
+         {
+            "source": "iron_ore",
+            "min": "5",
+            "max": "15",
+            "weightedChance": "30"
+         },
+         {
+            "source": "copper_ore",
+            "min": "5",
+            "max": "15",
+            "weightedChance": "20"
+         },
+         {
+            "source": "ice_source",
+            "min": "5",
+            "max": "10",
+            "weightedChance": "15"
+         },
+         {
+            "source": "uranium_ore",
+            "min": "5",
+            "max": "15",
+            "weightedChance": "35"
+         }
+      ]
+   },
+   "StartArea": {
+      "file": "EmptyStartArea.sav"
+   },
+   "Wallet": [
+      {
+         "name": "Quill Corp Bucks",
+         "startingBalance": "150"
+      },
+      {
+         "name": "Inter-Galactic Credits",
+         "startingBalance": "0"
+      }
+   ]
+}
+

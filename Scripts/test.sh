@@ -65,7 +65,7 @@ endTestsFold=0 #stores whether the travis_fold:end:tests has been echoed yet
 
 travecho 'travis_fold:start:compile'
 echo "Attempting Unit Tests"
-"$unityPath" -batchmode -runEditorTests -nographics -editorTestsResultFile "$(pwd)"/EditorTestResults.xml -projectPath "$(pwd)" -logFile unity.log
+"$unityPath" -batchmode -runEditorTests -nographics -editorTestsResultFile  "$(pwd)"/EditorTestResults.xml -projectPath "$(pwd)" -logFile unity.log
 logFile="$(pwd)"/unity.log
 travecho "$(cat "$logFile")"
 travecho 'travis_fold:end:compile'

@@ -253,6 +253,7 @@ public class OverlayMap : MonoBehaviour
     /// <param name="name">Name of overlay prototype.</param>
     public void SetOverlay(string name)
     {
+        OverlayDescriptor descr;
         if (name == "None")
         {
             meshRenderer.enabled = false;
@@ -260,19 +261,10 @@ public class OverlayMap : MonoBehaviour
             HideGUITooltip();
             return;
         }
-        else if (PrototypeManager.Overlay.Has(name))
+        else if (PrototypeManager.Overlay.TryGet(name, out descr))
         {
             meshRenderer.enabled = true;
             currentOverlay = name;
-            OverlayDescriptor descr = PrototypeManager.Overlay.Get(name);
-
-            if (FunctionsManager.Overlay.HasFunction(descr.LuaFunctionName) == false)
-            {
-                UnityDebugger.Debugger.LogError("OverlayMap", string.Format("Couldn't find a function named '{0}' in Overlay functions", descr.LuaFunctionName));
-                return;
-            }
-
-            bool loggedOnce = false;
             valueAt = (x, y, z) => 
             {
                 if (WorldController.Instance == null)
@@ -281,20 +273,11 @@ public class OverlayMap : MonoBehaviour
                 }
 
                 Tile tile = WorldController.Instance.GetTileAtWorldCoord(new Vector3(x, y, z));
-
-                DynValue result = FunctionsManager.Overlay.Call(descr.LuaFunctionName, new object[] { tile, World.Current });
-                double? value = result.CastToNumber();
-                if (value == null)
+                double value;
+                if (!FunctionsManager.Overlay.TryCall(descr.LuaFunctionName, out value, new object[] { tile, World.Current }))
                 {
-                    if (loggedOnce == false)
-                    {
-                        UnityDebugger.Debugger.LogError("OverlayMap", string.Format("The return value from the function named '{0}' was null for tile at ({1}, {2}, {3})", descr.LuaFunctionName, x, y, z));
-                        loggedOnce = true;
-                    }
-                    
                     return 0;
                 }
-                
                 return (int)value;
             };
 
@@ -468,14 +451,14 @@ public class OverlayMap : MonoBehaviour
         {
             UnityDebugger.Debugger.LogError("OverlayMap", "No color map texture setted!");
         }
-        
-        if (!overlayColorMapLookup.ContainsKey(currentOverlay))
+
+        Dictionary<int, Color> colorMapLookup;
+        if (overlayColorMapLookup.TryGetValue(currentOverlay, out colorMapLookup) == false)
         {
-            overlayColorMapLookup.Add(currentOverlay, new Dictionary<int, Color>());
+            colorMapLookup = new Dictionary<int, Color>();
+            overlayColorMapLookup.Add(currentOverlay, colorMapLookup);
         }
-
-        Dictionary<int, Color> colorMapLookup = overlayColorMapLookup[currentOverlay];
-
+        
         // Size in pixels of overlay texture and create texture.
         int textureWidth = sizeX;
         int textureHeight = sizeY;
@@ -490,12 +473,13 @@ public class OverlayMap : MonoBehaviour
 
                 int sampleX = ((int)v % 256) * colorMapWidth;
 
-                if (!colorMapLookup.ContainsKey(sampleX))
+                Color pixel;
+                if (colorMapLookup.TryGetValue(sampleX, out pixel) == false)
                 {
-                    colorMapLookup.Add(sampleX, colorMapTexture.GetPixel(sampleX, 0));
+                    pixel = colorMapTexture.GetPixel(sampleX, 0);
+                    colorMapLookup.Add(sampleX, pixel);
                 }
-
-                Color pixel = colorMapLookup[sampleX];
+                
                 int tilePixelIndex = (y * sizeX) + x;
                 pixels[tilePixelIndex] = pixel;
             }

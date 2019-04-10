@@ -40,6 +40,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         X = x;
         Y = y;
         Z = z;
+        CanSee = false;
         Characters = new List<Character>();
         MovementModifier = 1;
         Utilities = new Dictionary<string, Utility>();
@@ -99,6 +100,8 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public int Z { get; private set; }
 
     public float MovementModifier { get; set; }
+
+    public bool CanSee { get; set; }
 
     public float MovementCost
     {
@@ -181,6 +184,8 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
                 Tile tile = World.Current.GetTileAt(x_off, y_off, Z);
                 tile.Furniture = null;
                 UpdatePathfindingCost();
+
+                SetCanSee();
             }
         }
 
@@ -422,7 +427,7 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
     public bool IsReachableFromAnyNeighbor(bool checkDiagonals = false)
     {
         bool reachableFromSameLevel = GetNeighbours(checkDiagonals).Any(tile => tile != null && tile.MovementCost > 0 && (checkDiagonals == false || IsClippingCorner(tile) == false));
-        bool reachableVertically = GetVerticalNeighbors().Length > 0;
+        bool reachableVertically = GetVerticalNeighbors().Any(tile => tile.IsEnterable() != Enterability.Never);
         return reachableFromSameLevel || reachableVertically;
     }
 
@@ -723,6 +728,25 @@ public class Tile : ISelectable, IContextActionProvider, IComparable, IEquatable
         }
 
         PathfindingCost = newCost;
+    }
+
+    private void SetCanSee()
+    {
+        CanSee = true;
+        ReportTileChanged();
+
+        if (IsEnterable() == Enterability.Never)
+        {
+            return;
+        }
+
+        foreach (Tile neighbor in GetNeighbours(false, true, false))
+        {
+            if (neighbor.CanSee == false)
+            {
+                neighbor.SetCanSee();
+            }
+        }
     }
 
     private void ReportTileChanged()

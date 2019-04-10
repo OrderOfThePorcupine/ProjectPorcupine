@@ -102,7 +102,8 @@ public class ShipManager
     /// <param name="berth">The berth furniture object.</param>
     public bool IsOccupied(Furniture berth)
     {
-        return berthShipMap.ContainsKey(berth) && berthShipMap[berth] != null;
+        Ship ship;
+        return berthShipMap.TryGetValue(berth, out ship) && ship != null;
     }
 
     /// <summary>
@@ -111,7 +112,13 @@ public class ShipManager
     /// <param name="berth">The berth furniture object.</param>
     public Ship GetBerthedShip(Furniture berth)
     {
-        return berthShipMap.ContainsKey(berth) ? berthShipMap[berth] : null;
+        Ship ship;
+        if (berthShipMap.TryGetValue(berth, out ship) == false || ship == null)
+        {
+            return null;
+        }
+
+        return ship;
     }
 
     /// <summary>
@@ -137,14 +144,16 @@ public class ShipManager
     /// <param name="berth">The berth furniture object.</param>
     public void DeberthShip(Furniture berth)
     {
-        if (berthShipMap.ContainsKey(berth) == false || berthShipMap[berth] == null)
+        Ship ship;
+        if (berthShipMap.TryGetValue(berth, out ship) == false || ship  == null)
         {
             UnityDebugger.Debugger.LogError("Ships", "No ship berthed here: " + berth.Tile.ToString());
             return;
         }
 
-        berthShipMap[berth].State = ShipState.WRAPPED;
-        berthShipMap[berth].Wrap();
+        ship.State = ShipState.WRAPPED;
+        ship.Wrap();
+
         berthShipMap[berth] = null;
 
         berth.EventActions.Trigger("OnDeberth", berth);

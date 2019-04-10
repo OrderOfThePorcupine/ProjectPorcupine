@@ -59,7 +59,7 @@ public abstract class BaseDialogBox : BaseUIElement
     {
         // if (parameterData.ContainsKey("LUAInitializeFunction"))
         // {
-        //     FunctionsManager.DialogBox.Call(parameterData["LUAInitializeFunction"].ToString(), this);
+        //     FunctionsManager.DialogBox.TryCall(parameterData["LUAInitializeFunction"].ToString(), this);
         // }
     }
 

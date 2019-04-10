@@ -10,8 +10,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
-using System.Xml.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class WorldGenerator
@@ -43,15 +43,11 @@ public class WorldGenerator
         }
     }
 
-    public void Generate(World world, int seed)
+    public void Generate(int width, int height, int depth, World world, int seed)
     {
         asteroidFloorType = TileType.Empty;
 
-        int width = world.Width;
-        int height = world.Height;
-        int depth = world.Depth;
-
-        ReadXML(world);
+        ReadWorldData(world);
         world.ResizeWorld(width, height, depth);
 
         Random.InitState(seed);
@@ -73,18 +69,13 @@ public class WorldGenerator
         }
     }
 
-    private static void ReadXmlWallet(XmlReader reader, World world)
+    private static void ReadJsonWallet(JToken tokens, World world)
     {
-        XmlReader wallet = reader.ReadSubtree();
-
-        while (wallet.Read())
+        foreach (JToken token in tokens)
         {
-            if (wallet.Name == "Currency")
-            {
                 world.Wallet.AddCurrency(
-                    wallet.GetAttribute("name"),
-                    float.Parse(wallet.GetAttribute("startingBalance")));
-            }
+                    token["name"].ToString(),
+                    (float)token["startingBalance"]);
         }
     }
 
@@ -207,80 +198,55 @@ public class WorldGenerator
         }
     }
 
-    private void ReadXML(World world)
+    private void ReadWorldData(World world)
     {
-        // Setup XML Reader
         // Optimally, this would use GameController.Instance.GeneratorBasePath(), but that apparently may not exist at this point.
         // TODO: Investigate either a way to ensure GameController exists at this time or another place to reliably store the base path, that is accessible
         // both in _World and MainMenu scenes
-        string filePath = System.IO.Path.Combine(System.IO.Path.Combine(Application.streamingAssetsPath, "WorldGen"), SceneController.GeneratorFile);
-        string furnitureXmlText = System.IO.File.ReadAllText(filePath);
+        string filePath = Path.Combine(Path.Combine(Application.streamingAssetsPath, "WorldGen"), SceneController.GeneratorFile);
 
-        XmlTextReader reader = new XmlTextReader(new StringReader(furnitureXmlText));
+        StreamReader reader = File.OpenText(filePath);
+        JToken protoJson = JToken.ReadFrom(new JsonTextReader(reader));
 
-        if (reader.ReadToDescendant("WorldGenerator"))
+        ReadJsonData(world, protoJson);
+    }
+
+    private void ReadJsonData(World world, JToken protoJson)
+    {
+        try
         {
-            if (reader.ReadToDescendant("Asteroid"))
-            {
-                try
-                {
-                    ReadXmlAsteroid(reader);
-                }
-                catch (System.Exception e)
-                {
-                    // Leaving this in because UberLogger doesn't handle multiline messages  
-                    UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Asteroid" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
-                }
-            }
-            else
-            {
-                UnityDebugger.Debugger.LogError("WorldGenerator", "Did not find a 'Asteroid' element in the WorldGenerator definition file.");
-            }
-
-            if (reader.ReadToNextSibling("StartArea"))
-            {
-                try
-                {
-                    string startAreaFileName = reader.GetAttribute("file");
-                    string startAreaFilePath = Path.Combine(Application.streamingAssetsPath, Path.Combine("WorldGen", startAreaFileName));
-                    ReadStartArea(startAreaFilePath, world);
-                }
-                catch (System.Exception e)
-                {
-                    UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/StartArea" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
-                }
-            }
-            else
-            {
-                UnityDebugger.Debugger.LogError("WorldGenerator", "Did not find a 'StartArea' element in the WorldGenerator definition file.");
-            }
-
-            if (reader.ReadToNextSibling("Wallet"))
-            {
-                try
-                {
-                    ReadXmlWallet(reader, world);
-                }
-                catch (System.Exception e)
-                {
-                    UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Wallet" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
-                }
-            }
-            else
-            {
-                UnityDebugger.Debugger.LogError("WorldGenerator", "Did not find a 'Wallet' element in the WorldGenerator definition file.");
-            }
+            ReadJsonAsteroid(protoJson["Asteroid"]);
         }
-        else
+        catch (System.Exception e)
         {
-            UnityDebugger.Debugger.LogError("WorldGenerator", "Did not find a 'WorldGenerator' element in the WorldGenerator definition file.");
+            // Leaving this in because UberLogger doesn't handle multiline messages  
+            UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Asteroid" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
+        }
+
+        try
+        {
+            string startAreaFileName = protoJson["StartArea"]["file"].ToString();
+            string startAreaFilePath = Path.Combine(Application.streamingAssetsPath, Path.Combine("WorldGen", startAreaFileName));
+            ReadStartArea(startAreaFilePath, world);
+        }
+        catch (System.Exception e)
+        {
+            UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/StartArea" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
+        }
+
+        try
+        {
+            ReadJsonWallet(protoJson["Wallet"], world);
+        }
+        catch (System.Exception e)
+        {
+            UnityDebugger.Debugger.LogError("WorldGenerator", "Error reading WorldGenerator/Wallet" + System.Environment.NewLine + "Exception: " + e.Message + System.Environment.NewLine + "StackTrace: " + e.StackTrace);
         }
     }
 
-    private void ReadXmlAsteroid(XmlReader reader)
+    private void ReadJsonAsteroid(JToken token)
     {
-        XmlSerializer serializer = new XmlSerializer(typeof(AsteroidInfo));
-        asteroidInfo = (AsteroidInfo)serializer.Deserialize(reader);
+        asteroidInfo = token.ToObject<AsteroidInfo>();
     }
 
     private void ReadStartArea(string startAreaFilePath, World world)
@@ -289,16 +255,12 @@ public class WorldGenerator
     }
 
     [System.Serializable]
-    [XmlRoot("Asteroid")]
     public class AsteroidInfo
     {
-        [XmlElement("AsteroidSize")]
         public int AsteroidSize { get; set; }
 
-        [XmlElement("AsteroidDensity")]
         public float AsteroidDensity { get; set; }
 
-        [XmlElement("ResourceChance")]
         public float ResourceChance { get; set; }
 
         public List<Resource> Resources { get; set; }
@@ -307,19 +269,14 @@ public class WorldGenerator
     [System.Serializable]
     public class Resource
     {
-        [XmlAttribute("type")]
         public string Type { get; set; }
 
-        [XmlAttribute("source")]
         public string Source { get; set; }
 
-        [XmlAttribute("min")]
         public int Min { get; set; }
 
-        [XmlAttribute("max")]
         public int Max { get; set; }
 
-        [XmlAttribute("weightedChance")]
         public int WeightedChance { get; set; }
     }
 }

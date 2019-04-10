@@ -11,11 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
-using Newtonsoft.Json.Linq;
 using ProjectPorcupine.Entities;
 using ProjectPorcupine.Jobs;
 using ProjectPorcupine.Localization;
 using ProjectPorcupine.Pathfinding;
+using ProjectPorcupine.Rooms;
 using UnityEngine;
 
 [MoonSharpUserData]
@@ -181,6 +181,14 @@ public class Job : ISelectable
         Low
     }
 
+    public enum JobState
+    {
+        Active,
+        CantReach,
+        MissingInventory,
+        Suspended
+    }
+
     // The items needed to do this job.
     public Dictionary<string, RequestedItem> RequestedItems { get; set; }
 
@@ -324,7 +332,7 @@ public class Job : ISelectable
 
         foreach (string luaFunction in jobWorkedLua.ToList())
         {
-            FunctionsManager.Furniture.Call(luaFunction, this);
+            FunctionsManager.Furniture.TryCall(luaFunction, this);
         }
 
         // Check to make sure we actually have everything we need.
@@ -340,7 +348,7 @@ public class Job : ISelectable
         {
             foreach (string luaFunction in jobCompletedLua.ToList())
             {
-                FunctionsManager.Furniture.Call(luaFunction, this);
+                FunctionsManager.Furniture.TryCall(luaFunction, this);
             }
 
             // Do whatever is supposed to happen with a job cycle completes.
@@ -367,14 +375,10 @@ public class Job : ISelectable
         }
     }
 
-    public void Suspend()
-    {
-        IsActive = false;
-    }
-
     public void SuspendCantReach()
     {
         World.Current.RoomManager.Removed += (room) => ClearCharCantReach();
+        tile.TileChanged += (tile) => ClearCharCantReach();
         Suspend();
     }
 
@@ -396,6 +400,7 @@ public class Job : ISelectable
     {
         IsActive = true;
         World.Current.InventoryManager.InventoryCreated -= InventoryAvailable;
+        World.Current.InventoryManager.UnregisterInventoryTypeCreated(CheckIfInventorySufficient, inventory.Type);
     }
 
     public bool CheckIfInventorySufficient(Inventory inventory)
@@ -459,7 +464,8 @@ public class Job : ISelectable
 
         foreach (RequestedItem item in RequestedItems.Values)
         {
-            if (DeliveredItems.ContainsKey(item.Type) == false || item.AmountNeeded(DeliveredItems[item.Type]) > 0)
+            Inventory inventory;
+            if (DeliveredItems.TryGetValue(item.Type, out inventory) == false || item.AmountNeeded(inventory) > 0)
             {
                 return false;
             }
@@ -475,13 +481,19 @@ public class Job : ISelectable
 
     public int AmountDesiredOfInventoryType(string type)
     {
-        if (RequestedItems.ContainsKey(type) == false)
+        RequestedItem requestedItem;
+        if (RequestedItems.TryGetValue(type, out requestedItem) == false)
         {
             return 0;
         }
 
-        Inventory inventory = DeliveredItems.ContainsKey(type) ? DeliveredItems[type] : null;
-        return RequestedItems[type].AmountDesired(inventory);
+        Inventory inventory;
+        if (DeliveredItems.TryGetValue(type, out inventory) == false)
+        {
+            inventory = null;
+        }
+
+        return requestedItem.AmountDesired(inventory);
     }
 
     public bool IsRequiredInventoriesAvailable()
@@ -541,7 +553,11 @@ public class Job : ISelectable
     {
         foreach (RequestedItem item in RequestedItems.Values)
         {
-            Inventory inventory = DeliveredItems.ContainsKey(item.Type) ? DeliveredItems[item.Type] : null;
+            Inventory inventory;
+            if (DeliveredItems.TryGetValue(item.Type, out inventory) == false)
+            {
+                inventory = null;
+            }
 
             if (item.DesiresMore(inventory))
             {
@@ -606,7 +622,7 @@ public class Job : ISelectable
 
     public bool CanCharacterReach(Character character)
     {
-        return charsCantReach.Contains(character);
+        return charsCantReach.Contains(character) == false;
     }
 
     /// <summary>
@@ -632,6 +648,12 @@ public class Job : ISelectable
     /// </summary>
     public void ClearCharCantReach()
     {
+        World.Current.RoomManager.Removed -= (room) => ClearCharCantReach();
+        if (tile != null)
+        {
+            tile.TileChanged -= (tile) => ClearCharCantReach();
+        }
+
         charsCantReach.Clear();
         IsActive = true;
     }
@@ -639,5 +661,77 @@ public class Job : ISelectable
     public IEnumerable<string> GetAdditionalInfo()
     {
         yield break;
+    }
+
+    /// <summary>
+    /// Checks to see if a job can run, and suspends if it can't.
+    /// </summary>
+    /// <param name="characterRoom">Room character is in.</param>
+    /// <param name="changeState">If true allows changing the state.</param>
+    /// <returns>true if the job can be run.</returns>
+    public JobState CanJobRun(Room characterRoom, bool changeState)
+    {
+        // If the job requires material but there is nothing available, store it in jobsWaitingForInventory
+        if (RequestedItems.Count > 0 && GetFirstFulfillableInventoryRequirement() == null)
+        {
+            if (changeState)
+            {
+                string missing = acceptsAny ? "*" : GetFirstDesiredItem().Type;
+                SuspendWaitingForInventory(missing);
+            }
+
+            return JobState.MissingInventory;
+        }
+        else if (tile != null)
+        {
+            if (((adjacent == false && tile.IsEnterable() != Enterability.Never) ||
+                (adjacent && tile.IsReachableFromAnyNeighbor(false))) &&
+                tile.CanSee)
+            {
+                HashSet<Room> roomsToCheck = new HashSet<Room>();
+                if (tile.Room != null)
+                {
+                    roomsToCheck.Add(tile.Room);
+                }
+
+                foreach (Tile neighbor in tile.GetNeighbours(false))
+                {
+                    if (neighbor.Room != null && roomsToCheck.Contains(neighbor.Room) == false)
+                    {
+                        roomsToCheck.Add(neighbor.Room);
+                    }
+                }
+
+                if (CanReachRoom(roomsToCheck, characterRoom))
+                {
+                    return JobState.Active;
+                }
+            }
+
+            if (changeState)
+            {
+                // No one can reach the job.
+                SuspendCantReach();
+            }
+
+            return JobState.CantReach;
+        }
+
+        return JobState.Active;
+    }
+
+    private bool CanReachRoom(HashSet<Room> roomsToCheck, Room characterRoom)
+    {
+        if (Pathfinder.IsRoomReachable(characterRoom, roomsToCheck) == false)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void Suspend()
+    {
+        IsActive = false;
     }
 }

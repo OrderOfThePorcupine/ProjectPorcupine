@@ -130,11 +130,11 @@ public class DialogBoxManager : MonoBehaviour
 
         if (proto.ClassName != null)
         {
-            box = FunctionsManager.DialogBox.CreateInstance<BaseDialogBox>(proto.ClassName, false, args);
+            FunctionsManager.DialogBox.TryCreateInstance(proto.ClassName, false, out box, args);
         }
         else if (proto.CreatorFunction != null)
         {
-            box = FunctionsManager.DialogBox.Call<BaseDialogBox>(proto.CreatorFunction, args);
+            FunctionsManager.DialogBox.TryCall(proto.CreatorFunction, false, out box, args);
         }
         else
         {

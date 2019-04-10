@@ -103,9 +103,10 @@ public class ModsManager
         {
             foreach (Action<JProperty> handler in prototypeHandler.Value)
             {
-                if (tagNameToProperty.ContainsKey(prototypeHandler.Key))
+                JToken token;
+                if (tagNameToProperty.TryGetValue(prototypeHandler.Key, out token))
                 {
-                    foreach (JToken prototypeGroup in tagNameToProperty[prototypeHandler.Key])
+                    foreach (JToken prototypeGroup in token)
                     {
                         handler((JProperty)prototypeGroup);
                     }
@@ -238,13 +239,15 @@ public class ModsManager
     /// <param name="prototypesLoader">Called to handle the prototypes loading.</param>
     private void HandlePrototypes(string prototypeKey, Action<JProperty> prototypesLoader)
     {
-        if (!prototypeHandlers.ContainsKey(prototypeKey))
+        List<Action<JProperty>> handlers;
+        if (prototypeHandlers.TryGetValue(prototypeKey, out handlers) == false)
         {
-            prototypeHandlers.Add(prototypeKey, new List<Action<JProperty>>());
+            handlers = new List<Action<JProperty>>();
+            prototypeHandlers.Add(prototypeKey, handlers);
         }
 
         // The way these work suggest it should be in a separate class, either a new class (PrototypeLoader?) or in one of the prototype related classes
-        prototypeHandlers[prototypeKey].Add(prototypesLoader);
+        handlers.Add(prototypesLoader);
     }
 
     private void LoadPrototypes()

@@ -45,11 +45,22 @@ public static class SpriteManager
     }
 
     /// <summary>
+    /// Creates a sprite with an blank texture.
+    /// </summary>
+    /// <returns>The error sprite.</returns>
+    public static Sprite CreateBlankSprite()
+    {
+        noResourceTexture.SetPixel(0, 0, Color.white);
+        return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
+    }
+
+    /// <summary>
     /// Creates a sprite with an error texture.
     /// </summary>
     /// <returns>The error sprite.</returns>
     public static Sprite CreateErrorSprite()
     {
+        noResourceTexture.SetPixel(0, 0, new Color32(255, 0, 255, 255));
         return Sprite.Create(noResourceTexture, new Rect(Vector2.zero, new Vector3(32, 32)), new Vector2(0.5f, 0.5f), 32);
     }
 
@@ -106,6 +117,9 @@ public static class SpriteManager
     /// <param name="spriteName">Sprite name.</param>
     public static bool HasSprite(string categoryName, string spriteName)
     {
+        // NOTE! This method is a bad idea. Every time we want to know
+        // if a sprite exists we always want the sprite too
+        // So it's wastefull to check before
         Dictionary<string, Sprite> categorySprites;
         if (sprites.TryGetValue(categoryName, out categorySprites))
         {
@@ -280,7 +294,7 @@ public static class SpriteManager
         Color32[] pixels = noResourceTexture.GetPixels32();
         for (int i = 0; i < pixels.Length; i++)
         {
-            pixels[i] = new Color32(255, 0, 255, 255);
+            pixels[i] = new Color32(255, 255, 255, 255);
         }
 
         noResourceTexture.SetPixels32(pixels);

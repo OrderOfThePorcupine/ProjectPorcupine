@@ -18,10 +18,20 @@
         "Camera"
       ]
     },
-    "Run_LUA": {
+    "RunLuaStr": {
       "Description": "Runs the string as LUA",
       "Parameters": "String luaText",
-      "FunctionName": "Run_LUA",
+      "FunctionName": "RunLuaString",
+      "Tags": [
+        "LUA",
+        "Modding",
+        "Compile"
+      ]
+    },
+    "RunLuaFile": {
+      "Description": "Runs the file as LUA",
+      "Parameters": "String path",
+      "FunctionName": "RunLuaFile",
       "Tags": [
         "LUA",
         "Modding",

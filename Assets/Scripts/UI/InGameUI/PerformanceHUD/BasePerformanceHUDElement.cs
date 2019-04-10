@@ -43,7 +43,7 @@ public abstract class BasePerformanceHUDComponent : BaseUIElement
     {
         if (parameterData.ContainsKey("LUAInitializeFunction"))
         {
-            FunctionsManager.PerformanceHUD.Call(parameterData["LUAInitializeFunction"].ToString(), this);
+            FunctionsManager.PerformanceHUD.TryCall(parameterData["LUAInitializeFunction"].ToString(), this);
         }
     }
 }

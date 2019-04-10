@@ -622,8 +622,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             return Enterability.Yes;
         }
 
-        DynValue ret = FunctionsManager.Furniture.Call(isEnterableAction, this);
-        return (Enterability)ret.Number;
+        Enterability isEnterable;
+        FunctionsManager.Furniture.TryCall(isEnterableAction, out isEnterable, this);
+        return isEnterable;
     }
 
     public string GetDefaultSpriteName()
@@ -683,7 +684,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         Width = PrototypeReader.ReadJson(Width, innerJson["Width"]);
         Height = PrototypeReader.ReadJson(Height, innerJson["Height"]);
 
-        /* TODO: This may need altered, for now it is built to match the functionality of the xml reader
+        /* TODO: This may need altered, for now it is built to match the functionality of the prototype reader
         in that if no value is set it is invincible, and the furniture's health system will make it invincible if access while null.
         It may be preferable to have the HealthSystem constructor detect an "invalid" health amount such as -1, and autoset to invincible as appropriate */
         float healthValue = PrototypeReader.ReadJson(-1f, innerJson["Health"]);
@@ -861,10 +862,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
         ////World.current.InvalidateTileGraph();
 
-        if (World.Current.tileGraph != null)
-        {
-            World.Current.tileGraph.RegenerateGraphAtTile(Tile);
-        }
+        World.Current.RegenerateGraphAtTile(Tile);
 
         // We should inform our neighbours that they have just lost a
         // neighbour regardless of type.  
@@ -966,10 +964,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
 
         ////World.current.InvalidateTileGraph();
 
-        if (World.Current.tileGraph != null)
-        {
-            World.Current.tileGraph.RegenerateGraphAtTile(Tile);
-        }
+        World.Current.RegenerateGraphAtTile(Tile);
 
         // We should inform our neighbours that they have just lost a
         // neighbour regardless of type.  
@@ -1049,8 +1044,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
         else
         {
-            DynValue ret = FunctionsManager.Furniture.Call(getProgressInfoNameAction, this);
-            return ret.String;
+            string info;
+            FunctionsManager.Furniture.TryCall(getProgressInfoNameAction, out info, this);
+            return info;
         }
     }
 
@@ -1317,7 +1313,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     #region Private Context Menu
     private void InvokeContextMenuLuaAction(ContextMenuAction action, Character character)
     {
-        FunctionsManager.Furniture.Call(action.Parameter, this, character);
+        FunctionsManager.Furniture.TryCall(action.Parameter, this, character);
     }
     #endregion
 

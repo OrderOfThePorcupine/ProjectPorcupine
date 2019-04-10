@@ -78,10 +78,10 @@ public class LuaFunctionsTest
     {
         // This makes sure that the channel lua is activated since we require to to be
         // we set it back to the old value afterwards as to not annoy the 'dev'
-        bool oldVal = true;
-        if (UnityDebugger.Debugger.Channels.ContainsKey("Lua"))
+        bool oldVal;
+        if (UnityDebugger.Debugger.Channels.TryGetValue("Lua", out oldVal) == false)
         {
-            oldVal = UnityDebugger.Debugger.Channels["Lua"];
+            oldVal = true;
         }
 
         UnityDebugger.Debugger.Channels["Lua"] = true;
@@ -96,7 +96,8 @@ public class LuaFunctionsTest
     {
         // Test a function that dosent return anything (void c# , nil/nan Lua)
         functions.LoadScript(testCode1, "testCode1");
-        DynValue value = functions.Call("test_func0");
+        DynValue value;
+        Assert.IsTrue(functions.TryCallFunction("test_func0", out value));
         Assert.AreEqual(true, value.IsNilOrNan());
     }
 
@@ -105,7 +106,8 @@ public class LuaFunctionsTest
     {
         // Test a function that returns a string
         functions.LoadScript(testCode1, "testCode1");
-        DynValue value = functions.Call("test_func1");
+        DynValue value;
+        Assert.IsTrue(functions.TryCallFunction("test_func1", out value));
         Assert.AreEqual("test_func1_returns", value.CastToString());
     }
 
@@ -114,7 +116,8 @@ public class LuaFunctionsTest
     {
         // Test a function that returns the String passed to it
         functions.LoadScript(testCode1, "testCode1");
-        DynValue value = functions.Call("test_func2", "inputted value");
+        DynValue value;
+        Assert.IsTrue(functions.TryCallFunction("test_func2", out value, "inputted value"));
         Assert.AreEqual("inputted value", value.CastToString());
     }
 
@@ -123,10 +126,11 @@ public class LuaFunctionsTest
     {
         // Test passing more than one input
         functions.LoadScript(testCode1, "testCode1");
-        DynValue value = functions.Call("test_func3", 4, 7);
+        DynValue value;
+        Assert.IsTrue(functions.TryCallFunction("test_func3", out value, 4, 7));
         Assert.AreEqual(11, (int)value.CastToNumber());
     }
 
     // TODO: unit tests for LuaFunctions.RegisterGlobal
-    // TODO: unit tests for LuaFunctions.CallWithInstance
+    // TODO: unit tests for LuaFunctions.TryCallWithInstance
 }

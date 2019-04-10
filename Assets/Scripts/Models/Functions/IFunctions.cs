@@ -6,25 +6,27 @@
 // file LICENSE, which is part of this source code package, for details.
 // ====================================================
 #endregion
+
+using System;
 using MoonSharp.Interpreter;
 
 public interface IFunctions
 {
     void RegisterType(System.Type type);
 
-    bool HasFunction(string name);
+    DynValue ConvertObject(object obj);
 
-    bool HasConstructor(string name);
+    bool TryCallFunctionWithError(string name, out DynValue res, params object[] args);
+
+    bool TryCallFunction(string name, out DynValue res, params object[] args);
+
+    bool TryCreateInstance(string name, out DynValue res, params object[] args);
+
+    bool TryCallFunctionWithError<T>(string name, out T res, params object[] args);
+
+    bool TryCallFunction<T>(string name, out T res, params object[] args);
+
+    bool TryCreateInstance<T>(string name, out T res, params object[] args);
 
     bool LoadScript(string text, string scriptName);
-
-    DynValue Call(string functionName, params object[] args);
-
-    T Call<T>(string functionName, params object[] args);
-
-    DynValue CallWithError(string functionName, params object[] args);
-
-    DynValue CreateInstance(object fromObject);
-
-    T CreateInstance<T>(string className, params object[] arguments);
 }

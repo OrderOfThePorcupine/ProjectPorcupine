@@ -88,24 +88,15 @@ public static class AudioManager
     /// <returns>SoundClip from the specified category with the specified name.</returns>
     public static SoundClip GetAudio(string categoryName, string audioName)
     {
-        SoundClip clip;
-
         string audioNameAndCategory = categoryName + "/" + audioName;
-
-        if (audioClips.ContainsKey(audioNameAndCategory))
-        {
-            clip = audioClips[audioNameAndCategory];
-        }
-        else
+        
+        SoundClip clip;
+        if (audioClips.TryGetValue(audioNameAndCategory, out clip) == false)
         {
             try
             {
                 UnityDebugger.Debugger.LogWarning("AudioManager", "No audio available called: " + audioNameAndCategory);
-                if (audioClips.ContainsKey("Sound/Error"))
-                {
-                    clip = audioClips["Sound/Error"];
-                }
-                else
+                if (audioClips.TryGetValue("Sound/Error", out clip) == false)
                 {
                     UnityDebugger.Debugger.LogError("AudioManager", "Error audio not available!!!");
                     clip = null;
@@ -159,7 +150,7 @@ public static class AudioManager
             string audioCategory = new DirectoryInfo(directoryPath).Name;
             string filePath = new FileInfo(file).FullName;
 
-            if (filePath.Contains(".xml") || filePath.Contains(".meta") || filePath.Contains(".db"))
+            if (filePath.Contains(".json") || filePath.Contains(".meta") || filePath.Contains(".db"))
             {
                 continue;
             }
@@ -177,13 +168,15 @@ public static class AudioManager
 
             filename = audioCategory + "/" + filename;
 
-            if (audioClips.ContainsKey(filename))
+            SoundClip soundClip;
+            if (audioClips.TryGetValue(filename, out soundClip))
             {
-                audioClips[filename].Add(clip);
+                soundClip.Add(clip);
             }
             else
             {
-                audioClips[filename] = new SoundClip(clip);
+                soundClip = new SoundClip(clip);
+                audioClips[filename] = soundClip;
             }
         }
     }

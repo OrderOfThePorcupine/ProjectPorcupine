@@ -325,6 +325,7 @@ public class DialogBoxJobList : BaseDialogBox
     public void Clicked(int index, Character character)
     {
         Image[] images = content.GetComponentsInChildren<Image>();
+        Debug.LogWarning(images);
         for (int i = 0; i < images.Length; i++)
         {
             if (i != index)
@@ -335,7 +336,9 @@ public class DialogBoxJobList : BaseDialogBox
             {
                 images[i].color = selectedColor;
             }
-            images[i].GetComponentInChildren<Button>().gameObject.SetActive(i == index);
+
+            // Enable the delete button
+            images[i].GetComponentInChildren<Button>(true).gameObject.SetActive(i == index);
         }
 
         // center on character
@@ -1165,6 +1168,13 @@ public class DialogBoxPrompt : BaseDialogBox
 {
     string prompt;
     object[] localizationData;
+
+    public DialogBoxPrompt(string prompt)
+    {
+        this.prompt = prompt;
+        this.localizationData = new object[0];
+    }
+
     public DialogBoxPrompt(string prompt, params object[] localizationData)
     {
         this.prompt = prompt;

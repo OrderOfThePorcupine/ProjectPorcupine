@@ -27,7 +27,7 @@ public class KeyboardManager
 
         TimeManager.Instance.EveryFrameNotModal += (time) => Update();
 
-        ReadXmlOrJsonAfterWeDecide();
+        ReadKeyboardMapping();
     }
 
     public static KeyboardManager Instance
@@ -66,9 +66,9 @@ public class KeyboardManager
         }
     }
 
-    public void ReadXmlOrJsonAfterWeDecide()
+    public void ReadKeyboardMapping()
     {
-        // mock data for now until xml vs json is decided
+        // mock data for now. Should be converted to something else (json?) 
         RegisterInputMapping("MoveCameraEast", KeyboardInputModifier.None, KeyCode.D, KeyCode.RightArrow);
         RegisterInputMapping("MoveCameraWest", KeyboardInputModifier.None, KeyCode.A, KeyCode.LeftArrow);
         RegisterInputMapping("MoveCameraNorth", KeyboardInputModifier.None, KeyCode.W, KeyCode.UpArrow);
@@ -115,9 +115,10 @@ public class KeyboardManager
     /// </summary>
     public void TriggerActionIfValid(string inputName)
     {
-        if (mapping.ContainsKey(inputName))
+        KeyboadMappedInput mappedInput;
+        if (mapping.TryGetValue(inputName, out mappedInput))
         {
-            mapping[inputName].TriggerActionIfInputValid();
+            mappedInput.TriggerActionIfInputValid();
         }
     }
 
@@ -136,10 +137,11 @@ public class KeyboardManager
 
     public void RegisterInputAction(string inputName, KeyboardMappedInputType inputType, Action onTrigger)
     {
-        if (mapping.ContainsKey(inputName))
+        KeyboadMappedInput mappedInput;
+        if (mapping.TryGetValue(inputName, out mappedInput))
         {
-            mapping[inputName].OnTrigger = onTrigger;
-            mapping[inputName].Type = inputType;
+            mappedInput.OnTrigger = onTrigger;
+            mappedInput.Type = inputType;
         }
         else
         {
@@ -156,18 +158,16 @@ public class KeyboardManager
 
     public void UnRegisterInputAction(string inputName)
     {
-        if (mapping.ContainsKey(inputName))
-        {
-            mapping.Remove(inputName);
-        }
+        mapping.Remove(inputName);
     }
 
     public void RegisterInputMapping(string inputName, KeyboardInputModifier inputModifiers, params KeyCode[] keyCodes)
     {
-        if (mapping.ContainsKey(inputName))
+        KeyboadMappedInput mappedInput;
+        if (mapping.TryGetValue(inputName, out mappedInput))
         {
-            mapping[inputName].Modifiers = inputModifiers;
-            mapping[inputName].AddKeyCodes(keyCodes);
+            mappedInput.Modifiers = inputModifiers;
+            mappedInput.AddKeyCodes(keyCodes);
         }
         else
         {

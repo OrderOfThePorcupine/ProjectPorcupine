@@ -57,11 +57,12 @@ namespace DeveloperConsole.Core
         {
             try
             {
-                FunctionsManager.DevConsole.CallWithError(FunctionName, ParseArguments(arguments));
+                DynValue tmp;
+                FunctionsManager.DevConsole.TryCall(FunctionName, true, out tmp, ParseArguments(arguments));
             }
             catch (Exception e)
             {
-                DevConsole.LogError(e.Message);
+                DevConsole.LogError(e.ToString());
             }
         }
 
@@ -117,8 +118,8 @@ namespace DeveloperConsole.Core
             // This is relatively fast, (actually quite fast compared to other methods and is in start)
             // Something like text: String, value: Int, on: Bool
             // Old Regex: \s*(.*?\;)?.*?\:(.*?)\s*(?:\,|$)
-            // Koosemoose's Regex: /using\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)/
-            // My Adjustments to Koosemoose's Regex (optimises for groups not needed): (using\s+[^\s]+)?\s*([^\s]+)\s+[^\s]+
+            // Koosemoose's Regex: \s+([^\s]+)\s+([^\s]+)\s+([^\s]+)/
+            // My Adjustments to Koosemoose's Regex (optimises for groups not needed): \s+[^\s]+)?\s*([^\s]+)\s+[^\s]+
             // Note: Regex would be faster than using a for loop, cause it would require a lot of splits, and other heavily costing operations.
             string regexExpression = @"\s*([^\s]+)\s+[^\s]+";
 

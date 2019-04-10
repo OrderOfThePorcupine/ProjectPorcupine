@@ -99,7 +99,9 @@ public class GameEvent : IPrototypable
         foreach (string precondition in preconditions)
         {
             // Call lua precondition it should return 1 if met otherwise 0
-            conditionsMet += (int)FunctionsManager.GameEvent.Call(precondition, this, deltaTime).Number;
+            int res;
+            FunctionsManager.GameEvent.TryCall(precondition, out res, this, deltaTime);
+            conditionsMet += res;
         }
 
         if (conditionsMet >= preconditions.Count && executed == false && (MaxRepeats <= 0 || repeats < MaxRepeats))
@@ -134,7 +136,7 @@ public class GameEvent : IPrototypable
         if (executionActions != null)
         {
             // Execute Lua code like in Furniture ( FurnitureActions ) 
-            FunctionsManager.GameEvent.Call(executionActions, this);
+            FunctionsManager.GameEvent.TryCall(executionActions, this);
         }
 
         if (!Repeat)

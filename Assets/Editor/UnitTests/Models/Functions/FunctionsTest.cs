@@ -61,7 +61,9 @@ public class FunctionsTest
         sw1.Start();
         for (int i = 0; i < iterations; i++)
         {
-            cache.Add(csharpFunctions.Call<string>("PowerCellPress_StatusInfo", new Furniture()));
+            string tmp;
+            Assert.IsTrue(luaFunctions.TryCallFunction("PowerCellPress_StatusInfo", out tmp, new Furniture()));
+            cache.Add(tmp);
         }
 
         sw1.Stop();
@@ -70,7 +72,9 @@ public class FunctionsTest
         sw2.Start();
         for (int i = 0; i < iterations; i++)
         {
-            cache.Add(luaFunctions.Call<string>("PowerGenerator_FuelInfo", new Furniture()));
+            string tmp;
+            Assert.IsTrue(luaFunctions.TryCallFunction("PowerGenerator_FuelInfo", out tmp, new Furniture()));
+            cache.Add(tmp);
         }
 
         sw2.Stop();

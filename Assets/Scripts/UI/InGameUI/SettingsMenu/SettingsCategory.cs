@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// Holds the category and its options (and name).
-/// There is no need to implement a write method (to write to an xml document),
+/// There is no need to implement a write method (to write to an json document),
 /// since the template will only ever be read from.
 /// </summary>
 public class SettingsCategory : IPrototypable

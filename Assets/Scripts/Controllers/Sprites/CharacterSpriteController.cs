@@ -97,8 +97,8 @@ namespace ProjectPorcupine.Entities
             inv_sr.sortingOrder = 1;
             inv_sr.sortingLayerName = "Characters";
             inv_go.transform.SetParent(char_go.transform);
-            inv_go.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f); // Config needs to be added to XML
-            inv_go.transform.localPosition = new Vector3(0, -0.37f, 0); // Config needs to be added to XML
+            inv_go.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f); // Config needs to be added to data file
+            inv_go.transform.localPosition = new Vector3(0, -0.37f, 0); // Config needs to be added to data file
 
             // Register our callback so that our GameObject gets updated whenever
             // the object's into changes.
@@ -128,14 +128,13 @@ namespace ProjectPorcupine.Entities
                 }
             }
 
-            if (objectGameObjectMap.ContainsKey(character) == false)
+            GameObject char_go;
+            if (objectGameObjectMap.TryGetValue(character, out char_go) == false)
             {
                 UnityDebugger.Debugger.LogError("CharacterSpriteController", "OnCharacterChanged -- trying to change visuals for character not in our map.");
                 return;
             }
-
-            GameObject char_go = objectGameObjectMap[character];
-
+            
             char_go.transform.position = new Vector3(character.X, character.Y, character.Z);
 
             if (character.IsSelected)

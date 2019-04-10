@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 [MoonSharpUserData]
 public class Parameter
 {
-    // Name is primarily to simplify writing to XML, and will be the same as the key used to access it in a higher up Parameter when read from XML
+    // Name is primarily to simplify writing to data files, and will be the same as the key used to access it in a higher up Parameter when read from XML
     private string name;
 
     // Value is stored as a string and converted as needed, this simplifies storing multiple value types.
@@ -78,13 +78,14 @@ public class Parameter
     {
         get
         {
-            if (contents.ContainsKey(key) == false)
+            Parameter param;
+            if (contents.TryGetValue(key, out param) == false)
             {
-                // Add a new blank key to contents, that will then be returned.
-                contents.Add(key, new Parameter(key));
+                param = new Parameter(key);
+                contents.Add(key, param);
             }
-
-            return contents[key];
+            
+            return param;
         }
 
         set
@@ -174,6 +175,7 @@ public class Parameter
         return keys;
     }
 
+    // FIXME: ContainsKey should be avoided in favor of TryGetValue!
     public bool ContainsKey(string key)
     {
         return contents.ContainsKey(key);

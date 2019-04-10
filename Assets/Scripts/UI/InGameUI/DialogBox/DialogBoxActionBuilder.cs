@@ -43,7 +43,7 @@ public struct Actionable
 
 public class DialogBoxActionBuilder : IEnumerable<Actionable>
 {
-    private List<Actionable> options;
+    private List<Actionable> options = new List<Actionable>();
 
     public System.Collections.IEnumerator GetEnumerator()
     {
