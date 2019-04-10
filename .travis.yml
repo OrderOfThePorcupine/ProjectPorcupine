@@ -30,7 +30,7 @@ jobs:
         secure: PufaISwFWiFSLoBM/fMIBpABcTAmktf4pYS9nbEB5IrnYPm67FKLsFjVKofCkMVT/Z7/DoglqT88zit/g1nFklcAvAcQ3dz5zfWqftpIX5fWG7KnNggivnM0EZldj81lVlBuwQeg98F84VVK6qVAk1bcTxdosPn8gtGw3/QSGqWpMe1il38YFG8nb/hMx2lgJqw4s/55yau96N6/05WJdSbdmfdtptoz9oXRBr5Yq2vHwvtQPuNJNaxx7fCcf4URPrb78vShB+Uvj3+Lppvmmf7xIKhcSPXLIEXN8Szoa+CSBdbn6jm/7gD4mPdpN8UeK9MtqskSeg2lrdOw6ABzfxFmBfd+NlktTBE01uAXLJmvtoarcyR5jLAI+I0306YjmxYL4ZW7SwcSTaOLz6N6CvzbkAWSk6jJ51Uq90bpVE7k6d1VaA5V9DKdAjL1AdIuyMNMmal+wzo43/7jbij6iBBO482AjEkxEIsbS6C1UXMdfBDwRjT0Os3FcXXX3VVARiRXfXn7ZfYvFpvt1sSil6rxsZkHPrg9egvNLG2fjOVR79+cDQII0xGv25z8cNrVV9ligXCxjJrE4CW5EQ8Jp3188E9QDek/6dt3tgRUS4egA83o+aYLAeQDIYtc09U1gbw6SFI+QhLBllHO0WFPjaAm+MGJtewfwVYuAUNZmXE=
 env:
   global:
-  - BUILD_VERSION=$( date +%Y.%V 
+  - BUILD_VERSION=$( date +%Y.%V )
 before_install:
 - chmod +x ./Scripts/Install/unity.sh
 - chmod +x ./Scripts/Install/stylecop.sh
