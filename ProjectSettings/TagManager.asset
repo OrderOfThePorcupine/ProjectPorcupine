@@ -3,71 +3,80 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
+  
+  # Unity's tag list. 
+  # These tags can be referenced in scripts to identify objects.
   tags:
-  - DeleteButton
-  - AreYouSureDelete
-  - PerformanceUI
+    - DeleteButton
+    - AreYouSureDelete
+    - PerformanceUI
+
+  # Unity's layer list. 
+  # The index (line order) is crucial for references in project settings.
   layers:
-  - Default
-  - TransparentFX
-  - Ignore Raycast
-  - 
-  - Water
-  - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+    - Default
+    - TransparentFX
+    - Ignore Raycast
+    - 
+    - Water
+    - UI
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+
+  # Unity's sorting layers (used for 2D sprite rendering order).
   m_SortingLayers:
-  - name: Tiles
-    uniqueID: 2329541923
-    locked: 0
-  - name: Utility
-    uniqueID: 3987794993
-    locked: 0
-  - name: Furniture
-    uniqueID: 1892590203
-    locked: 0
-  - name: Power
-    uniqueID: 186703983
-    locked: 0
-  - name: Jobs
-    uniqueID: 3858056555
-    locked: 0
-  - name: Inventory
-    uniqueID: 2702625675
-    locked: 0
-  - name: InventoryUI
-    uniqueID: 2785086419
-    locked: 0
-  - name: Characters
-    uniqueID: 431918351
-    locked: 0
-  - name: TileUI
-    uniqueID: 656026085
-    locked: 0
-  - name: Default
-    uniqueID: 0
-    locked: 0
+    - name: Tiles
+      uniqueID: 2329541923
+      locked: 0
+    - name: Utility
+      uniqueID: 3987794993
+      locked: 0
+    - name: Furniture
+      uniqueID: 1892590203
+      locked: 0
+    - name: Power
+      uniqueID: 186703983
+      locked: 0
+    - name: Jobs
+      uniqueID: 3858056555
+      locked: 0
+    - name: Inventory
+      uniqueID: 2702625675
+      locked: 0
+    - name: InventoryUI
+      uniqueID: 2785086419
+      locked: 0
+    - name: Characters
+      uniqueID: 431918351
+      locked: 0
+    - name: TileUI
+      uniqueID: 656026085
+      locked: 0
+    # Default must remain at the end (ID=0) to keep references intact.
+    - name: Default
+      uniqueID: 0
+      locked: 0
