@@ -105,7 +105,7 @@ public class EventActions
         List<string> actions;
         if (actionsList.TryGetValue(actionName, out actions) && actions != null)
         {
-            FunctionsManager.Get(parameters[0].GetType().Name).Call(actions, parameters);
+            FunctionsManager.Get(parameters[0].GetType().Name).TryCall(actions, parameters);
         }
     }
 

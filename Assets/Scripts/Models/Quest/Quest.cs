@@ -8,6 +8,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using MoonSharp.Interpreter;
 using Newtonsoft.Json.Linq;
 
@@ -32,6 +33,29 @@ public class Quest : IPrototypable
     public List<QuestReward> Rewards { get; set; }
 
     public List<string> RequiredQuests { get; set; }
+
+    /// <summary>
+    /// Returns all completable quests.
+    /// </summary>
+    /// <remarks>
+    /// Workaround Mono.CSharp internal compiler bug with loading prototype map.
+    /// </remarks>
+    public static IEnumerable<Quest> GetCompletableQuests()
+    {
+        return PrototypeManager.Quest.Values.Where(q => {
+            if (q.IsAccepted)
+            {
+                return false;
+            }
+
+            if (q.RequiredQuests.Count == 0)
+            {
+                return true;
+            }
+
+            return PrototypeManager.Quest.Values.Where(pq => q.RequiredQuests.Contains(pq.Name)).All(pq => pq.IsCompleted);
+        });
+    }
 
     /// <summary>
     /// Reads the prototype from the specified JObject.

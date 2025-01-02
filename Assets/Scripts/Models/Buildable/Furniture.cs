@@ -622,8 +622,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
             return Enterability.Yes;
         }
 
-        DynValue ret = FunctionsManager.Furniture.Call(isEnterableAction, this);
-        return (Enterability)ret.Number;
+        Enterability isEnterable;
+        FunctionsManager.Furniture.TryCall(isEnterableAction, out isEnterable, this);
+        return isEnterable;
     }
 
     public string GetDefaultSpriteName()
@@ -1043,8 +1044,9 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
         }
         else
         {
-            DynValue ret = FunctionsManager.Furniture.Call(getProgressInfoNameAction, this);
-            return ret.String;
+            string info;
+            FunctionsManager.Furniture.TryCall(getProgressInfoNameAction, out info, this);
+            return info;
         }
     }
 
@@ -1311,7 +1313,7 @@ public class Furniture : ISelectable, IPrototypable, IContextActionProvider, IBu
     #region Private Context Menu
     private void InvokeContextMenuLuaAction(ContextMenuAction action, Character character)
     {
-        FunctionsManager.Furniture.Call(action.Parameter, this, character);
+        FunctionsManager.Furniture.TryCall(action.Parameter, this, character);
     }
     #endregion
 

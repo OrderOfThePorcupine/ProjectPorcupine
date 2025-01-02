@@ -54,7 +54,7 @@ public static class SceneController
 
     public static void ConfigureNewWorld()
     {
-        GameObject.FindObjectOfType<DialogBoxManager>().dialogBoxNewGame.ShowDialog();
+        DialogBoxManager.FindInstance().ShowDialogBox("NewGame");
     }
 
     // Load a save file.

@@ -1,0 +1,101 @@
+{
+  "DialogBox": {
+    "Quests": {
+      "ClassName": "DialogBoxQuests",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "45%",
+        "height": "70%"
+      },
+      "Background": "general"
+    },
+    "NewGame": {
+      "ClassName": "DialogBoxNewGame",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "40%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "JobList": {
+      "ClassName": "DialogBoxJobList",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "30%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "Trade": {
+      "ClassName": "DialogBoxTrade",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "60%",
+        "height": "80%"
+      },
+      "Background": "general"
+    },
+    "Load": {
+      "ClassName": "DialogBoxLoad",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "30%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "Save": {
+      "ClassName": "DialogBoxSave",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "30%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "LoadingScreen": {
+      "ClassName": "DialogBoxPrompt",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "top": "12.5%",
+        "bottom": "12.5%",
+        "left": "12.5%",
+        "right": "12.5%"
+      },
+      "Background": "prompt",
+      "Parameters": {
+        "Prompt": "message_creating_new_world"
+      }
+    },
+    "ButtonMenu": {
+      "ClassName": "DialogBoxButtonMenu",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "35%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "Options": {
+      "ClassName": "DialogBoxOptions",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "width": "35%",
+        "height": "60%"
+      },
+      "Background": "general"
+    },
+    "Prompt": {
+      "ClassName": "DialogBoxPrompt",
+      "Position": { "x": "50%", "y": "50%" },
+      "Dimensions": {
+        "top": "12.5%",
+        "bottom": "12.5%",
+        "left": "12.5%",
+        "right": "12.5%"
+      },
+      "Background": "prompt"
+    }
+  }
+}

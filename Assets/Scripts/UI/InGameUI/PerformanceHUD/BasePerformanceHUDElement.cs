@@ -15,6 +15,11 @@ using System;
 [MoonSharp.Interpreter.MoonSharpUserData]
 public abstract class BasePerformanceHUDComponent : BaseUIElement
 {
+    /// <summary>
+    /// Internal option data.
+    /// </summary>
+    public Parameter parameterData;
+
     public event EventHandler UpdateHandler;
 
     public abstract void Update();
@@ -38,7 +43,7 @@ public abstract class BasePerformanceHUDComponent : BaseUIElement
     {
         if (parameterData.ContainsKey("LUAInitializeFunction"))
         {
-            FunctionsManager.PerformanceHUD.Call(parameterData["LUAInitializeFunction"].ToString(), this);
+            FunctionsManager.PerformanceHUD.TryCall(parameterData["LUAInitializeFunction"].ToString(), this);
         }
     }
 }

@@ -28,11 +28,6 @@ public class Functions
 
     public List<IFunctions> FunctionsSets { get; private set; }
 
-    public bool HasFunction(string name)
-    {
-        return GetFunctions(name) != null;
-    }
-
     public bool LoadScript(string text, string scriptName, Type type)
     {
         bool result = false;
@@ -58,83 +53,107 @@ public class Functions
     }
 
     /// <summary>
-    /// The Common Call Function.
+    /// Reduce GC bloat by caching the dyn values.
     /// </summary>
-    public DynValue Call(string functionName, params object[] args)
+    /// <param name="functionNames">All the functions to call.</param>
+    /// <param name="args">The args.</param>
+    /// <returns>How many function successfully called</returns>
+    public int TryCall(IEnumerable<string> functionNames, params object[] args)
     {
-        return Call(functionName, false, args);
-    }
-
-    /// <summary>
-    /// Throws an error if warranted.
-    /// </summary>
-    public DynValue CallWithError(string functionName, params object[] args)
-    {
-        return Call(functionName, true, args);
-    }
-
-    public T Call<T>(string functionName, params object[] args)
-    {
-        IFunctions functions = GetFunctions(functionName);
-        if (functions != null)
-        {
-            return functions.Call<T>(functionName, args);
+        if (FunctionsSets.Count == 0) {
+            // Then we won't ever find it so just return
+            return 0;
         }
-        else
-        {
-            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA nor CSharp function!");
-            return default(T);
+
+        DynValue[] values = new DynValue[args.Length];
+        for (int i = 0; i < args.Length; i++) {
+            values[i] = FunctionsSets[0].ConvertObject(args[i]);
         }
-    }
+        int count = 0;
+        DynValue tmp;
 
-    /// <summary>
-    /// The Common Call Function expanded for multiple functions.
-    /// </summary>
-    public void Call(List<string> functionNames, params object[] args)
-    {
-        bool ranLUAArgs = false;
-        DynValue[] luaArgs = null;
-
-        for (int i = 0; i < functionNames.Count; i++)
-        {
-            if (functionNames[i] == null)
-            {
-                UnityDebugger.Debugger.LogError(ModFunctionsLogChannel, "'" + functionNames[i] + "'  is not a LUA nor CSharp function!");
-                continue;
-            }
-
-            IFunctions functions = GetFunctions(functionNames[i]);
-
-            if (functions is LuaFunctions)
-            {
-                if (ranLUAArgs == false)
-                {
-                    luaArgs = new DynValue[args.Length];
-                    for (int j = 0; j < args.Length; j++)
-                    {
-                        luaArgs[j] = functions.CreateInstance(args[j]);
-                    }
-                }
-
-                Call(functionNames[i], false, luaArgs);
-            }
-            else
-            {
-                Call(functionNames[i], false, args);
+        foreach (string name in functionNames) {
+            if (TryCall(name, out tmp, values)) {
+                count++;
             }
         }
+        return count;
     }
 
-    public T CreateInstance<T>(string className, bool throwError, params object[] args)
+    public bool TryCall(string functionName, params object[] args)
     {
-        string fullClassName = className + (args.Length > 0 ? string.Join(",", args.Select(x => x.GetType().Name).ToArray()) : string.Empty);
-        IFunctions functions = GetFunctions(fullClassName, true);
-        if (functions != null)
-        {
-            return functions.CreateInstance<T>(fullClassName, args);
+        DynValue tmp;
+        return TryCall(functionName, false, out tmp, args);
+    }
+
+    public bool TryCall(string functionName, out DynValue res, params object[] args)
+    {
+        return TryCall(functionName, false, out res, args);
+    }
+
+    public bool TryCall(string functionName, bool throwError, out DynValue res, params object[] args)
+    {
+        if (throwError ? TryCallIFunctions(functionName, false, out res, args) 
+                       : TryCallIFunctionsError(functionName, out res, args)) {
+            return true;
+        } else {
+            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA nor is it a CSharp function!");
+
+            if (throwError)
+            {
+                throw new Exception("'" + functionName + "' is not a LUA nor is it a CSharp function!");
+            }
+
+            res = null;
+            return false;
         }
-        else
-        {
+    }
+
+    public bool TryCall<T>(string functionName, out T res, params object[] args)
+    {
+        return TryCall(functionName, false, out res, args);
+    }
+
+    public bool TryCall(string functionName, bool throwError, out DynValue res, params DynValue[] args)
+    {
+        if (throwError ? TryCallIFunctions(functionName, false, out res, args) 
+                       : TryCallIFunctionsError(functionName, out res, args)) {
+            return true;
+        } else {
+            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA nor is it a CSharp function!");
+
+            if (throwError)
+            {
+                throw new Exception("'" + functionName + "' is not a LUA nor is it a CSharp function!");
+            }
+
+            res = null;
+            return false;
+        }
+    }
+
+    public bool TryCall<T>(string functionName, bool throwError, out T res, params object[] args)
+    {
+        if (TryCallIFunctions(functionName, false, out res, args)) {
+            return true;
+        } else {
+            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA function nor is it a CSharp function!");
+
+            if (throwError)
+            {
+                throw new Exception("'" + functionName + "' is not a LUA function nor is it a CSharp function!");
+            }
+
+            res = default(T);
+            return false;
+        }
+    }
+
+    public bool TryCreateInstance<T>(string className, bool throwError, out T res, params object[] args)
+    {
+        if (TryCallIFunctions(className, true, out res, args)) {
+            return true;
+        } else {
             UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + className + "' is not a LUA function nor is it a CSharp constructor!");
 
             if (throwError)
@@ -142,7 +161,8 @@ public class Functions
                 throw new Exception("'" + className + "' is not a LUA function nor is it a CSharp constructor!");
             }
 
-            return default(T);
+            res = default(T);
+            return false;
         }
     }
 
@@ -154,56 +174,53 @@ public class Functions
         }
     }
 
-    private DynValue Call(string functionName, bool throwError, params object[] args)
-    {
-        IFunctions functions = GetFunctions(functionName);
-        if (functions != null)
-        {
-            return functions.Call(functionName, args);
-        }
-        else
-        {
-            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA nor is it a CSharp function!");
-
-            if (throwError)
-            {
-                throw new Exception("'" + functionName + "' is not a LUA nor is it a CSharp function!");
-            }
-
-            return null;
-        }
-    }
-
-    private DynValue Call(string functionName, bool throwError, params DynValue[] args)
-    {
-        IFunctions functions = GetFunctions(functionName);
-        if (functions != null)
-        {
-            return functions.Call(functionName, args);
-        }
-        else
-        {
-            UnityDebugger.Debugger.Log(ModFunctionsLogChannel, "'" + functionName + "' is not a LUA nor is it a CSharp function!");
-
-            if (throwError)
-            {
-                throw new Exception("'" + functionName + "' is not a LUA nor is it a CSharp function!");
-            }
-
-            return null;
-        }
-    }
-
-    private IFunctions GetFunctions(string name, bool constructor = false)
-    {
+    private bool TryCallIFunctionsError(string name, out DynValue res, object[] args) {
         for (int i = 0; i < FunctionsSets.Count; i++)
         {
-            if ((constructor == false && FunctionsSets[i].HasFunction(name)) || (constructor && FunctionsSets[i].HasConstructor(name)))
+            if (FunctionsSets[i].TryCallFunctionWithError(name, out res, args))
             {
-                return FunctionsSets[i];
+                return true;
             }
         }
+        res = null;
+        return false;
+    }
 
-        return null;
+    private bool TryCallIFunctionsError<T>(string name, out T res, object[] args) {
+        for (int i = 0; i < FunctionsSets.Count; i++)
+        {
+            if (FunctionsSets[i].TryCallFunctionWithError(name, out res, args))
+            {
+                return true;
+            }
+        }
+        res = default(T);
+        return false;
+    }
+
+    private bool TryCallIFunctions(string name, bool constructor, out DynValue res, object[] args) {
+        for (int i = 0; i < FunctionsSets.Count; i++)
+        {
+            if ((constructor == false && FunctionsSets[i].TryCallFunction(name, out res, args)) ||
+                (constructor && FunctionsSets[i].TryCreateInstance(name, out res, args)))
+            {
+                return true;
+            }
+        }
+        res = null;
+        return false;
+    }
+
+    private bool TryCallIFunctions<T>(string name, bool constructor, out T res, object[] args) {
+        for (int i = 0; i < FunctionsSets.Count; i++)
+        {
+            if ((constructor == false && FunctionsSets[i].TryCallFunction(name, out res, args)) ||
+                (constructor && FunctionsSets[i].TryCreateInstance(name, out res, args)))
+            {
+                return true;
+            }
+        }
+        res = default(T);
+        return false;
     }
 }

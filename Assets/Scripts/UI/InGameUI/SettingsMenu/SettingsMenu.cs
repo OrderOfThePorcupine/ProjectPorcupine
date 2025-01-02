@@ -54,11 +54,11 @@ public class SettingsMenu : MonoBehaviour
             return;
         }
 
-        GameController.Instance.IsModal = true;
         GameController.Instance.SoundController.OnButtonSFX();
 
         instance.changesTracker.Clear();
         instance.mainRoot.SetActive(true);
+        DialogBoxManager.FindInstance().IsModal = true;
 
         if (instance.options.Count > 0)
         {
@@ -194,56 +194,22 @@ public class SettingsMenu : MonoBehaviour
             return;
         }
 
-        // Open a dialog box to double check
-        DialogBoxPromptOrInfo check;
-
-        if (WorldController.Instance != null)
-        {
-            check = WorldController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
-        }
-        else if (MainMenuController.Instance != null)
-        {
-            check = MainMenuController.Instance.DialogBoxManager.dialogBoxPromptOrInfo;
-        }
-        else
-        {
-            Exit();
-            return;
-        }
-
-        check.SetPrompt("confirm_settings_menu_close");
-        check.SetButtons(new DialogBoxResult[] { DialogBoxResult.Yes, DialogBoxResult.No });
-        check.Closed =
-            () =>
-            {
-                switch (check.Result)
+        DialogBoxManager.FindInstance().ShowDialogBox("Prompt", DialogBoxActionBuilder.YesNo(),
+            (ActionResult res) => {
+                if (res == ActionResult.Yes)
                 {
-                    case DialogBoxResult.Yes:
-                        // CANCEL
-                        Dictionary<string, BaseSettingsElement[]> option;
-                        if (options.TryGetValue(currentCategory, out option))
-                        {
-                            changesTracker.AddRange(option.Values.SelectMany(x => x).Where(x => x != null && x.valueChanged));
-                        }
-                        
-                        Settings.LoadSettings();
+                    // Cancel changes then quit
+                    Settings.LoadSettings();
+                    for (int i = 0; i < changesTracker.Count; i++)
+                    {
+                        changesTracker[i].CancelSetting();
+                        changesTracker[i].CancelSettingLUA();
+                    }
 
-                        for (int i = 0; i < changesTracker.Count; i++)
-                        {
-                            changesTracker[i].CancelSetting();
-                            changesTracker[i].CancelSettingLUA();
-                        }
-
-                        Exit();
-                        GameController.Instance.SoundController.OnButtonSFX();
-                        break;
-                    case DialogBoxResult.No:
-                        GameController.Instance.SoundController.OnButtonSFX();
-                        break;
+                    Exit();
                 }
-            };
-
-        check.ShowDialog();
+                GameController.Instance.SoundController.OnButtonSFX();
+            }, "confirm_settings_menu_close");
     }
 
     public void Default()
@@ -312,9 +278,9 @@ public class SettingsMenu : MonoBehaviour
     private void Exit()
     {
         currentCategory = string.Empty;
-        GameController.Instance.IsModal = false;
         mainRoot.SetActive(false);
         changesTracker.Clear();
+        DialogBoxManager.FindInstance().IsModal = false;
     }
 
     private void Update()
@@ -360,7 +326,8 @@ public class SettingsMenu : MonoBehaviour
 
                 for (int j = 0; j < keyValuePair.Value.Count; j++)
                 {
-                    BaseSettingsElement element = FunctionsManager.SettingsMenu.CreateInstance<BaseSettingsElement>(keyValuePair.Value[j].classData.Type, true);
+                    BaseSettingsElement element;
+                    FunctionsManager.SettingsMenu.TryCreateInstance(keyValuePair.Value[j].classData.Type, false, out element);
                     element.option = keyValuePair.Value[j];
                     element.parameterData = keyValuePair.Value[j].classData.Parameters;
                     element.InitializeLUA();

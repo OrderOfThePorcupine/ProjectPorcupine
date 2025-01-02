@@ -170,14 +170,13 @@ public class TileType : IPrototypable, IEquatable<TileType>
             return true;
         }
 
-        DynValue value = FunctionsManager.TileType.Call(CanBuildHereLua, tile);
-        if (value != null)
+        bool res;
+        if (!FunctionsManager.TileType.TryCall(CanBuildHereLua, out res, tile))
         {
-            return value.Boolean;
+            UnityDebugger.Debugger.Log("Lua", "Found no lua function " + CanBuildHereLua);
+            return false;
         }
-
-        UnityDebugger.Debugger.Log("Lua", "Found no lua function " + CanBuildHereLua);
-        return false;
+        return res;
     }
 
     /// <summary>

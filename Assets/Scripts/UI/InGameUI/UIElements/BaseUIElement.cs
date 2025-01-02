@@ -16,11 +16,6 @@ using UnityEngine.UI;
 public abstract class BaseUIElement
 {
     /// <summary>
-    /// Internal option data.
-    /// </summary>
-    public Parameter parameterData;
-
-    /// <summary>
     /// For internals, to prevent having to load resources every time.
     /// </summary>
     private static Dictionary<string, GameObject> loadedResources = new Dictionary<string, GameObject>();
@@ -37,9 +32,12 @@ public abstract class BaseUIElement
     /// </summary>
     public abstract GameObject InitializeElement();
 
+    protected const string FontAnitaSemiSquare = "Fonts/anita-semi-square/Anita semi square";
+
     protected GameObject GetFluidHorizontalBaseElement(string elementTitle = "", bool stretchX = false, bool stretchY = false, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         HorizontalLayoutGroup layout = go.AddComponent<HorizontalLayoutGroup>();
@@ -54,6 +52,7 @@ public abstract class BaseUIElement
     protected GameObject GetFluidVerticalBaseElement(string elementTitle = "", bool stretchX = false, bool stretchY = false, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         VerticalLayoutGroup layout = go.AddComponent<VerticalLayoutGroup>();
@@ -72,6 +71,7 @@ public abstract class BaseUIElement
     protected GameObject GetGridBaseElement(string elementTitle = "", int xSize = 97, int ySize = 37, TextAnchor alignment = TextAnchor.MiddleCenter, int spacingX = 5, int spacingY = 5, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         GridLayoutGroup layout = go.AddComponent<GridLayoutGroup>();
@@ -89,6 +89,7 @@ public abstract class BaseUIElement
     protected GameObject GetHorizontalBaseElement(string elementTitle = "", int xSize = 95, int ySize = 80, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         GridLayoutGroup layout = go.AddComponent<GridLayoutGroup>();
@@ -108,6 +109,7 @@ public abstract class BaseUIElement
     protected GameObject GetVerticalBaseElement(string elementTitle = "", int xSize = 100, int ySize = 80, TextAnchor alignment = TextAnchor.MiddleCenter, int spacing = 10, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         GameObject go = new GameObject(elementTitle == string.Empty ? "Element_" + GetName() : elementTitle);
+        go.transform.localScale = Vector3.one;
         AllocateSpaceForGameObject(go, allocatedHeight, allocatedWidth);
 
         GridLayoutGroup layout = go.AddComponent<GridLayoutGroup>();
@@ -120,6 +122,23 @@ public abstract class BaseUIElement
         return go;
     }
 
+    protected GameObject CreateScrollView(GameObject parent, bool horizontal, bool vertical, int height = 180, int width = 60)
+    {
+        if (loadedResources.ContainsKey("ScrollView") == false)
+        {
+            loadedResources["ScrollView"] = Resources.Load<GameObject>("UI/Elements/ScrollView");
+        }
+
+        GameObject go = GameObject.Instantiate(loadedResources["ScrollView"]);
+        ScrollRect scroll = go.GetComponent<ScrollRect>();
+        scroll.horizontal = horizontal;
+        scroll.vertical = vertical;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
+        AllocateSpaceForGameObject(go, height, width);
+        go.transform.SetParent(parent.transform);
+        return go.transform.GetChild(0).GetChild(0).gameObject;
+    }
+
     protected void AllocateSpaceForGameObject(GameObject toAllocate, int allocatedHeight = 60, int allocatedWidth = 220)
     {
         LayoutElement baseLayout = toAllocate.AddComponent<LayoutElement>();
@@ -127,7 +146,37 @@ public abstract class BaseUIElement
         baseLayout.minHeight = allocatedHeight;
     }
 
-    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true)
+    protected Text CreateTextCustom(string withText, Color color, string font, bool bestFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true, params object[] localizationData)
+    {
+        if (loadedResources.ContainsKey("Text") == false)
+        {
+            loadedResources["Text"] = Resources.Load<GameObject>("UI/Elements/Text");
+        }
+
+        Text text = GameObject.Instantiate(loadedResources["Text"]).GetComponent<Text>();
+        text.color = color;
+        text.font = Resources.Load<Font>(font);
+
+        if (localize)
+        {
+            text.text = LocalizationTable.GetLocalization(withText, localizationData);
+        }
+        else
+        {
+            text.text = withText;
+        }
+
+        text.alignment = alignment;
+
+        if (bestFit == true)
+        {
+            text.resizeTextForBestFit = true;
+        }
+
+        return text;
+    }
+
+    protected Text CreateText(string withText, bool autoFit = false, TextAnchor alignment = TextAnchor.MiddleLeft, bool localize = true, params object[] localizationData)
     {
         if (loadedResources.ContainsKey("Text") == false)
         {
@@ -138,7 +187,7 @@ public abstract class BaseUIElement
 
         if (localize)
         {
-            text.text = LocalizationTable.GetLocalization(withText);
+            text.text = LocalizationTable.GetLocalization(withText, localizationData);
         }
         else
         {
@@ -153,6 +202,41 @@ public abstract class BaseUIElement
         }
 
         return text;
+    }
+
+    protected Button CreateTextButton(string text, bool localize = true)
+    {
+        if (loadedResources.ContainsKey("TextButton") == false)
+        {
+            loadedResources["TextButton"] = Resources.Load<GameObject>("UI/Elements/TextButton");
+        }
+
+        if (localize)
+        {
+            text = LocalizationTable.GetLocalization(text);
+        }
+
+        Button button = GameObject.Instantiate(loadedResources["TextButton"]).GetComponent<Button>();
+        button.GetComponent<Text>().text = text;
+        
+        return button;
+    }
+
+    protected Button CreateButton(string text, bool localize = true)
+    {
+        if (loadedResources.ContainsKey("Button") == false)
+        {
+            loadedResources["Button"] = Resources.Load<GameObject>("UI/Elements/Button");
+        }
+
+        if (localize)
+        {
+            text = LocalizationTable.GetLocalization(text);
+        }
+
+        Button button = GameObject.Instantiate(loadedResources["Button"]).GetComponent<Button>();
+        button.GetComponentInChildren<Text>().text = text;
+        return button;
     }
 
     protected Toggle CreateToggle(string type)

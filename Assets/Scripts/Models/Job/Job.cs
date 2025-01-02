@@ -332,7 +332,7 @@ public class Job : ISelectable
 
         foreach (string luaFunction in jobWorkedLua.ToList())
         {
-            FunctionsManager.Furniture.Call(luaFunction, this);
+            FunctionsManager.Furniture.TryCall(luaFunction, this);
         }
 
         // Check to make sure we actually have everything we need.
@@ -348,7 +348,7 @@ public class Job : ISelectable
         {
             foreach (string luaFunction in jobCompletedLua.ToList())
             {
-                FunctionsManager.Furniture.Call(luaFunction, this);
+                FunctionsManager.Furniture.TryCall(luaFunction, this);
             }
 
             // Do whatever is supposed to happen with a job cycle completes.
