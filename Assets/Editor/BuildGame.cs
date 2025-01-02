@@ -1,67 +1,125 @@
 ﻿#region License
-// ====================================================
+// =================================================================================================
 // Project Porcupine Copyright(C) 2016 Team Porcupine
-// This program comes with ABSOLUTELY NO WARRANTY; This is free software, 
-// and you are welcome to redistribute it under certain conditions; See 
-// file LICENSE, which is part of this source code package, for details.
-// ====================================================
+//
+// This program comes with ABSOLUTELY NO WARRANTY. This is free software,
+// and you are welcome to redistribute it under certain conditions. 
+// See file LICENSE, which is part of this source code package, for details.
+// =================================================================================================
 #endregion
-using System.Collections;
+
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-public class BuildGame
+/// <summary>
+/// Provides a series of static methods to build the game for multiple platforms,
+/// including Windows (32 and 64-bit), macOS, and Linux.
+/// 
+/// Usage from command line (examples):
+///   - macOS:
+///       /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -logfile -projectPath "path/to/ProjectPorcupine" -executeMethod BuildGame.BuildOSX
+///   - Windows:
+///       "C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -logfile -projectPath "path/to/ProjectPorcupine" -executeMethod BuildGame.BuildWindows
+/// </summary>
+public static class BuildGame
 {
+    /// <summary>
+    /// The name of the project used for build folder naming.
+    /// </summary>
     private const string BuildName = "ProjectPorcupine";
 
-    public static void All()
+    /// <summary>
+    /// Builds the project for all main platforms (Windows, macOS, Linux).
+    /// </summary>
+    public static void BuildAllTargets()
     {
-        OSX();
-        Windows();
-        Linux();
+        BuildOSX();
+        BuildWindows();
+        BuildLinux();
     }
 
-    public static void Windows() 
+    /// <summary>
+    /// Builds both 32-bit and 64-bit versions on Windows.
+    /// </summary>
+    public static void BuildWindows()
     {
-        Windows32();
-        Windows64();
+        BuildWindows32();
+        BuildWindows64();
     }
 
-    public static void Windows32()
+    /// <summary>
+    /// Builds the project as a 32-bit Windows Standalone.
+    /// </summary>
+    public static void BuildWindows32()
     {
-        BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_Win32", BuildTarget.StandaloneWindows, BuildOptions.None);
+        // Example: if you want debugging, pass BuildOptions.Development
+        BuildPipeline.BuildPlayer(
+            GetEnabledScenes(),
+            "Builds/" + BuildName + "_Win32",
+            BuildTarget.StandaloneWindows,
+            BuildOptions.None
+        );
     }
 
-    public static void Windows64() 
+    /// <summary>
+    /// Builds the project as a 64-bit Windows Standalone.
+    /// </summary>
+    public static void BuildWindows64()
     {
-        BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_Win64", BuildTarget.StandaloneWindows64, BuildOptions.None);
+        BuildPipeline.BuildPlayer(
+            GetEnabledScenes(),
+            "Builds/" + BuildName + "_Win64",
+            BuildTarget.StandaloneWindows64,
+            BuildOptions.None
+        );
     }
 
-    public static void OSX()
+    /// <summary>
+    /// Builds the project for macOS (standalone).
+    /// </summary>
+    public static void BuildOSX()
     {
         #if UNITY_2017_4_OR_NEWER
-			BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_OSX", BuildTarget.StandaloneOSX, BuildOptions.None);
-		#else
-            BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_OSX", BuildTarget.StandaloneOSXUniversal, BuildOptions.None);
+            BuildPipeline.BuildPlayer(
+                GetEnabledScenes(),
+                "Builds/" + BuildName + "_OSX",
+                BuildTarget.StandaloneOSX,
+                BuildOptions.None
+            );
+        #else
+            BuildPipeline.BuildPlayer(
+                GetEnabledScenes(),
+                "Builds/" + BuildName + "_OSX",
+                BuildTarget.StandaloneOSXUniversal,
+                BuildOptions.None
+            );
         #endif
     }
 
-    public static void Linux()
+    /// <summary>
+    /// Builds the project for Linux (universal).
+    /// </summary>
+    public static void BuildLinux()
     {
-        BuildPipeline.BuildPlayer(GetScenes(), "Builds/" + BuildName + "_Linux", BuildTarget.StandaloneLinuxUniversal, BuildOptions.None);
+        BuildPipeline.BuildPlayer(
+            GetEnabledScenes(),
+            "Builds/" + BuildName + "_Linux",
+            BuildTarget.StandaloneLinuxUniversal,
+            BuildOptions.None
+        );
     }
 
-    private static string[] GetScenes()
+    /// <summary>
+    /// Retrieves all enabled scenes from the EditorBuildSettings.
+    /// Only scenes marked as "enabled" will be included in the build.
+    /// </summary>
+    /// <returns>An array of scene paths to include in the build.</returns>
+    private static string[] GetEnabledScenes()
     {
-        return EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
+        return EditorBuildSettings.scenes
+            .Where(scene => scene.enabled)
+            .Select(scene => scene.path)
+            .ToArray();
     }
 }
-
-/*
-to build from command line:
-    mac:
-        /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -logfile -projectPath path/to/ProjectPorcupine -executeMethod BuildGame.OSX
-    windows: 
-        "C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -logfile -projectPath path/to/ProjectPorcupine -executeMethod BuildGame.Windows
-*/
