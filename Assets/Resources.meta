@@ -1,9 +1,9 @@
-fileFormatVersion: 2
-guid: 208b58410b658bb4c83da3d81de9bd08
-folderAsset: yes
-timeCreated: 1451514513
-licenseType: Free
+fileFormatVersion: 2          # File format version
+guid: 208b58410b658bb4c83da3d81de9bd08   # Unique identifier for this asset
+folderAsset: yes              # Indicates this is a folder asset
+timeCreated: 1451514513       # Unix-like timestamp (in seconds)
+licenseType: Free             # License type for this asset
 DefaultImporter:
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  userData: ""                # Reserved field for user data
+  assetBundleName: ""         # Name of the asset bundle, if any
+  assetBundleVariant: ""      # Variant of the asset bundle, if any
