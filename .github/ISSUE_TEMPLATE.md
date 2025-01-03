@@ -1,34 +1,29 @@
-_this template is for reporting bugs or issues in the current game. You don't need to use it if you are suggesting a feature or starting a discussion_
+Bug/Issue Reporting Template
+Use this only for bugs or issues in the current game. For feature suggestions or general discussions, please start a separate thread.
 
-Check your title. Try to make it short but descriptive. Have a quick look at the available [labels](https://github.com/TeamPorcupine/ProjectPorcupine/labels). If one seems relevant prefix the title with [label name].
+Title
+Keep it short yet descriptive.
+If a label seems relevant, prefix the title with [label name].
+Note: This template is optional. Include as much detail as you want, but remove any sections that don’t apply to this particular issue.
 
-NOTE: This template is not enforced. You are encouraged to include all of the detail below, but if anything doesn't fit this particular issue feel free to delete it!
+Expected Behavior
+What you expected to happen (e.g., “Should do X”).
 
-### Expected behavior
+Actual Behavior
+What actually happened (e.g., “Instead does Y”).
+Include an image, animated GIF, error messages, or a stack trace if they would be helpful.
 
-Should do X
+Steps to Reproduce
+Step 1 (e.g., “do foo”).
+Step 2 (e.g., “do bar”).
+Step 3 (e.g., “do baz”).
+Related Issues / Pull Requests
+Reference #issueNumbers or PR links here if relevant.
 
-### Actual behavior
+Specs
+Any relevant system/version info (e.g., OS, game version).
+You can also include the output of git describe --tags if you have a local repository.
 
-Instead does Y
-If it would help, you may include an image or animated gif of the problem.
-
-```
-include error messages or stack trace if there are any exceptions
-```
-
-### Steps to reproduce the behavior
-
-- Step 1: do foo
-- Step 2: do bar
-- Step 3: do baz
-
-### Related issues / pull requests
-
-Reference #numbers here
-
-### Specs
-
-Any relevant system / version information. Include the output of running `git describe --tags` on the local repository you are testing against.
-
-Pings: @mentions (Note: all project maintainers are automatically notified of new issues. Only ping one if it is specifically relevant to them.)
+Pings
+@mention specific maintainers only if they are directly involved.
+(All maintainers are already notified when a new issue is created.)
