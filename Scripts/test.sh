@@ -1,139 +1,189 @@
-#! /bin/sh
+#!/usr/bin/env bash
+# -----------------------------------------------------------------------------
+#  A script to build a Unity project and run unit tests in either a local or
+#  Travis CI environment. Exits with code 1 if any test fails or build errors
+#  occur.
+#
+#  Usage:
+#    build_and_test.sh [OPTION]
+#
+#  OPTIONS:
+#    --travis    Indicate that this is being run on the Travis CI server.
+#                Otherwise runs as a local environment.
+#    -h, --help  Display this usage message.
+#
+#  NOTES:
+#    1) If you're running locally without a special Unity path, the script
+#       attempts to guess one based on your OS. If that fails, you can export
+#       'unityPath' in your environment to manually set the path.
+#    2) The script will produce:
+#         - A Unity log file:   unity.log
+#         - A Test results XML: EditorTestResults.xml
+#       After processing, those files are removed unless needed for error info.
+# -----------------------------------------------------------------------------
 
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Default path for Unity if not overridden
 travisUnity="/Applications/Unity/Unity.app/Contents/MacOS/Unity"
+unityPath="${unityPath:-}"           # allow override by env var
+RUN_AS_TRAVIS=""                     # will be set if --travis is used
 
-if [ $# -eq "0" ]; # Running without arguments -- assume running locally
-then
-    RUN_AS_TRAVIS=""
-fi
-
-while [ $# -gt 0 ]; do    # Until you run out of parameters . . .
+# -----------------------------------------------------------------------------
+# 1) Parse arguments
+# -----------------------------------------------------------------------------
+while [[ $# -gt 0 ]]; do
   case "$1" in
     --travis)
-        unityPath="$travisUnity"
-        RUN_AS_TRAVIS=1 ;;
+      # If --travis is given, override unityPath with the Travis-specific path
+      unityPath="$travisUnity"
+      RUN_AS_TRAVIS=1
+      ;;
     -h|--help)
-        echo "Usage: ${0##*/} [OPTION]"
-        echo "Build ProjectPorcupine and run all unit tests. Exits with 1 if anything fails."
-        echo
-        echo "Options available:"
-        echo "  --travis     Indicate that this is being run on the Travis CI server."
-        echo "               Otherwise runs locally."
-        echo "  -h, --help   This usage message."
-        echo
-        echo "If running locally, export the unityPath env variable to the location of any special"
-        echo "Unity executable you want to run. Otherwise an OS based default is chosen."
-        exit 0 ;;
+      echo "Usage: ${0##*/} [OPTION]"
+      echo "Build Unity project and run all unit tests. Exits with 1 if anything fails."
+      echo
+      echo "Options:"
+      echo "  --travis     Indicate Travis CI environment; overrides unityPath with Travis path."
+      echo "  -h, --help   This usage message."
+      echo
+      echo "Environment Variables:"
+      echo "  unityPath     If set, used as the path to the Unity executable for local runs."
+      exit 0
+      ;;
     *)
-        # could be being run as a git hook in which case it might have args
-        # but we don't care about them
-        echo "${0##*/}: unknown option -- $1. Ignoring for now. If this being run as a git hook this is okay."
-        echo "Try '${0##*/} --help' for more information."
-        ;;
+      # Possibly invoked in a scenario with unexpected extra arguments
+      echo "Warning: Unknown option '$1'. Ignoring."
+      echo "Try '${0##*/} --help' for usage info."
+      ;;
   esac
-  shift       # Check next set of parameters.
+  shift
 done
 
-if [ -z "$RUN_AS_TRAVIS" ];
-then
-    if [ -z "$unityPath" ]; # user did not specify a special unity path to run locally
-    then
-        case $(uname -o) in # TODO: Add more systems!!!
-            Msys)
-                unityPath="C:\\Program Files\\Unity\\Editor\\Unity.exe"
-                ;;
-            *)
-                echo "Don't know the path to your local Unity! Assuming OS X and crossing fingers."
-		unityPath="/Applications/Unity/Unity.app/Contents/MacOS/Unity"
-                ;;
-        esac
-    fi
-
-    echo "Using local Unity: $unityPath";
+# -----------------------------------------------------------------------------
+# 2) If local run and unityPath is still empty, guess the path
+# -----------------------------------------------------------------------------
+if [[ -z "$RUN_AS_TRAVIS" ]]; then
+  if [[ -z "$unityPath" ]]; then
+    # Attempt to guess the environment/OS
+    case "$(uname -o || true)" in
+      # some systems might not support 'uname -o'; fallback is set above
+      Msys)
+        unityPath="C:\\Program Files\\Unity\\Editor\\Unity.exe"
+        ;;
+      *)
+        echo "No local Unity path specified; assuming macOS default."
+        unityPath="$travisUnity"
+        ;;
+    esac
+  fi
+  echo "Using Unity executable: $unityPath"
 fi
 
-# Only echos if $RUN_AS_TRAVIS is true. Used to suppress log spam when run locally.
-travecho()
-{
-    if [ -n "$RUN_AS_TRAVIS" ];
-    then
-        echo "$@"
-    fi
+# -----------------------------------------------------------------------------
+# 3) A helper function that only echos if we are in Travis CI mode
+# -----------------------------------------------------------------------------
+travecho() {
+  if [[ -n "$RUN_AS_TRAVIS" ]]; then
+    echo "$@"
+  fi
 }
 
-endTestsFold=0 #stores whether the travis_fold:end:tests has been echoed yet
+# Track whether we ended the Travis fold for tests
+endTestsFold=0
 
+# -----------------------------------------------------------------------------
+# 4) Initiate Unity build + test runs
+# -----------------------------------------------------------------------------
 travecho 'travis_fold:start:compile'
-echo "Attempting Unit Tests"
-"$unityPath" -batchmode -runEditorTests -nographics -editorTestsResultFile  "$(pwd)"/EditorTestResults.xml -projectPath "$(pwd)" -logFile unity.log
-logFile="$(pwd)"/unity.log
+echo "Attempting to run unit tests in Unity..."
+
+# Kick off Unity in batch mode to run the tests
+"$unityPath" \
+  -batchmode \
+  -runEditorTests \
+  -nographics \
+  -editorTestsResultFile "$(pwd)/EditorTestResults.xml" \
+  -projectPath "$(pwd)" \
+  -logFile unity.log
+
+# Capture log content for Travis logs
+logFile="$(pwd)/unity.log"
 travecho "$(cat "$logFile")"
 travecho 'travis_fold:end:compile'
 
+# -----------------------------------------------------------------------------
+# 5) Check if test results file was created
+# -----------------------------------------------------------------------------
 travecho 'travis_fold:start:tests'
 travecho 'Show Results from Tests'
-if [ ! -f "$(pwd)"/EditorTestResults.xml ]; then
-    echo "Results file not found!"
-    echo "Make sure that there are no Unity processes already open and try again."
-    travecho "travis_fold:end:tests"
-    endTestsFold=1
 
-    # at this point we know that the build has failed due to compilation errors
-    # lets try to parse them out of unity.log and display them
-    if [ -f "$(pwd)"/unity.log ]; then
-        out=$(grep "CompilerOutput" unity.log)
-        if [ "$out" != "" ]; then
+if [[ ! -f "$(pwd)/EditorTestResults.xml" ]]; then
+  echo "ERROR: Results file not found: EditorTestResults.xml"
+  echo "Make sure no existing Unity process was open and try again."
+  travecho "travis_fold:end:tests"
+  endTestsFold=1
 
-            printf '\nBuild Failed! \nThe compiler generated the following messages:'
-            echo | awk '/CompilerOutput:/,/EndCompilerOutput/' < unity.log #show lines in between compiler output "tags" including tags
-        fi
+  # Attempt to parse compilation errors from unity.log
+  if [[ -f "$(pwd)/unity.log" ]]; then
+    out=$(grep "CompilerOutput" unity.log || true)
+    if [[ -n "$out" ]]; then
+      printf '\n[BUILD FAILED] The compiler generated the following messages:\n'
+      # Show lines between CompilerOutput and EndCompilerOutput
+      awk '/CompilerOutput:/,/EndCompilerOutput/' < unity.log
     fi
-    rm "$(pwd)"/unity.log
-    exit 1
+  fi
+
+  # Cleanup
+  rm -f "$(pwd)/unity.log"
+  exit 1
 fi
-rm "$(pwd)"/unity.log
+
+# If we got here, we have EditorTestResults.xml
+rm -f "$(pwd)/unity.log"
 
 resultsFile="$(pwd)/EditorTestResults.xml"
 travecho "$(cat "$resultsFile")"
-if [ "$endTestsFold" = 0 ]; then
-    travecho 'travis_fold:end:tests'
+if [[ "$endTestsFold" == 0 ]]; then
+  travecho 'travis_fold:end:tests'
 fi
 
+# -----------------------------------------------------------------------------
+# 6) Parse the XML results for pass/fail
+# -----------------------------------------------------------------------------
+result=$(sed -n 's/<test-run.*result="\([^"]*\).*/\1/p' "$resultsFile")
+errorCount=$(sed -n 's/<test-run.*failed="\([^"]*\).*/\1/p' "$resultsFile")
 
+exitStatus=0
 
-result=$(sed -n 's/<test-run.*result="\([^"]*\).*/\1/p' EditorTestResults.xml)
-errorCount=$(sed -n 's/<test-run.*failed="\([^"]*\).*/\1/p' EditorTestResults.xml)
+# If any test fails
+if [[ "$errorCount" != "0" ]]; then
+  echo "$errorCount unit test(s) failed!"
 
-if [ "$errorCount" != "0" ]; then
-    echo "$errorCount" ' unit tests failed!'
+  # Show which tests specifically failed
+  echo
+  echo "The following unit tests failed:"
+  grep 'result="Failed"' "$resultsFile" | grep 'test-case' || true
 
-     #show the exact unit test failure
-    printf '\nThe following unit tests failed:'
-    echo | grep 'result="Failed"' EditorTestResults.xml | grep 'test-case'
-
-    exitStatus=1
+  exitStatus=1
 fi
 
-# Unity unit test report no longer reports errors, if this returns, this functionality should be readded
-#errorCount=$(grep -m 1 "failed" EditorTestResults.xml | head -1 | awk -F"\"" '{print $6}') #now for errors
-#
-#if [ "$errorCount" != "0" ]; then
-#    echo "$errorCount" ' unit tests threw errors!'
-#
-#    exitStatus=1
-#fi
-
-
-inconclusiveCount=$(sed -n 's/<test-run.*inconclusive="\([^"]*\).*/\1/p' EditorTestResults.xml)
-if [ "$inconclusiveCount" != "0" ]; then
-    echo "$inconclusiveCount" ' unit tests were inconlusive!'
-
-    exitStatus=1
+# If we want to catch inconclusive tests too:
+inconclusiveCount=$(sed -n 's/<test-run.*inconclusive="\([^"]*\).*/\1/p' "$resultsFile")
+if [[ "$inconclusiveCount" != "0" ]]; then
+  echo "$inconclusiveCount unit test(s) were inconclusive!"
+  exitStatus=1
 fi
 
+# Clean up the results file
+rm -f "$resultsFile"
 
-#end of unit test checks. at this point the test have succeeded or set exitStatus to 1.
-rm "$(pwd)"/EditorTestResults.xml
+# -----------------------------------------------------------------------------
+# 7) Exit with final status
+# -----------------------------------------------------------------------------
 exit $exitStatus
+
 
 
